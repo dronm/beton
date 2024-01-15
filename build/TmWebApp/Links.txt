@@ -1,0 +1,27 @@
+https://core.telegram.org/bots/webapps
+
+InlineKeyboardButton {
+	"text":"",
+	"web_app" WebAppInfo {
+		"url" 
+	}
+}
+https://core.telegram.org/bots/webapps#initializing-web-apps
+
+
+
+The Web App will be able to send an arbitrary message on behalf of the user using the method answerWebAppQuery
+https://core.telegram.org/bots/api#answerwebappquery
+web_app_query_id
+result 	InlineQueryResult
+https://core.telegram.org/bots/api#inlinequeryresult
+
+**************
+sendMessage
+parse_mode HTML
+text : <b>bold</b>, <strong>bold</strong>, <i>italic</i>
+reply_markup {
+}
+
+
+ReplyKeyboardMarkup

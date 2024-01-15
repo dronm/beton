@@ -1,0 +1,40 @@
+<table class="table-bordered table-responsive table-striped">
+	<thead>
+		<tr>
+			<th rowspan="2">Отметка
+				<input id="owner_schedule_mark_all" type="checkbox" title="Выбрать/отменить все автомобили"></input>
+			</th>
+			<th rowspan="2">Автомобиль
+			</th>
+			<th colspan="{{DAY_COUNT}}">График
+			</th>
+		</tr>
+		<tr>
+			{{#DAYS}}
+			<th class="owner_schedule_day_header{{#WEEKEND}} owner_schedule_weekend{{/WEEKEND}}">
+				<span class="owner_schedule_head_day">{{DAY}}</span>
+				<span class="owner_schedule_head_dow">{{DOW}}</span>
+			</th>
+			{{/DAYS}}
+		</tr>
+	</thead>
+	<tbody>
+		{{#ROWS}}
+		<tr vehicle_id="{{VEHICLE_ID}}">
+			<td>
+				<input class="owner_schedule_vehicle_mark" type="checkbox" title="Выбрать/отменить выбор автомобиля"></input>
+			</td>
+			<td>{{VEHICLE}}
+			</td>
+			{{#DAYS}}
+			<td dt="{{DATE}}" class="owner_schedule_day{{#SHIFT}} owner_schedule_shift{{/SHIFT}}{{#WEEKEND}} owner_schedule_weekend{{/WEEKEND}}">
+				{{#SHIFT}}<span class="owner_schedule_driver" driver_id="{{DRIVER_ID}}" title="{{DRIVER}}">{{DRIVER_SHORT}}</span>
+				<span class="owner_schedule_prod_base" driver_id="{{PROD_BASE_ID}}" title="{{PROD_BASE}}">{{PROD_BASE_SHORT}}</span>{{/SHIFT}}
+				{{#NO_SHIFT}}&nbsp;{{/NO_SHIFT}}
+			</td>
+			{{/DAYS}}
+		</tr>
+		{{/ROWS}}
+	</tbody>
+</table>
+

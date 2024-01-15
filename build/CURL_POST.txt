@@ -1,0 +1,15 @@
+curl --data-binary @post.txt -i -X POST http://eurobeton.katren.org/ \
+  -H "Content-Type: application/x-www-form-urlencoded"
+  
+-d "content=@post.txt&c=MainMenuConstructor_Controller&f=update&token=653731ee83699:9876ddde28508459dd94b96ed10b49c1&v=ViewXML&old_id=1"  
+  
+XHRPOST
+http://eurobeton.katren.org/
+[HTTP/1.1 200 OK 18ms]
+
+	
+c	"MainMenuConstructor_Controller"
+f	"update"
+v	"ViewXML"
+old_id	"1"
+content	'<menu xmlns="http://www.katren.org/crm/doc/mainmenu" id="MainMenuContent_Model"><menuitem xmlns="http://www.w3.org/1999/xhtml" id="12" descr="Заявки и отгрузки" viewid="" viewdescr="" default="" glyphclass="icon-truck"><menuitem id="13" descr="Заявки онлайн" viewid="30003" viewdescr="Формы Заявки онлайн" default="true" glyphclass="null" updated="1"></menuitem><menuitem id="14" descr="Отгрузки оператор" viewid="30004" viewdescr="Формы Отгрузки (оператор)" default="" glyphclass=""></menuitem><menuitem id="15…r="" default="" glyphclass="icon-hammer-wrench"><menuitem id="43" descr="Пользователи" viewid="10000" viewdescr="Справочники Пользователи" default="" glyphclass="null" updated="1"></menuitem><menuitem id="44" descr="MAC адреса пользователей" viewid="10001" viewdescr="Справочники MAC адреса пользователей" default="" glyphclass="null" updated="1"></menuitem><menuitem id="102" descr=" Текущие назначения" viewid="30009" viewdescr="Формы Текущие назначения" default="" glyphclass=""></menuitem></menuitem></menu>'

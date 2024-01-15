@@ -1,0 +1,106 @@
+<div class="panel">
+	<div class="form-group">
+		<label id="VehicleOwnerTotIncomeRep:balance_beg:label" class="control-label col-lg-2" for="VehicleOwnerTotIncomeRep:balance_beg" name="label">Остаток на {{PERIOD_FROM}}:
+		</label>		
+		<div id="VehicleOwnerTotIncomeRep:balance_beg:edit-cont" class="input-group col-lg-2" name="edit-cont">
+			<input id="VehicleOwnerTotIncomeRep:balance_beg" class="form-control" readonly="readOnly" type="text" name="balance_beg" autocomplete="off" value="{{BALANCE_BEG}}">
+			</input>
+		</div>
+	</div>
+
+	{{#VEHICLES}}
+	<div class="panel veh_owner_tot_income_panel">
+		<table class="table table-bordered table-responsive table-striped{{#TOTAL_TABLE}} veh_owner_tot_income_total_table{{/TOTAL_TABLE}}{{#NOT_TOTAL_TABLE}} veh_owner_tot_income_veh_table{{/NOT_TOTAL_TABLE}}">
+			<thead>
+				<tr>
+					<th class="veh_owner_tot_income_th">{{PLATE}}
+					</th>
+					{{#PERIODS}}
+					<th class="veh_owner_tot_income_th">{{PERIOD}}
+					</th>
+					{{/PERIODS}}
+					<th class="veh_owner_tot_income_th veh_owner_tot_income_th_total" align="right">Всего
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{#ROWS}}
+				<tr>
+					<td class="{{ITEM_CLASS}}">{{ITEM_NAME}}
+					</td>
+					{{#PERIODS}}
+					<td align="right" class="veh_owner_tot_income_all {{ITEM_CLASS}}{{#COMMON_ITEM}} veh_owner_tot_income_common_input{{/COMMON_ITEM}}{{#NOT_COMMON_ITEM}} veh_owner_tot_income_input{{/NOT_COMMON_ITEM}}{{#ITEM_INPUT}} veh_owner_tot_income_input_edit{{/ITEM_INPUT}}{{#ITEM_INFO}} veh_owner_tot_income_info{{/ITEM_INFO}}"
+					item_id="{{ITEM_ID}}" vehicle_id="{{VEH_ID}}" period="{{PERIOD}}">{{VAL}}
+					</td>
+					{{/PERIODS}}
+					<td align="right" class="veh_owner_tot_income_total {{ITEM_CLASS}}">{{VAL_TOTAL}}
+					</td>
+				</tr>
+				{{/ROWS}}
+			</tbody>
+			<tfoot>
+				<tr>
+					<td>Итого
+					</td>
+					{{#PERIOD_TOTALS}}
+					<td align="right" nowrap="nowrap">{{VAL}}
+					</td>
+					{{/PERIOD_TOTALS}}
+					<td align="right" nowrap="nowrap">{{VAL_TOTAL}}
+					</td>
+				</tr>
+				<tr name="runs">
+					<td>Количество рейсов
+					</td>
+					{{#PERIOD_RUNS}}
+					<td align="right">{{VAL}}
+					</td>
+					{{/PERIOD_RUNS}}
+					<td align="right">{{RUN_TOTAL}}
+					</td>
+				</tr>
+				<tr name="avg_runs">
+					<td>Сред.количество рейсов
+					</td>
+					{{#PERIOD_AVG_RUNS}}
+					<td align="right">{{VAL}}
+					</td>
+					{{/PERIOD_AVG_RUNS}}
+					<td align="right">{{AVG_RUN_TOTAL}}
+					</td>
+				</tr>
+				<tr name="avg_quant">
+					<td>Средний объём
+					</td>
+					{{#PERIOD_AVG_QUANT}}
+					<td align="right">{{VAL}}
+					</td>
+					{{/PERIOD_AVG_QUANT}}
+					<td align="right">{{AVG_QUANT_TOTAL}}
+					</td>
+				</tr>
+				<tr name="self_runs">
+					<td>Количество рейсов сымовывоз
+					</td>
+					{{#PERIOD_SELF_RUNS}}
+					<td align="right">{{VAL}}
+					</td>
+					{{/PERIOD_SELF_RUNS}}
+					<td align="right">{{SELF_RUN_TOTAL}}
+					</td>
+				</tr>
+				
+			</tfoot>
+		</table>
+	</div>
+	{{/VEHICLES}}
+	<div class="form-group">
+		<label id="VehicleOwnerTotIncomeRep:balance_end:label" class="control-label col-lg-2" for="VehicleOwnerTotIncomeRep:balance_end" name="label">Остаток на {{PERIOD_TO}}:
+		</label>		
+		<div id="VehicleOwnerTotIncomeRep:balance_end:edit-cont" class="input-group col-lg-2" name="edit-cont">
+			<input id="VehicleOwnerTotIncomeRep:balance_end" class="form-control" type="text" readonly="readOnly" name="balance_end" autocomplete="off" value="{{BALANCE_END}}">
+			</input>
+		</div>
+	</div>
+
+</div>

@@ -1,0 +1,1 @@
+psql:.run_sql.sql:3: ERROR:  view "quality_passports_list" does not exist

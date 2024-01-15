@@ -1,0 +1,55 @@
+Хост: eurobeton.katren.org
+
+Общие парамтеры:
+c - Контроллер
+f - функция
+v - в каком виде вернуть результат, может быть ViewJSON, ViewXML
+
+Остальные параметры зависят от конкретного метода, могут быть и без параметров, например, для получения
+списка марок бетона:
+https://eurobeton.katren.org/?c=ConcreteType_Controller&f=get_for_site_list&v=ViewJSON
+
+
+В ответ приходит объект models, который содержит модели (наборы данных). Модель содержит rows. Каждый row содержит поля.
+Состав моделей зависит от метода, но всегда есть модель ModelServResponse
+	result - результат выполнения, "0" или код ошибки
+	descr - описание ошибки или пусто
+	app_version - вверсия ПО на сервере
+
+Напрмер, тот же метод получения списка марок
+https://eurobeton.katren.org/?c=ConcreteType_Controller&f=get_for_site_list&v=ViewJSON
+вернет модель ConcreteTypeForSiteList_Model с полями: id, name, price
+
+
+
+Описание функций
+
+1) Автоподстановка адреса
+c=Destination_Controller
+<publicMethod id="complete_for_site" modelId="DestinationForSiteList">
+	<field id="search" dataType="String" length="200" required="TRUE"/>
+	<field id="count" dataType="Int" maxValue="30"/>
+</publicMethod>			
+Пример
+https://eurobeton.katren.org/?c=Destination_Controller&f=complete_for_site&search=Тюмень республики&count=10&v=ViewJSON
+
+
+
+2) Марки бнтона
+c=ConcreteType_Controller
+<publicMethod id="get_for_site_list" modelId="ConcreteTypeForSiteList"/>
+https://eurobeton.katren.org/?c=ConcreteType_Controller&f=get_for_site_list&v=ViewJSON
+
+
+3) Расчет стоимости для адреса
+c=Order_Controller
+<publicMethod id="calc_for_site">
+	<field id="address" dataType="Text" required="TRUE" maxLength="500"/>
+	<field id="concrete_type_id" dataType="Int" required="TRUE"/>
+	<field id="quant" dataType="Float" required="TRUE"/>
+</publicMethod>
+
+https://eurobeton.katren.org/?c=Order_Controller&f=calc_for_site&concrete_type_id=1&quant=1&address=Тюмень Мельничная 83&v=ViewJSON
+
+
+

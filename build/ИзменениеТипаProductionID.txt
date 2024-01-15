@@ -1,0 +1,27 @@
+
+
+DROP productions_list
+DROP production_sites_last_production_list
+DROP material_fact_consumptions_rolled_list
+DROP material_fact_consumptions_list
+DROP VIEW material_cons_tolerance_violation_list;
+DROP VIEW production_material_list;
+
+DROP VIEW material_fact_consumption_corrections_list;
+DROP VIEW production_vehicle_corrections_list;
+
+
+alter table productions alter column production_id type varchar(24);
+alter table productions alter column production_vehicle_descr type varchar(10);
+alter table productions alter column missing_elkon_production_ids type array[text];
+
+ALTER TABLE material_fact_consumptions ALTER COLUMN production_id type varchar(24);
+ALTER TABLE production_vehicle_corrections ALTER COLUMN production_id type varchar(24);
+ALTER TABLE production_comments ALTER COLUMN production_id type varchar(24);
+
+
+
+-- !!!!!
+func productions_process
+!!!missing_elkon_production_ids!!!
+func material_fact_consumptions_add_material

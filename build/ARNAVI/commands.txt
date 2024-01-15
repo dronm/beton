@@ -1,0 +1,21 @@
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 clientCount
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 runTime
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 clientMaxCount
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 downloadedBytes
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 uploadedBytes
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 list
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 handshakes
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 status
+
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 imeiRunTime 866201059553278
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 imeiDownloadedBytes 866201059553278
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 imeiUploadedBytes 866201059553278
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 imeiHandshakes 866201059553278
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 imeiStatus 866201059553278
+
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 transmitCoords 4005622328
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 updateSoftwareForce 866201059553278
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 updateSoftware 866201059553278
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 reset 4005622328
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 downloadSettingsFromWebConf 866201059553278
+./client 192.168.1.77:52053 eg419rh4t14mn4s54tgr7g1 sendSettingsToWebConf 866201059553278

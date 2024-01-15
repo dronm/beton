@@ -1,0 +1,13 @@
+view orders_dialog
+view client_tels_list
+view entity_contacts_list
+view contacts_list
+
+DROP SCHEMA notifications CASCADE;
+CREATE SCHEMA notifications;
+IMPORT FOREIGN SCHEMA notifications FROM SERVER ms INTO notifications;
+
+IMPORT FOREIGN SCHEMA notifications LIMIT TO (ext_users_photo_list) FROM SERVER ms INTO notifications;
+IMPORT FOREIGN SCHEMA notifications LIMIT TO (ext_users_dialog) FROM SERVER ms INTO notifications;
+IMPORT FOREIGN SCHEMA notifications LIMIT TO (ext_messages1) FROM SERVER ms INTO notifications;
+

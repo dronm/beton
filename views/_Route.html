@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<meta name="Author" content="{{AUTHOR}}"/>
+	<meta name="Keywords" content="{{KEYWORD}}"/>
+	<meta name="Description" content="{{DESCRIPTION}}"/>
+	
+	<!--<link rel="stylesheet" href="js20/custom-css/print.css?40dad3f2e8709e217cb57feeaa981830" type="text/css">-->
+	
+	<!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/css/ol.css" type="text/css">-->
+	
+	<link rel="stylesheet" href="style.css" type="text/css">			
+	<link rel="icon" type="image/png" href="favicon.ico"/>
+	
+	<script src="../js20/ext/OpenLayers/OpenLayers.js"></script>
+	<!--<script src="../js20/lib.js"></script>-->
+	
+	<script src="../js20/core/extend.js"></script>
+	<script src="../js20/core/DateHelper.js?{{VERSION}}"></script>
+	<script src="../js20/core/CommonHelper.js?{{VERSION}}"></script>
+	<script src="../js20/core/EventHelper.js?{{VERSION}}"></script>
+	<script src="../js20/core/AppSrv.js?{{VERSION}}"></script>
+	<script src="../js20/custom_controls/TrackConstants.js?{{VERSION}}"></script>
+	<script src="../js20/custom_controls/ObjMapLayer.js?{{VERSION}}"></script>
+	<script src="../js20/custom_controls/GeoZones.js?{{VERSION}}"></script>
+	<script src="../js20/custom_controls/VehicleLayer.js?{{VERSION}}"></script>
+	<script src="../js20/custom_controls/Markers.js?{{VERSION}}"></script>
+	<script src="../js20/custom_controls/TrackLayer.js?{{VERSION}}"></script>
+	<script src="route.js?{{VERSION}}"></script>
+	
+	<title>{{TITLE}}</title>
+	
+</head>
+
+<body>
+	<div id="inf">
+		<div class="inf">Автомобиль: {{vehiclePlate}}</div>
+		<button id="showVehicle">Найти на карте</button>
+		<br/>
+		<div class="inf">Расстояние: <span id="distanceToDest"/> </div>
+	</div>	
+	<div id="map" class="map"></div>
+	
+	<script>	
+		window.onload = function() {
+			DateHelper.MON_DATE_LIST = Array("Января","Февраля","Марта","Апреля","Мая",
+				"Июня","Июля","Августа","Сентября","Октября","Ноября","Декабря");
+			DateHelper.MON_LIST = Array("Январь","Февраль","Март","Апрель","Май",
+				"Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь");
+				
+			DateHelper.WEEK_LIST = Array("Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница",
+				"Суббота");	
+			DateHelper.FORMAT_STR = "d/m/Y H:i:s";
+		
+			Route.init({
+				"id": {{ID}}
+				,"token": "{{token}}"
+				,"lon": "{{lon}}"
+				,"lat": "{{lat}}"
+				,"destZone": "{{destZone}}"
+				,"lastPos": '{{lastPos}}'
+				,"route": "{{routeRest}}"
+				,"appName": "{{appName}}"
+				,"appSrvHost": "{{appSrvHost}}"
+				,"appSrvPort": "{{appSrvPort}}"
+				,"routeRestLen": "{{routeRestLen}}"
+			});
+		}
+	 </script>	
+	
+</body>
+
+</html>

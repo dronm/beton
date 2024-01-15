@@ -1,0 +1,71 @@
+	
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="Author" content="">
+<meta name="Keywords" content="">
+<meta name="Description" content="">
+<link rel="stylesheet" href="js20/assets/css/icons/icomoon/styles.css?31298f665d4066d35cc228efe4ac8869" type="text/css">
+<link rel="stylesheet" href="js20/assets/css/bootstrap.css?31298f665d4066d35cc228efe4ac8869" type="text/css">
+<link rel="stylesheet" href="js20/assets/css/core.min.css?31298f665d4066d35cc228efe4ac8869" type="text/css">
+<link rel="stylesheet" href="js20/assets/css/components.min.css?31298f665d4066d35cc228efe4ac8869" type="text/css">
+<link rel="stylesheet" href="js20/assets/css/colors.min.css?31298f665d4066d35cc228efe4ac8869" type="text/css">
+<link rel="stylesheet" href="js20/assets/css/icons/fontawesome/styles.min.css?31298f665d4066d35cc228efe4ac8869" type="text/css">
+<link rel="stylesheet" href="js20/custom-css/easyTree.css?31298f665d4066d35cc228efe4ac8869" type="text/css">
+<link rel="stylesheet" href="js20/ext/bootstrap-datepicker/bootstrap-datepicker.standalone.min.css?31298f665d4066d35cc228efe4ac8869" type="text/css">
+<link rel="stylesheet" href="js20/ext/chart.js-2.8.0/Chart.min.css?31298f665d4066d35cc228efe4ac8869" type="text/css">
+<link rel="stylesheet" href="js20/custom-css/style.css?31298f665d4066d35cc228efe4ac8869" type="text/css">
+<link rel="stylesheet" href="js20/custom-css/print.css?31298f665d4066d35cc228efe4ac8869" type="text/css">
+<link rel="icon" type="image/png" href="img/favicon.ico">
+<title>Bereg</title>
+<script>		
+			function pageLoad(){
+			}
+		</script>
+</head>
+<body onload="pageLoad();" class="login-container">
+<div class="navbar navbar"><div class="container-fluid"><div class="navbar-header"><a href="index.php"><img class="logotype" src="img/logo.png?31298f665d4066d35cc228efe4ac8869"></a></div></div></div>
+<div class="page-container"><div class="page-content"><div class="content-wrapper"><div class="content">
+<form id="Login"><div class="panel panel-body login-form">
+<div class="form-group has-feedback has-feedback-left">
+<input id="Login:user" type="text" class="form-control" placeholder="Логин"><div class="form-control-feedback"><i class="icon-user text-muted"></i></div>
+<div id="Login:user:error"></div>
+</div>
+<div class="form-group has-feedback has-feedback-left">
+<input id="Login:pwd" type="password" class="form-control" placeholder="Пароль"><div class="form-control-feedback"><i class="icon-lock2 text-muted"></i></div>
+<div id="Login:pwd:error"></div>
+</div>
+<div><div id="Login:error"></div></div>
+<div class="form-group"><div id="Login:submit_login" class="btn bg-blue-400 btn-block">Войти <i class="icon-arrow-right14 position-right"></i>
+</div></div>
+<div class="form-group login-options"><div class="row"><div class="col-sm-6 text-right"><a href="index.php?v=PasswordRecovery">Забыли пароль?</a></div></div></div>
+<script src="https://telegram.org/js/telegram-widget.js?18" data-telegram-login="eurobeton_crm_bot" data-size="large" data-onauth="onTelegramAuth(user)" data-request-access="write"></script><script type="text/javascript">
+  function onTelegramAuth(user) {
+    alert('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
+  }
+</script><!--[if IE 8]>
+							<div class="alert alert-danger alert-styled-left alert-bordered">К сожалению, работа в личном кабинете с данным браузером невозможна!
+							</div>
+							<![endif]-->
+</div></form>
+<div class="footer text-muted text-center">
+						2013г - 2021г <a href="#">Катрэн+</a>
+</div>
+</div></div></div></div>
+<script>
+			var n = document.getElementById("Login:user");
+			if (n){
+				if (document.activeElement && document.activeElement.id!="Login:pwd"){
+					n.focus();
+				}
+			}
+	</script><div id="users-device-size">
+<div id="sm" class="visible-sm"></div>
+<div id="md" class="visible-md"></div>
+<div id="lg" class="visible-lg"></div>
+</body>
+</html>
+

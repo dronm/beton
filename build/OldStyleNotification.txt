@@ -1,0 +1,8 @@
+$srv_ar = explode(',',APP_SERVER_LIST);
+
+	foreach($srv_ar as $srv){
+		$srv_par_ar = explode(':',$srv);
+		list($secured, $host, $port) = $srv_par_ar;
+		EventSrv::publish($events->key(), $event_par, APP_NAME, $host, $port, boolval($secured));
+	}		
+

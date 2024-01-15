@@ -1,0 +1,14 @@
+1) Что зависит от сервера
+	1.1) telsrv/telsrv.json
+		"storageConnection":"postgresql://beton:159753@localhost:5432/beton"
+	
+	Перенести на второй сервер, другой telsrvd (пути) 		
+	
+	1.2) www/srv/app_srv
+		app.json
+		
+	1.3) www/www.katren.org/htdocs/tmnstroi/tmnstroi
+		tmnstroi.json
+		
+		
+	1.4) sasttodb/asttodbd 

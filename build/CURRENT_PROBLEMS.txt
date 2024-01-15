@@ -1,0 +1,7 @@
+1) Не перестраивает пройденный маршрут при слежении. Например, отгружен, есть маршрут, изменил, он очищается, но не перестраивается. Нет слушателя rebuild??
+routText.split is not a function
+Map_View.prototype.addGuessedRoute = function(routeText, noteMsg){
+	if(!routeText || !routeText.length){
+		return;
+	}
+

@@ -1,0 +1,109 @@
+﻿instance MSSQL10_50.GEOTEK
+
+sqlcmd -S np:\\.\pipe\MSSQL$GEOTEK\sql\qury
+sqlcmd -S tcp:.\GEOTEK
+
+CREATE LOGIN andreymikhalevich WITH PASSWORD = 'wimaf2020ii42'
+go
+CREATE USER andreymikhalevich FOR LOGIN andreymikhalevich
+go
+
+exec sp_addrolemember 'db_datareader','andreymikhalevich'
+go
+
+sqlcmd -S tcp:.\GEOTEK -U andreymikhalevich -P wimaf2020ii42 -d Santral
+
+Запустить службы
+SQLServer
+SQLServerBrowser
+
+Protocols for GEOTEK
+SharedMemory
+NamedPipes
+TCPIP
+
+**************************************
+sqlcmd -S tcp:ZAVOD\SQLEXPRESS
+
+еще делал
+ALTER LOGIN andreymikhalevich ENABLE
+go
+
+Поменял режим входа (authentication method)
+Реестр
+HKey_LOCAL_MACHINE\Software\MICROSOFTSQLServer\MSSQL.1\MSSQLServer\LoginMode было 1, сделал 2
+и MSSQL.2 тоже самое!
+
+Для работы php5, подключение через mssql_connect
+ФАЙЛ /etc/freetds/freetds.conf
+Добавить строки в секцию global
+        tds version = 7.0
+        client charset = UTF8
+
+php7 sqlsrv_connect Подключение описано в настройке сервера install
+
+
+///*********************** 16/04/21
+sqlcmd -S tcp:.\GEOTEK
+USE Santral
+go
+Нужен доступ на запись!
+--Drivers
+GRANT SELECT,UPDATE,INSERT,DELETE ON dbo.Surucu TO andreymikhalevich
+go
+--Vehicles
+GRANT SELECT,UPDATE,INSERT,DELETE ON dbo.Arac TO andreymikhalevich
+go
+--Production
+GRANT SELECT,UPDATE,INSERT,DELETE ON dbo.Uretim TO andreymikhalevich
+go
+
+
+//******************** 20/09/22
+Третий завод
+Third plant ServerName: DESKTOP-2TR574D\GEOTEK
+Создал пользователя andreymikhalevich через студию, дал права в базе
+ProtocolsForGEOTEK запустил поддержку TCPIP
+Запустил службу Browser
+Подключается через sqlcmd -S tcp:.\GEOTEK
+Через моего юзера не подключался, просил сменить пароль
+sqlcmd -S tcp:.\GEOTEK -U andreymikhalevich -P wimaf2022ii44 -d Santral
+
+sqlcmd -S tcp:192.168.40.62,1433\GEOTEK -U andreymikhalevich -P wimaf2022ii44 -d Santral
+
+Зашел через студию через своего юзера (Только TCP!! в options), сменил пароль, тогда зараболтало
+ДРУГОЙ ПАРОЛЬ!!!
+CREATE LOGIN andreymikhalevich WITH PASSWORD = 'wimaf2022ii44'
+
+
+//******************** 07/06/23
+Подключается через sqlcmd -S tcp:.\GEOTEK
+Завод на Ветеранов труда. Создал пользователя в Studio
+!!!ProtocolsForGEOTEK запустил поддержку TCPIP
+!!!Запустил службу Browser
+Перезапустил службу.TCPIP в свойствах во всех протоколах установил фикс айпи 1433
+Через студию настроил все права
+Проверка sqlcmd -S tcp:.\GEOTEK -U andreymikhalevich -P wimaf2022ii44 -d Santral
+Проверить через yougetsignal.com открытость порта
+
+
+//******************** 07/08/23
+Четвертый завод
+!!!ProtocolsForGEOTEK запустил поддержку TCPIP
+!!!Запустил службу Browser
+Подключается через sqlcmd -S tcp:.\GEOTEK
+Студии нет
+USE Santral
+go
+CREATE LOGIN andreymikhalevich WITH PASSWORD = 'wimaf2023ii45'
+go
+CREATE USER andreymikhalevich FOR LOGIN andreymikhalevich
+go
+GRANT SELECT,UPDATE,INSERT,DELETE ON dbo.Surucu TO andreymikhalevich
+go
+exec sp_addrolemember 'db_datareader','andreymikhalevich'
+go
+Проверка sqlcmd -S tcp:.\GEOTEK -U andreymikhalevich -P wimaf2023ii45 -d Santral
+
+В свойствах ProtocolsForGEOTEK посмотрел IP forALL Dynamic port и поставил его же в TCP Port
+49840

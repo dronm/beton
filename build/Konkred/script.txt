@@ -1,0 +1,33 @@
+pdftotext 111.pdf 111.txt
+
+1)
+<SEARCH>Клиент:
+
+<CLIENT_NAME>101; Konkrid
+
+2)
+<SEARCH>Изготовл. кол-во:
+
+<QUANT>12.00 m³
+
+3)
+<SEARCH>Машина:
+
+858 (858);
+
+4)
+<SEARCH>Накладная №:
+
+002674
+
+5)
+<SEARCH>Дата изготовления:
+
+30.04.2021
+
+6)
+<SEARCH>Оператор:
+
+Ammann
+
+

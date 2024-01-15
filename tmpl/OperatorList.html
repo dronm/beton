@@ -1,0 +1,59 @@
+<div id="{{id}}">
+	<div class="row">
+		<h1 id="{{id}}:prod_site_title" class="page-header">
+		</h1>
+	</div>
+	<div class="{{bsCol}}12">
+		{{#productionBases}}
+		<div class="panel panel-default {{bsCol}}3">
+			<div class="panel-heading">{{productionBaseName}}</div>
+			<div class="panel-body">				
+				<div class="row order-l-grid">
+					<div id="{{id}}:production_sites{{productionBaseId}}">
+					</div>
+					<div id="{{id}}:material_stores{{productionBaseId}}">
+					</div>			
+				</div>	
+				
+				<div class="row order-l-grid">
+					<div id="{{id}}:mat_totals_grid{{productionBaseId}}">
+					</div>
+				</div>				
+			</div>	
+		</div>					
+		{{/productionBases}}
+	</div>
+	
+	<div id="{{id}}:colLeft" class="{{bsCol}}12">
+		{{#showPeriod}}
+		<div id="{{id}}:date_filter">
+		</div>
+		{{/showPeriod}}
+		
+		<div id="totContainer">
+			<span style="margin-right:20px;">
+				<label class="lbl" id="totOrdered_l" for="totOrdered">Заявлено:</label>
+				<input id="totOrdered" disabled="disabled" class="" type="text" size="4">
+				</input>
+				<span id="totOrdered_m" class="">м3</span>
+			</span>
+			
+			<span style="margin-right:20px;">
+				<label class="lbl" id="totShipped_l" for="totShipped">Отгружено:</label>
+				<input id="totShipped" disabled="disabled" class="" type="text" size="4">
+				</input>
+				<span id="totShipped_m" class="">м3</span>
+			</span>
+			
+			<span style="margin-right:20px;">
+				<label class="lbl" id="totBalance_l" for="totShipped">Остаток:</label>
+				<input id="totBalance" disabled="disabled" class="" type="text" size="4">
+				</input>
+				<span id="totBalance_m" class="">м3</span>		
+			</span>
+		</div>	
+		
+		<div id="{{id}}:grid">
+		</div>	
+	</div>	
+</div>

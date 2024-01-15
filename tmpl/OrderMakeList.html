@@ -1,0 +1,226 @@
+<div id="{{id}}">
+	<div id="{{id}}:colLeft" class="{{bsCol}}9">
+		{{#showChart}}		
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h6 class="panel-title">Загрузка заводов
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:plantLoadTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>
+			
+			<div class="panel-body">
+				<canvas id="{{id}}:plant_load_graph">
+				</canvas>
+			</div>
+		</div>
+		{{/showChart}}
+		<div class="panel panel-default">
+			<div class="panel-body wideGridPanelBody">
+				<div id="totContainer">
+					<div class="ordListParamCont" title="Заявлено, м3">
+						<span class="ordListParamPref" >Звл.:
+						</span>
+						<span id="totOrdered">
+						</span>
+						<span class="ordListParamPostf">м3
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Отгружено, м3">
+						<span class="ordListParamPref">Отг.:
+						</span>
+						<span id="totShipped">
+						</span>
+						<span class="ordListParamPostf">м3
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Остаток, м3">
+						<span class="ordListParamPref">Ост.:
+						</span>
+						<span id="totBalance">
+						</span>
+						<span class="ordListParamPostf">м3
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Состояние текущее">
+						<span class="ordListParamPref">Сост.:
+						</span>
+						<span id="totEfficiency">
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Скорость дневная {{workHours}}ч., м3/ч">
+						<span class="ordListParamPref">Скор.д.:
+						</span>
+						<span id="totDayVelocity">
+						</span>
+						<span class="ordListParamPostf">м3/ч
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Скорость текущая, м3/ч">
+						<span class="ordListParamPref">Скор.т.:
+						</span>
+						<span id="totCurVelocity">
+						</span>
+						<span class="ordListParamPostf">м3/ч
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Заявлено {{workHours}}ч., м3">
+						<span class="ordListParamPref">Звл.({{workHours}}):
+						</span>
+						<span id="totOrderedDay">
+						</span>
+						<span class="ordListParamPostf">м3
+						</span>
+					</div>
+						
+				</div>	
+				<div id="{{id}}:order_make_filter">
+				</div>	
+				<div id="{{id}}:order_make_grid">
+				</div>
+			
+			</div>	
+		</div>		
+	</div>	
+	
+	<div id="{{id}}:panelCont" class="{{bsCol}}3 hidden" style="position:static;">
+		{{#productionBases}}
+			<div id="{{id}}:prodBaseCont_{{productionBaseId}}" class="panel panel-default draggable">
+				<div class="panel-heading">
+					<h6 class="panel-title">{{productionBaseName}}
+					</h6>
+					<div class="heading-elements">
+						<ul class="icons-list">
+				        		<li>
+				        			<a id="{{id}}:prodBase{{productionBaseId}}Tgl" data-action="collapse" class="">
+				        			</a>
+				        		</li>
+				        	</ul>
+					</div>				
+				</div>
+				
+				<div class="panel-body">
+					{{#showProductionSites}}
+					<div class="row order-l-grid">
+						<div id="{{id}}:production_sites{{productionBaseId}}">
+						</div>
+						<div id="{{id}}:material_stores{{productionBaseId}}">
+						</div>			
+					</div>	
+					{{/showProductionSites}}
+					
+					<div class="row order-l-grid">
+						<div id="{{id}}:mat_totals_grid{{productionBaseId}}">
+						</div>
+					</div>					
+				</div>
+			</div>
+		{{/productionBases}}		
+		
+		<div id="{{id}}:vehAssignCont" class="panel panel-default draggable">
+			{{#showGridHeaders}}
+			<div class="panel-heading">
+				<h6 class="panel-title">Назначенные транспорнтные средства
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:vehAssignTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>
+			{{/showGridHeaders}}
+			<div class="panel-body">
+				<div class="row order-l-grid">		
+					<div id="{{id}}:veh_assigning" class="row">
+					</div>	
+				</div>
+			</div>			
+		</div>
+		
+		<div id="{{id}}:vehAllCont" class="panel panel-default draggable">
+			{{#showGridHeaders}}
+			<div class="panel-heading">
+				<h6 class="panel-title">Все транспорнтные средства
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:vehAllTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>			
+			{{/showGridHeaders}}
+			
+			<div class="panel-body wideGridPanelBody">
+				<div class="row order-l-grid">
+					<div id="{{id}}:veh_schedule_grid">
+					</div>	
+				</div>
+			</div>	
+		</div>			
+		
+		<div id="{{id}}:vehFeatureCont" class="panel panel-default draggable">
+			{{#showGridHeaders}}
+			<div class="panel-heading">
+				<h6 class="panel-title">Свойства транспортных средств
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:vehFeatureTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>			
+			{{/showGridHeaders}}
+			
+			<div class="panel-body">
+				<div class="row order-l-grid">
+					<div id="{{id}}:features_grid">
+					</div>	
+				</div>
+			</div>	
+		</div>			
+		
+		<div id="{{id}}:statisticsCont" class="panel panel-default draggable">
+			<div class="panel-heading">
+				<h6 class="panel-title">Статистика
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:statisticsTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>
+		
+			<div class="panel-body">
+				<div class="row order-l-grid">
+					<div id="{{id}}:statistics">
+					</div>	
+				</div>
+			</div>				
+		</div>			
+	</div>	
+	
+</div>

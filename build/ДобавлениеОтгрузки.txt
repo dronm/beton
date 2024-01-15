@@ -1,0 +1,7 @@
+
+INSERT INTO public.shipments(
+	date_time, order_id, vehicle_schedule_id, quant, user_id, shipped,
+	ship_date_time, production_site_id)
+	VALUES ('2022-09-08 21:30:00', 83801, 76105, 0.5, 80, true,
+			'2022-09-08 21:30:00',2
+		   );

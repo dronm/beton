@@ -1,0 +1,62 @@
+#map{
+	height: 800px;
+	width: 100%;  
+}
+.inf{
+	display:inline;
+	font-weight:bolder;
+	font-size:120%;
+}
+#showVehicle{
+	cursor:pointer;
+}
+/*
+@media all and (min-width:960px) and (max-width: 1024px) {
+	#map{
+		height: 800px;
+		width: 100%;  
+	}
+}
+
+@media all and (min-width:801px) and (max-width: 959px) {
+	#map{
+		height: 100px;
+		width: 100%;  
+	}
+}
+
+@media all and (min-width:769px) and (max-width: 800px) {
+	#map{
+		height: 100px;
+		width: 100%;  
+	}
+}
+
+@media all and (min-width:569px) and (max-width: 768px) {
+	#map{
+		height: 100px;
+		width: 100%;  
+	}
+}
+
+@media all and (min-width:481px) and (max-width: 568px) {
+	#map{
+		height: 100px;
+		width: 100%;  
+	}
+}
+
+@media all and (min-width:321px) and (max-width: 480px) {
+	#map{
+		height: 100px;
+		width: 100%;  
+	}
+}
+
+@media all and (min-width:0px) and (max-width: 320px) {
+	#map{
+		height: 100px;
+		width: 100%;  
+	}
+}
+*/
