@@ -1,0 +1,6 @@
+С 11/03/24 пути в файле метаданных представлены в полном виде:
+1) jsTemplates ProjectManager->build() JS Templates
+2) Javascript 
+	build
+	minifyJs()
+	minifyCSS()

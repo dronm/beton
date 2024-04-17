@@ -1,0 +1,98 @@
+<div id="{{id}}">
+	<h1 class="page-header">Грфики работ транспортных средств</h1>
+	
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h6 class="panel-title">Фильтр</h6>				
+		</div>
+	
+		<div class="panel-body">
+			<div id="{{id}}:vehicle_owner">
+			</div>
+			
+			<div id="{{id}}:period">
+			</div>
+			
+			<div id="{{id}}:cmdApplyFilter">
+			</div>			
+		</div>
+	</div>
+	
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h6 class="panel-title">Шаблон</h6>				
+		</div>
+	
+		<div class="panel-body">
+			<div class="alert alert-info alert-styled-left">
+				<p>Шаблон используется для быстрого заполнения графика.</p>
+				<ul>
+					<li>Сформируйте график.</li>
+					<li>Отметьте необходимые транспортые средства в графике.</li>
+					<li>Выберите необходимые дни в шаблоне.</li>
+					<li>Выберите водителя в шаблоне.</li>
+					<li>Нажмите кнопку "Применить".</li>
+				</ul>
+				<br></br>
+				<p>Для установки одного водителя всем выбранным транспортным средствам выберите водителя и нажмите "Установить водителя".</p>
+				<p>Выбранный водитель шаблона также используется при добавлении новой смены в график.</p>
+			</div>
+			
+			<div class="row">
+				<div class="col-lg-6">
+					<table class="table-bordered table-responsive table-striped">
+						<tr>
+							<td class="owner_schedule_day_tmpl" id="{{id}}:tmpl:day1" title="Понедельник">Пн
+							</td>
+							<td class="owner_schedule_day_tmpl" id="{{id}}:tmpl:day2" title="Вторник">Вт
+							</td>
+							<td class="owner_schedule_day_tmpl" id="{{id}}:tmpl:day3" title="Среда">Ср
+							</td>
+							<td class="owner_schedule_day_tmpl" id="{{id}}:tmpl:day4" title="Четверг">Чт
+							</td>
+							<td class="owner_schedule_day_tmpl" id="{{id}}:tmpl:day5" title="Пятница">Пт
+							</td>
+							<td class="owner_schedule_day_tmpl" id="{{id}}:tmpl:day6" title="Суббота">Сб
+							</td>
+							<td class="owner_schedule_day_tmpl" id="{{id}}:tmpl:day7" title="Воскресенье">Вс
+							</td>
+							
+						</tr>
+					</table>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-lg-6">
+					<div id="{{id}}:tmpl_driver">
+					</div>			
+				</div>	
+			</div>	
+			<div class="row">
+				<div class="col-lg-6">
+					<div id="{{id}}:tmpl_prod_base">
+					</div>			
+				</div>	
+			</div>	
+			
+			<div class="panel-footer">
+				<div id="{{id}}:cmdApplyTemplate">
+				</div>
+				<div id="{{id}}:cmdApplyDriver">
+				</div>
+				
+			</div>		
+		</div>	
+	</div>
+	
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h6 class="panel-title">График</h6>				
+		</div>
+	
+		<div class="panel-body">
+			<div id="{{id}}:schedule" style="overflow: auto;">
+			</div>			
+		</div>
+	</div>
+</div>	

@@ -1,0 +1,16 @@
+<div id="{{id}}">
+	<table>
+	{{#rows}}
+		<tr>
+			<td nowrap="nowrap" title="{{user_title}}" class="chat_user" user_id="{{user_id}}">
+				<img src="{{user_img}}" width="10" height="10">
+				</img>
+				{{name}}
+				<span id="unviewd_msg_for_{{user_id}}" class="{{#no_unviewed}}hidden{{/no_unviewed}} badge bg-info" title="Непрочитанные сообщения от этого пользователя для меня">
+					{{unviewed_msg_cnt}}
+				</span>
+			</td>
+		</tr>
+	{{/rows}}
+	</table>
+</div>

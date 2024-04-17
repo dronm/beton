@@ -1,0 +1,30 @@
+<div id="{{id}}" class="chat draggable" title="Чат сотрудников">
+	<div class="panel panel-collapsed">
+		<div class="panel-heading chatBar" >
+			<h4 class="panel-title">Чат с сотрудниками
+			</h4>
+			<div class="heading-elements">
+				<ui class="icons-list">
+					<li>
+						<span id="{{id}}:unviewedMsg" title="Непрочитанные сообщения">&nbsp;
+						</span>
+					</li>
+					<li>
+						<a id="{{id}}:toggle" class="rotate-180" data-action="collapse" title="Свернуть/развернуть" href="#">
+						</a>
+					</li>
+				</ui>
+			</div>
+		</div>
+		<div id="{{id}}:body" class="panel-body chatBody">
+			<div id="{{id}}:status">
+			</div>
+			<div>
+				<div id="{{id}}:contacts" class="chatContacts">
+				</div>
+				<div id="{{id}}:activeChat" class="chatActive">
+				</div>				
+			</div>
+		</div>
+	</div>
+</div>

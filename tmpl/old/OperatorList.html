@@ -1,0 +1,111 @@
+<div id="{{id}}">
+	<div class="row">
+		<h1 id="{{id}}:prod_site_title" class="page-header">
+		</h1>
+	</div>
+	<div class="{{bsCol}}12">
+		{{#OPERATOR}}
+		<!-- one plant-->
+		<div class="panel panel-default {{bsCol}}3">
+			<div class="panel-body">				
+				<div class="row order-l-grid">
+					<div id="{{id}}:production_sites1">
+					</div>
+					<div id="{{id}}:material_stores1">
+					</div>			
+				</div>	
+				
+				<div class="row order-l-grid">
+					<div id="{{id}}:mat_totals_grid1">
+					</div>
+				</div>				
+			</div>	
+		</div>			
+		{{/OPERATOR}}
+		
+		{{#NOT_OPERATOR}}
+		<div class="panel panel-default {{bsCol}}6">
+			<div class="panel-heading">Утяшево</div>
+			<div class="panel-body">				
+				<div class="row order-l-grid">
+					<div id="{{id}}:production_sites1">
+					</div>
+					<div id="{{id}}:material_stores1">
+					</div>			
+				</div>	
+				
+				<div class="row order-l-grid">
+					<div id="{{id}}:mat_totals_grid1">
+					</div>
+				</div>				
+			</div>	
+		</div>	
+		<div class="panel panel-default {{bsCol}}3">
+			<div class="panel-heading">В.труда</div>
+			<div class="panel-body">				
+				<div class="row order-l-grid">
+					<div id="{{id}}:production_sites2">
+					</div>
+					<div id="{{id}}:material_stores2">
+					</div>			
+				</div>	
+				
+				<div class="row order-l-grid">
+					<div id="{{id}}:mat_totals_grid2">
+					</div>
+				</div>				
+			</div>	
+		</div>	
+		<div class="panel panel-default {{bsCol}}3">
+			<div class="panel-heading">Респуб.</div>
+			<div class="panel-body">				
+				<div class="row order-l-grid">
+					<div id="{{id}}:production_sites3">
+					</div>
+					<div id="{{id}}:material_stores3">
+					</div>			
+				</div>	
+				
+				<div class="row order-l-grid">
+					<div id="{{id}}:mat_totals_grid3">
+					</div>
+				</div>				
+			</div>	
+		</div>	
+		
+		{{/NOT_OPERATOR}}
+	</div>
+	
+	<div id="{{id}}:colLeft" class="{{bsCol}}12">
+		{{#showPeriod}}
+		<div id="{{id}}:date_filter">
+		</div>
+		{{/showPeriod}}
+		
+		<div id="totContainer">
+			<span style="margin-right:20px;">
+				<label class="lbl" id="totOrdered_l" for="totOrdered">Заявлено:</label>
+				<input id="totOrdered" disabled="disabled" class="" type="text" size="4">
+				</input>
+				<span id="totOrdered_m" class="">м3</span>
+			</span>
+			
+			<span style="margin-right:20px;">
+				<label class="lbl" id="totShipped_l" for="totShipped">Отгружено:</label>
+				<input id="totShipped" disabled="disabled" class="" type="text" size="4">
+				</input>
+				<span id="totShipped_m" class="">м3</span>
+			</span>
+			
+			<span style="margin-right:20px;">
+				<label class="lbl" id="totBalance_l" for="totShipped">Остаток:</label>
+				<input id="totBalance" disabled="disabled" class="" type="text" size="4">
+				</input>
+				<span id="totBalance_m" class="">м3</span>		
+			</span>
+		</div>	
+		
+		<div id="{{id}}:grid">
+		</div>	
+	</div>	
+</div>

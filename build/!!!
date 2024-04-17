@@ -1,0 +1,109 @@
+КООРДИНАТЫ ДОРОГИ БАЗЫ
+65.391466000000 57.148727000000
+
+update destinations set zone_center=ST_Centroid(zone) where zone IS NOT NULL
+База lon=65,lat=57
+https://www.katren.org/nearest/v1/driving/65.3914348831315,57.148785767065
+Update destinations set near_road_lon=65.391466, near_road_lat=57.148727 where id=152
+
+
+http://dev.openlayers.org/releases/OpenLayers-2.13.1/doc/apidocs/files/OpenLayers/Geometry/Point-js.html
+
+circle buffer
+http://dev.openlayers.org/docs/files/OpenLayers/Geometry/Polygon-js.html#OpenLayers.Geometry.Polygon.createRegularPolygon
+
+https://stackoverflow.com/questions/53817431/how-to-detect-deviation-in-path-between-coordinates-set
+
+Убрал из ViewBase
+		var m_data = CommonHelper.longString(function () {/*
+				<xsl:copy-of select="/document/model[@id=$m_id]"/>
+			*/});		
+
+BEGIN;
+
+
+
+
+
+
+Как быть с отображением расстояния до базы? если брать чисто точку - не показательно, тк, маршрут намного длиннее
+
+WITH
+pos AS (select lon, lat from car_tracking where car_id = (select tracker_id FROM vehicles where plate='х428ра') order by period desc limit 1)
+select
+	ST_Distance(
+		st_geomFromText('POINT('|| (SELECT lon FROM pos) ||' '|| (SELECT lat FROM pos) ||')', 3587)
+		,st_geomFromText('POINT('|| d.near_road_lon ||' '|| d.near_road_lat ||')', 3587)
+		--,d.zone
+	)
+from destinations AS d WHERE 
+d.id = (select b.destination_id from production_bases AS b where b.id=1)
+
+
+
+
+SELECT
+	sub3.d,
+	json_agg(sub3.vehicles)
+FROM (
+	SELECT
+		sub2.d::date,
+		json_build_object(
+				'vehicle_id',
+			sub2.veh_id,
+				'items',
+			(SELECT
+					json_agg(s.v)
+				FROM
+				(SELECT		 	
+					json_build_object(
+						'name', its.name,
+						'is_income', its.is_income,
+						'val',
+							CASE
+								WHEN its.query IS NOT NULL THEN
+									vehicle_tot_rep_item_exec_query(
+											its.query,
+											sub2.veh_id,
+											sub2.d,
+											last_month_day(sub2.d::date)+'1 day'::interval+'05:59:59'									
+									)
+								ELSE coalesce(vals.value, 0.00)
+							END
+					) AS v
+				FROM vehicle_tot_rep_items AS its
+				LEFT JOIN vehicle_tot_rep_item_vals AS vals ON vals.vehicle_tot_rep_item_id = its.id
+				ORDER BY its.code
+				) AS s
+			)
+		) AS vehicles
+
+	FROM (
+		SELECT
+			sub1.d,
+			unnest(sub1.veh_ids) As veh_id
+		FROM (
+			SELECT
+						d AS d				
+						,(SELECT
+							array_agg(v.id)
+						FROM vehicles AS v
+						LEFT JOIN vehicle_schedules AS sch ON sch.vehicle_id = v.id AND sch.schedule_date=d::date
+						WHERE (
+								vehicle_owner_on_date(
+										v.vehicle_owners,
+									(date_trunc('month', d::date) + interval '1 month - 1 day')::date
+								)->'keys'->>'id')::int = 10
+							AND sch.id IS NOT NULL
+						) AS veh_ids
+
+				FROM generate_series(
+						'2023-05-01T06:00:00'::timestamp,
+						'2023-08-01T05:59:59'::timestamp,
+						'1 month'::interval
+				) AS d
+		) AS sub1
+	) AS sub2
+) AS sub3
+GROUP BY sub3.d
+

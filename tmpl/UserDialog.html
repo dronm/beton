@@ -1,0 +1,92 @@
+<div id="{{id}}">
+	<div id="{{id}}:cmd-cont">
+		<div id="{{id}}:cmdOk"/>
+		<div id="{{id}}:cmdSave"/>
+		<div id="{{id}}:cmdResetPwd" title="Назначить пользователю новый пароль и отправить СМС" options="{'caption':'Сменить пароль'}"/>
+		<div id="{{id}}:cmdCancel"/>
+	</div>
+
+	<div class="panel-heading">
+		<h3 class="panel-title">Карточка пользователя</h3>
+	</div>
+	
+	<div class="tabbable">
+		<ul class="nav nav-tabs nav-tabs-highlight">
+			<li class="active">
+				<a href="#profile" data-toggle="tab" aria-expanded="true">Профиль</a>
+			</li>
+			<li>
+				<a href="#mac_list" data-toggle="tab" aria-expanded="false">Мак адреса</a>
+			</li>
+			<li>
+				<a href="#contacts_list" data-toggle="tab" aria-expanded="false">Контакты</a>
+			</li>
+			
+			<li>
+				<a href="#activity" data-toggle="tab" aria-expanded="false">Активность</a>
+			</li>
+		</ul>
+	</div>
+	
+	<!-- Tab panes -->
+	<div class="tab-content dialogForm">	
+		<div class="tab-pane fade in active" id="profile">
+			<div class="panel panel-body userDialogTab">
+				<div class="panel-heading">
+					<h4 class="panel-title">Данные пользователя</h4>
+				</div>
+			
+				<div id="UserDialog:name"/>
+				<div id="UserDialog:role"/>
+				<!--
+				<div id="UserDialog:email"/>
+				<div id="UserDialog:phone_cel"/>
+				<div id="UserDialog:tel_ext"/>
+				-->
+				<div id="UserDialog:production_sites_ref"/>
+				<div id="UserDialog:banned"/>
+				
+			</div>
+		</div>
+
+		<div class="tab-pane fade" id="mac_list">
+			<div class="panel panel-body userDialogTab">
+				<div class="panel">
+					<div class="panel-heading">
+						<h4 class="panel-title">MAC адреса пользователя</h4>
+					</div>
+	
+					<div id="UserDialog:mac_list"/>
+				</div>
+				
+			</div>
+		</div>
+		<div class="tab-pane fade" id="contacts_list">
+			<div class="panel panel-body userDialogTab">
+				<div class="panel">
+					<div class="panel-heading">
+						<h4 class="panel-title">Контакты</h4>
+					</div>
+	
+					<div id="{{id}}:contacts_list"/>
+				</div>
+				
+			</div>
+		</div>
+
+		<div class="tab-pane fade" id="activity">
+			<div class="panel panel-body userDialogTab">
+				<div class="panel-heading">
+					<h4 class="panel-title">Активность пользователя</h4>		
+				</div>
+				
+				<h6 class="panel-title">Устройства входа</h6>
+				<div id="UserDialog:login_device_list"/>
+				
+				<h6 class="panel-title">Сессии</h6>
+				<div id="UserDialog:login_list"/>
+			</div>
+		</div>
+		
+	</div>	
+</div>	

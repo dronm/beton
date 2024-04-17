@@ -1,0 +1,6393 @@
+array (
+  0 => 
+  (object) array(
+     'id' => '513AF4CD-D64B-1342-B3AA-DA80E51A926F',
+     'eventDateTime' => '2023-08-19T07:56:00.6840',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  1 => 
+  (object) array(
+     'id' => 'C243D5B3-AAB0-0940-9E42-B638ED809CCE',
+     'eventDateTime' => '2023-08-19T08:46:27.2920',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42160,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 24640,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  2 => 
+  (object) array(
+     'id' => 'B58F76C6-29AC-1C4B-AE4C-3D38927787F4',
+     'eventDateTime' => '2023-08-19T09:09:54.9610',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  3 => 
+  (object) array(
+     'id' => '6EF606A6-013C-0A45-AFB9-86CD45BD2B68',
+     'eventDateTime' => '2023-08-19T09:25:38.5280',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  4 => 
+  (object) array(
+     'id' => '425870BF-125D-AA45-93FD-9F646AF3C9B5',
+     'eventDateTime' => '2023-08-19T09:38:05.7380',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 39780,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 23840,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  5 => 
+  (object) array(
+     'id' => '219D27B4-A706-B24E-A293-37CB9672EBB2',
+     'eventDateTime' => '2023-08-19T09:41:37.4150',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  6 => 
+  (object) array(
+     'id' => '0D26D53E-9CEB-494F-ACB4-FAD9C81B5957',
+     'eventDateTime' => '2023-08-19T09:53:40.7100',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42120,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25000,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  7 => 
+  (object) array(
+     'id' => 'FA4E921D-9255-A14C-9308-7E7A2E6926FF',
+     'eventDateTime' => '2023-08-19T10:07:36.0140',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42720,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25180,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  8 => 
+  (object) array(
+     'id' => 'D391446F-7E40-164A-8599-14352E61FC00',
+     'eventDateTime' => '2023-08-19T10:20:04.6440',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  9 => 
+  (object) array(
+     'id' => '37511250-C415-CB4E-AD2F-A1112C129052',
+     'eventDateTime' => '2023-08-19T10:41:13.0970',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 39480,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 23580,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  10 => 
+  (object) array(
+     'id' => '1900311F-7584-E248-ACD5-AD727C552F33',
+     'eventDateTime' => '2023-08-19T10:56:52.6090',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  11 => 
+  (object) array(
+     'id' => '484C3F0F-5B90-6841-BF05-5A2ADBDB4050',
+     'eventDateTime' => '2023-08-19T11:31:39.4730',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  12 => 
+  (object) array(
+     'id' => 'F275EEF4-E140-5C49-A3F3-22222BE7FA18',
+     'eventDateTime' => '2023-08-19T12:05:21.5640',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 43760,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 26600,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  13 => 
+  (object) array(
+     'id' => '40D63DB2-C0D0-A04E-AD40-73543773B28B',
+     'eventDateTime' => '2023-08-19T12:10:55.8250',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42820,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25280,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  14 => 
+  (object) array(
+     'id' => '32EF584B-43EC-9D43-896D-8606335CA650',
+     'eventDateTime' => '2023-08-19T12:48:27.9090',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  15 => 
+  (object) array(
+     'id' => 'AFE8555F-6471-2448-86FC-8CBC4763DF58',
+     'eventDateTime' => '2023-08-19T13:20:52.4680',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 38700,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 22780,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  16 => 
+  (object) array(
+     'id' => 'CA889F18-B62B-2144-B76A-4CAB92A3ABF7',
+     'eventDateTime' => '2023-08-19T14:03:06.0380',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  17 => 
+  (object) array(
+     'id' => '096EABED-597C-C743-B548-9260CBDDAFAA',
+     'eventDateTime' => '2023-08-19T14:25:53.1620',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42980,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25940,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  18 => 
+  (object) array(
+     'id' => '34E77016-AA2C-6A4A-B2B5-D2390B3954D4',
+     'eventDateTime' => '2023-08-19T14:29:22.1240',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  19 => 
+  (object) array(
+     'id' => 'FAB114EF-DD5F-A147-B298-CA68A8293540',
+     'eventDateTime' => '2023-08-19T15:28:12.9250',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 38300,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 22420,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  20 => 
+  (object) array(
+     'id' => '241F0363-C4CD-D040-9621-C9FFF7FA58A6',
+     'eventDateTime' => '2023-08-19T16:13:06.7310',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  21 => 
+  (object) array(
+     'id' => 'FBDA9E66-B92B-5A4B-8A4F-0E4064BBFD61',
+     'eventDateTime' => '2023-08-19T16:45:02.6010',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 43340,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 26280,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  22 => 
+  (object) array(
+     'id' => '5F9CD016-FD57-CF46-89E0-146C94F6EC61',
+     'eventDateTime' => '2023-08-19T17:49:17.1820',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  23 => 
+  (object) array(
+     'id' => '5B713CB6-32BE-274B-8435-DEA9ACB2A126',
+     'eventDateTime' => '2023-08-19T18:12:46.5840',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 39480,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 23580,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  24 => 
+  (object) array(
+     'id' => 'ADCC25B8-6710-7742-A6CE-942332C9D10D',
+     'eventDateTime' => '2023-08-20T08:16:56.1190',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+  ),
+  25 => 
+  (object) array(
+     'id' => '4A88153B-9A63-484C-9722-8D1C7AC17E71',
+     'eventDateTime' => '2023-08-20T08:47:28.2010',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 43880,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 26760,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+  ),
+  26 => 
+  (object) array(
+     'id' => 'A43DFEA0-2090-8F4A-8788-6D7EDDDF15DB',
+     'eventDateTime' => '2023-08-20T09:51:44.1530',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  27 => 
+  (object) array(
+     'id' => 'CAC0791C-DA16-BD45-AF23-7B434443E969',
+     'eventDateTime' => '2023-08-20T10:14:15.4950',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 43360,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 26320,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  28 => 
+  (object) array(
+     'id' => 'B130BDC5-9628-3F42-9FF7-EE2707261FB2',
+     'eventDateTime' => '2023-08-20T11:11:14.8300',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  29 => 
+  (object) array(
+     'id' => '2F725C95-575D-684E-97E3-AE955705BB8B',
+     'eventDateTime' => '2023-08-20T11:13:14.4360',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  30 => 
+  (object) array(
+     'id' => 'E1C54638-88AC-E049-8E6E-0221D69121AA',
+     'eventDateTime' => '2023-08-20T11:45:23.3720',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 43420,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 26220,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  31 => 
+  (object) array(
+     'id' => 'F8941A63-C16F-3E49-9E41-03D2E5A88A34',
+     'eventDateTime' => '2023-08-20T11:55:32.6920',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 38740,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 22820,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  32 => 
+  (object) array(
+     'id' => 'DD87EA87-1763-5C4B-9A49-8A64D97557D3',
+     'eventDateTime' => '2023-08-20T12:44:02.4690',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  33 => 
+  (object) array(
+     'id' => '7747034F-E2E6-FF4F-8C98-8B8FB54C5CFA',
+     'eventDateTime' => '2023-08-20T12:48:40.1510',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  34 => 
+  (object) array(
+     'id' => 'E89CB241-F575-DD4C-89D3-E4D7661264F5',
+     'eventDateTime' => '2023-08-20T13:09:30.5150',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 39660,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 23780,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  35 => 
+  (object) array(
+     'id' => 'CEA68B57-D731-CF45-A7F9-9DB1A711282F',
+     'eventDateTime' => '2023-08-20T13:29:49.2190',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42540,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25480,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  36 => 
+  (object) array(
+     'id' => 'EAF13A97-9763-C049-9EEB-D3283E74BD37',
+     'eventDateTime' => '2023-08-20T13:54:22.2750',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  37 => 
+  (object) array(
+     'id' => '781E4E2C-FAC2-A14C-9F60-13D5CB2E6398',
+     'eventDateTime' => '2023-08-20T14:19:45.2970',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 38580,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 22720,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  38 => 
+  (object) array(
+     'id' => 'B0D5039A-BDC1-ED4A-8ACF-9734DCAB6E34',
+     'eventDateTime' => '2023-08-21T08:09:15.2590',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  39 => 
+  (object) array(
+     'id' => '8BC6F284-6045-074E-A41C-84961135A62C',
+     'eventDateTime' => '2023-08-21T08:42:17.6830',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42440,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 24880,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  40 => 
+  (object) array(
+     'id' => 'F835529F-9447-604C-A1FD-5738B2E842FF',
+     'eventDateTime' => '2023-08-21T09:32:41.3700',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+  ),
+  41 => 
+  (object) array(
+     'id' => '575FBAC1-49A8-954A-9279-F5D5625DEF58',
+     'eventDateTime' => '2023-08-21T09:34:46.1700',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  42 => 
+  (object) array(
+     'id' => 'EDB5820A-2A9D-944E-910E-FAD1F7C83AE6',
+     'eventDateTime' => '2023-08-21T09:47:55.1850',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  43 => 
+  (object) array(
+     'id' => '6AD92D6E-EE2E-3F40-9CC4-2951FFCF6824',
+     'eventDateTime' => '2023-08-21T09:51:22.0950',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42600,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25020,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  44 => 
+  (object) array(
+     'id' => '13D585CD-BFF5-CE49-B76E-5F63980BAE09',
+     'eventDateTime' => '2023-08-21T09:55:39.9120',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 71320,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 51200,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+  ),
+  45 => 
+  (object) array(
+     'id' => 'C4377D09-9979-E44D-A7D0-83DAD3D96C91',
+     'eventDateTime' => '2023-08-21T10:04:51.9470',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42540,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25280,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  46 => 
+  (object) array(
+     'id' => '2E00AF72-189F-CA42-8CEE-0595BB2C99A9',
+     'eventDateTime' => '2023-08-21T10:10:31.6200',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+  ),
+  47 => 
+  (object) array(
+     'id' => '469AAE52-7519-7E4D-818C-B2C1BBA65755',
+     'eventDateTime' => '2023-08-21T10:38:21.5400',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '947',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  48 => 
+  (object) array(
+     'id' => '34FE1B67-6728-2444-A2CB-4991F9A5D4C5',
+     'eventDateTime' => '2023-08-21T10:49:02.1370',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  49 => 
+  (object) array(
+     'id' => 'ED1B5F16-764D-F346-AE84-EE50145AF2DF',
+     'eventDateTime' => '2023-08-21T10:50:10.7620',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  50 => 
+  (object) array(
+     'id' => '47146E4F-9C70-1141-A8D8-2601B6B85224',
+     'eventDateTime' => '2023-08-21T10:52:14.1190',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 68240,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 48140,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  51 => 
+  (object) array(
+     'id' => 'CDAEEBAE-0BBF-284D-9744-50F57F109633',
+     'eventDateTime' => '2023-08-21T10:58:11.7900',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '947',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 64480,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 44280,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  52 => 
+  (object) array(
+     'id' => '2E32007F-E6BE-EB4B-B3E4-AE85EA048A82',
+     'eventDateTime' => '2023-08-21T11:06:34.3280',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  53 => 
+  (object) array(
+     'id' => '1D6F7A89-0274-A644-A4D5-7B0B938239FA',
+     'eventDateTime' => '2023-08-21T11:08:43.1220',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  54 => 
+  (object) array(
+     'id' => '36A9ECB6-2C43-5B4C-B1B0-A64B9D447305',
+     'eventDateTime' => '2023-08-21T11:13:26.5660',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42900,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25260,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  55 => 
+  (object) array(
+     'id' => 'B337C40D-2FEA-E641-BD4E-43F5EA119E8B',
+     'eventDateTime' => '2023-08-21T11:16:12.7460',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '947',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  56 => 
+  (object) array(
+     'id' => 'D1C6837E-443A-BE45-809B-2C1753307B56',
+     'eventDateTime' => '2023-08-21T11:21:17.7830',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 38280,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 22400,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  57 => 
+  (object) array(
+     'id' => '999A767D-5B12-0840-8B96-D12FAB0E8C39',
+     'eventDateTime' => '2023-08-21T11:24:15.5470',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 68620,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 48520,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  58 => 
+  (object) array(
+     'id' => 'D89F47A2-FF05-ED4C-A320-90FC55914635',
+     'eventDateTime' => '2023-08-21T11:33:11.3460',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '947',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 64980,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 44820,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  59 => 
+  (object) array(
+     'id' => '0DC6D188-1A26-A944-9FE5-8098EF503950',
+     'eventDateTime' => '2023-08-21T11:38:00.2570',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  60 => 
+  (object) array(
+     'id' => '80C6058E-7FAF-7544-94FF-1EB90873F5AE',
+     'eventDateTime' => '2023-08-21T11:45:53.6960',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42960,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25820,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  61 => 
+  (object) array(
+     'id' => '01518E56-80A1-D44D-B047-FD54478F32DE',
+     'eventDateTime' => '2023-08-21T12:06:56.2800',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  62 => 
+  (object) array(
+     'id' => '9082DAC9-FED4-3D40-9614-711EB67D20F0',
+     'eventDateTime' => '2023-08-21T12:08:07.6610',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  63 => 
+  (object) array(
+     'id' => '00A5CBF5-48D2-9C45-AC67-DD634738C5C5',
+     'eventDateTime' => '2023-08-21T12:32:22.2450',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 39860,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 24000,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  64 => 
+  (object) array(
+     'id' => '50B74F3A-0412-2B4A-A476-30C7B6D5FC62',
+     'eventDateTime' => '2023-08-21T12:45:44.8030',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42340,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 24680,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  65 => 
+  (object) array(
+     'id' => 'D8FA7CAA-E137-3D45-B24C-9DEBD0346F19',
+     'eventDateTime' => '2023-08-21T12:48:38.0600',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  66 => 
+  (object) array(
+     'id' => '26D8FC59-1710-CC48-A19D-84178E3AE26F',
+     'eventDateTime' => '2023-08-21T13:05:52.6900',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '947',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  67 => 
+  (object) array(
+     'id' => '0194359A-4EAF-114B-A919-C54B8280FAC7',
+     'eventDateTime' => '2023-08-21T13:07:51.6820',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 41940,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 24740,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  68 => 
+  (object) array(
+     'id' => 'F5EAB815-6153-204F-9749-B81B34AE6A96',
+     'eventDateTime' => '2023-08-21T13:15:10.5140',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 68800,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 48700,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  69 => 
+  (object) array(
+     'id' => 'D53199D2-79F1-9B4B-B22C-89665B9ACAE6',
+     'eventDateTime' => '2023-08-21T13:24:41.4620',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '947',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 63940,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 43900,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  70 => 
+  (object) array(
+     'id' => '25F028F2-CDE9-614C-8145-A63D047E0289',
+     'eventDateTime' => '2023-08-21T13:31:25.3130',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 20100,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+)array (
+  0 => 
+  (object) array(
+     'id' => '513AF4CD-D64B-1342-B3AA-DA80E51A926F',
+     'eventDateTime' => '2023-08-19T07:56:00.6840',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  1 => 
+  (object) array(
+     'id' => 'C243D5B3-AAB0-0940-9E42-B638ED809CCE',
+     'eventDateTime' => '2023-08-19T08:46:27.2920',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42160,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 24640,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  2 => 
+  (object) array(
+     'id' => 'B58F76C6-29AC-1C4B-AE4C-3D38927787F4',
+     'eventDateTime' => '2023-08-19T09:09:54.9610',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  3 => 
+  (object) array(
+     'id' => '6EF606A6-013C-0A45-AFB9-86CD45BD2B68',
+     'eventDateTime' => '2023-08-19T09:25:38.5280',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  4 => 
+  (object) array(
+     'id' => '425870BF-125D-AA45-93FD-9F646AF3C9B5',
+     'eventDateTime' => '2023-08-19T09:38:05.7380',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 39780,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 23840,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  5 => 
+  (object) array(
+     'id' => '219D27B4-A706-B24E-A293-37CB9672EBB2',
+     'eventDateTime' => '2023-08-19T09:41:37.4150',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  6 => 
+  (object) array(
+     'id' => '0D26D53E-9CEB-494F-ACB4-FAD9C81B5957',
+     'eventDateTime' => '2023-08-19T09:53:40.7100',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42120,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25000,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  7 => 
+  (object) array(
+     'id' => 'FA4E921D-9255-A14C-9308-7E7A2E6926FF',
+     'eventDateTime' => '2023-08-19T10:07:36.0140',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42720,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25180,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  8 => 
+  (object) array(
+     'id' => 'D391446F-7E40-164A-8599-14352E61FC00',
+     'eventDateTime' => '2023-08-19T10:20:04.6440',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  9 => 
+  (object) array(
+     'id' => '37511250-C415-CB4E-AD2F-A1112C129052',
+     'eventDateTime' => '2023-08-19T10:41:13.0970',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 39480,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 23580,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  10 => 
+  (object) array(
+     'id' => '1900311F-7584-E248-ACD5-AD727C552F33',
+     'eventDateTime' => '2023-08-19T10:56:52.6090',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  11 => 
+  (object) array(
+     'id' => '484C3F0F-5B90-6841-BF05-5A2ADBDB4050',
+     'eventDateTime' => '2023-08-19T11:31:39.4730',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  12 => 
+  (object) array(
+     'id' => 'F275EEF4-E140-5C49-A3F3-22222BE7FA18',
+     'eventDateTime' => '2023-08-19T12:05:21.5640',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 43760,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 26600,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  13 => 
+  (object) array(
+     'id' => '40D63DB2-C0D0-A04E-AD40-73543773B28B',
+     'eventDateTime' => '2023-08-19T12:10:55.8250',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42820,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25280,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  14 => 
+  (object) array(
+     'id' => '32EF584B-43EC-9D43-896D-8606335CA650',
+     'eventDateTime' => '2023-08-19T12:48:27.9090',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  15 => 
+  (object) array(
+     'id' => 'AFE8555F-6471-2448-86FC-8CBC4763DF58',
+     'eventDateTime' => '2023-08-19T13:20:52.4680',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 38700,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 22780,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  16 => 
+  (object) array(
+     'id' => 'CA889F18-B62B-2144-B76A-4CAB92A3ABF7',
+     'eventDateTime' => '2023-08-19T14:03:06.0380',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  17 => 
+  (object) array(
+     'id' => '096EABED-597C-C743-B548-9260CBDDAFAA',
+     'eventDateTime' => '2023-08-19T14:25:53.1620',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42980,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25940,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  18 => 
+  (object) array(
+     'id' => '34E77016-AA2C-6A4A-B2B5-D2390B3954D4',
+     'eventDateTime' => '2023-08-19T14:29:22.1240',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  19 => 
+  (object) array(
+     'id' => 'FAB114EF-DD5F-A147-B298-CA68A8293540',
+     'eventDateTime' => '2023-08-19T15:28:12.9250',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 38300,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 22420,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  20 => 
+  (object) array(
+     'id' => '241F0363-C4CD-D040-9621-C9FFF7FA58A6',
+     'eventDateTime' => '2023-08-19T16:13:06.7310',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  21 => 
+  (object) array(
+     'id' => 'FBDA9E66-B92B-5A4B-8A4F-0E4064BBFD61',
+     'eventDateTime' => '2023-08-19T16:45:02.6010',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 43340,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 26280,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  22 => 
+  (object) array(
+     'id' => '5F9CD016-FD57-CF46-89E0-146C94F6EC61',
+     'eventDateTime' => '2023-08-19T17:49:17.1820',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  23 => 
+  (object) array(
+     'id' => '5B713CB6-32BE-274B-8435-DEA9ACB2A126',
+     'eventDateTime' => '2023-08-19T18:12:46.5840',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'р986ст',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 39480,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 23580,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  24 => 
+  (object) array(
+     'id' => 'ADCC25B8-6710-7742-A6CE-942332C9D10D',
+     'eventDateTime' => '2023-08-20T08:16:56.1190',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+  ),
+  25 => 
+  (object) array(
+     'id' => '4A88153B-9A63-484C-9722-8D1C7AC17E71',
+     'eventDateTime' => '2023-08-20T08:47:28.2010',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 43880,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 26760,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+  ),
+  26 => 
+  (object) array(
+     'id' => 'A43DFEA0-2090-8F4A-8788-6D7EDDDF15DB',
+     'eventDateTime' => '2023-08-20T09:51:44.1530',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  27 => 
+  (object) array(
+     'id' => 'CAC0791C-DA16-BD45-AF23-7B434443E969',
+     'eventDateTime' => '2023-08-20T10:14:15.4950',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 43360,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 26320,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  28 => 
+  (object) array(
+     'id' => 'B130BDC5-9628-3F42-9FF7-EE2707261FB2',
+     'eventDateTime' => '2023-08-20T11:11:14.8300',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  29 => 
+  (object) array(
+     'id' => '2F725C95-575D-684E-97E3-AE955705BB8B',
+     'eventDateTime' => '2023-08-20T11:13:14.4360',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  30 => 
+  (object) array(
+     'id' => 'E1C54638-88AC-E049-8E6E-0221D69121AA',
+     'eventDateTime' => '2023-08-20T11:45:23.3720',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 43420,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 26220,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  31 => 
+  (object) array(
+     'id' => 'F8941A63-C16F-3E49-9E41-03D2E5A88A34',
+     'eventDateTime' => '2023-08-20T11:55:32.6920',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 38740,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 22820,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  32 => 
+  (object) array(
+     'id' => 'DD87EA87-1763-5C4B-9A49-8A64D97557D3',
+     'eventDateTime' => '2023-08-20T12:44:02.4690',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  33 => 
+  (object) array(
+     'id' => '7747034F-E2E6-FF4F-8C98-8B8FB54C5CFA',
+     'eventDateTime' => '2023-08-20T12:48:40.1510',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  34 => 
+  (object) array(
+     'id' => 'E89CB241-F575-DD4C-89D3-E4D7661264F5',
+     'eventDateTime' => '2023-08-20T13:09:30.5150',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 39660,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 23780,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  35 => 
+  (object) array(
+     'id' => 'CEA68B57-D731-CF45-A7F9-9DB1A711282F',
+     'eventDateTime' => '2023-08-20T13:29:49.2190',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42540,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25480,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  36 => 
+  (object) array(
+     'id' => 'EAF13A97-9763-C049-9EEB-D3283E74BD37',
+     'eventDateTime' => '2023-08-20T13:54:22.2750',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  37 => 
+  (object) array(
+     'id' => '781E4E2C-FAC2-A14C-9F60-13D5CB2E6398',
+     'eventDateTime' => '2023-08-20T14:19:45.2970',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 38580,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 22720,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  38 => 
+  (object) array(
+     'id' => 'B0D5039A-BDC1-ED4A-8ACF-9734DCAB6E34',
+     'eventDateTime' => '2023-08-21T08:09:15.2590',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  39 => 
+  (object) array(
+     'id' => '8BC6F284-6045-074E-A41C-84961135A62C',
+     'eventDateTime' => '2023-08-21T08:42:17.6830',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42440,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 24880,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  40 => 
+  (object) array(
+     'id' => 'F835529F-9447-604C-A1FD-5738B2E842FF',
+     'eventDateTime' => '2023-08-21T09:32:41.3700',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+  ),
+  41 => 
+  (object) array(
+     'id' => '575FBAC1-49A8-954A-9279-F5D5625DEF58',
+     'eventDateTime' => '2023-08-21T09:34:46.1700',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  42 => 
+  (object) array(
+     'id' => 'EDB5820A-2A9D-944E-910E-FAD1F7C83AE6',
+     'eventDateTime' => '2023-08-21T09:47:55.1850',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  43 => 
+  (object) array(
+     'id' => '6AD92D6E-EE2E-3F40-9CC4-2951FFCF6824',
+     'eventDateTime' => '2023-08-21T09:51:22.0950',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42600,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25020,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  44 => 
+  (object) array(
+     'id' => '13D585CD-BFF5-CE49-B76E-5F63980BAE09',
+     'eventDateTime' => '2023-08-21T09:55:39.9120',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 71320,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 51200,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+  ),
+  45 => 
+  (object) array(
+     'id' => 'C4377D09-9979-E44D-A7D0-83DAD3D96C91',
+     'eventDateTime' => '2023-08-21T10:04:51.9470',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42540,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25280,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  46 => 
+  (object) array(
+     'id' => '2E00AF72-189F-CA42-8CEE-0595BB2C99A9',
+     'eventDateTime' => '2023-08-21T10:10:31.6200',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+  ),
+  47 => 
+  (object) array(
+     'id' => '469AAE52-7519-7E4D-818C-B2C1BBA65755',
+     'eventDateTime' => '2023-08-21T10:38:21.5400',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '947',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  48 => 
+  (object) array(
+     'id' => '34FE1B67-6728-2444-A2CB-4991F9A5D4C5',
+     'eventDateTime' => '2023-08-21T10:49:02.1370',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  49 => 
+  (object) array(
+     'id' => 'ED1B5F16-764D-F346-AE84-EE50145AF2DF',
+     'eventDateTime' => '2023-08-21T10:50:10.7620',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  50 => 
+  (object) array(
+     'id' => '47146E4F-9C70-1141-A8D8-2601B6B85224',
+     'eventDateTime' => '2023-08-21T10:52:14.1190',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 68240,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 48140,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  51 => 
+  (object) array(
+     'id' => 'CDAEEBAE-0BBF-284D-9744-50F57F109633',
+     'eventDateTime' => '2023-08-21T10:58:11.7900',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '947',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 64480,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 44280,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  52 => 
+  (object) array(
+     'id' => '2E32007F-E6BE-EB4B-B3E4-AE85EA048A82',
+     'eventDateTime' => '2023-08-21T11:06:34.3280',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  53 => 
+  (object) array(
+     'id' => '1D6F7A89-0274-A644-A4D5-7B0B938239FA',
+     'eventDateTime' => '2023-08-21T11:08:43.1220',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  54 => 
+  (object) array(
+     'id' => '36A9ECB6-2C43-5B4C-B1B0-A64B9D447305',
+     'eventDateTime' => '2023-08-21T11:13:26.5660',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42900,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25260,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  55 => 
+  (object) array(
+     'id' => 'B337C40D-2FEA-E641-BD4E-43F5EA119E8B',
+     'eventDateTime' => '2023-08-21T11:16:12.7460',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '947',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  56 => 
+  (object) array(
+     'id' => 'D1C6837E-443A-BE45-809B-2C1753307B56',
+     'eventDateTime' => '2023-08-21T11:21:17.7830',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 38280,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 22400,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  57 => 
+  (object) array(
+     'id' => '999A767D-5B12-0840-8B96-D12FAB0E8C39',
+     'eventDateTime' => '2023-08-21T11:24:15.5470',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 68620,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 48520,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  58 => 
+  (object) array(
+     'id' => 'D89F47A2-FF05-ED4C-A320-90FC55914635',
+     'eventDateTime' => '2023-08-21T11:33:11.3460',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '947',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 64980,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 44820,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  59 => 
+  (object) array(
+     'id' => '0DC6D188-1A26-A944-9FE5-8098EF503950',
+     'eventDateTime' => '2023-08-21T11:38:00.2570',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  60 => 
+  (object) array(
+     'id' => '80C6058E-7FAF-7544-94FF-1EB90873F5AE',
+     'eventDateTime' => '2023-08-21T11:45:53.6960',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42960,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 25820,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  61 => 
+  (object) array(
+     'id' => '01518E56-80A1-D44D-B047-FD54478F32DE',
+     'eventDateTime' => '2023-08-21T12:06:56.2800',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  62 => 
+  (object) array(
+     'id' => '9082DAC9-FED4-3D40-9614-711EB67D20F0',
+     'eventDateTime' => '2023-08-21T12:08:07.6610',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  63 => 
+  (object) array(
+     'id' => '00A5CBF5-48D2-9C45-AC67-DD634738C5C5',
+     'eventDateTime' => '2023-08-21T12:32:22.2450',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'у685кр72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'SCANIA',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 39860,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 24000,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  64 => 
+  (object) array(
+     'id' => '50B74F3A-0412-2B4A-A476-30C7B6D5FC62',
+     'eventDateTime' => '2023-08-21T12:45:44.8030',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м707ке72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 42340,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 24680,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  65 => 
+  (object) array(
+     'id' => 'D8FA7CAA-E137-3D45-B24C-9DEBD0346F19',
+     'eventDateTime' => '2023-08-21T12:48:38.0600',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  66 => 
+  (object) array(
+     'id' => '26D8FC59-1710-CC48-A19D-84178E3AE26F',
+     'eventDateTime' => '2023-08-21T13:05:52.6900',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '947',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  67 => 
+  (object) array(
+     'id' => '0194359A-4EAF-114B-A919-C54B8280FAC7',
+     'eventDateTime' => '2023-08-21T13:07:51.6820',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => 'м676ув72',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'FRED',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => 'Цемент42,5',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 41940,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 24740,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 26000,
+       'Valid' => true,
+    ),
+  ),
+  68 => 
+  (object) array(
+     'id' => 'F5EAB815-6153-204F-9749-B81B34AE6A96',
+     'eventDateTime' => '2023-08-21T13:15:10.5140',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 68800,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 48700,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  69 => 
+  (object) array(
+     'id' => 'D53199D2-79F1-9B4B-B22C-89665B9ACAE6',
+     'eventDateTime' => '2023-08-21T13:24:41.4620',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '947',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 63940,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 43900,
+       'Valid' => true,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+  70 => 
+  (object) array(
+     'id' => '25F028F2-CDE9-614C-8145-A63D047E0289',
+     'eventDateTime' => '2023-08-21T13:31:25.3130',
+     'vehiclePlate' => 
+    (object) array(
+       'String' => '109рх',
+       'Valid' => true,
+    ),
+     'driverName' => 
+    (object) array(
+       'String' => '',
+       'Valid' => false,
+    ),
+     'vehicleMake' => 
+    (object) array(
+       'String' => 'Шакман',
+       'Valid' => true,
+    ),
+     'materialName' => 
+    (object) array(
+       'String' => '5-20 Евробетон',
+       'Valid' => true,
+    ),
+     'brutto' => 
+    (object) array(
+       'Float64' => 20100,
+       'Valid' => true,
+    ),
+     'netto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docBrutto' => 
+    (object) array(
+       'Float64' => 0,
+       'Valid' => false,
+    ),
+     'docNetto' => 
+    (object) array(
+       'Float64' => 45000,
+       'Valid' => true,
+    ),
+  ),
+)

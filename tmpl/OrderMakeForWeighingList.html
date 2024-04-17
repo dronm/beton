@@ -1,0 +1,79 @@
+<div id="{{id}}">
+	<div id="{{id}}:colLeft" class="{{bsCol}}9">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h6 class="panel-title">Гашение талонов
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:ticketCloseTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>
+			
+			<div class="panel-body">										
+				<div id="{{id}}:ticket_close">
+				</div>	
+			</div>	
+		</div>		
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h6 class="panel-title">Заявки
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:orderCloseTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>
+			
+			<div class="panel-body wideGridPanelBody">										
+				<div id="{{id}}:order_make_filter">
+				</div>	
+				<div id="{{id}}:order_make_grid">
+				</div>	
+			</div>	
+		</div>		
+		
+	</div>	
+	<div id="{{id}}:panelCont" class="{{bsCol}}3 hidden" style="position:static;">
+		{{#productionBases}}
+		<div id="{{id}}:prodBaseCont_{{productionBaseId}}" class="panel panel-default draggable">
+			<div class="panel-heading">
+				<h6 class="panel-title">{{productionBaseName}}
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:prodBase{{productionBaseId}}Tgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>
+			
+			<div class="panel-body">							
+				<div class="row order-l-grid">
+					<div id="{{id}}:production_sites{{productionBaseId}}">
+					</div>
+					<div id="{{id}}:material_stores{{productionBaseId}}">
+					</div>			
+				</div>	
+			
+				<div class="row order-l-grid">
+					<div id="{{id}}:mat_totals_grid{{productionBaseId}}">
+					</div>
+				</div>		
+			</div>		
+		</div>			
+		{{/productionBases}}
+	</div>	
+	
+</div>

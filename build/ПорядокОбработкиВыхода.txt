@@ -1,0 +1,37 @@
+1) logins AFTER UPDATE trigger
+При выходе отправляет событие User.logout с указанием pubkey
+
+sessions AFTER delete
+UPDATE logins SET date_time_out = now() WHERE session_id=OLD.id;
+
+srv.exe старый сервер
+User.logout локально слушает сервер, если поймал, находит по pubkey нужного клиента и отправляет ему команду на закрытие User.logout
++ закрывает сокет этого клиента
+
+
+
+
+
+Как stroyservice
+1) Событие User.logout param=session_id
+Слушаем локально событие Login.logout
+Login_Controller метода logout НЕТ!!!
+
+session_vals AFTER delete
+UPDATE logins SET date_time_out = now() WHERE session_id=OLD.id;
+
+Слушаем в браузере событие User.logout
+
+Неясно играет ли роль "Login.logout", если отключить - работает
+
+!!!Сессия убивается в хранилище, соответственно на другом сервере тоже не работает, например в WS
+User.logout
+
+
+!!! ПЕРЕЗАГРУЗКА СЛУЧАЕТСЯ У ВСЕХ!!! ПРИ СОБЫТИИ User.logout !!!
+
+
+
+Что сделать:
+1) При назначении сессии искать по юзеру, выдавать тот же ключ, если есть активная сессия . 
+Это когда зашли с другого устройства

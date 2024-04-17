@@ -1,0 +1,1 @@
+/home/andrey/go/gobizap/templates/build.proj-tmpl/sql.proj-tmpl/session_vals_trigger.sql

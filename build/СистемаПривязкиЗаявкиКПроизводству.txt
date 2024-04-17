@@ -1,0 +1,17 @@
+
+SELECT
+	p.production_id,
+	p.production_dt_start,
+	p.production_vehicle_descr,
+	v.plate,
+	sh.ship_date_time
+from productions AS p
+left join vehicles AS v On v.id = p.vehicle_id
+left join shipments AS sh On sh.id = p.shipment_id
+WHERE p.production_site_id=6
+order by p.production_id desc limit 50
+
+
+
+public.productions_process()
+Вызывается material_fact_consumptions_find_vehicle()
