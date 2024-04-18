@@ -27,7 +27,7 @@ CREATE OR REPLACE VIEW public.vehicle_states_all AS
 		st.state, 
 
 		CASE 
-			--WHEN st.state = 'busy'::vehicle_states AND (st.date_time + (coalesce(dest.time_route,'00:00'::time)*2+constant_vehicle_unload_time())::interval)::timestamp with time zone < CURRENT_TIMESTAMP
+			--WHEN st.state = 'busy'::vehicle_states AND (st.date_time + (coalesce(dest.time_route,'00:00'::time)*2+const_vehicle_unload_time_val())::interval)::timestamp with time zone < CURRENT_TIMESTAMP
 				--THEN true
 			WHEN st.state = 'busy'::vehicle_states AND (st.date_time + coalesce(dest.time_route::interval,'00:00'::interval))::timestamp with time zone < CURRENT_TIMESTAMP
 				THEN true
@@ -38,7 +38,7 @@ CREATE OR REPLACE VIEW public.vehicle_states_all AS
 		END AS is_late,
 
 		CASE
-			WHEN st.state = 'at_dest'::vehicle_states AND (st.date_time + (coalesce(dest.time_route,'00:00'::time)*1 + constant_vehicle_unload_time())::interval)::timestamp with time zone < CURRENT_TIMESTAMP
+			WHEN st.state = 'at_dest'::vehicle_states AND (st.date_time + (coalesce(dest.time_route,'00:00'::time)*1 + const_vehicle_unload_time_val())::interval)::timestamp with time zone < CURRENT_TIMESTAMP
 				THEN true
 			ELSE false
 		END AS is_late_at_dest,
@@ -57,23 +57,23 @@ CREATE OR REPLACE VIEW public.vehicle_states_all AS
 				THEN to_char(CURRENT_TIMESTAMP-st.date_time,'HH24:MI')
 
 			--busy && late inf = -
-			--WHEN st.state = 'busy'::vehicle_states AND (st.date_time + (coalesce(dest.time_route,'00:00'::time)*2+constant_vehicle_unload_time())::interval )::timestamp with time zone < CURRENT_TIMESTAMP
-				--THEN '-'::text || time5_descr((CURRENT_TIMESTAMP - (st.date_time + (coalesce(dest.time_route,'00:00'::time)*2+constant_vehicle_unload_time())::interval)::timestamp with time zone)::time without time zone)::text
-			WHEN st.state = 'busy'::vehicle_states AND (st.date_time + coalesce(dest.time_route,'00:00'::time)+constant_vehicle_unload_time()::interval )::timestamp with time zone < CURRENT_TIMESTAMP
-				THEN time5_descr((coalesce(dest.time_route,'00:00'::time)+constant_vehicle_unload_time()::interval )::time without time zone)::text
+			--WHEN st.state = 'busy'::vehicle_states AND (st.date_time + (coalesce(dest.time_route,'00:00'::time)*2+const_vehicle_unload_time_val())::interval )::timestamp with time zone < CURRENT_TIMESTAMP
+				--THEN '-'::text || time5_descr((CURRENT_TIMESTAMP - (st.date_time + (coalesce(dest.time_route,'00:00'::time)*2+const_vehicle_unload_time_val())::interval)::timestamp with time zone)::time without time zone)::text
+			WHEN st.state = 'busy'::vehicle_states AND (st.date_time + coalesce(dest.time_route,'00:00'::time)+const_vehicle_unload_time_val()::interval )::timestamp with time zone < CURRENT_TIMESTAMP
+				THEN time5_descr((coalesce(dest.time_route,'00:00'::time)+const_vehicle_unload_time_val()::interval )::time without time zone)::text
 				
 			-- busy not late
 			WHEN st.state = 'busy'::vehicle_states
-				--THEN time5_descr(((st.date_time + (coalesce(dest.time_route,'00:00'::time)*2+constant_vehicle_unload_time())::interval)::timestamp with time zone - CURRENT_TIMESTAMP)::time without time zone)::text
-				THEN time5_descr((coalesce(dest.time_route,'00:00'::time)+constant_vehicle_unload_time()::interval )::time without time zone)::text
+				--THEN time5_descr(((st.date_time + (coalesce(dest.time_route,'00:00'::time)*2+const_vehicle_unload_time_val())::interval)::timestamp with time zone - CURRENT_TIMESTAMP)::time without time zone)::text
+				THEN time5_descr((coalesce(dest.time_route,'00:00'::time)+const_vehicle_unload_time_val()::interval )::time without time zone)::text
 
 			--at dest && late inf=route_time
-			WHEN st.state = 'at_dest'::vehicle_states AND (st.date_time + (coalesce(dest.time_route,'00:00'::time)*1+constant_vehicle_unload_time())::interval )::timestamp with time zone < CURRENT_TIMESTAMP
+			WHEN st.state = 'at_dest'::vehicle_states AND (st.date_time + (coalesce(dest.time_route,'00:00'::time)*1+const_vehicle_unload_time_val())::interval )::timestamp with time zone < CURRENT_TIMESTAMP
 				THEN time5_descr(coalesce(dest.time_route,'00:00'::time))::text
 
 			--at dest NOT late
 			WHEN st.state = 'at_dest'::vehicle_states
-				THEN time5_descr( ((st.date_time + (coalesce(dest.time_route::interval,'00:00'::interval)+constant_vehicle_unload_time()::interval))::timestamp with time zone - CURRENT_TIMESTAMP)::time without time zone)::text
+				THEN time5_descr( ((st.date_time + (coalesce(dest.time_route::interval,'00:00'::interval)+const_vehicle_unload_time_val()::interval))::timestamp with time zone - CURRENT_TIMESTAMP)::time without time zone)::text
 
 			--left_for_base && LATE
 			WHEN st.state = 'left_for_base'::vehicle_states AND (st.date_time + coalesce(dest.time_route,'00:00'::time)::interval )::timestamp with time zone < CURRENT_TIMESTAMP
@@ -95,7 +95,7 @@ CREATE OR REPLACE VIEW public.vehicle_states_all AS
 
 		coalesce(
 			(SELECT 
-				(now()-(tr.period+AGE(now(),now() AT TIME ZONE 'UTC')) )>constant_no_tracker_signal_warn_interval()
+				(now()-(tr.period+AGE(now(),now() AT TIME ZONE 'UTC')) ) > (const_no_tracker_signal_warn_interval_val())::interval
 				FROM car_tracking AS tr
 				WHERE tr.car_id=v.tracker_id
 				ORDER BY tr.period DESC LIMIT 1

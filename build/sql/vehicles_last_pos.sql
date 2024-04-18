@@ -98,5 +98,5 @@ FROM vehicles v
 WHERE v.tracker_id IS NOT NULL AND v.tracker_id::text <> ''::text
 ORDER BY v.plate_n;
 
-ALTER TABLE public.vehicles_last_pos OWNER TO beton;
+ALTER TABLE public.vehicles_last_pos OWNER TO ;
 

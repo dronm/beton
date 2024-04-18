@@ -94,5 +94,5 @@ CREATE OR REPLACE VIEW public.vehicle_current_pos_all
   WHERE v.tracker_id IS NOT NULL AND v.tracker_id::text <> ''::text
   ORDER BY v.plate;
 
-ALTER TABLE public.vehicle_current_pos_all OWNER TO beton;
+ALTER TABLE public.vehicle_current_pos_all OWNER TO ;
 

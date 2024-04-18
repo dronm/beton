@@ -72,5 +72,5 @@ CREATE OR REPLACE VIEW public.vehicles_dialog AS
 	;
 
 ALTER TABLE public.vehicles_dialog
-  OWNER TO beton;
+  OWNER TO ;
 

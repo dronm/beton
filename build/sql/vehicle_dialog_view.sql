@@ -1,6 +1,6 @@
 -- View: public.vehicle_dialog_view
 
- DROP VIEW public.vehicle_dialog_view;
+-- DROP VIEW public.vehicle_dialog_view;
 
 CREATE OR REPLACE VIEW public.vehicle_dialog_view AS 
 	SELECT
@@ -34,5 +34,5 @@ CREATE OR REPLACE VIEW public.vehicle_dialog_view AS
 	LEFT JOIN drivers dr ON dr.id = v.driver_id;
 
 ALTER TABLE public.vehicle_dialog_view
-  OWNER TO beton;
+  OWNER TO ;
 
