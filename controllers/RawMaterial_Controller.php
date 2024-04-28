@@ -1572,10 +1572,14 @@ class RawMaterial_Controller extends ControllerSQL{
 						coalesce(
 						CASE
 							WHEN (SELECT is_cement FROM cement) THEN
-								(SELECT sum(quant)
+								(SELECT
+									sum(quant)
 								FROM rg_cement_balance(			
 									(SELECT d1 FROM rep_period),
-									'{}'
+									(SELECT
+										array_agg(silo_id)
+									FROM silo_with_material_list((SELECT id from mat), (SELECT d1 FROM rep_period))
+									)
 								))
 							ELSE
 								(SELECT quant
@@ -1589,10 +1593,14 @@ class RawMaterial_Controller extends ControllerSQL{
 					SELECT
 						CASE
 							WHEN (SELECT is_cement FROM cement) THEN
-								(SELECT sum(quant)
+								(SELECT
+									sum(quant)
 								FROM rg_cement_balance(			
 									(SELECT d2 FROM rep_period),
-									'{}'
+									(SELECT
+										array_agg(silo_id)
+									FROM silo_with_material_list((SELECT id from mat), (SELECT d2 FROM rep_period))
+									)
 								))
 							ELSE
 								(SELECT quant
@@ -1851,6 +1859,14 @@ class RawMaterial_Controller extends ControllerSQL{
 						WHERE
 							(SELECT is_cement FROM cement)
 							AND ra.date_time BETWEEN (SELECT d1 FROM rep_period) AND (SELECT d2 FROM rep_period)
+							/*
+							AND ra.cement_silos_id IN (
+								SELECT
+									array_agg(silo_id)
+								FROM silo_with_material_list((SELECT id from mat), (SELECT d2 FROM rep_period))
+							)
+							*/
+							AND material_in_silo_on_date(ra.cement_silos_id, ra.date_time::timestamp with time zone) = (SELECT id FROM mat)
 						GROUP BY
 							get_shift_start(ra.date_time)
 						)
@@ -1858,6 +1874,7 @@ class RawMaterial_Controller extends ControllerSQL{
 						
 					) AS deb ON deb.d = shift
 				) AS sub				
+				
 			",
 				$dt_from,
 				$dt_to,

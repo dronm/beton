@@ -1,25 +1,56 @@
 --http://localhost/beton_new/?c=RawMaterial_Controller&f=get_material_actions_by_shift_list&v=ViewHTMLXSL&cond_fields=date_time,date_time,material_id&cond_sgns=ge,le,e&cond_vals=2023-10-01T06:00:00,2023-10-04T05:59:59,79&templ=RepMaterialActionByShift
 --select * from raw_materials where name like '%Цемент%'
+
+
 			WITH
 				rep_period AS (SELECT
-							   get_shift_start('2023-10-01T06:00:00')::timestamp without time zone AS d1,
-							   '2023-10-15T06:00:00'::timestamp without time zone AS d2
+							   get_shift_start('2024-04-01T06:00:00')::timestamp without time zone AS d1,
+							   '2024-04-15T06:00:00'::timestamp without time zone AS d2
 				),
 				mat AS (SELECT 5 AS id),
 				cement AS (SELECT is_cement FROM raw_materials WHERE id=(SELECT id FROM mat)),
 				rest_beg AS (
-						SELECT quant
-						FROM rg_material_facts_balance(			
-							(SELECT d1 FROM rep_period),
-							ARRAY[(SELECT id FROM mat)]
-						)
+					SELECT
+						coalesce(
+						CASE
+							WHEN (SELECT is_cement FROM cement) THEN
+								(SELECT
+									sum(quant)
+								FROM rg_cement_balance(			
+									(SELECT d1 FROM rep_period),
+									(SELECT
+										array_agg(silo_id)
+									FROM silo_with_material_list((SELECT id from mat), (SELECT d1 FROM rep_period))
+									)
+								))
+							ELSE
+								(SELECT quant
+								FROM rg_material_facts_balance(			
+									(SELECT d1 FROM rep_period),
+									ARRAY[(SELECT id FROM mat)]
+								))
+						END, 0) AS quant
 				),
 				rest_end AS (
-						SELECT quant
-						FROM rg_material_facts_balance(			
-							(SELECT d2 FROM rep_period),
-							ARRAY[(SELECT id FROM mat)]
-						)
+					SELECT
+						CASE
+							WHEN (SELECT is_cement FROM cement) THEN
+								(SELECT
+									sum(quant)
+								FROM rg_cement_balance(			
+									(SELECT d2 FROM rep_period),
+									(SELECT
+										array_agg(silo_id)
+									FROM silo_with_material_list((SELECT id from mat), (SELECT d2 FROM rep_period))
+									)
+								))
+							ELSE
+								(SELECT quant
+								FROM rg_material_facts_balance(			
+									(SELECT d2 FROM rep_period),
+									ARRAY[(SELECT id FROM mat)]									
+								))
+						END AS quant
 				),
 				prod_site1 AS (SELECT 1 AS id),
 				prod_site2 AS (SELECT 2 AS id),
@@ -102,6 +133,7 @@
 							'1 day'
 						) AS shift
 					LEFT JOIN (
+						-- all materials withowt cement
 						(SELECT
 							get_shift_start(ra.date_time) AS d,
 						
@@ -269,11 +301,20 @@
 						WHERE
 							(SELECT is_cement FROM cement)
 							AND ra.date_time BETWEEN (SELECT d1 FROM rep_period) AND (SELECT d2 FROM rep_period)
+							/*
+							AND ra.cement_silos_id IN (
+								SELECT
+									array_agg(silo_id)
+								FROM silo_with_material_list((SELECT id from mat), (SELECT d2 FROM rep_period))
+							)
+							*/
+							AND material_in_silo_on_date(ra.cement_silos_id, ra.date_time::timestamp with time zone) = (SELECT id FROM mat)
 						GROUP BY
 							get_shift_start(ra.date_time)
 						)
 						
 						
 					) AS deb ON deb.d = shift
-				) AS sub
+				) AS sub				
+
 

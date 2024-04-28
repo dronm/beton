@@ -23,7 +23,7 @@ BEGIN
 			
 			-- new event trapped by browsers
 			PERFORM pg_notify(
-				'User.logout.' || trim(NEW.session_id), NULL
+				'User.logout.' || trim(NEW.pub_key), NULL
 			);			
 			
 		END IF;

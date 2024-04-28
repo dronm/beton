@@ -1,3 +1,0 @@
-Запрос shipments_list выполняется 25с, тогда как из таблицы быстро, смотреть VIEW!!!
-select * from shipments_list order by ship_date_time desc limit 60
-select * from shipments order by ship_date_time desc limit 60

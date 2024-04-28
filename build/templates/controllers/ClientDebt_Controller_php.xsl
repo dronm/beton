@@ -102,7 +102,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 			$link->query($q);
 			//throw new Exception($q);
 		}
-		$link->query("DELETE FROM client_debts WHERE update_date &lt; '%s'", $cur_time_s);				
+		$link->query(sprintf("DELETE FROM client_debts WHERE update_date &lt; '%s'", $cur_time_s));
 	}
 	
 </xsl:template>

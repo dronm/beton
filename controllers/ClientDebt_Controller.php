@@ -140,7 +140,7 @@ class ClientDebt_Controller extends ControllerSQL{
 			$link->query($q);
 			//throw new Exception($q);
 		}
-		$link->query("DELETE FROM client_debts WHERE update_date < '%s'", $cur_time_s);		
+		$link->query(sprintf("DELETE FROM client_debts WHERE update_date < '%s'", $cur_time_s));		
 	}
 
 }

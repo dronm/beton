@@ -22,6 +22,8 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
+require_once(FRAME_WORK_PATH.'basic_classes/ModelWhereSQL.php');
+
 class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL){
 		parent::__construct($dbLinkMaster);<xsl:apply-templates/>
@@ -92,22 +94,26 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		//$link = $this->getDbLink();
 		//$this->add_material_model($link);
 		
+		$cond = '';
+
 		$list_model = new DOCMaterialProcurementShiftList_Model($this->getDbLink());
 		$where = $this->conditionFromParams($pm,$list_model);
-		$list_model->addStoredFilter($where);			
-		$list_model->addGlobalFilter($where);
+		if(isset($where)){
+			//$where = new ModelWhereSQL();
 		
-		$def_date=null;
-		FieldSQLDateTime::formatForDb(time(),$def_date);
-		
-		$cond = '';
-		
-		$production_base_id = $where->getFieldValueForDb('production_base_id','=',0,0);
-		if ($production_base_id != 0){
-			$cond = sprintf("production_base_id = %d", $production_base_id);
+			$list_model->addStoredFilter($where);			
+			$list_model->addGlobalFilter($where);
+
+			$production_base_id = $where->getFieldValueForDb('production_base_id','=',0,0);
+			if ($production_base_id != 0){
+				$cond = sprintf("production_base_id = %d", $production_base_id);
+			}
 		}
 		
-		if($where->getFieldsById('shift_date_time','&gt;=') &amp;&amp; $where->getFieldsById('shift_date_time','&lt;=')){
+		if(isset($where) &amp;&amp; $where->getFieldsById('shift_date_time','&gt;=') &amp;&amp; $where->getFieldsById('shift_date_time','&lt;=')){
+			$def_date=null;
+			FieldSQLDateTime::formatForDb(time(),$def_date);
+
 			if($cond != ""){
 				$cond.= " AND ";
 			}
@@ -127,7 +133,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			%s
 			GROUP BY m.ord,d.material_id,m.name
 			ORDER BY m.ord",
-			is_null($where)? '' : 'WHERE '.$cond
+			!isset($where)? '' : 'WHERE '.$cond
 			),
 		'RawMaterial_Model');
 		

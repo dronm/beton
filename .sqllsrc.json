@@ -4,5 +4,6 @@
   "host": "192.168.1.177",
   "port": 5432,
   "user": "beton",
-  "database": "beton"
+  "database": "beton",
+	"password": "159753"
 }

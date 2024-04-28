@@ -1,1 +1,0 @@
-create publication konkrid;

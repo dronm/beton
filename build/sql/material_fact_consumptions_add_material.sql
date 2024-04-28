@@ -37,12 +37,16 @@ BEGIN
 	ORDER BY t.w ASC
 	LIMIT 1;
 */	
-	SELECT raw_material_id
-	INTO v_raw_material_id
+	SELECT
+		raw_material_id
+	INTO
+		v_raw_material_id
 	FROM raw_material_map_to_production
-	WHERE	(production_site_id = in_production_site_id OR production_site_id IS NULL)
+	WHERE
+		(production_site_id = in_production_site_id OR production_site_id IS NULL)
 		AND production_descr = in_material_descr AND date_time <= in_date_time
-	ORDER BY date_time DESC
+	ORDER BY
+		date_time DESC
 	LIMIT 1;
 	
 	IF v_raw_material_id IS NULL AND coalesce(in_material_descr,'')<>'' THEN

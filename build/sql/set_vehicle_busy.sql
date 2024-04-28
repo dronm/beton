@@ -173,6 +173,25 @@ BEGIN
 		
 	END IF;
 	
+	IF current_database() = 'beton' THEN
+		--check if client id Konkrid
+		IF
+			coalesce(
+				(SELECT
+					o.client_id = (const_konkrid_client_val()->'keys'->>'id')::int
+				FROM orders as o
+				WHERE o.id = NEW.order_id)
+			, FALSE)
+		THEN
+			INSERT INTO konkrid.bereg_to_konkrid
+				VALUES ('Shipment.to_konkrid',
+					json_build_object('params',
+						json_build_object('id', NEW.id)
+					)::text
+			);
+		END IF;
+	END IF;
+	
 	RETURN NEW;
 END;
 $BODY$

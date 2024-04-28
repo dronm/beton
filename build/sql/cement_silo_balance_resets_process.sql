@@ -17,8 +17,11 @@ BEGIN
 			PERFORM doc_log_insert('cement_silo_balance_reset'::doc_types,NEW.id,NEW.date_time);
 		END IF;
 	
-		SELECT rg.quant INTO v_quant FROM rg_cement_balance(NEW.date_time,ARRAY[NEW.cement_silo_id]) AS rg;		
+		SELECT rg.quant INTO v_quant FROM rg_cement_balance(NEW.date_time, ARRAY[NEW.cement_silo_id]) AS rg;		
+		
+		--RAISE EXCEPTION 'v_quant=%, cement_silo_id=%', v_quant, NEW.cement_silo_id;
 		v_quant = NEW.quant_required - coalesce(v_quant,0);
+		--RAISE EXCEPTION 'v_quant=%', v_quant;
 		IF v_quant<>0 THEN
 			--register actions ra_cement
 			reg_cement.date_time		= NEW.date_time;
@@ -31,12 +34,17 @@ BEGIN
 		END IF;
 		
 		--Остатки материалов, материал определить по последнему приходу в силос
+		
+		/*
 		SELECT material_id
 		INTO v_material_id
 		FROM doc_material_procurements
 		WHERE cement_silos_id = NEW.cement_silo_id
 		ORDER BY date_time DESC
 		LIMIT 1;
+		*/
+		
+		v_material_id = material_in_silo_on_date(NEW.cement_silo_id, NEW.date_time);
 		
 		IF coalesce(v_material_id,0)>0 AND v_quant<>0 THEN		
 			--здесь определяем свое количество по регистру материалов

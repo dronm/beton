@@ -125,7 +125,7 @@ BEGIN
 		ELSE
 			--
 			-- base zone
-			-- ALL possible zones, NOT constant_base_geo_zone_id()
+			-- ALL possible zones, NOT const_base_geo_zone_id_val()
 			-- returns one zone only
 			SELECT
 				b.id,
@@ -155,7 +155,7 @@ BEGIN
 					FROM car_tracking AS t
 					WHERE t.car_id = NEW.car_id AND t.gps_valid = 1
 					ORDER BY t.period DESC
-					LIMIT constant_geo_zone_check_points_count() - 1
+					LIMIT const_geo_zone_check_points_count_val() - 1
 					OFFSET 1
 			LOOP	
 				--4326
@@ -317,7 +317,7 @@ BEGIN
 						)
 					INTO v_point_in_zone
 					FROM destinations
-					WHERE destinations.id = constant_base_geo_zone_id()
+					WHERE destinations.id = const_base_geo_zone_id_val()
 					;
 					
 				ELSIF v_cur_state = 'at_dest'::vehicle_states THEN
@@ -544,6 +544,45 @@ BEGIN
 			);
 		EXCEPTION WHEN OTHERS THEN
 		END;
+	END IF;
+
+	--from beton to konkrid
+	
+	IF current_database() = 'beton' THEN
+		--all vehicles to konkrid
+		INSERT INTO konkrid.bereg_to_konkrid
+			VALUES ('CarTracking.to_konkrid',
+				json_build_object('params',
+					json_build_object('car_id', NEW.car_id, 'period', NEW.period)
+				)::text
+		);
+		
+		--whose car?
+		--konkrid ownerID=286
+		/*		
+		IF
+			coalesce(
+				(SELECT
+						(owners.f->'owner'->'keys'->>'id')::int = 286 AS konkrid_owned
+				FROM (
+					SELECT
+							jsonb_array_elements(vehicle_owners->'rows')->'fields' AS f
+					FROM vehicles AS v
+					WHERE v.tracker_id = NEW.car_id
+				) AS owners
+				ORDER BY (owners.f->>'dt_from')::timestamp DESC
+				LIMIT 1)
+			, FALSE
+			) THEN
+			
+			INSERT INTO konkrid.bereg_to_konkrid
+				VALUES ('CarTracking.to_konkrid',
+					json_build_object('params',
+						json_build_object('car_id', NEW.car_id, 'period', NEW.period)
+					)::text
+			);
+		END IF;
+		*/
 	END IF;
 		
 	RETURN NEW;

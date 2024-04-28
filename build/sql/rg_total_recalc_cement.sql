@@ -11,7 +11,7 @@ DECLARE
 	v_cur_period timestamp without time zone;
 BEGIN	
 	v_act_date_time = reg_current_balance_time();
-	SELECT date_time INTO v_cur_period FROM rg_calc_periods;
+	SELECT date_time INTO v_cur_period FROM rg_calc_periods where reg_type='cement';
 	
 	FOR period_row IN
 		WITH

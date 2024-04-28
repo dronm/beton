@@ -13,8 +13,15 @@ DECLARE
 	v_production_site_id int;
 BEGIN
 	IF (TG_WHEN='BEFORE' AND TG_OP='INSERT') THEN
-		-- Временно!
-		NEW.production_base_id = 1;
+		IF NEW.date_time < '2024-01-01T00:00:00'::timestamp THEN
+			RAISE EXCEPTION 'Дата запрета редактирования: %', '2024-01-01T00:00:00'::timestamp;
+		END IF;
+		
+		-- Временно ОТ ВЕСОВ!!!
+		IF NEW.production_base_id IS NULL THEN
+			NEW.production_base_id = 1;
+		END IF;	
+		
 		--Обнудение материал = БЕТОН
 		IF NEW.material_id = 1240 THEN
 			NEW.quant_net = 0;
@@ -96,14 +103,18 @@ BEGIN
 		RETURN NEW;
 		
 	ELSIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
-		PERFORM ra_materials_remove_acts('material_procurement'::doc_types,OLD.id);
-		PERFORM ra_material_facts_remove_acts('material_procurement'::doc_types,OLD.id);
-		PERFORM ra_cement_remove_acts('material_procurement'::doc_types,OLD.id);
-
-		-- Временно!
+		IF NEW.date_time < '2024-01-01T00:00:00'::timestamp THEN
+			RAISE EXCEPTION 'Дата запрета редактирования: %', '2024-01-01T00:00:00'::timestamp;
+		END IF;
+	
+		-- Временно ОТ ВЕСОВ!!!
 		IF NEW.production_base_id IS NULL THEN
 			NEW.production_base_id = 1;
 		END IF;	
+	
+		PERFORM ra_materials_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_material_facts_remove_acts('material_procurement'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_procurement'::doc_types,OLD.id);
 
 		--Если это из горного - обнулить по документам
 		IF coalesce(NEW.doc_ref_gornyi, '') <> ''
@@ -134,6 +145,10 @@ BEGIN
 	
 		RETURN OLD;
 	ELSIF (TG_WHEN='BEFORE' AND TG_OP='DELETE') THEN
+		IF OLD.date_time < '2024-01-01T00:00:00'::timestamp THEN
+			RAISE EXCEPTION 'Дата запрета редактирования: %', '2024-01-01T00:00:00'::timestamp;
+		END IF;
+	
 		--detail tables
 		
 		--register actions										
@@ -151,5 +166,5 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 ALTER FUNCTION public.doc_material_procurements_process()
-  OWNER TO beton;
+  OWNER TO ;
 

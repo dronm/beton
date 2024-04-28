@@ -41,6 +41,33 @@ BEGIN
 		END IF;
 		
 		RETURN NEW;
+	
+	--not used as there is no uniquness on plate field	
+	/*ELSIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+		IF coalesce(NEW.tracker_id,'') <> coalesce(OLD.tracker_id,'')
+		OR coalesce(NEW.plate,'') <> coalesce(OLD.plate,'') THEN
+			INSERT INTO konkrid.bereg_to_konkrid
+				VALUES ('Vehicle.to_konkrid',
+					json_build_object('params',
+						json_build_object('id', NEW.id)
+					)::text
+			);
+		END IF;
+	
+		RETURN NEW;
+
+	ELSIF TG_WHEN='AFTER' AND TG_OP='INSERT' THEN
+		IF coalesce(NEW.tracker_id,'') <> '' THEN
+			INSERT INTO konkrid.bereg_to_konkrid
+				VALUES ('Vehicle.to_konkrid',
+					json_build_object('params',
+						json_build_object('id', NEW.id)
+					)::text
+			);
+		END IF;
+	
+		RETURN NEW;
+	*/	
 	END IF;
 END;
 $BODY$
