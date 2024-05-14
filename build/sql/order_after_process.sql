@@ -14,24 +14,25 @@ DECLARE
 BEGIN	
 	IF TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
 	
-		IF current_database() = 'bereg' AND NEW.client_id = (const_konkrid_client_val()->'keys'->>'id')::int THEN
-			INSERT INTO konkrid.bereg_to_konkrid
-				VALUES ('Order.to_konkrid_' || LOWER(TG_OP),
-					json_build_object('params',
-						json_build_object('id', NEW.id)
-					)::text
-			);
+		IF NEW.date_time::date >= '2024-05-07' THEN
+			IF current_database() = 'bereg' AND NEW.client_id = (const_konkrid_client_val()->'keys'->>'id')::int THEN
+				INSERT INTO konkrid.replicate_events
+					VALUES ('Order.to_konkrid_' || LOWER(TG_OP),
+						json_build_object('params',
+							json_build_object('id', NEW.id)
+						)::text
+				);
+				
+			ELSIF current_database() = 'concrete1' THEN
+				INSERT INTO beton.replicate_events
+					VALUES ('Order.to_bereg_' || LOWER(TG_OP),
+						json_build_object('params',
+							json_build_object('id', NEW.id)
+						)::text
+				);
 			
-		ELSIF current_database() = 'concrete1' THEN
-			INSERT INTO konkrid.bereg_to_konkrid
-				VALUES ('Order.to_bereg_' || LOWER(TG_OP),
-					json_build_object('params',
-						json_build_object('id', NEW.id)
-					)::text
-			);
-		
+			END IF;
 		END IF;
-	
 	
 		IF TG_OP = 'INSERT' OR (TG_OP='UPDATE'
 			AND NEW.phone_cel<>''
@@ -62,23 +63,25 @@ BEGIN
 		RETURN NEW;
 		
 	ELSIF TG_WHEN='AFTER' AND TG_OP='DELETE' THEN
-		IF current_database() = 'bereg' AND OLD.client_id = (const_konkrid_client_val()->'keys'->>'id')::int THEN
-			INSERT INTO konkrid.bereg_to_konkrid
-				VALUES ('Order.to_konkrid_delete',
-					json_build_object('params',
-						json_build_object('id', OLD.id)
-					)::text
-			);
+		IF OLD.date_time::date >= '2024-05-07' THEN
+			IF current_database() = 'bereg' AND OLD.client_id = (const_konkrid_client_val()->'keys'->>'id')::int THEN
+				INSERT INTO konkrid.replicate_events
+					VALUES ('Order.to_konkrid_delete',
+						json_build_object('params',
+							json_build_object('id', OLD.id)
+						)::text
+				);
+				
+			ELSIF current_database() = 'concrete1' THEN
+				INSERT INTO beton.replicate_events
+					VALUES ('Order.to_bereg_delete',
+						json_build_object('params',
+							json_build_object('id', OLD.id)
+						)::text
+				);
 			
-		ELSIF current_database() = 'concrete1' THEN
-			INSERT INTO konkrid.bereg_to_konkrid
-				VALUES ('Order.to_bereg_delete',
-					json_build_object('params',
-						json_build_object('id', OLD.id)
-					)::text
-			);
-		
-		END IF;
+			END IF;
+		END IF;	
 	
 		RETURN OLD;
 	END IF;	

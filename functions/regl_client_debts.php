@@ -10,10 +10,11 @@ try{
 	$contr->update_from_1c(NULL);
 	
 }catch(Exception $e){
+	$msg = "ClientDebt_Controller->update_from_1c() failed: ". $e->getMessage();
 	if(!defined("DEBUG") || DEBUG!==TRUE){
-		error_log("ClientDebt_Controller->update_from_1c() failed: ". $e->getMessage());
+		error_log($msg);
 	}else{
-		throw $e;
+		throw new Exception($msg);
 	}
 }
 ?>

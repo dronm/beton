@@ -219,7 +219,7 @@ OrderCalc_View.prototype.recalcTotalCont = function(){
 	var quant = this.getElement("quant").getValue();
 	//min quant for destination
 	var quant_for_ship_cost = quant;
-	if(quant_for_ship_cost<this.m_minQuantForShipCost){
+	if(quant_for_ship_cost < this.m_minQuantForShipCost){
 		quant_for_ship_cost = this.m_minQuantForShipCost;
 	}
 	

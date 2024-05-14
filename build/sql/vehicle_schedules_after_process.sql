@@ -26,6 +26,6 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 ALTER FUNCTION public.vehicle_schedules_after_process()
-  OWNER TO beton;
+  OWNER TO ;
 
 

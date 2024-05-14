@@ -24,9 +24,9 @@ function insert_value($dbLink, $row, $smField, $itemId){
 		VALUES (
 			%d,
 			%d,
-			%s,
+			'%s',
 			%f
-		) ON CONFLICT (vehicle_owner_id, vehicle_tot_rep_common_item_id)
+		) ON CONFLICT (vehicle_owner_id, vehicle_tot_rep_common_item_id, period)
 		DO UPDATE SET value = %f";
 	$sm = floatval($row[$smField]);
 	$per = strtotime($row['period']);
@@ -35,8 +35,8 @@ function insert_value($dbLink, $row, $smField, $itemId){
 		return;
 	}
 	$q = sprintf($val_query, $owner_id, $itemId, date('Y-m-d', $per), $sm, $sm);
-	//$dbLink->query($q);
-	echo 'dogovor='.$row['dogovor'].PHP_EOL.$q.PHP_EOL;
+	$dbLink->query($q);
+	//echo 'dogovor='.$row['dogovor'].PHP_EOL.$q.PHP_EOL;
 }
 
 function log_error($s) {
@@ -92,11 +92,12 @@ try{
 	}
 	
 }catch(Exception $e){
-	//notify admin
-	//to log
-	$msg = 'Eurobeton regl_client_oborit() failed: '. $e->getMessage();
-	//syslog(LOG_CRIT, $msg);	
-	echo $msg.PHP_EOL;
+	$msg = 'Eurobeton regl_client_oborot() failed: '. $e->getMessage();
+	if(!defined("DEBUG") || DEBUG!==TRUE){
+		error_log($msg);
+	}else{
+		throw new Exception($msg);
+	}
 }
 
 ?>

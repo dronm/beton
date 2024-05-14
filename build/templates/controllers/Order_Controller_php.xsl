@@ -236,7 +236,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	
 		$pm->setParamValue('last_modif_user_id',$_SESSION['user_id']);
 	
-		$order_id = $this->getExtDbVal($pm,'old_id');
+		$order_id = $this->getExtDbVal($pm, 'old_id');
 	
 		$dbLink = $this->getDbLink();
 		$ar = $dbLink->query_first(sprintf(
@@ -260,7 +260,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				) AS shipped,
 				orders_ref(o) AS orders_ref,
 				coalesce(o.contact_id, ct.id) AS ext_contact_id,
-				coalesce(pv.specialist_inform,FALSE) AS specialist_inform
+				coalesce(pv.specialist_inform,FALSE) AS specialist_inform,
+				o.client_specification_id,
+				o.pay_cash,
+				o.total_edit
 				
 			FROM orders AS o
 			LEFT JOIN pump_vehicles AS pv ON pv.id = o.pump_vehicle_id
@@ -300,6 +303,28 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				}
 			}									
 		}
+
+		if($_SESSION["role_id"] == "lab_worker"){
+			//if concrete_type_id has changed and client_specification_id is not null - clear,
+			// if concrete_type_id has changed and pay_cash and !total_edit - recalc total
+
+			$concrete_type_id = $this->getExtVal($pm,'concrete_type_id');
+			if(isset($concrete_type_id) &amp;&amp; $concrete_type_id !='null'
+			&amp;&amp; $concrete_type_id != $ar["concrete_type_id"]
+			){
+				if(isset($ar["client_specification_id"])){
+					//clear specification
+					$pm->setParamValue("client_specification_id", "null");
+				}
+				if(isset($ar["pay_cash"]) &amp;&amp; $ar["pay_cash"] == "t"
+				&amp;&amp; $ar["total_edit"] != "t"
+				){
+					//recalc is not implemented
+					throw new Exception("При изменении марки с ценой необходим пересчет!");
+				}
+			}
+		}
+
 		//no quotes!!!	
 		$phone_cel = ($pm->getParamValue('phone_cel'))? $this->getExtVal($pm,'phone_cel'):$ar['phone_cel'];
 		$resend_sms = (
@@ -1102,10 +1127,12 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	public function get_object_for_lab($pm){
 		$this->addNewModel(sprintf(
 			"SELECT
-				id,
-				comment_text
-			FROM orders
-			WHERE id = %d",
+				orders.id,
+				orders.comment_text,
+				concrete_types_ref(ct) AS concrete_types_ref
+		FROM orders
+			LEFT JOIN concrete_types AS ct ON ct.id = orders.concrete_type_id
+			WHERE orders.id = %d",
 			$this->getExtDbVal($pm, 'id')
 		),'OrderMakeForLabDialog_Model'		
 		);

@@ -173,24 +173,26 @@ BEGIN
 		
 	END IF;
 	
-	IF current_database() = 'beton' THEN
-		--check if client id Konkrid
-		IF
-			coalesce(
-				(SELECT
-					o.client_id = (const_konkrid_client_val()->'keys'->>'id')::int
-				FROM orders as o
-				WHERE o.id = NEW.order_id)
-			, FALSE)
-		THEN
-			INSERT INTO konkrid.bereg_to_konkrid
-				VALUES ('Shipment.to_konkrid',
-					json_build_object('params',
-						json_build_object('id', NEW.id)
-					)::text
-			);
+	IF NEW.date_time::date >= '2024-05-07' THEN
+		IF current_database()::text = 'beton' THEN
+			--check if client id Konkrid
+			IF
+				coalesce(
+					(SELECT
+						o.client_id = (const_konkrid_client_val()->'keys'->>'id')::int
+					FROM orders as o
+					WHERE o.id = NEW.order_id)
+				, FALSE)
+			THEN
+				INSERT INTO konkrid.replicate_events
+					VALUES ('Shipment.to_konkrid',
+						json_build_object('params',
+							json_build_object('id', NEW.id)
+						)::text
+				);
+			END IF;
 		END IF;
-	END IF;
+	END IF;	
 	
 	RETURN NEW;
 END;
@@ -198,5 +200,5 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 ALTER FUNCTION public.set_vehicle_busy()
-  OWNER TO beton;
+  OWNER TO ;
 

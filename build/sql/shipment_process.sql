@@ -54,7 +54,9 @@ BEGIN
 		--END IF;
 	END IF;
 	*/
-	IF (TG_OP='INSERT' OR (TG_OP='UPDATE' AND NEW.shipped=false AND OLD.shipped=false)) THEN
+	
+	--checkings for bereg only!
+	IF (current_database()::text <> 'concrete1') AND (TG_OP='INSERT' OR (TG_OP='UPDATE' AND NEW.shipped=false AND OLD.shipped=false)) THEN
 		SELECT
 			v.load_capacity
 		INTO
@@ -135,5 +137,5 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 ALTER FUNCTION public.shipment_process()
-  OWNER TO beton;
+  OWNER TO ;
 

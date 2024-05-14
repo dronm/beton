@@ -40,6 +40,15 @@ function OrderMakeForLabDialog_Model(options){
 	
 	options.fields.comment_text = new FieldText("comment_text",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.concrete_types_ref = new FieldJSON("concrete_types_ref",filed_options);
+	
 		OrderMakeForLabDialog_Model.superclass.constructor.call(this,id,options);
 }
 extend(OrderMakeForLabDialog_Model,ModelXML);
