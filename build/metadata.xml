@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-05-14 11:12:28</lastBuild></version>
+		<lastBuild>2024-05-22 04:56:48</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -229,6 +229,7 @@
 		<version dateOpen="2024-04-12 09:45:01" dateClose="2024-04-15 06:25:27">1.00323</version>
 		<version dateOpen="2024-04-17 09:26:52" dateClose="2024-04-18 05:21:17">1.00324</version>
 		<version dateOpen="2024-04-18 11:09:36" dateClose="2024-05-14 11:12:31">1.00325</version>
+		<version dateOpen="2024-05-16 07:52:36" dateClose="2024-05-22 04:57:09">1.00326</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1560,7 +1561,7 @@
 		<model id="Shipment" parent="ModelSQLBeton" dataTable="shipments" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
 			<field id="date_time" dataType="DateTime" alias="Дата" dbRequired="TRUE" defaultValue="CURRENT_TIMESTAMP"/>
-			<field id="order_id" dataType="Int" required="TRUE" refTable="orders" refField="id" alias="Заявка"/>
+			<field id="order_id" dataType="Int" refTable="orders" refField="id" alias="Заявка" required="TRUE"/>
 			<field id="vehicle_schedule_id" dataType="Int" required="TRUE" refTable="vehicle_schedules" refField="id" alias="Экипаж"/>
 			<field id="quant" dataType="Float" length="19" precision="4" alias="Количество"/>
 			<field id="user_id" dataType="Int" refTable="users" refField="id" alias="Автор"/>
@@ -7710,6 +7711,7 @@
 		<jsScript file="js20/custom_controls/VehicleScheduleGridCmdSetFree.js"/>
 		<jsScript file="js20/custom_controls/VehicleScheduleGridCmdSetOut.js"/>
 		<jsScript file="js20/custom_controls/VehicleScheduleGridCmdShowPosition.js"/>
+		<jsScript file="js20/custom_controls/VehicleScheduleGridCmdShowVehicle.js"/>
 		<jsScript file="js20/custom_controls/PrintInvoiceBtn.js"/>
 		<jsScript file="js20/custom_controls/PrintTTNBtn.js"/>
 		<jsScript file="js20/custom_controls/PrintPutevoiListBtn.js"/>

@@ -76,51 +76,54 @@ function TmUserPhotoList_View(id,options){
 										"labelCaption":""
 									},
 									"ctrlEdit":false,
-									"formatFunction":function(f, cell){
-										var cell_n = cell.getNode();										
-										var ft = f.tm_photo.getValue();
-										if(ft){
-											var i = document.createElement("img");
-											i.setAttribute("src", "data:image/png;base64, "+ft);
-											i.className = "userPhoto";
-											cell_n.appendChild(i);
-											if(self.photoDetail){
-												delete self.photoDetail;
-											}											
-											self.photoDetail = new ToolTip({
-												"node": cell_n,
-												"wait":2,
-												"onHover":(function(grid, id){
-													return function(event){
-														if(!grid.photoDetailData){
-															grid.photoDetailData = [];
+									"formatFunction":(function(self){
+										return function(f, cell){
+											var cell_n = cell.getNode();										
+											var ft = f.tm_photo.getValue();
+											if(ft){
+												var i = document.createElement("img");
+												i.setAttribute("src", "data:image/png;base64, "+ft);
+												i.className = "userPhoto";
+												cell_n.appendChild(i);
+												// if(self.photoDetail){
+												// 	delete self.photoDetail;
+												// }											
+												// self.photoDetail = 
+												(new ToolTip({
+													"node": cell_n,
+													"wait":500,
+													"onHover":(function(grid, id){
+														return function(event){
+															if(!grid.photoDetailData){
+																grid.photoDetailData = [];
+															}
+															if(!grid.photoDetailData[id]){
+																var pm = (new TmUser_Controller()).getPublicMethod("get_object");
+																pm.setFieldValue("id", id);
+																var ctrl = this;
+																pm.run({
+																	"ok":function(resp){
+																		var m = resp.getModel("TmUserDialog_Model");
+																		if(m.getNextRow()){
+																			self.photoDetailData[id] = m.getFieldValue("tm_photo");
+																			self.showPhoto(ctrl, self.photoDetailData[id]);
+																		}
+																	}																
+																});
+															}else{
+																self.showPhoto(this, self.photoDetailData[id]);
+															}													
 														}
-														if(!grid.photoDetailData[id]){
-															var pm = (new TmUser_Controller()).getPublicMethod("get_object");
-															pm.setFieldValue("id", id);
-															var ctrl = this;
-															pm.run({
-																"ok":function(resp){
-																	var m = resp.getModel("TmUserDialog_Model");
-																	if(m.getNextRow()){
-																		self.photoDetailData[id] = m.getFieldValue("tm_photo");
-																		self.showPhoto(ctrl, self.photoDetailData[id]);
-																	}
-																}																
-															});
-														}else{
-															self.showPhoto(this, self.photoDetailData[id]);
-														}													
-													}
-												})(self, f.id.getValue())
-											});
+													})(self, f.id.getValue())
+												}));
+											}
+											var nm = f.tm_first_name.getValue();	
+											var t = document.createElement("span");										
+											DOMHelper.setText(t, ((nm && nm.length)? nm:""));
+											cell_n.appendChild(t);
+											
 										}
-										var nm = f.tm_first_name.getValue();	
-										var t = document.createElement("span");										
-										DOMHelper.setText(t, ((nm && nm.length)? nm:""));
-										cell_n.appendChild(t);
-										
-									}
+									})(self)
 								})
 							],
 							"sortable":true

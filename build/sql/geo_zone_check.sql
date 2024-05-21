@@ -553,7 +553,7 @@ BEGIN
 		INSERT INTO konkrid.replicate_events
 			VALUES ('CarTracking.to_konkrid',
 				json_build_object('params',
-					json_build_object('car_id', NEW.car_id, 'period', NEW.period)
+					json_build_object('car_id', NEW.car_id, 'period', NEW.period::text)
 				)::text
 		);
 		

@@ -38,6 +38,8 @@ require_once(ABSOLUTE_PATH.'functions/notifications.php');
 
 require_once(ABSOLUTE_PATH.'functions/CustomEmailSender.php');
 
+require_once(ABSOLUTE_PATH.'functions/Beton.php');
+
 //User Agent parser
 //if (PHP_VERSION_ID >= 70000) {
 
@@ -885,6 +887,13 @@ class User_Controller extends ControllerSQL{
 		SessionVarManager::addVar('eventServerToken','',TRUE);
 		SessionVarManager::addVar('role_view_restriction',isset($ar['role_view_restriction'])? json_decode($ar['role_view_restriction']):NULL,TRUE);
 		
+		//shift start, end - default date filter
+		$dt = time() + Beton::shiftStartTime();
+		$date_from = Beton::shiftStart($dt);
+		$date_to = Beton::shiftEnd($date_from);
+		$shift_from_s = date("Y-m-d H:i:s", $date_from);
+		$shift_to_s = date("Y-m-d H:i:s", $date_to);	
+
 		//global filters				
 		if ($ar['role_id']=='client'){
 			$client_ar = $this->getDbLink()->query_first(sprintf("SELECT id,account_from_date FROM clients WHERE user_id=%d",$ar['id']));
@@ -930,8 +939,7 @@ class User_Controller extends ControllerSQL{
 			$filter->addField($field2,'>=');
 			GlobalFilter::set('ShipmentForOrderList_Model',$filter);
 			
-		}		
-		else if ($ar['role_id']=='vehicle_owner'){
+		}else if ($ar['role_id']=='vehicle_owner'){
 			$ar_veh_owner = $this->getDbLink()->query_first(sprintf("SELECT id FROM vehicle_owners WHERE user_id=%d LIMIT 1",$ar['id']));
 			if(is_array($ar_veh_owner) && count($ar_veh_owner)){
 				$_SESSION['global_vehicle_owner_id'] = $ar_veh_owner['id'];
@@ -1048,8 +1056,146 @@ class User_Controller extends ControllerSQL{
 			);
 			GlobalFilter::set('PumpVehicleWorkList_Model',$filter);
 						
-			
 		}
+		$filter = new ModelWhereSQL();
+		$filter->addExpression(
+			'order_period_filter',
+			sprintf("date_time BETWEEN '%s' AND '%s'",
+				$shift_from_s, $shift_to_s 
+			),
+			'AND'
+		);
+		GlobalFilter::set('OrderList_Model', $filter);
+
+		$filter = new ModelWhereSQL();
+		$filter->addExpression(
+			'order_pump_filter',
+			sprintf("date_time BETWEEN '%s' AND '%s'",
+				$shift_from_s, $shift_to_s 
+			),
+			'AND'
+		);
+		GlobalFilter::set('OrderPumpList_Model', $filter);
+
+		$filter = new ModelWhereSQL();
+		$filter->addExpression(
+			'ship_f',
+			sprintf("ship_date_time BETWEEN '%s' AND '%s'",
+				$shift_from_s, $shift_to_s 
+			),
+			'AND'
+		);
+		GlobalFilter::set('ShipmentList_Model', $filter);
+
+		$filter = new ModelWhereSQL();
+		$filter->addExpression(
+			'ship_for_vown_f',
+			sprintf("ship_date_time BETWEEN '%s' AND '%s'",
+				$shift_from_s, $shift_to_s 
+			),
+			'AND'
+		);
+		GlobalFilter::set('ShipmentForVehOwnerList_Model', $filter);
+
+		$filter = new ModelWhereSQL();
+		$filter->addExpression(
+			'ship_for_client',
+			sprintf("ship_date BETWEEN '%s' AND '%s'",
+				$shift_from_s, $shift_to_s 
+			),
+			'AND'
+		);
+		GlobalFilter::set('ShipmentForClientList_Model', $filter);
+
+		$filter = new ModelWhereSQL();
+		$filter->addExpression(
+			'order_for_client',
+			sprintf("date_time BETWEEN '%s' AND '%s'",
+				$shift_from_s, $shift_to_s 
+			),
+			'AND'
+		);
+		GlobalFilter::set('OrderForClientList_Model', $filter);
+
+		$filter = new ModelWhereSQL();
+		$filter->addExpression(
+			'ship_for_client_von_f',
+			sprintf("ship_date_time BETWEEN '%s' AND '%s'",
+				$shift_from_s, $shift_to_s 
+			),
+			'AND'
+		);
+		GlobalFilter::set('ShipmentForClientVehOwnerList_Model', $filter);
+
+		$filter = new ModelWhereSQL();
+		$filter->addExpression(
+			'ship_pump_f',
+			sprintf("date_time BETWEEN '%s' AND '%s'",
+				$shift_from_s, $shift_to_s 
+			),
+			'AND'
+		);
+		GlobalFilter::set('ShipmentPumpList_Model', $filter);
+
+		$filter = new ModelWhereSQL();
+		$filter->addExpression(
+			'ship_pump_veh_own_f',
+			sprintf("date_time BETWEEN '%s' AND '%s'",
+				$shift_from_s, $shift_to_s 
+			),
+			'AND'
+		);
+		GlobalFilter::set('ShipmentPumpForVehOwnerList_Model', $filter);
+
+		$filter = new ModelWhereSQL();
+		$filter->addExpression(
+			'ship_date_f',
+			sprintf("ship_date BETWEEN '%s' AND '%s'",
+				$shift_from_s, $shift_to_s 
+			),
+			'AND'
+		);
+		GlobalFilter::set('ShipmentDateList_Model', $filter);
+
+		$filter = new ModelWhereSQL();
+		$filter->addExpression(
+			'mat_proc_f',
+			sprintf("date_time BETWEEN '%s' AND '%s'",
+				$shift_from_s, $shift_to_s 
+			),
+			'AND'
+		);
+		GlobalFilter::set('DOCMaterialProcurementList_Model', $filter);
+
+		$filter = new ModelWhereSQL();
+		$filter->addExpression(
+			'mat_fact_cons_f',
+			sprintf("date_time BETWEEN '%s' AND '%s'",
+				$shift_from_s, $shift_to_s 
+			),
+			'AND'
+		);
+		GlobalFilter::set('MaterialFactConsumptionCorretionList_Model', $filter);
+
+		$filter = new ModelWhereSQL();
+		$filter->addExpression(
+			'ticket_filter',
+			sprintf("issue_date_time BETWEEN '%s' AND '%s'",
+				$shift_from_s, $shift_to_s 
+			),
+			'AND'
+		);
+		GlobalFilter::set('RawMaterialTicketList_Model', $filter);
+
+		$filter = new ModelWhereSQL();
+		$filter->addExpression(
+			'ast_period_f',
+			sprintf("end_time BETWEEN '%s' AND '%s'",
+				$shift_from_s, $shift_to_s 
+			),
+			'AND'
+		);
+		GlobalFilter::set('AstCallList_Model', $filter);
 		
 		//app_id clobal filter
 					

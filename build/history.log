@@ -1133,14 +1133,18 @@ added new sql function sms_pump_order_ship_f.sql
 	sms_pump_order_ship_ct.sql
 
 
-1.00325 20.05.24
+1.00325 
 1) OrderMakeForLabDialog_View.js added field for edit: concrete_type
 	Order_Controller->update() added clearing client_specification_id when concrete_type_id is changed.
 		!!! if pay_cash is set then error is issued. Recalc is needed.
 	Order_Controller->get_object_for_lab() added field concrete_types_ref,
 	metadata.xml model OrderMakeForLabDialog_Model added concrete_types_ref field. 
-
-
+2) VehicleScheduleMakeOrderGrid added new command - show vehicle dialog. VehicleScheduleGridCmdShowVehicle
+3) TmUserPhotoList_View.js corrected tooltip behaviour
+4) When user role is vehicle_owner Chat methods are called after login, not allowed, but called. ViewBase.html
+5) How to constraint queries if a user manually removes filter in gui? Shipment_Controller->get_list() add date_time filter on one shift.
+add conception of ObligatoryFilter like global, but is applied only if no filter on this column.
+6) User_Controller added filter support for "mild" filters, applied only when there is no filter at all. ModelSQL.php, GlobalFilter.php
 
 
 TODO:

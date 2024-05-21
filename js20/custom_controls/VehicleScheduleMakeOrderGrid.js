@@ -40,6 +40,7 @@ function VehicleScheduleMakeOrderGrid(id,options){
 				commands.push(new VehicleScheduleGridCmdSetFree(id+":grid:cmd:setFree",{"showCmdControl":false}));
 				commands.push(new VehicleScheduleGridCmdSetOut(id+":grid:cmd:setOut",{"showCmdControl":false}));
 				commands.push(new VehicleScheduleGridCmdShowPosition(id+":grid:cmd:showPos",{"showCmdControl":false}));
+				commands.push(new VehicleScheduleGridCmdShowVehicle(id+":grid:cmd:showVeh",{"showCmdControl":false}));
 			}
 		}),
 		"popUpMenu":new PopUpMenu(),
@@ -100,7 +101,28 @@ function VehicleScheduleMakeOrderGrid(id,options){
 												}	
 											]
 										}													
-									}										
+									},
+									"formatFunction":(function(gridCont){
+										return function(f, cell){
+											let ref = f.vehicles_ref.getValue();
+											if(!ref || ref.isNull()){
+												return "";
+											}
+											//hover tooltip
+											let cell_n = cell.getNode();										
+											// this.m_toolTip = 
+											(new ToolTip({
+												"node": cell_n,
+												"wait": 3000,
+												"onHover": (function(cont, vehID){
+													return function(ev){
+														cont.showVehicleInfo(this, vehID);
+													}
+												})(gridCont, ref.getKey())
+											}));
+											return ref.getDescr();
+										}
+									})(self)
 								})
 							]								
 						})
@@ -372,4 +394,48 @@ VehicleScheduleMakeOrderGrid.prototype.setBaseChangeEvent = function(cellNode, c
 	});
 	
 	cellNode.appendChild(st_t);
+}
+
+VehicleScheduleMakeOrderGrid.prototype.showVehicleInfoCont = function(ctrl, info){
+	ctrl.popup(
+		'<h4>'+ info.plate.getValue() +'</h4>'+
+		'<table>'+
+		'<tr>'+
+			'<td>Марка:</td>'+
+			'<td>'+ info.make.getValue() +'</td>'+
+		'</tr>'+
+		'<tr>'+
+			'<td>Грузоподъемность:</td>'+
+			'<td>'+ info.load_capacity.getValue() +'</td>'+
+		'</tr>'+
+		'<tr>'+
+			'<td>Трэкер:</td>'+
+			'<td>'+ info.tracker_id.getValue() +'</td>'+
+		'</tr>'+
+		'<tr>'+
+			'<td>Послeдние данные:</td>'+
+			'<td>'+ DateHelper.format(info.tracker_last_dt.getValue(), "d.m.y H:i") +'</td>'+
+		'</tr>'+
+		'<tr>'+
+			'<td>Кол-во спутников:</td>'+
+			'<td>'+ info.tracker_sat_num.getValue() +'</td>'+
+		'</tr>'+
+		'</table>',
+		{"title":"Данные по ТС"}
+	);
+}
+
+VehicleScheduleMakeOrderGrid.prototype.showVehicleInfo = function(ctrl, vehID){
+	var pm = (new Vehicle_Controller()).getPublicMethod("get_object");
+	pm.setFieldValue("id", vehID);
+	pm.run({
+		"ok":(function(cont){
+			return function(resp){
+				let m = resp.getModel("VehicleDialog_Model");
+				if(m.getNextRow()){
+					cont.showVehicleInfoCont(ctrl, m.getFields());
+				}
+			}
+		})(this)
+	});
 }

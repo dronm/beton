@@ -656,6 +656,8 @@ throw Error(CommonHelper.longString(function () {/*
 					</a>
 				</li>			
 
+				<!-- employed staff only -->
+				<xsl:if test="not(/document/model[@id='ModelVars']/row/role_id='vehicle_owner') and not(/document/model[@id='ModelVars']/row/role_id='client')">
 				<li class="dropdown">
 					<a id="user_chat_status" title="Чат с сотрудниками">
 						<i class="icon-bubbles4">
@@ -668,7 +670,8 @@ throw Error(CommonHelper.longString(function () {/*
 						</img>
 					</a>
 				</li>			
-			
+				</xsl:if>	
+
 				<!-- USER DATA -->
 				<li class="dropdown dropdown-user">
 					<a class="dropdown-toggle" data-toggle="dropdown">

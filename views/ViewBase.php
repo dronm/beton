@@ -1529,6 +1529,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/VehicleScheduleGridCmdSetFree.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/VehicleScheduleGridCmdSetFree.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/VehicleScheduleGridCmdSetOut.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/VehicleScheduleGridCmdSetOut.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/VehicleScheduleGridCmdShowPosition.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/VehicleScheduleGridCmdShowPosition.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/VehicleScheduleGridCmdShowVehicle.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/VehicleScheduleGridCmdShowVehicle.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/PrintInvoiceBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/PrintInvoiceBtn.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/PrintTTNBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/PrintTTNBtn.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/PrintPutevoiListBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/PrintPutevoiListBtn.js')) ));
