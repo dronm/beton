@@ -73,8 +73,9 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		try{
 			$this->getDbLinkMaster()->query(sprintf(
 				"INSERT INTO raw_material_tickets
-				(carrier_id, raw_material_id, barcode, quant, expire_date, issue_date_time, issue_user_id)
+				(carrier_id, quarry_id, raw_material_id, barcode, quant, expire_date, issue_date_time, issue_user_id)
 				SELECT
+					%d,
 					%d,
 					%d,
 					code,
@@ -84,6 +85,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 					%d
 				FROM generate_series(%d, %d) AS code"
 				,$this->getExtDbVal($pm, 'carrier_id')
+				,$this->getExtDbVal($pm, 'quarry_id')
 				,$this->getExtDbVal($pm, 'raw_material_id')
 				,$this->getExtDbVal($pm, 'quant')
 				,$this->getExtDbVal($pm, 'expire_date')

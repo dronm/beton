@@ -86,6 +86,32 @@ $permissions = array();
 		
 			$permissions['SessionVar_Controller_get_values']=TRUE;
 		
+				$permissions['Quarry_Controller_insert']=TRUE;
+			
+				$permissions['Quarry_Controller_update']=TRUE;
+			
+				$permissions['Quarry_Controller_delete']=TRUE;
+			
+				$permissions['Quarry_Controller_get_list']=TRUE;
+			
+				$permissions['Quarry_Controller_get_object']=TRUE;
+			
+				$permissions['Quarry_Controller_complete']=TRUE;
+			
+			$permissions['RawMaterial_Controller_get_material_actions_list']=TRUE;
+		
+				$permissions['UserChat_Controller_get_object']=TRUE;
+			
+				$permissions['UserChat_Controller_get_user_list']=TRUE;
+			
+				$permissions['UserChat_Controller_send']=TRUE;
+			
+				$permissions['UserChat_Controller_send_media']=TRUE;
+			
+				$permissions['UserChat_Controller_get_history']=TRUE;
+			
+			$permissions['DOCMaterialProcurement_Controller_get_shift_list']=TRUE;
+		
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }
 ?>

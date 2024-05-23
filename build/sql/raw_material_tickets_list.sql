@@ -24,7 +24,8 @@ CREATE OR REPLACE VIEW raw_material_tickets_list AS
 	LEFT JOIN raw_materials AS m ON m.id = t.raw_material_id
 	LEFT JOIN users AS i_u ON i_u.id = t.issue_user_id
 	LEFT JOIN users AS c_u ON c_u.id = t.close_user_id
+	LEFT JOIN quarries AS qr ON qr.id = t.quarry_id
 	ORDER BY t.issue_date_time DESC
 	;
 	
-ALTER VIEW raw_material_tickets_list OWNER TO ;
+-- ALTER VIEW raw_material_tickets_list OWNER TO ;

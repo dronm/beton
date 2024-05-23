@@ -419,6 +419,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			GlobalFilter::set('<xsl:value-of select="$model_id"/>',$filter);
 			</xsl:for-each>			
 		}
+
+		/*
+		// mild filters
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
 			'order_period_filter',
@@ -427,7 +430,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('OrderList_Model', $filter);
+		GlobalFilter::set('OrderList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -437,7 +440,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('OrderPumpList_Model', $filter);
+		GlobalFilter::set('OrderPumpList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -447,7 +450,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('ShipmentList_Model', $filter);
+		GlobalFilter::set('ShipmentList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -457,7 +460,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('ShipmentForVehOwnerList_Model', $filter);
+		GlobalFilter::set('ShipmentForVehOwnerList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -467,7 +470,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('ShipmentForClientList_Model', $filter);
+		GlobalFilter::set('ShipmentForClientList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -477,7 +480,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('OrderForClientList_Model', $filter);
+		GlobalFilter::set('OrderForClientList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -487,7 +490,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('ShipmentForClientVehOwnerList_Model', $filter);
+		GlobalFilter::set('ShipmentForClientVehOwnerList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -497,7 +500,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('ShipmentPumpList_Model', $filter);
+		GlobalFilter::set('ShipmentPumpList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -507,7 +510,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('ShipmentPumpForVehOwnerList_Model', $filter);
+		GlobalFilter::set('ShipmentPumpForVehOwnerList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -517,7 +520,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('ShipmentDateList_Model', $filter);
+		GlobalFilter::set('ShipmentDateList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -527,7 +530,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('DOCMaterialProcurementList_Model', $filter);
+		GlobalFilter::set('DOCMaterialProcurementList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -537,7 +540,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('MaterialFactConsumptionCorretionList_Model', $filter);
+		GlobalFilter::set('MaterialFactConsumptionCorretionList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -547,7 +550,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('RawMaterialTicketList_Model', $filter);
+		GlobalFilter::set('RawMaterialTicketList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -557,8 +560,19 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('AstCallList_Model', $filter);
+		GlobalFilter::set('AstCallList_Model', $filter, TRUE);
 		
+		$filter = new ModelWhereSQL();
+		$filter->addExpression(
+			'ticket_f',
+			sprintf("issue_date_time BETWEEN '%s' AND '%s'",
+				$shift_from_s, $shift_to_s 
+			),
+			'AND'
+		);
+		GlobalFilter::set('RawMaterialTicketList_Model', $filter, TRUE);
+		*/
+
 		//app_id clobal filter
 		<xsl:for-each select="/metadata/models/model/globalFilter[@id='app_id']">
 		<xsl:variable name="model_id" select="concat(../@id,'_Model')"/>

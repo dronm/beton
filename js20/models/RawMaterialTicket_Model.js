@@ -53,6 +53,15 @@ function RawMaterialTicket_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Карьер';
+	filed_options.autoInc = false;	
+	
+	options.fields.quarry_id = new FieldInt("quarry_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Штрихкод';
 	filed_options.autoInc = false;	
 	

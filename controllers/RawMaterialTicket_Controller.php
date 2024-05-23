@@ -47,6 +47,13 @@ class RawMaterialTicket_Controller extends ControllerSQL{
 		
 			$f_params = array();
 			
+				$f_params['alias']='Карьер';
+			$param = new FieldExtInt('quarry_id'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
 				$f_params['alias']='Штрихкод';
 			$param = new FieldExtString('barcode'
 				,$f_params);
@@ -129,6 +136,13 @@ class RawMaterialTicket_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Материал';
 			$param = new FieldExtInt('raw_material_id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Карьер';
+			$param = new FieldExtInt('quarry_id'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -264,6 +278,12 @@ class RawMaterialTicket_Controller extends ControllerSQL{
 	$opts=array();
 	
 		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('quarry_id',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
 		$pm->addParam(new FieldExtInt('quant',$opts));
 	
 				
@@ -375,8 +395,9 @@ class RawMaterialTicket_Controller extends ControllerSQL{
 		try{
 			$this->getDbLinkMaster()->query(sprintf(
 				"INSERT INTO raw_material_tickets
-				(carrier_id, raw_material_id, barcode, quant, expire_date, issue_date_time, issue_user_id)
+				(carrier_id, quarry_id, raw_material_id, barcode, quant, expire_date, issue_date_time, issue_user_id)
 				SELECT
+					%d,
 					%d,
 					%d,
 					code,
@@ -386,6 +407,7 @@ class RawMaterialTicket_Controller extends ControllerSQL{
 					%d
 				FROM generate_series(%d, %d) AS code"
 				,$this->getExtDbVal($pm, 'carrier_id')
+				,$this->getExtDbVal($pm, 'quarry_id')
 				,$this->getExtDbVal($pm, 'raw_material_id')
 				,$this->getExtDbVal($pm, 'quant')
 				,$this->getExtDbVal($pm, 'expire_date')

@@ -59,9 +59,15 @@ RawMaterialTicketIssueBtn.prototype.onClick = function(){
 				"labelCaption":"Перевозчик:",
 				"focus":true
 			})
+
+			,new QuarryEdit("dialog:cont:quarries_ref",{
+				"labelCaption":"Карьер:"
+			})
+
 			,new MaterialSelect("dialog:cont:raw_materials_ref",{
 				"labelCaption":"Материал:"
 			})			
+
 			,new EditInt("dialog:cont:quant",{
 				"labelCaption":"Вес, т.:"
 				,"cmdCalc":false
@@ -114,6 +120,12 @@ RawMaterialTicketIssueBtn.prototype.onClick = function(){
 				if(!carriers_ref || carriers_ref.isNull()){
 					throw Error("Не задан перевозчик!");
 				}
+
+				var quarries_ref = self.m_view.getElement("quarries_ref").getValue();
+				if(!quarries_ref|| quarries_ref.isNull()){
+					throw Error("Не задан карьер!");
+				}
+
 				var raw_materials_ref = self.m_view.getElement("raw_materials_ref").getValue();
 				if(!raw_materials_ref || raw_materials_ref.isNull()){
 					throw Error("Не задан материал!");
@@ -127,6 +139,7 @@ RawMaterialTicketIssueBtn.prototype.onClick = function(){
 				}
 				self.closeSelect(
 					carriers_ref.getKey(),
+					quarries_ref.getKey(),
 					raw_materials_ref.getKey(),
 					quant,
 					self.m_view.getElement("barcode_from").getValue(),
@@ -154,12 +167,13 @@ RawMaterialTicketIssueBtn.prototype.doCloseForm = function(){
 	
 }
 
-RawMaterialTicketIssueBtn.prototype.closeSelect = function(carrierId, rawMaterialId, quant, barcodeFrom, barcodeTo, expireDate){
+RawMaterialTicketIssueBtn.prototype.closeSelect = function(carrierId, quarryId, rawMaterialId, quant, barcodeFrom, barcodeTo, expireDate){
 	if(carrierId && rawMaterialId && quant && barcodeFrom && barcodeTo && this.m_view.m_ticketCount){
 		var pm = (new RawMaterialTicket_Controller()).getPublicMethod("generate");
 		var self = this;
 		
 		pm.setFieldValue("carrier_id", carrierId);
+		pm.setFieldValue("quarry_id", quarryId);
 		pm.setFieldValue("raw_material_id", rawMaterialId);
 		pm.setFieldValue("quant", quant);
 		pm.setFieldValue("barcode_from", barcodeFrom);

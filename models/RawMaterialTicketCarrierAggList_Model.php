@@ -50,6 +50,16 @@ class RawMaterialTicketCarrierAggList_Model extends ModelSQL{
 		$this->addField($f_raw_materials_ref);
 		//********************
 		
+		//*** Field quarries_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Карьер';
+		$f_opts['id']="quarries_ref";
+						
+		$f_quarries_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quarries_ref",$f_opts);
+		$this->addField($f_quarries_ref);
+		//********************
+		
 		//*** Field quant ***
 		$f_opts = array();
 		

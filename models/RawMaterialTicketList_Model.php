@@ -74,6 +74,26 @@ class RawMaterialTicketList_Model extends ModelSQL{
 		$this->addField($f_raw_materials_ref);
 		//********************
 		
+		//*** Field quarry_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Карьер';
+		$f_opts['id']="quarry_id";
+						
+		$f_quarry_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quarry_id",$f_opts);
+		$this->addField($f_quarry_id);
+		//********************
+		
+		//*** Field quarries_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Карьер';
+		$f_opts['id']="quarries_ref";
+						
+		$f_quarries_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quarries_ref",$f_opts);
+		$this->addField($f_quarries_ref);
+		//********************
+		
 		//*** Field barcode ***
 		$f_opts = array();
 		

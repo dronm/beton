@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-05-22 04:56:48</lastBuild></version>
+		<lastBuild>2024-05-23 16:43:32</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -230,6 +230,7 @@
 		<version dateOpen="2024-04-17 09:26:52" dateClose="2024-04-18 05:21:17">1.00324</version>
 		<version dateOpen="2024-04-18 11:09:36" dateClose="2024-05-14 11:12:31">1.00325</version>
 		<version dateOpen="2024-05-16 07:52:36" dateClose="2024-05-22 04:57:09">1.00326</version>
+		<version dateOpen="2024-05-23 14:59:38" dateClose="2024-05-23 16:43:35">1.00327</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -4215,6 +4216,7 @@
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="carrier_id" dataType="Int" alias="Перевозчик" refTable="suppliers" refField="id"/>
 			<field id="raw_material_id" dataType="Int" alias="Материал" refTable="raw_materials" refField="id"/>
+			<field id="quarry_id" dataType="Int" alias="Карьер" refTable="quarries" refField="id"/>
 			<field id="barcode" dataType="String" dbRequired="TRUE" length="13" alias="Штрихкод"/>
 			<field id="quant" dataType="Int" required="TRUE" alias="Вес, т"/>
 			<field id="issue_date_time" dataType="DateTimeTZ" dbRequired="TRUE" defaultValue="CURRENT_TIMESTAMP"/>
@@ -4244,6 +4246,8 @@
 			<field id="carriers_ref" dataType="JSON" alias="Перевозчик"/>
 			<field id="raw_material_id" dataType="Int" alias="Материал" refTable="raw_materials" refField="id"/>
 			<field id="raw_materials_ref" dataType="JSON" alias="Материал"/>
+			<field id="quarry_id" dataType="Int" alias="Карьер" refTable="quarries" refField="id"/>
+			<field id="quarries_ref" dataType="JSON" alias="Карьер"/>
 			<field id="barcode" dataType="String" alias="Штрихкод"/>
 			<field id="quant" dataType="Int" alias="Вес, т"/>
 			<field id="issue_date_time" dataType="DateTimeTZ"/>
@@ -4261,6 +4265,7 @@
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="carriers_ref" dataType="JSON" alias="Перевозчик"/>
 			<field id="raw_materials_ref" dataType="JSON" alias="Материал"/>
+			<field id="quarries_ref" dataType="JSON" alias="Карьер"/>
 			<field id="quant" dataType="Int" alias="Вес, т"/>
 			<field id="ticket_count" dataType="Int" alias="Количество"/>
 			<field id="quant_tot" dataType="Int" alias="Вес, т"/>
@@ -6311,6 +6316,7 @@
 			<publicMethod id="generate">
 				<field id="carrier_id" dataType="Int" required="TRUE"/>
 				<field id="raw_material_id" dataType="Int" required="TRUE"/>
+				<field id="quarry_id" dataType="Int" required="TRUE"/>
 				<field id="quant" dataType="Int" required="TRUE"/>
 				<field id="barcode_from" dataType="Int" required="TRUE"/>
 				<field id="barcode_to" dataType="Int" required="TRUE"/>
@@ -6714,6 +6720,10 @@
 		<permission type="allow" controllerId="RawMaterial" methodId="complete" roleId="weighing"/>
 		<permission type="allow" controllerId="RawMaterial" methodId="get_object" roleId="weighing"/>
 		<permission type="allow" controllerId="SessionVar" methodId="get_values" roleId="weighing"/>
+		<permission type="allow" controllerId="Quarry" methodId="all" roleId="weighing"/>
+		<permission type="allow" controllerId="RawMaterial" methodId="get_material_actions_list" roleId="weighing"/>
+		<permission type="allow" controllerId="UserChat" methodId="all" roleId="weighing"/>
+		<permission type="allow" controllerId="DOCMaterialProcurement" methodId="get_shift_list" roleId="weighing"/>
 	</permissions>
 	<views>
 		<view id="10000" c="User_Controller" t="UserList" f="get_list" section="Справочники" descr="Пользователи"/>

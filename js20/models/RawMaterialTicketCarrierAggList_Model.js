@@ -56,6 +56,15 @@ function RawMaterialTicketCarrierAggList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Карьер';
+	filed_options.autoInc = false;	
+	
+	options.fields.quarries_ref = new FieldJSON("quarries_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Вес, т';
 	filed_options.autoInc = false;	
 	

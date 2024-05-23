@@ -1,5 +1,5 @@
 /**
- * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017 - 2024
  
  * THIS FILE IS GENERATED FROM TEMPLATE build/templates/controllers/Controller_js20.xsl
  * ALL DIRECT MODIFICATIONS WILL BE LOST WITH THE NEXT BUILD PROCESS!!!
@@ -56,6 +56,12 @@ extend(RawMaterialTicket_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Материал";
 	var field = new FieldInt("raw_material_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Карьер";
+	var field = new FieldInt("quarry_id",options);
 	
 	pm.addField(field);
 	
@@ -128,6 +134,12 @@ extend(RawMaterialTicket_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Материал";
 	var field = new FieldInt("raw_material_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Карьер";
+	var field = new FieldInt("quarry_id",options);
 	
 	pm.addField(field);
 	
@@ -218,6 +230,12 @@ extend(RawMaterialTicket_Controller,ControllerObjServer);
 	f_opts.alias = "Материал";
 	pm.addField(new FieldJSON("raw_materials_ref",f_opts));
 	var f_opts = {};
+	f_opts.alias = "Карьер";
+	pm.addField(new FieldInt("quarry_id",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Карьер";
+	pm.addField(new FieldJSON("quarries_ref",f_opts));
+	var f_opts = {};
 	f_opts.alias = "Штрихкод";
 	pm.addField(new FieldString("barcode",f_opts));
 	var f_opts = {};
@@ -279,6 +297,14 @@ extend(RawMaterialTicket_Controller,ControllerObjServer);
 		options.required = true;
 	
 		pm.addField(new FieldInt("raw_material_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("quarry_id",options));
 	
 				
 	

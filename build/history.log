@@ -1147,6 +1147,20 @@ add conception of ObligatoryFilter like global, but is applied only if no filter
 6) User_Controller added filter support for "mild" filters, applied only when there is no filter at all. ModelSQL.php, GlobalFilter.php
 
 
+1.00325 
+1) RawMaterialTicket added new field quarry_id of type quarries.
+RawMaterialTicketList, RawMaterialTicketCarrierAggList
+raw_material_tickets_list.sql
+raw_material_ticket_carrier_agg_list.sql
+RawMaterialTicketList_View.js
+RawMaterialTicketIssueBtn.js
+RawMaterialTicket_Controller->generate() function changed.
+RawMaterialTicketClose_View.js
+
+
+
+
+
 TODO:
 	Chat_Controller->get_history() add offset, guid, add scrolling, fetch messages
 

@@ -1057,6 +1057,9 @@ class User_Controller extends ControllerSQL{
 			GlobalFilter::set('PumpVehicleWorkList_Model',$filter);
 						
 		}
+		
+		//mild filters
+/*		
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
 			'order_period_filter',
@@ -1065,7 +1068,7 @@ class User_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('OrderList_Model', $filter);
+		GlobalFilter::set('OrderList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -1075,7 +1078,7 @@ class User_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('OrderPumpList_Model', $filter);
+		GlobalFilter::set('OrderPumpList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -1085,7 +1088,7 @@ class User_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('ShipmentList_Model', $filter);
+		GlobalFilter::set('ShipmentList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -1095,7 +1098,7 @@ class User_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('ShipmentForVehOwnerList_Model', $filter);
+		GlobalFilter::set('ShipmentForVehOwnerList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -1105,7 +1108,7 @@ class User_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('ShipmentForClientList_Model', $filter);
+		GlobalFilter::set('ShipmentForClientList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -1115,7 +1118,7 @@ class User_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('OrderForClientList_Model', $filter);
+		GlobalFilter::set('OrderForClientList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -1125,7 +1128,7 @@ class User_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('ShipmentForClientVehOwnerList_Model', $filter);
+		GlobalFilter::set('ShipmentForClientVehOwnerList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -1135,7 +1138,7 @@ class User_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('ShipmentPumpList_Model', $filter);
+		GlobalFilter::set('ShipmentPumpList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -1145,7 +1148,7 @@ class User_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('ShipmentPumpForVehOwnerList_Model', $filter);
+		GlobalFilter::set('ShipmentPumpForVehOwnerList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -1155,7 +1158,7 @@ class User_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('ShipmentDateList_Model', $filter);
+		GlobalFilter::set('ShipmentDateList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -1165,7 +1168,7 @@ class User_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('DOCMaterialProcurementList_Model', $filter);
+		GlobalFilter::set('DOCMaterialProcurementList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -1175,7 +1178,7 @@ class User_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('MaterialFactConsumptionCorretionList_Model', $filter);
+		GlobalFilter::set('MaterialFactConsumptionCorretionList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -1185,7 +1188,7 @@ class User_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('RawMaterialTicketList_Model', $filter);
+		GlobalFilter::set('RawMaterialTicketList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
 		$filter->addExpression(
@@ -1195,8 +1198,8 @@ class User_Controller extends ControllerSQL{
 			),
 			'AND'
 		);
-		GlobalFilter::set('AstCallList_Model', $filter);
-		
+		GlobalFilter::set('AstCallList_Model', $filter, TRUE);
+*/		
 		//app_id clobal filter
 					
 		$model = new TmUserList_Model($this->getDbLink());

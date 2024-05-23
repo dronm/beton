@@ -72,6 +72,15 @@ function RawMaterialTicketList_View(id,options){
 				"field":new FieldInt("carrier_id")}),
 			"sign":"e"		
 		}
+		,"quarry":{
+			"binding":new CommandBinding({
+				"control":new QuarryEdit(id+":filter-ctrl-quarry",{
+					"contClassName":"form-group-filter",
+					"labelCaption":"Карьер:"
+				}),
+				"field":new FieldInt("quarry_id")}),
+			"sign":"e"		
+		}
 		,"material":{
 			"binding":new CommandBinding({
 				"control":new MaterialSelect(id+":filter-ctrl-material",{
@@ -116,6 +125,20 @@ function RawMaterialTicketList_View(id,options){
 									},
 									"ctrlClass":SupplierEdit,
 									"ctrlBindFieldId": "carrier_id"
+								})
+							],
+							"sortable":true
+						})
+						,new GridCellHead(id+":grid:head:quarries_ref",{
+							"value":"Карьер",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("quarries_ref"),
+									"ctrlOptions":{
+										"labelCaption": ""
+									},
+									"ctrlClass":QuarryEdit,
+									"ctrlBindFieldId": "quarry_id"
 								})
 							],
 							"sortable":true
@@ -223,7 +246,7 @@ function RawMaterialTicketList_View(id,options){
 				new GridRow(id+":grid:foot:row0",{
 					"elements":[
 						new GridCell(id+":grid:foot:total_sp1",{
-							"colSpan":"3"
+							"colSpan":"4"
 						})											
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
 							"attrs":{"align":"right"},

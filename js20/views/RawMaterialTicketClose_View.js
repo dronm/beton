@@ -70,6 +70,16 @@ function RawMaterialTicketClose_View(id,options){
 									})
 								]
 							})
+
+							,new GridCellHead(id+":grid:head:quarries_ref",{
+								"value":"Карьер",
+								"columns":[
+									new GridColumnRef({
+										"field":model.getField("quarries_ref")
+									})
+								]
+							})
+
 							,new GridCellHead(id+":grid:head:raw_materials_ref",{
 								"value":"Материал",
 								"columns":[
@@ -123,7 +133,7 @@ function RawMaterialTicketClose_View(id,options){
 					new GridRow(id+":grid:foot:row0",{
 						"elements":[
 							new GridCell(id+":grid:foot:total_sp1",{
-								"colSpan":"3"
+								"colSpan":"4"
 							})											
 							,new GridCellFoot(id+":grid:foot:tot_ticket_count",{
 								"attrs":{"align": "right"},
