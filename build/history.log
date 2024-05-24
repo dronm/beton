@@ -1158,6 +1158,9 @@ RawMaterialTicket_Controller->generate() function changed.
 RawMaterialTicketClose_View.js
 
 
+1.00326 
+1) Change column order in RawMaterialTicketList_View.js, RawMaterialTicketClose_View.js
+
 
 
 

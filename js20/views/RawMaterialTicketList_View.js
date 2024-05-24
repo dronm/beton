@@ -129,6 +129,19 @@ function RawMaterialTicketList_View(id,options){
 							],
 							"sortable":true
 						})
+						,new GridCellHead(id+":grid:head:raw_materials_ref",{
+							"value":"Материал",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("raw_materials_ref"),
+									"ctrlOptions":{
+										"labelCaption": ""
+									},
+									"ctrlClass":MaterialSelect,
+									"ctrlBindFieldId": "raw_material_id"
+								})
+							]
+						})
 						,new GridCellHead(id+":grid:head:quarries_ref",{
 							"value":"Карьер",
 							"columns":[
@@ -143,20 +156,6 @@ function RawMaterialTicketList_View(id,options){
 							],
 							"sortable":true
 						})
-						,new GridCellHead(id+":grid:head:raw_materials_ref",{
-							"value":"Материал",
-							"columns":[
-								new GridColumnRef({
-									"field":model.getField("raw_materials_ref"),
-									"ctrlOptions":{
-										"labelCaption": ""
-									},
-									"ctrlClass":MaterialSelect,
-									"ctrlBindFieldId": "raw_material_id"
-								})
-							]
-						})
-						
 						
 						,new GridCellHead(id+":grid:head:barcode",{
 							"value":"Штрихкод",

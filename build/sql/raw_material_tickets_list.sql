@@ -1,6 +1,6 @@
 -- VIEW: raw_material_tickets_list
 
---DROP VIEW raw_material_tickets_list;
+DROP VIEW raw_material_tickets_list;
 
 CREATE OR REPLACE VIEW raw_material_tickets_list AS
 	SELECT
@@ -9,6 +9,7 @@ CREATE OR REPLACE VIEW raw_material_tickets_list AS
 		,suppliers_ref(cr) AS carriers_ref
 		,t.raw_material_id
 		,materials_ref(m) AS raw_materials_ref
+		,quarries_ref(qr) AS quarries_ref 
 		,t.barcode
 		,t.quant
 		,t.issue_date_time

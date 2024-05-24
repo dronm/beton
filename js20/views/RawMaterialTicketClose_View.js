@@ -70,16 +70,6 @@ function RawMaterialTicketClose_View(id,options){
 									})
 								]
 							})
-
-							,new GridCellHead(id+":grid:head:quarries_ref",{
-								"value":"Карьер",
-								"columns":[
-									new GridColumnRef({
-										"field":model.getField("quarries_ref")
-									})
-								]
-							})
-
 							,new GridCellHead(id+":grid:head:raw_materials_ref",{
 								"value":"Материал",
 								"columns":[
@@ -88,14 +78,11 @@ function RawMaterialTicketClose_View(id,options){
 									})
 								]
 							})
-							,new GridCellHead(id+":grid:head:quant",{
-								"value":"Вес за талон, т",
-								"colAttrs":{
-									"align":"right"
-								},
+							,new GridCellHead(id+":grid:head:quarries_ref",{
+								"value":"Карьер",
 								"columns":[
-									new GridColumn({
-										"field":model.getField("quant")
+									new GridColumnRef({
+										"field":model.getField("quarries_ref")
 									})
 								]
 							})
@@ -110,7 +97,17 @@ function RawMaterialTicketClose_View(id,options){
 									})
 								]
 							})
-							
+							,new GridCellHead(id+":grid:head:quant",{
+								"value":"Вес за талон, т",
+								"colAttrs":{
+									"align":"right"
+								},
+								"columns":[
+									new GridColumn({
+										"field":model.getField("quant")
+									})
+								]
+							})
 							,new GridCellHead(id+":grid:head:quant_tot",{
 								"value":"Вес итого, т",
 								"colAttrs":{
@@ -122,7 +119,6 @@ function RawMaterialTicketClose_View(id,options){
 									})
 								]
 							})
-							
 						]
 					})
 				]

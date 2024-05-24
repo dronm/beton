@@ -20996,3 +20996,107 @@ $BODY$;
 
 ALTER FUNCTION public.geo_zone_check()
     OWNER TO beton;
+
+
+
+-- ******************* update 24/05/2024 05:02:40 ******************
+
+		ALTER TABLE public.raw_material_tickets ADD COLUMN quarry_id int REFERENCES quarries(id);
+
+
+
+-- ******************* update 24/05/2024 05:03:11 ******************
+
+
+-- DROP FUNCTION public.quarries_ref(quarries);
+
+CREATE OR REPLACE FUNCTION public.quarries_ref(quarries)
+  RETURNS json AS
+$BODY$
+	SELECT json_build_object(
+		'keys',json_build_object(
+			'id',$1.id    
+			),	
+		'descr',$1.name,
+		'dataType','quarries'
+	);
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION public.quarries_ref(quarries) OWNER TO concrete1;
+
+
+
+-- ******************* update 24/05/2024 05:03:24 ******************
+-- VIEW: raw_material_ticket_carrier_agg_list
+
+ DROP VIEW raw_material_ticket_carrier_agg_list;
+
+CREATE OR REPLACE VIEW raw_material_ticket_carrier_agg_list AS
+	WITH
+	sel AS (
+		SELECT
+			carrier_id,
+			raw_material_id,
+			quarry_id,
+			quant,
+			count(*) AS ticket_count,
+			count(*) * quant AS quant_tot
+		FROM raw_material_tickets		
+		WHERE close_date_time IS NULL
+		GROUP BY
+			carrier_id,
+			raw_material_id,
+			quarry_id,
+			quant				
+	)
+	SELECT
+		suppliers_ref(sp) AS carriers_ref,
+		materials_ref(mat) AS raw_materials_ref,
+		quarries_ref(qr) AS quarries_ref,
+		sel.quant,
+		sel.ticket_count,
+		sel.quant_tot
+	FROM sel
+	LEFT JOIN suppliers AS sp ON sp.id = sel.carrier_id
+	LEFT JOIN raw_materials AS mat ON mat.id = sel.raw_material_id	
+	LEFT JOIN quarries AS qr ON qr.id = sel.quarry_id
+	ORDER BY sp.name, mat.name
+	;
+	
+-- ALTER VIEW raw_material_ticket_carrier_agg_list OWNER TO concrete1;
+
+
+
+-- ******************* update 24/05/2024 05:03:36 ******************
+-- VIEW: raw_material_tickets_list
+
+--DROP VIEW raw_material_tickets_list;
+
+CREATE OR REPLACE VIEW raw_material_tickets_list AS
+	SELECT
+		t.id 
+		,t.carrier_id
+		,suppliers_ref(cr) AS carriers_ref
+		,t.raw_material_id
+		,materials_ref(m) AS raw_materials_ref
+		,t.barcode
+		,t.quant
+		,t.issue_date_time
+		,t.close_date_time
+		,t.issue_user_id
+		,users_ref(i_u) AS issue_users_ref
+		,t.close_user_id
+		,users_ref(c_u) AS close_users_ref
+		,t.expire_date
+		
+	FROM raw_material_tickets AS t
+	LEFT JOIN suppliers AS cr ON cr.id = t.carrier_id
+	LEFT JOIN raw_materials AS m ON m.id = t.raw_material_id
+	LEFT JOIN users AS i_u ON i_u.id = t.issue_user_id
+	LEFT JOIN users AS c_u ON c_u.id = t.close_user_id
+	LEFT JOIN quarries AS qr ON qr.id = t.quarry_id
+	ORDER BY t.issue_date_time DESC
+	;
+	
+-- ALTER VIEW raw_material_tickets_list OWNER TO concrete1;
