@@ -11,12 +11,31 @@ function db_con(){
 	/*conneсtion*/
 	$link->server		= DB_SERVER_MASTER;
 	$link->user		= DB_USER;
-	$link->password	= DB_PASSWORD;
-	$link->database	= DB_NAME;
-	$link->connect(DB_SERVER_MASTER, DB_USER, DB_PASSWORD);
+	$link->password		= DB_PASSWORD;
+	$link->database		= DB_NAME;
+	$link->connect(DB_SERVER_MASTER, DB_USER, DB_PASSWORD, DB_PORT_MASTER);
 
 	//ВНИМАНИЕ!!! БЕЗ reportError=TRUE исключение не генерится!!!!
 	
 	return $link;
 }
+
+function db_readOnlyCon(){
+	$link = new DB_Sql();
+	$link->appname = APP_NAME;
+	$link->technicalemail = TECH_EMAIL;
+	$link->detailedError = defined('DETAILED_ERROR')? DETAILED_ERROR:DEBUG;
+
+	/*conneсtion*/
+	$link->server		= DB_SERVER_MASTER;
+	$link->user		= DB_USER;
+	$link->password		= DB_PASSWORD;
+	$link->database		= DB_NAME;
+	$link->connect(DB_SERVER, DB_USER, DB_PASSWORD, DB_PORT);
+
+	//ВНИМАНИЕ!!! БЕЗ reportError=TRUE исключение не генерится!!!!
+	
+	return $link;
+}
+
 ?>

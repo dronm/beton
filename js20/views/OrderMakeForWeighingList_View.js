@@ -279,9 +279,12 @@ OrderMakeForWeighingList_View.prototype.onRefreshResponse = function(resp){
 	
 }
 
-OrderMakeForWeighingList_View.prototype.runSpecificUpdateMethod = function(meth){
+OrderMakeForWeighingList_View.prototype.runSpecificUpdateMethod = function(meth, lsn){
 	var pm = (new Order_Controller()).getPublicMethod(meth);
 	pm.setFieldValue("date", (new FieldDateTime("d",{"value": DateHelper.time()})).getValueXHR());
+	if(lsn && pm.fieldExists("lsn")){
+		pm.setFieldValue("lsn", lsn);
+	}
 	var self = this;
 	pm.run({
 		"ok":function(resp){
@@ -292,7 +295,7 @@ OrderMakeForWeighingList_View.prototype.runSpecificUpdateMethod = function(meth)
 
 OrderMakeForWeighingList_View.prototype.srvEventsCallBack = function(json){
 	if(json.controllerId=="RAMaterialFact" || json.controllerId=="Production"){
-		this.runSpecificUpdateMethod("get_make_orders_for_weighing_form");
+		this.runSpecificUpdateMethod("get_make_orders_for_weighing_form", (json.params && json.params.lsn)? json.params.lsn:null);
 	}
 }
 

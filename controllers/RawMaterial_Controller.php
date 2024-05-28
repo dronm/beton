@@ -33,8 +33,8 @@ require_once(ABSOLUTE_PATH.'functions/Beton.php');
 require_once(USER_CONTROLLERS_PATH.'Order_Controller.php');
 
 class RawMaterial_Controller extends ControllerSQL{
-	public function __construct($dbLinkMaster){
-		parent::__construct($dbLinkMaster);
+	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
+		parent::__construct($dbLinkMaster, $dbLink);
 			
 
 		/* insert */

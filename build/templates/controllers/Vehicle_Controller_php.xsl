@@ -25,8 +25,8 @@ require_once(FUNC_PATH.'VehicleRoute.php');
 
 class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 
-	public function __construct($dbLinkMaster=NULL){
-		parent::__construct($dbLinkMaster);<xsl:apply-templates/>
+	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
+		parent::__construct($dbLinkMaster, $dbLink);<xsl:apply-templates/>
 	}
 	
 	public function get_vehicle_statistics($pm){

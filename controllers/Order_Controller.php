@@ -591,6 +591,11 @@ class Order_Controller extends ControllerSQL{
 					
 		$pm->addParam(new FieldExtDate('date',$opts));
 	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('lsn',$opts));
+	
 			
 		$this->addPublicMethod($pm);
 
@@ -601,6 +606,11 @@ class Order_Controller extends ControllerSQL{
 	$opts=array();
 					
 		$pm->addParam(new FieldExtDate('date',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('lsn',$opts));
 	
 			
 		$this->addPublicMethod($pm);
@@ -613,6 +623,11 @@ class Order_Controller extends ControllerSQL{
 					
 		$pm->addParam(new FieldExtDate('date',$opts));
 	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('lsn',$opts));
+	
 			
 		$this->addPublicMethod($pm);
 
@@ -623,6 +638,11 @@ class Order_Controller extends ControllerSQL{
 	$opts=array();
 					
 		$pm->addParam(new FieldExtDate('date',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('lsn',$opts));
 	
 			
 		$this->addPublicMethod($pm);
@@ -635,6 +655,11 @@ class Order_Controller extends ControllerSQL{
 					
 		$pm->addParam(new FieldExtDate('date',$opts));
 	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('lsn',$opts));
+	
 			
 		$this->addPublicMethod($pm);
 
@@ -645,6 +670,11 @@ class Order_Controller extends ControllerSQL{
 	$opts=array();
 					
 		$pm->addParam(new FieldExtDate('date',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('lsn',$opts));
 	
 			
 		$this->addPublicMethod($pm);
@@ -657,6 +687,11 @@ class Order_Controller extends ControllerSQL{
 					
 		$pm->addParam(new FieldExtDate('date',$opts));
 	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('lsn',$opts));
+	
 			
 		$this->addPublicMethod($pm);
 
@@ -668,6 +703,11 @@ class Order_Controller extends ControllerSQL{
 					
 		$pm->addParam(new FieldExtDate('date',$opts));
 	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('lsn',$opts));
+	
 			
 		$this->addPublicMethod($pm);
 
@@ -678,6 +718,11 @@ class Order_Controller extends ControllerSQL{
 	$opts=array();
 					
 		$pm->addParam(new FieldExtDate('date',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('lsn',$opts));
 	
 			
 		$this->addPublicMethod($pm);

@@ -91,8 +91,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	const TM_ALLOWED_TRIES = 3;
 	const TM_TEL_DURATION_SEC = 10*24*60*60;
 
-	public function __construct($dbLinkMaster=NULL){
-		parent::__construct($dbLinkMaster);<xsl:apply-templates/>
+	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
+		parent::__construct($dbLinkMaster, $dbLink);<xsl:apply-templates/>
 	}
 		
 	<xsl:call-template name="extra_methods"/>
@@ -420,159 +420,132 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			</xsl:for-each>			
 		}
 
-		/*
-		// mild filters
+		//mild filters
 		$filter = new ModelWhereSQL();
-		$filter->addExpression(
-			'order_period_filter',
-			sprintf("date_time BETWEEN '%s' AND '%s'",
-				$shift_from_s, $shift_to_s 
-			),
-			'AND'
-		);
+		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+		$f1->setValue($date_from);
+		$filter->addField($f1,'&gt;=');		
+		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+		$f2->setValue($date_to);
+		$filter->addField($f2,'&lt;=');				
 		GlobalFilter::set('OrderList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
-		$filter->addExpression(
-			'order_pump_filter',
-			sprintf("date_time BETWEEN '%s' AND '%s'",
-				$shift_from_s, $shift_to_s 
-			),
-			'AND'
-		);
+		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+		$f1->setValue($date_from);
+		$filter->addField($f1,'&gt;=');		
+		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+		$f2->setValue($date_to);
+		$filter->addField($f2,'&lt;=');				
 		GlobalFilter::set('OrderPumpList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
-		$filter->addExpression(
-			'ship_f',
-			sprintf("ship_date_time BETWEEN '%s' AND '%s'",
-				$shift_from_s, $shift_to_s 
-			),
-			'AND'
-		);
+		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
+		$f1->setValue($date_from);
+		$filter->addField($f1,'&gt;=');		
+		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
+		$f2->setValue($date_to);
+		$filter->addField($f2,'&lt;=');				
 		GlobalFilter::set('ShipmentList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
-		$filter->addExpression(
-			'ship_for_vown_f',
-			sprintf("ship_date_time BETWEEN '%s' AND '%s'",
-				$shift_from_s, $shift_to_s 
-			),
-			'AND'
-		);
+		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
+		$f1->setValue($date_from);
+		$filter->addField($f1,'&gt;=');		
+		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
+		$f2->setValue($date_to);
+		$filter->addField($f2,'&lt;=');				
 		GlobalFilter::set('ShipmentForVehOwnerList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
-		$filter->addExpression(
-			'ship_for_client',
-			sprintf("ship_date BETWEEN '%s' AND '%s'",
-				$shift_from_s, $shift_to_s 
-			),
-			'AND'
-		);
+		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date");
+		$f1->setValue($date_from);
+		$filter->addField($f1,'&gt;=');		
+		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date");
+		$f2->setValue($date_to);
+		$filter->addField($f2,'&lt;=');				
 		GlobalFilter::set('ShipmentForClientList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
-		$filter->addExpression(
-			'order_for_client',
-			sprintf("date_time BETWEEN '%s' AND '%s'",
-				$shift_from_s, $shift_to_s 
-			),
-			'AND'
-		);
+		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+		$f1->setValue($date_from);
+		$filter->addField($f1,'&gt;=');		
+		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+		$f2->setValue($date_to);
+		$filter->addField($f2,'&lt;=');				
 		GlobalFilter::set('OrderForClientList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
-		$filter->addExpression(
-			'ship_for_client_von_f',
-			sprintf("ship_date_time BETWEEN '%s' AND '%s'",
-				$shift_from_s, $shift_to_s 
-			),
-			'AND'
-		);
+		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
+		$f1->setValue($date_from);
+		$filter->addField($f1,'&gt;=');		
+		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
+		$f2->setValue($date_to);
+		$filter->addField($f2,'&lt;=');				
 		GlobalFilter::set('ShipmentForClientVehOwnerList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
-		$filter->addExpression(
-			'ship_pump_f',
-			sprintf("date_time BETWEEN '%s' AND '%s'",
-				$shift_from_s, $shift_to_s 
-			),
-			'AND'
-		);
+		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+		$f1->setValue($date_from);
+		$filter->addField($f1,'&gt;=');		
+		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+		$f2->setValue($date_to);
+		$filter->addField($f2,'&lt;=');				
 		GlobalFilter::set('ShipmentPumpList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
-		$filter->addExpression(
-			'ship_pump_veh_own_f',
-			sprintf("date_time BETWEEN '%s' AND '%s'",
-				$shift_from_s, $shift_to_s 
-			),
-			'AND'
-		);
+		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+		$f1->setValue($date_from);
+		$filter->addField($f1,'&gt;=');		
+		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+		$f2->setValue($date_to);
+		$filter->addField($f2,'&lt;=');				
 		GlobalFilter::set('ShipmentPumpForVehOwnerList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
-		$filter->addExpression(
-			'ship_date_f',
-			sprintf("ship_date BETWEEN '%s' AND '%s'",
-				$shift_from_s, $shift_to_s 
-			),
-			'AND'
-		);
+		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date");
+		$f1->setValue($date_from);
+		$filter->addField($f1,'&gt;=');		
+		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date");
+		$f2->setValue($date_to);
+		$filter->addField($f2,'&lt;=');				
 		GlobalFilter::set('ShipmentDateList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
-		$filter->addExpression(
-			'mat_proc_f',
-			sprintf("date_time BETWEEN '%s' AND '%s'",
-				$shift_from_s, $shift_to_s 
-			),
-			'AND'
-		);
+		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+		$f1->setValue($date_from);
+		$filter->addField($f1,'&gt;=');		
+		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+		$f2->setValue($date_to);
+		$filter->addField($f2,'&lt;=');				
 		GlobalFilter::set('DOCMaterialProcurementList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
-		$filter->addExpression(
-			'mat_fact_cons_f',
-			sprintf("date_time BETWEEN '%s' AND '%s'",
-				$shift_from_s, $shift_to_s 
-			),
-			'AND'
-		);
+		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+		$f1->setValue($date_from);
+		$filter->addField($f1,'&gt;=');		
+		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+		$f2->setValue($date_to);
+		$filter->addField($f2,'&lt;=');				
 		GlobalFilter::set('MaterialFactConsumptionCorretionList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
-		$filter->addExpression(
-			'ticket_filter',
-			sprintf("issue_date_time BETWEEN '%s' AND '%s'",
-				$shift_from_s, $shift_to_s 
-			),
-			'AND'
-		);
+		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "issue_date_time");
+		$f1->setValue($date_from);
+		$filter->addField($f1,'&gt;=');		
+		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "issue_date_time");
+		$f2->setValue($date_to);
+		$filter->addField($f2,'&lt;=');				
 		GlobalFilter::set('RawMaterialTicketList_Model', $filter, TRUE);
 
 		$filter = new ModelWhereSQL();
-		$filter->addExpression(
-			'ast_period_f',
-			sprintf("end_time BETWEEN '%s' AND '%s'",
-				$shift_from_s, $shift_to_s 
-			),
-			'AND'
-		);
+		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "end_time");
+		$f1->setValue($date_from);
+		$filter->addField($f1,'&gt;=');		
+		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "end_time");
+		$f2->setValue($date_to);
+		$filter->addField($f2,'&lt;');				
 		GlobalFilter::set('AstCallList_Model', $filter, TRUE);
-		
-		$filter = new ModelWhereSQL();
-		$filter->addExpression(
-			'ticket_f',
-			sprintf("issue_date_time BETWEEN '%s' AND '%s'",
-				$shift_from_s, $shift_to_s 
-			),
-			'AND'
-		);
-		GlobalFilter::set('RawMaterialTicketList_Model', $filter, TRUE);
-		*/
-
 		//app_id clobal filter
 		<xsl:for-each select="/metadata/models/model/globalFilter[@id='app_id']">
 		<xsl:variable name="model_id" select="concat(../@id,'_Model')"/>

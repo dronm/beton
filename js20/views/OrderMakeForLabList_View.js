@@ -311,9 +311,12 @@ OrderMakeForLabList_View.prototype.onRefreshResponse = function(resp){
 
 }
 
-OrderMakeForLabList_View.prototype.runSpecificUpdateMethod = function(meth){
+OrderMakeForLabList_View.prototype.runSpecificUpdateMethod = function(meth, lsn){
 	var pm = (new Order_Controller()).getPublicMethod(meth);
 	pm.setFieldValue("date",this.getElement("order_make_filter").getDateFrom());
+	if(lsn && pm.fieldExists("lsn")){
+		pm.setFieldValue("lsn", lsn);
+	}
 	var self = this;
 	pm.run({
 		"ok":function(resp){
@@ -323,19 +326,19 @@ OrderMakeForLabList_View.prototype.runSpecificUpdateMethod = function(meth){
 }
 
 OrderMakeForLabList_View.prototype.srvEventsCallBack = function(json){
-console.log("OrderMakeForLabList_View.prototype.srvEventsCallBack",json)
+// console.log("OrderMakeForLabList_View.prototype.srvEventsCallBack",json)
 	if(json.controllerId=="Graph"){
 		//analyse cond_date!
-		this.runSpecificUpdateMethod("get_make_orders_form_ord");
+		this.runSpecificUpdateMethod("get_make_orders_form_ord", (json.params && json.params.lsn)? json.params.lsn:null);
 		
 		this.getElement("OperatorList_View").getElement("grid").onRefresh();
 		
 	}
 	else if(json.controllerId=="VehicleScheduleState"){
-		this.runSpecificUpdateMethod("get_make_orders_for_lab_form_veh");
+		this.runSpecificUpdateMethod("get_make_orders_for_lab_form_veh", (json.params && json.params.lsn)? json.params.lsn:null);
 	}
 	else if(json.controllerId=="RAMaterialFact"){
-		this.runSpecificUpdateMethod("get_make_orders_for_lab_form_mat");
+		this.runSpecificUpdateMethod("get_make_orders_for_lab_form_mat", (json.params && json.params.lsn)? json.params.lsn:null);
 	}
 	else if(json.controllerId=="Production"){
 		this.getElement("OperatorList_View").getElement("grid").onRefresh();

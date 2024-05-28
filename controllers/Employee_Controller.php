@@ -27,8 +27,8 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ParamsSQL.php');
 
 class Employee_Controller extends ControllerSQL{
-	public function __construct($dbLinkMaster=NULL){
-		parent::__construct($dbLinkMaster);
+	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
+		parent::__construct($dbLinkMaster, $dbLink);
 			
 
 		/* insert */

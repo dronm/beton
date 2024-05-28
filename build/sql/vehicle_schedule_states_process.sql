@@ -91,7 +91,8 @@ BEGIN
 				'VehicleScheduleState.insert'
 			,json_build_object(
 				'params',json_build_object(
-					'id',NEW.id
+					'id',NEW.id,
+					'lsn', pg_current_wal_lsn()
 				)
 			)::text
 		);
@@ -104,7 +105,8 @@ BEGIN
 				'VehicleScheduleState.update'
 			,json_build_object(
 				'params',json_build_object(
-					'id',NEW.id
+					'id',NEW.id,
+					'lsn', pg_current_wal_lsn()
 				)
 			)::text
 		);
@@ -117,7 +119,8 @@ BEGIN
 				'VehicleScheduleState.delete'
 			,json_build_object(
 				'params',json_build_object(
-					'id',OLD.id
+					'id',OLD.id,
+					'lsn', pg_current_wal_lsn()
 				)
 			)::text
 		);

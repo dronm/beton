@@ -31,8 +31,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	const ER_OSRM_ROUTE_QUERY = 'Ошибка получения данных с сервера OSRM!';
 	const ER_ZONE_COORD_QUERY = 'Ошибка обработки координат зоны!';
 
-	public function __construct($dbLinkMaster=NULL){
-		parent::__construct($dbLinkMaster);<xsl:apply-templates/>
+	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
+		parent::__construct($dbLinkMaster, $dbLink);<xsl:apply-templates/>
 	}
 
 	/**

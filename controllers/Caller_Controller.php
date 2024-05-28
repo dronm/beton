@@ -34,8 +34,8 @@ require_once(ABSOLUTE_PATH.'domru/DOMRuIntegration.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelVars.php');
 
 class Caller_Controller extends ControllerSQL{
-	public function __construct($dbLinkMaster=NULL){
-		parent::__construct($dbLinkMaster);
+	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
+		parent::__construct($dbLinkMaster, $dbLink);
 			
 		$pm = new PublicMethod('call');
 		

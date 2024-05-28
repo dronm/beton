@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-05-24 04:57:52</lastBuild></version>
+		<lastBuild>2024-05-28 05:42:55</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -232,6 +232,7 @@
 		<version dateOpen="2024-05-16 07:52:36" dateClose="2024-05-22 04:57:09">1.00326</version>
 		<version dateOpen="2024-05-23 14:59:38" dateClose="2024-05-23 16:43:35">1.00327</version>
 		<version dateOpen="2024-05-24 16:49:24" dateClose="2024-05-24 16:55:20">1.00328</version>
+		<version dateOpen="2024-05-27 07:25:46" dateClose="2024-05-28 05:42:58">1.00329</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -4935,30 +4936,39 @@
 			</publicMethod>
 			<publicMethod id="get_make_orders_form">
 				<field id="date" dataType="Date"/>
+				<field id="lsn" dataType="String"/>
 			</publicMethod>
 			<publicMethod id="get_make_orders_form_ord">
 				<field id="date" dataType="Date"/>
+				<field id="lsn" dataType="String"/>
 			</publicMethod>
 			<publicMethod id="get_make_orders_form_veh">
 				<field id="date" dataType="Date"/>
+				<field id="lsn" dataType="String"/>
 			</publicMethod>
 			<publicMethod id="get_make_orders_form_mat">
 				<field id="date" dataType="Date"/>
+				<field id="lsn" dataType="String"/>
 			</publicMethod>
 			<publicMethod id="get_make_orders_for_weighing_form">
 				<field id="date" dataType="Date"/>
+				<field id="lsn" dataType="String"/>
 			</publicMethod>
 			<publicMethod id="get_make_orders_for_lab_form">
 				<field id="date" dataType="Date"/>
+				<field id="lsn" dataType="String"/>
 			</publicMethod>
 			<publicMethod id="get_make_orders_for_lab_form_ord">
 				<field id="date" dataType="Date"/>
+				<field id="lsn" dataType="String"/>
 			</publicMethod>
 			<publicMethod id="get_make_orders_for_lab_form_veh">
 				<field id="date" dataType="Date"/>
+				<field id="lsn" dataType="String"/>
 			</publicMethod>
 			<publicMethod id="get_make_orders_for_lab_form_mat">
 				<field id="date" dataType="Date"/>
+				<field id="lsn" dataType="String"/>
 			</publicMethod>
 			<publicMethod id="get_make_orders_list" modelId="OrderMakeList" cashable="TRUE">
 				<events>
@@ -6724,7 +6734,7 @@
 		<permission type="allow" controllerId="Quarry" methodId="all" roleId="weighing"/>
 		<permission type="allow" controllerId="RawMaterial" methodId="get_material_actions_list" roleId="weighing"/>
 		<permission type="allow" controllerId="UserChat" methodId="all" roleId="weighing"/>
-		<permission type="allow" controllerId="DOCMaterialProcurement" methodId="get_shift_list" roleId="weighing"/>
+		<permission type="allow" controllerId="DOCMaterialProcurement" methodId="get_list" roleId="weighing"/>
 	</permissions>
 	<views>
 		<view id="10000" c="User_Controller" t="UserList" f="get_list" section="Справочники" descr="Пользователи"/>

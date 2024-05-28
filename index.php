@@ -10,5 +10,6 @@ if (isset($_REQUEST['sid'])){
 else if (strlen($_SERVER['QUERY_STRING'])&&substr($_SERVER['QUERY_STRING'],0,3)=='sid'){	
 	session_id(substr($_SERVER['QUERY_STRING'],3));
 }
-require_once(FRAME_WORK_PATH.'cmd.php');
+//throw new Exception("dbLinkMaster");
+require_once('cmd.php');
 ?>

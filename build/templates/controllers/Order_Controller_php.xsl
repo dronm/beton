@@ -35,6 +35,7 @@ require_once('common/MyDate.php');
 
 require_once(ABSOLUTE_PATH.'functions/Beton.php');
 require_once(ABSOLUTE_PATH.'functions/notifications.php');
+require_once(ABSOLUTE_PATH.'functions/checkPmPeriod.php');
 
 class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 
@@ -1020,6 +1021,11 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	public function get_list_for_client($pm){	
 		$this->modelGetList(new OrderForClientList_Model($this->getDbLink()),$pm);
 	}
+
+	<!-- public function get_list($pm){	 -->
+	<!-- 	checkPublicMethodPeriod($pm, new OrderMakeList_Model($this->getDbLink()), "date_time", 90); -->
+	<!-- 	parent::get_list($pm); -->
+	<!-- } -->
 
 	//localhost/beton_new/?c=Order_Controller&amp;f=calc_for_site&amp;v=ViewXML&amp;concrete_type_id=1&amp;quant=1&amp;address=Тюмень сакко 5
 	public function calc_for_site($pm){

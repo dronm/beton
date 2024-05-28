@@ -37,8 +37,8 @@ class Destination_Controller extends ControllerSQL{
 	const ER_OSRM_ROUTE_QUERY = 'Ошибка получения данных с сервера OSRM!';
 	const ER_ZONE_COORD_QUERY = 'Ошибка обработки координат зоны!';
 
-	public function __construct($dbLinkMaster=NULL){
-		parent::__construct($dbLinkMaster);
+	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
+		parent::__construct($dbLinkMaster, $dbLink);
 			
 
 		/* insert */

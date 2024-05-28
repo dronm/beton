@@ -42,9 +42,10 @@ require_once(USER_CONTROLLERS_PATH.'ExcelTemplate_Controller.php');
 require_once(USER_CONTROLLERS_PATH.'Order_Controller.php');
 
 class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
-	public function __construct($dbLinkMaster=NULL){
-		parent::__construct($dbLinkMaster);<xsl:apply-templates/>
+	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
+		parent::__construct($dbLinkMaster, $dbLink);<xsl:apply-templates/>
 	}
+	
 	public function shipment_report($pm){
 		$model = new ShipmentRep_Model($this->getDbLink());
 		

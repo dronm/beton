@@ -56,6 +56,11 @@ class Graph_Controller extends Controller{
 			'cond_date'=>date('Y-m-d',$date_from)
 			,'emitterId' => SessionVarManager::getEmitterId()
 		];
+		//add lsn in case it is after update/insert/delete
+		$ar = self::get_db_con_master()->query_first("SELECT pg_current_wal_lsn() AS lsn");
+		if(is_array($ar) && count($ar) && isset($ar['lsn'])){
+		     $event_par["lsn"] = $ar["lsn"];
+		}
 		EventSrv::publishAsync('Graph.change',$event_par);
 	}
 	
@@ -74,7 +79,7 @@ class Graph_Controller extends Controller{
 		$dbLink->technicalemail = TECH_EMAIL;
 		$dbLink->reporterror = DEBUG;
 		$dbLink->database	= DB_NAME;
-		$dbLink->connect(DB_SERVER,DB_USER,DB_PASSWORD);			
+		$dbLink->connect(DB_SERVER,DB_USER,DB_PASSWORD, DB_PORT);			
 		return $dbLink;
 	}
 	private static function get_db_con_master(){
@@ -83,7 +88,7 @@ class Graph_Controller extends Controller{
 		$dbLink->technicalemail = TECH_EMAIL;
 		$dbLink->reporterror = DEBUG;
 		$dbLink->database	= DB_NAME;
-		$dbLink->connect(DB_SERVER_MASTER,DB_USER,DB_PASSWORD);			
+		$dbLink->connect(DB_SERVER_MASTER,DB_USER,DB_PASSWORD,DB_PORT_MASTER);			
 		return $dbLink;
 	}
 	

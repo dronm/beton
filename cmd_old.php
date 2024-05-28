@@ -25,13 +25,14 @@ try{
 	if (defined('QUERY_EXPLAIN'))$dbLinkMaster->explain = QUERY_EXPLAIN;
 	
 	$port = (defined('DB_PORT_MASTER'))? DB_PORT_MASTER : DB_PORT;
-	$dbLinkMaster->connect(DB_SERVER_MASTER,DB_USER,DB_PASSWORD,$port);
-	//$dbLinkMaster->set_error_verbosity((DEBUG)? PGSQL_ERRORS_VERBOSE:PGSQL_ERRORS_TERSE);
 	
+	$dbLinkMaster->connect(DB_SERVER_MASTER, DB_USER, DB_PASSWORD, $port);
+	
+	//$dbLinkMaster->set_error_verbosity((DEBUG)? PGSQL_ERRORS_VERBOSE:PGSQL_ERRORS_TERSE);
 	if (DB_SERVER_MASTER == DB_SERVER && (!defined('DB_PORT_MASTER') || DB_PORT_MASTER == DB_PORT) ){	
 		$dbLink = $dbLinkMaster;
 	}
-	else{
+	else{	
 		// connection for reading
 		$dbLink = new DB_Sql();
 		$dbLink->persistent=true;
@@ -193,7 +194,7 @@ try{
 
 	/* including controller */	
 	require_once($script);
-	$contrObj = new $contr($dbLinkMaster, $dbLink);
+	$contrObj = new $contr($dbLinkMaster,$dbLink);
 
 	/* view checking*/
 	if (is_null($view)){

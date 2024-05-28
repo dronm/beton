@@ -110,7 +110,7 @@ $permissions = array();
 			
 				$permissions['UserChat_Controller_get_history']=TRUE;
 			
-			$permissions['DOCMaterialProcurement_Controller_get_shift_list']=TRUE;
+			$permissions['DOCMaterialProcurement_Controller_get_list']=TRUE;
 		
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

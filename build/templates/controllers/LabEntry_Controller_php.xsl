@@ -27,8 +27,8 @@ include("common/pChart2.1.3/class/pImage.class.php");
 require_once(ABSOLUTE_PATH.'functions/Beton.php');
 
 class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@parentId"/>{
-	public function __construct($dbLinkMaster=NULL){
-		parent::__construct($dbLinkMaster);<xsl:apply-templates/>
+	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
+		parent::__construct($dbLinkMaster, $dbLink);<xsl:apply-templates/>
 	}
 	
 	public function modelGetList($model,$pm=null){

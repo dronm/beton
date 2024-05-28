@@ -31,8 +31,8 @@ require_once(FUNC_PATH.'VehicleRoute.php');
 
 class Vehicle_Controller extends ControllerSQL{
 
-	public function __construct($dbLinkMaster=NULL){
-		parent::__construct($dbLinkMaster);
+	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
+		parent::__construct($dbLinkMaster, $dbLink);
 			
 
 		/* insert */

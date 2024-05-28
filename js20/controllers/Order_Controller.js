@@ -568,6 +568,12 @@ extend(Order_Controller,ControllerObjServer);
 	
 		pm.addField(new FieldDate("date",options));
 	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("lsn",options));
+	
 			
 	this.addPublicMethod(pm);
 }
@@ -581,6 +587,12 @@ extend(Order_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldDate("date",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("lsn",options));
 	
 			
 	this.addPublicMethod(pm);
@@ -596,6 +608,12 @@ extend(Order_Controller,ControllerObjServer);
 	
 		pm.addField(new FieldDate("date",options));
 	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("lsn",options));
+	
 			
 	this.addPublicMethod(pm);
 }
@@ -609,6 +627,12 @@ extend(Order_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldDate("date",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("lsn",options));
 	
 			
 	this.addPublicMethod(pm);
@@ -624,6 +648,12 @@ extend(Order_Controller,ControllerObjServer);
 	
 		pm.addField(new FieldDate("date",options));
 	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("lsn",options));
+	
 			
 	this.addPublicMethod(pm);
 }
@@ -637,6 +667,12 @@ extend(Order_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldDate("date",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("lsn",options));
 	
 			
 	this.addPublicMethod(pm);
@@ -652,6 +688,12 @@ extend(Order_Controller,ControllerObjServer);
 	
 		pm.addField(new FieldDate("date",options));
 	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("lsn",options));
+	
 			
 	this.addPublicMethod(pm);
 }
@@ -666,6 +708,12 @@ extend(Order_Controller,ControllerObjServer);
 	
 		pm.addField(new FieldDate("date",options));
 	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("lsn",options));
+	
 			
 	this.addPublicMethod(pm);
 }
@@ -679,6 +727,12 @@ extend(Order_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldDate("date",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("lsn",options));
 	
 			
 	this.addPublicMethod(pm);
