@@ -52,32 +52,32 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 	public function update($pm){
 		$this->upload_file($pm);
 		$tmpl_id = $this->getExtDbVal($pm, 'old_id');
-		self::delete_template_file_on_id($tmpl_id);
+		self::delete_template_file_on_id($this->getDbLink(), $tmpl_id);
+		$pm->setParamValue("update_dt", date("Y-m-d H:i:s", time()));
 		parent::update($pm);
 	}
 
 	public function delete($pm){
 		$tmpl_id = $this->getExtDbVal($pm, 'id');
-		self::delete_template_file_on_id($tmpl_id);
+		self::delete_template_file_on_id($this->getDbLink(), $tmpl_id);
 		parent::delete($pm);
 	}
 	
-	private static function delete_template_file_on_id($templateID){
-
-		$ar = $this->getDbLink()->query(sprintf(
+	private static function delete_template_file_on_id($dbLink, $templateID){
+		$ar = $dbLink->query_first(sprintf(
 			"SELECT
 				file_info->>'name' as file_name,
-				reverse(substring(reverse(file_info->>'name') from 1 for strpos(reverse(file_info->>'name'),'.')-1)) AS file_ext
+				reverse(substring(reverse(file_info->>'name') from 1 for strpos(reverse(file_info->>'name'),'.')-1)) AS file_ext,
+				update_dt
 			FROM excel_templates	
 			WHERE id = %d"
 			,$templateID
 		));
-		if(!is_array($ar) || !isset($ar['file_name'])){
-			throw new Exception("get file info query failed");
-		}
-		$tmpl_fl = self::get_template_file_name($templateID, $ar['file_ext']);
-		if(file_exists($tmpl_fl)){
-			unlink($tmpl_fl);
+		if(is_array($ar) &amp;&amp; isset($ar['file_name'])){
+			$tmpl_fl = self::get_template_file_name($templateID, $ar['file_ext'], $ar['update_dt']);
+			if(file_exists($tmpl_fl)){
+				unlink($tmpl_fl);
+			}
 		}
 	}
 
@@ -219,8 +219,8 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		}
 	}
 
-	private static function get_template_file_name($templateID, $fileExt){
-		return OUTPUT_PATH.'excel_tmpl_'.$templateID.'.'.$fileExt;
+	private static function get_template_file_name($templateID, $fileExt, $updateDate){
+		return OUTPUT_PATH. md5('excel_tmpl_'. $templateID.'.'.$updateDate. $fileExt);
 	}
 
 	//generates template, populates with data. 
@@ -234,8 +234,9 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 			file_info->>'name' as file_name,
 			reverse(substring(reverse(file_info->>'name') from 1 for strpos(reverse(file_info->>'name'),'.')-1)) AS file_ext,
 			sql_query,
-			cell_matching->'rows' AS cell_matching
-		FROM excel_templates	
+			cell_matching->'rows' AS cell_matching,
+			update_dt
+			FROM excel_templates	
 		WHERE name = '%s'",
 		$templateName
 		));
@@ -268,7 +269,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 			throw new Exception(sprintf("Не определен тип файла шаблона '%s'!", $ext));
 		}
 
-		$tmpl_fl = self::get_template_file_name($ar['id'], $ext);
+		$tmpl_fl = self::get_template_file_name($ar['id'], $ext, $ar['update_dt']);
 		if(!file_exists($tmpl_fl)){
 			//get content from database
 			$ar_cont = $dbLink->query_first(sprintf(

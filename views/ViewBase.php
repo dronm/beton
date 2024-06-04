@@ -2084,6 +2084,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/controllers/UserChatLastOpen_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/UserChatLastOpen_Controller.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controllers/UserChatMessageView_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/UserChatMessageView_Controller.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/UserChatHistory_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/UserChatHistory_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/DOCMaterialProcurementDialog_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/DOCMaterialProcurementDialog_Model.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

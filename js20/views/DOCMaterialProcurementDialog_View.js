@@ -15,7 +15,7 @@ function DOCMaterialProcurementDialog_View(id,options){
 	options = options || {};	
 	
 	options.controller = new DOCMaterialProcurement_Controller();
-	options.model = options.models.DOCMaterialProcurementList_Model;
+	options.model = options.models.DOCMaterialProcurementDialog_Model;
 	
 	var self = this;
 

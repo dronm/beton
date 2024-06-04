@@ -80,6 +80,12 @@ extend(ExcelTemplate_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldDateTimeTZ("update_dt",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 		var options = {};
@@ -133,6 +139,12 @@ extend(ExcelTemplate_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldJSON("cell_matching",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldDateTimeTZ("update_dt",options);
 	
 	pm.addField(field);
 	

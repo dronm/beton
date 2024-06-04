@@ -2,7 +2,7 @@
 require_once('Config.php');
 require_once(FRAME_WORK_PATH.'Constants.php');
 require_once(ABSOLUTE_PATH.'db/SessManager.php');
-//require_once(FRAME_WORK_PATH.'db/SessManager.php');
+
 require_once(FRAME_WORK_PATH.'db/db_pgsql.php');
 
 require_once(FRAME_WORK_PATH.'basic_classes/Controller.php');
@@ -25,7 +25,7 @@ try{
 	if (defined('QUERY_EXPLAIN'))$dbLinkMaster->explain = QUERY_EXPLAIN;
 	
 	$port = (defined('DB_PORT_MASTER'))? DB_PORT_MASTER : DB_PORT;
-	$dbLinkMaster->connect(DB_SERVER_MASTER,DB_USER,DB_PASSWORD,$port);
+	$dbLinkMaster->connect(DB_SERVER_MASTER, DB_USER, DB_PASSWORD, $port);
 	//$dbLinkMaster->set_error_verbosity((DEBUG)? PGSQL_ERRORS_VERBOSE:PGSQL_ERRORS_TERSE);
 	
 	if (DB_SERVER_MASTER == DB_SERVER && (!defined('DB_PORT_MASTER') || DB_PORT_MASTER == DB_PORT) ){	

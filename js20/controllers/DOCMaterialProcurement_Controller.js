@@ -20,7 +20,7 @@
 function DOCMaterialProcurement_Controller(options){
 	options = options || {};
 	options.listModelClass = DOCMaterialProcurementList_Model;
-	options.objModelClass = DOCMaterialProcurementList_Model;
+	options.objModelClass = DOCMaterialProcurementDialog_Model;
 	DOCMaterialProcurement_Controller.superclass.constructor.call(this,options);	
 	
 	//methods

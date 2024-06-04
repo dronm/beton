@@ -76,6 +76,15 @@ function ExcelTemplate_Model(options){
 	
 	options.fields.cell_matching = new FieldJSON("cell_matching",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.update_dt = new FieldDateTimeTZ("update_dt",filed_options);
+	
 		ExcelTemplate_Model.superclass.constructor.call(this,id,options);
 }
 extend(ExcelTemplate_Model,ModelXML);

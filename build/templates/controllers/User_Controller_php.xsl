@@ -418,134 +418,136 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			);
 			GlobalFilter::set('<xsl:value-of select="$model_id"/>',$filter);
 			</xsl:for-each>			
-		}
+		}else{
 
-		//mild filters
-		$filter = new ModelWhereSQL();
-		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
-		$f1->setValue($date_from);
-		$filter->addField($f1,'&gt;=');		
-		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
-		$f2->setValue($date_to);
-		$filter->addField($f2,'&lt;=');				
-		GlobalFilter::set('OrderList_Model', $filter, TRUE);
+			//mild filters
+			$filter = new ModelWhereSQL();
+			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+			$f1->setValue($date_from);
+			$filter->addField($f1,'&gt;=');		
+			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+			$f2->setValue($date_to);
+			$filter->addField($f2,'&lt;=');				
+			GlobalFilter::set('OrderList_Model', $filter, TRUE);
 
-		$filter = new ModelWhereSQL();
-		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
-		$f1->setValue($date_from);
-		$filter->addField($f1,'&gt;=');		
-		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
-		$f2->setValue($date_to);
-		$filter->addField($f2,'&lt;=');				
-		GlobalFilter::set('OrderPumpList_Model', $filter, TRUE);
+			$filter = new ModelWhereSQL();
+			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+			$f1->setValue($date_from);
+			$filter->addField($f1,'&gt;=');		
+			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+			$f2->setValue($date_to);
+			$filter->addField($f2,'&lt;=');				
+			GlobalFilter::set('OrderPumpList_Model', $filter, TRUE);
 
-		$filter = new ModelWhereSQL();
-		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
-		$f1->setValue($date_from);
-		$filter->addField($f1,'&gt;=');		
-		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
-		$f2->setValue($date_to);
-		$filter->addField($f2,'&lt;=');				
-		GlobalFilter::set('ShipmentList_Model', $filter, TRUE);
+			$filter = new ModelWhereSQL();
+			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
+			$f1->setValue($date_from);
+			$filter->addField($f1,'&gt;=');		
+			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
+			$f2->setValue($date_to);
+			$filter->addField($f2,'&lt;=');				
+			GlobalFilter::set('ShipmentList_Model', $filter, TRUE);
 
-		$filter = new ModelWhereSQL();
-		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
-		$f1->setValue($date_from);
-		$filter->addField($f1,'&gt;=');		
-		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
-		$f2->setValue($date_to);
-		$filter->addField($f2,'&lt;=');				
-		GlobalFilter::set('ShipmentForVehOwnerList_Model', $filter, TRUE);
+			$filter = new ModelWhereSQL();
+			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
+			$f1->setValue($date_from);
+			$filter->addField($f1,'&gt;=');		
+			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
+			$f2->setValue($date_to);
+			$filter->addField($f2,'&lt;=');				
+			GlobalFilter::set('ShipmentForVehOwnerList_Model', $filter, TRUE);
 
-		$filter = new ModelWhereSQL();
-		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date");
-		$f1->setValue($date_from);
-		$filter->addField($f1,'&gt;=');		
-		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date");
-		$f2->setValue($date_to);
-		$filter->addField($f2,'&lt;=');				
-		GlobalFilter::set('ShipmentForClientList_Model', $filter, TRUE);
+			$filter = new ModelWhereSQL();
+			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date");
+			$f1->setValue($date_from);
+			$filter->addField($f1,'&gt;=');		
+			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date");
+			$f2->setValue($date_to);
+			$filter->addField($f2,'&lt;=');				
+			GlobalFilter::set('ShipmentForClientList_Model', $filter, TRUE);
 
-		$filter = new ModelWhereSQL();
-		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
-		$f1->setValue($date_from);
-		$filter->addField($f1,'&gt;=');		
-		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
-		$f2->setValue($date_to);
-		$filter->addField($f2,'&lt;=');				
-		GlobalFilter::set('OrderForClientList_Model', $filter, TRUE);
+			$filter = new ModelWhereSQL();
+			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+			$f1->setValue($date_from);
+			$filter->addField($f1,'&gt;=');		
+			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+			$f2->setValue($date_to);
+			$filter->addField($f2,'&lt;=');				
+			GlobalFilter::set('OrderForClientList_Model', $filter, TRUE);
 
-		$filter = new ModelWhereSQL();
-		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
-		$f1->setValue($date_from);
-		$filter->addField($f1,'&gt;=');		
-		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
-		$f2->setValue($date_to);
-		$filter->addField($f2,'&lt;=');				
-		GlobalFilter::set('ShipmentForClientVehOwnerList_Model', $filter, TRUE);
+			$filter = new ModelWhereSQL();
+			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
+			$f1->setValue($date_from);
+			$filter->addField($f1,'&gt;=');		
+			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
+			$f2->setValue($date_to);
+			$filter->addField($f2,'&lt;=');				
+			GlobalFilter::set('ShipmentForClientVehOwnerList_Model', $filter, TRUE);
 
-		$filter = new ModelWhereSQL();
-		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
-		$f1->setValue($date_from);
-		$filter->addField($f1,'&gt;=');		
-		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
-		$f2->setValue($date_to);
-		$filter->addField($f2,'&lt;=');				
-		GlobalFilter::set('ShipmentPumpList_Model', $filter, TRUE);
+			$filter = new ModelWhereSQL();
+			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+			$f1->setValue($date_from);
+			$filter->addField($f1,'&gt;=');		
+			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+			$f2->setValue($date_to);
+			$filter->addField($f2,'&lt;=');				
+			GlobalFilter::set('ShipmentPumpList_Model', $filter, TRUE);
 
-		$filter = new ModelWhereSQL();
-		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
-		$f1->setValue($date_from);
-		$filter->addField($f1,'&gt;=');		
-		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
-		$f2->setValue($date_to);
-		$filter->addField($f2,'&lt;=');				
-		GlobalFilter::set('ShipmentPumpForVehOwnerList_Model', $filter, TRUE);
+			$filter = new ModelWhereSQL();
+			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+			$f1->setValue($date_from);
+			$filter->addField($f1,'&gt;=');		
+			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+			$f2->setValue($date_to);
+			$filter->addField($f2,'&lt;=');				
+			GlobalFilter::set('ShipmentPumpForVehOwnerList_Model', $filter, TRUE);
 
-		$filter = new ModelWhereSQL();
-		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date");
-		$f1->setValue($date_from);
-		$filter->addField($f1,'&gt;=');		
-		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date");
-		$f2->setValue($date_to);
-		$filter->addField($f2,'&lt;=');				
-		GlobalFilter::set('ShipmentDateList_Model', $filter, TRUE);
+			$filter = new ModelWhereSQL();
+			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date");
+			$f1->setValue($date_from);
+			$filter->addField($f1,'&gt;=');		
+			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date");
+			$f2->setValue($date_to);
+			$filter->addField($f2,'&lt;=');				
+			GlobalFilter::set('ShipmentDateList_Model', $filter, TRUE);
 
-		$filter = new ModelWhereSQL();
-		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
-		$f1->setValue($date_from);
-		$filter->addField($f1,'&gt;=');		
-		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
-		$f2->setValue($date_to);
-		$filter->addField($f2,'&lt;=');				
-		GlobalFilter::set('DOCMaterialProcurementList_Model', $filter, TRUE);
+			$filter = new ModelWhereSQL();
+			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+			$f1->setValue($date_from);
+			$filter->addField($f1,'&gt;=');		
+			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+			$f2->setValue($date_to);
+			$filter->addField($f2,'&lt;=');				
+			GlobalFilter::set('DOCMaterialProcurementList_Model', $filter, TRUE);
 
-		$filter = new ModelWhereSQL();
-		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
-		$f1->setValue($date_from);
-		$filter->addField($f1,'&gt;=');		
-		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
-		$f2->setValue($date_to);
-		$filter->addField($f2,'&lt;=');				
-		GlobalFilter::set('MaterialFactConsumptionCorretionList_Model', $filter, TRUE);
+			$filter = new ModelWhereSQL();
+			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+			$f1->setValue($date_from);
+			$filter->addField($f1,'&gt;=');		
+			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+			$f2->setValue($date_to);
+			$filter->addField($f2,'&lt;=');				
+			GlobalFilter::set('MaterialFactConsumptionCorretionList_Model', $filter, TRUE);
 
-		$filter = new ModelWhereSQL();
-		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "issue_date_time");
-		$f1->setValue($date_from);
-		$filter->addField($f1,'&gt;=');		
-		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "issue_date_time");
-		$f2->setValue($date_to);
-		$filter->addField($f2,'&lt;=');				
-		GlobalFilter::set('RawMaterialTicketList_Model', $filter, TRUE);
+			$filter = new ModelWhereSQL();
+			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "issue_date_time");
+			$f1->setValue($date_from);
+			$filter->addField($f1,'&gt;=');		
+			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "issue_date_time");
+			$f2->setValue($date_to);
+			$filter->addField($f2,'&lt;=');				
+			GlobalFilter::set('RawMaterialTicketList_Model', $filter, TRUE);
 
-		$filter = new ModelWhereSQL();
-		$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "end_time");
-		$f1->setValue($date_from);
-		$filter->addField($f1,'&gt;=');		
-		$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "end_time");
-		$f2->setValue($date_to);
-		$filter->addField($f2,'&lt;');				
-		GlobalFilter::set('AstCallList_Model', $filter, TRUE);
+			$filter = new ModelWhereSQL();
+			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "start_time");
+			$f1->setValue($date_from);
+			$filter->addField($f1,'&gt;=');		
+			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "start_time");
+			$f2->setValue($date_to);
+			$filter->addField($f2,'&lt;');				
+			GlobalFilter::set('AstCallList_Model', $filter, TRUE);
+		}	
+		
 		//app_id clobal filter
 		<xsl:for-each select="/metadata/models/model/globalFilter[@id='app_id']">
 		<xsl:variable name="model_id" select="concat(../@id,'_Model')"/>

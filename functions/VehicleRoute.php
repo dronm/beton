@@ -283,6 +283,7 @@ class VehicleRoute {
 	/**
 	 * БЫЛО так:routes[0]->geometry OSRM encoded(5) polyline
 	 * По новому: text(array(lon lat)) только остаток пути
+	 * $dbLink should be a master link, not slave!!!
 	 */
 	public static function getRoute($vehicleId, $dbLink, &$routeRestLen){
 		/**

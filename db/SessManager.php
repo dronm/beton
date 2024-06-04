@@ -159,7 +159,7 @@ class SessManager{
 					'died' => $session_ar['died'],
 					'pub_key' => $access_salt
 				);
-				session_id($session_ar['session_id']);
+				@session_id($session_ar['session_id']);
 			}	
 		}
 		return $res;

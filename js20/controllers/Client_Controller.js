@@ -1,5 +1,5 @@
 /**
- * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017 - 2024
  
  * THIS FILE IS GENERATED FROM TEMPLATE build/templates/controllers/Controller_js20.xsl
  * ALL DIRECT MODIFICATIONS WILL BE LOST WITH THE NEXT BUILD PROCESS!!!
@@ -43,7 +43,6 @@ extend(Client_Controller,ControllerObjServer);
 	Client_Controller.superclass.addInsert.call(this);
 	
 	var pm = this.getInsert();
-	//pm.setWS(true)
 	
 	var options = {};
 	options.alias = "Код";options.primaryKey = true;options.autoInc = true;
@@ -168,7 +167,6 @@ extend(Client_Controller,ControllerObjServer);
 			Client_Controller.prototype.addUpdate = function(){
 	Client_Controller.superclass.addUpdate.call(this);
 	var pm = this.getUpdate();
-	//pm.setWS(true)
 	
 	var options = {};
 	options.alias = "Код";options.primaryKey = true;options.autoInc = true;
@@ -295,7 +293,6 @@ extend(Client_Controller,ControllerObjServer);
 			Client_Controller.prototype.addDelete = function(){
 	Client_Controller.superclass.addDelete.call(this);
 	var pm = this.getDelete();
-	//pm.setWS(true)
 	var options = {"required":true};
 	options.alias = "Код";	
 	pm.addField(new FieldInt("id",options));
@@ -307,7 +304,7 @@ extend(Client_Controller,ControllerObjServer);
 	
 	
 	var pm = this.getGetList();
-	//pm.setWS(true)
+	
 	pm.addField(new FieldInt(this.PARAM_COUNT));
 	pm.addField(new FieldInt(this.PARAM_FROM));
 	pm.addField(new FieldString(this.PARAM_COND_FIELDS));
@@ -379,7 +376,6 @@ extend(Client_Controller,ControllerObjServer);
 	Client_Controller.superclass.addGetObject.call(this);
 	
 	var pm = this.getGetObject();
-	pm.setWS(true)
 	var f_opts = {};
 		
 	pm.addField(new FieldInt("id",f_opts));
@@ -394,7 +390,6 @@ extend(Client_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "";
 	var pm = this.getComplete();
-	//pm.setWS(true)
 	pm.addField(new FieldString("name",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");	
 }

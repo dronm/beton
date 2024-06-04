@@ -261,6 +261,7 @@
 <li><a href="#SupplierList_Model">SupplierList_Model</a></li>
 <li><a href="#DOCMaterialProcurement_Model">DOCMaterialProcurement_Model</a></li>
 <li><a href="#DOCMaterialProcurementList_Model">DOCMaterialProcurementList_Model</a></li>
+<li><a href="#DOCMaterialProcurementDialog_Model">DOCMaterialProcurementDialog_Model</a></li>
 <li><a href="#DOCMaterialProcurementDriverList_Model">DOCMaterialProcurementDriverList_Model</a></li>
 <li><a href="#DOCMaterialProcurementVehicleList_Model">DOCMaterialProcurementVehicleList_Model</a></li>
 <li><a href="#DOCMaterialProcurementStoreList_Model">DOCMaterialProcurementStoreList_Model</a></li>
@@ -1363,7 +1364,7 @@
 <a href="#DOCMaterialProcurement_Model">Model: DOCMaterialProcurement_Model</a><h2>delete</h2>
 <a href="#DOCMaterialProcurement_Model">Model: DOCMaterialProcurement_Model</a><h2>get_list</h2>
 <a href="#DOCMaterialProcurementList_Model">Model: DOCMaterialProcurementList_Model</a><h2>get_object</h2>
-<a href="#DOCMaterialProcurementList_Model">Model: DOCMaterialProcurementList_Model</a><h2>before_open</h2>
+<a href="#DOCMaterialProcurementDialog_Model">Model: DOCMaterialProcurementDialog_Model</a><h2>before_open</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
 <h3>doc_id</h3>
@@ -8026,6 +8027,156 @@
 <div>Precision:2</div>
 </div>
 </div>
+<div id="DOCMaterialProcurementDialog_Model" class="content_box">
+<h1>DOCMaterialProcurementDialog_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>number</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>processed</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>supplier_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>suppliers_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>carrier_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>carriers_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>driver</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_plate</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>material_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>materials_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>cement_silos_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>cement_silos_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_gross</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+<h2>quant_net</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+<h2>store</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>sender_name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_base_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_bases_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>doc_quant_net</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
+<h2>doc_ref</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:36</div>
+<div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>doc_quant_gross</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+</div>
+</div>
 <div id="DOCMaterialProcurementDriverList_Model" class="content_box">
 <h1>DOCMaterialProcurementDriverList_Model</h1>
 <div class="content_item">
@@ -9232,6 +9383,12 @@
 <div>Precision:</div>
 <h2>cell_matching</h2>
 <div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>update_dt</h2>
+<div>Type:DateTimeTZ</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

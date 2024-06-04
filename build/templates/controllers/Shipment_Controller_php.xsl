@@ -623,17 +623,19 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		}
 
 		//notify pump driver if there is a pump in this order
+		/*
+		    Removed thid notification with 1.00330 build on 2024-05-29
 		if($ar['pump_exists'] == 't'){
 			//Вызываем новые SQL функции *_ct(), которые используют контакты, а не телефоны из таблиц!
 			$pump_sms_q_id = $dbLinkMaster->query(sprintf(
 				"SELECT * FROM sms_pump_order_ship_ct(%d)"
 				,$ar['order_id']
 			));
-			while($pump_sms_ar = $this->getDbLink()->fetch_array($pump_sms_q_id)){
+			while($pump_sms_ar = $dbLinkMaster->fetch_array($pump_sms_q_id)){
 				$pump_sms_mes = $pump_sms_ar['message'];
 				add_notification_from_contact($dbLinkMaster, $pump_sms_ar['phone_cel'], $pump_sms_mes, 'ship', $ar['doc_ref'], $pump_sms_ar['ext_contact_id']);
 			}
-		}
+		}*/
 		
 		//СМС миксеристу с маршрутом
 		//Если в этот день на этот объект уже отправляли - не отправлять!

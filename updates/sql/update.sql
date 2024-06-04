@@ -21239,3 +21239,14 @@ $BODY$;
 
 ALTER FUNCTION public.vehicle_schedule_states_process()
     OWNER TO beton;
+
+
+
+-- ******************* update 03/06/2024 17:31:49 ******************
+
+		ALTER TABLE public.excel_templates ADD COLUMN update_dt timestampTZ;
+		
+
+-- ******************* update 03/06/2024 17:33:16 ******************
+
+alter table excel_templates alter column update_dt set default now();

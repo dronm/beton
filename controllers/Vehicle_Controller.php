@@ -700,7 +700,7 @@ class Vehicle_Controller extends ControllerSQL{
 		&& isset($ar_st['tracker_id']) && strlen($ar_st['tracker_id'])
 		&& isset($ar_st['do_route']) && $ar_st['do_route']=='t'){			
 		
-			$route_rest = VehicleRoute::getRoute($vehicle_id,$this->getDbLink(), $route_rest_len);
+			$route_rest = VehicleRoute::getRoute($vehicle_id, $this->getDbLinkMaster(), $route_rest_len);
 			
 			if($route_rest && strlen($route_rest)){
 				$this->addModel(new ModelVars(

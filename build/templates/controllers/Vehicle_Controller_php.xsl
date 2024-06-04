@@ -215,7 +215,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		&amp;&amp; isset($ar_st['tracker_id']) &amp;&amp; strlen($ar_st['tracker_id'])
 		&amp;&amp; isset($ar_st['do_route']) &amp;&amp; $ar_st['do_route']=='t'){			
 		
-			$route_rest = VehicleRoute::getRoute($vehicle_id,$this->getDbLink(), $route_rest_len);
+			$route_rest = VehicleRoute::getRoute($vehicle_id, $this->getDbLinkMaster(), $route_rest_len);
 			
 			if($route_rest &amp;&amp; strlen($route_rest)){
 				$this->addModel(new ModelVars(

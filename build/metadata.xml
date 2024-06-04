@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-05-28 05:42:55</lastBuild></version>
+		<lastBuild>2024-06-04 06:07:15</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -233,6 +233,7 @@
 		<version dateOpen="2024-05-23 14:59:38" dateClose="2024-05-23 16:43:35">1.00327</version>
 		<version dateOpen="2024-05-24 16:49:24" dateClose="2024-05-24 16:55:20">1.00328</version>
 		<version dateOpen="2024-05-27 07:25:46" dateClose="2024-05-28 05:42:58">1.00329</version>
+		<version dateOpen="2024-06-03 15:25:06" dateClose="2024-06-04 06:07:18">1.00330</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -2197,6 +2198,32 @@
 			<field id="user_id" dataType="Int" alias="Автор"/>
 			<field id="doc_quant_gross" dataType="Float" length="19" alias="Брутто по документам" precision="2"/>
 		</model>
+		<model id="DOCMaterialProcurementDialog" parent="ModelSQLDOC" dataTable="doc_material_procurements_list" virtual="TRUE" baseModelId="DOCMaterialProcurement">
+			<field id="id" dataType="Int" primaryKey="TRUE" alias="Идентификатор"/>
+			<field id="date_time" dataType="DateTime" alias="Дата"/>
+			<field id="number" dataType="String" alias="Номер 1с"/>
+			<field id="processed" dataType="String" sysCol="TRUE"/>
+			<field id="supplier_id" dataType="Int" sysCol="TRUE"/>
+			<field id="suppliers_ref" dataType="JSON" alias="Поставщик"/>
+			<field id="carrier_id" dataType="Int" sysCol="TRUE"/>
+			<field id="carriers_ref" dataType="JSON" alias="Перевозчик"/>
+			<field id="driver" dataType="String" alias="Водитель"/>
+			<field id="vehicle_plate" dataType="String" alias="ТС"/>
+			<field id="material_id" dataType="Int" sysCol="TRUE"/>
+			<field id="materials_ref" dataType="JSON" alias="Материал"/>
+			<field id="cement_silos_id" dataType="Int" sysCol="TRUE"/>
+			<field id="cement_silos_ref" dataType="JSON" alias="Силос"/>
+			<field id="quant_gross" dataType="Float" length="19" precision="4" alias="Вес"/>
+			<field id="quant_net" dataType="Float" length="19" precision="4" alias="Вес чистый"/>
+			<field id="store" dataType="String" alias="Склад"/>
+			<field id="sender_name" dataType="String" alias="Пункт отправления"/>
+			<field id="production_base_id" dataType="Int" alias="База"/>
+			<field id="production_bases_ref" dataType="JSON" alias="База"/>
+			<field id="doc_quant_net" dataType="Float" length="19" precision="4" alias="Вес чистый"/>
+			<field id="doc_ref" dataType="String" length="36"/>
+			<field id="user_id" dataType="Int" alias="Автор"/>
+			<field id="doc_quant_gross" dataType="Float" length="19" alias="Брутто по документам" precision="2"/>
+		</model>
 		<model id="DOCMaterialProcurementDriverList" parent="ModelSQLDOC" dataTable="doc_material_procurements_driver_list" virtual="TRUE">
 			<field id="driver" dataType="String" primaryKey="TRUE" alias="Водитель"/>
 		</model>
@@ -4057,6 +4084,7 @@
 			<field id="file_info" dataType="JSON"/>
 			<field id="sql_query" dataType="Text"/>
 			<field id="cell_matching" dataType="JSON"/>
+			<field id="update_dt" dataType="DateTimeTZ"/>
 		</model>
 		<model id="ExcelTemplateList" parent="ModelSQLBeton" dataTable="excel_templates_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
@@ -5507,7 +5535,7 @@
 			<publicMethod id="update" modelId="DOCMaterialProcurement"/>
 			<publicMethod id="delete" modelId="DOCMaterialProcurement"/>
 			<publicMethod id="get_list" modelId="DOCMaterialProcurementList"/>
-			<publicMethod id="get_object" modelId="DOCMaterialProcurementList"/>
+			<publicMethod id="get_object" modelId="DOCMaterialProcurementDialog"/>
 			<publicMethod id="before_open">
 				<field id="doc_id" dataType="Int"/>
 			</publicMethod>
@@ -8294,6 +8322,7 @@
 		<jsScript file="js20/controllers/UserChatLastOpen_Controller.js"/>
 		<jsScript file="js20/controllers/UserChatMessageView_Controller.js"/>
 		<jsScript file="js20/models/UserChatHistory_Model.js"/>
+		<jsScript file="js20/models/DOCMaterialProcurementDialog_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

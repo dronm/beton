@@ -1149,13 +1149,13 @@ add conception of ObligatoryFilter like global, but is applied only if no filter
 
 1.00325 
 1) RawMaterialTicket added new field quarry_id of type quarries.
-RawMaterialTicketList, RawMaterialTicketCarrierAggList
-raw_material_tickets_list.sql
-raw_material_ticket_carrier_agg_list.sql
-RawMaterialTicketList_View.js
-RawMaterialTicketIssueBtn.js
-RawMaterialTicket_Controller->generate() function changed.
-RawMaterialTicketClose_View.js
+	RawMaterialTicketList, RawMaterialTicketCarrierAggList
+	raw_material_tickets_list.sql
+	raw_material_ticket_carrier_agg_list.sql
+	RawMaterialTicketList_View.js
+	RawMaterialTicketIssueBtn.js
+	RawMaterialTicket_Controller->generate() function changed.
+	RawMaterialTicketClose_View.js
 
 
 1.00326 
@@ -1170,7 +1170,33 @@ RawMaterialTicketClose_View.js
 	OrderMakeForWeighingList_View.js
 	   changed functions: srvEventsCallBack(), runSpecificUpdateMethod()
 2) User_Controller changed mild filter not to have expression
-2) VehicleScheduleGrid, sometimes do not show vehicle information, issues a query, but no hover. 
+3) VehicleScheduleGrid, sometimes do not show vehicle information, issues a query, but no hover. 
+4) ms with haProxy
+
+
+1.00330 04/06/2024
+1) User_Controller.php: user roles vehicle_owner && client removed mild filters. They should be merged,but are not. Mild filters override personnal which is incorrect.
+2) Shimpent_Controlle.php removed notifications for pump owners and drivers on every shipment.
+3) Client_Controller->insert_from_order() corrected insert to readOnly server
+4) VehicleRoute->getRoue() dbLink should be from master server. Vehicle_Controller->get_current_position() 
+5) User_Controller mild filters: AstCall changed filter field from end_date to start_date to match with list filter.
+6) DOCMaterialProcurement_Controller added new dialog model DOCMaterialProcurementDialog. There is a problem with mild
+	filters as they are applied to dialog model.
+	DOCMaterialProcurementDialog_View.js corrected to use new model.
+
+
+
+
+
+
+Tasks:
+	1) Make new table for deleted orders. In on delete trigger put information into that table. New List
+	2) Report for vehicle owner: make the same report but for all owners/vehicles.
+	3) Check contact transfer on call to a new client. Old client must be deprived from this contact.
+
+
+
+
 
 
 

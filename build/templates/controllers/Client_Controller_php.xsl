@@ -84,7 +84,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	public function insert_from_order($pm){
 		$res = $this->getDbLink()->query_first(sprintf("SELECT id FROM clients WHERE name=%s",$this->getExtDbVal($pm,"name")));
 		if(!is_array($res) || !count($res)){
-			$res = $this->getDbLink()->query_first(sprintf("INSERT INTO clients (name,name_full) VALUES (%s,%s) RETURNING id",
+			$res = $this->getDbLinkMaster()->query_first(sprintf("INSERT INTO clients (name,name_full) VALUES (%s,%s) RETURNING id",
 			$this->getExtDbVal($pm,"name"),
 			$this->getExtDbVal($pm,"name")
 			));

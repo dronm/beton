@@ -376,7 +376,7 @@ class DOCMaterialProcurement_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtString('lsn'));
 		$this->addPublicMethod($pm);
-		$this->setObjectModelId('DOCMaterialProcurementList_Model');		
+		$this->setObjectModelId('DOCMaterialProcurementDialog_Model');		
 
 			
 		$pm = new PublicMethod('before_open');

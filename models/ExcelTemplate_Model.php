@@ -9,6 +9,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class ExcelTemplate_Model extends ModelSQLBeton{
@@ -73,6 +74,14 @@ class ExcelTemplate_Model extends ModelSQLBeton{
 						
 		$f_cell_matching=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cell_matching",$f_opts);
 		$this->addField($f_cell_matching);
+		//********************
+		
+		//*** Field update_dt ***
+		$f_opts = array();
+		$f_opts['id']="update_dt";
+						
+		$f_update_dt=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"update_dt",$f_opts);
+		$this->addField($f_update_dt);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
