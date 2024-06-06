@@ -59,6 +59,7 @@ function VehicleTotRepItemValue_Model(options){
 	options.fields.value = new FieldFloat("value",filed_options);
 	options.fields.value.getValidator().setMaxLength('15');
 	
+			
 		VehicleTotRepItemValue_Model.superclass.constructor.call(this,id,options);
 }
 extend(VehicleTotRepItemValue_Model,ModelXML);

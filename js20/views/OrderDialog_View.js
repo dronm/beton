@@ -4,8 +4,8 @@
 function OrderDialog_View(id,options){	
 
 	options = options || {};
-	options.controller = new Order_Controller();
-	options.model = (options.models&&options.models.OrderDialog_Model)? options.models.OrderDialog_Model: new OrderDialog_Model();
+	options.controller = options.controller || new Order_Controller();
+	options.model = options.model || ((options.models&&options.models.OrderDialog_Model)? options.models.OrderDialog_Model: new OrderDialog_Model());
 	
 	options.cmdSave = false;
 
@@ -14,7 +14,7 @@ function OrderDialog_View(id,options){
 	app.getConstantManager().get(constants);
 	
 	var role_id = app.getServVar("role_id");
-	this.m_readOnly = (role_id=="lab_worker");
+	this.m_readOnly = (role_id=="lab_worker" || options.readOnly);
 	
 	var bool_bs_cl = "control-label "+window.getBsCol(5);
 	var obj_bs_cl = ("control-label "+window.getBsCol(2));
@@ -177,9 +177,9 @@ function OrderDialog_View(id,options){
 			"maxLength":500,
 			"cmdAutoComplete":true,
 			"acMinLengthForQuery":0,
-			"acController":options.controller,
+			"acController":options.readOnly? null : options.controller,
 			"acModel":descr_ac_model,
-			"acPublicMethod":options.controller.getPublicMethod("complete_descr"),
+			"acPublicMethod":options.readOnly? null : options.controller.getPublicMethod("complete_descr"),
 			"acPatternFieldId":"descr",
 			"acKeyFields":[descr_ac_model.getField("descr")],
 			"acDescrFunction":function(f){
@@ -542,18 +542,24 @@ OrderDialog_View.prototype.setPublicMethodDateTime = function(pm){
 }
 
 OrderDialog_View.prototype.setClientId = function(clientId){
-	var dest_ac = this.getElement("calc").getElement("destination").getAutoComplete();
 	var descr_ac = this.getElement("descr").getAutoComplete();
+	var dest_ac = this.getElement("calc").getElement("destination").getAutoComplete();
+	if(!descr_ac || !dest_ac){
+		return;
+	}
+	let descr_ac_pm = descr_ac.getPublicMethod();
+	let dest_ac_pm = dest_ac.getPublicMethod();
+	if(!descr_ac_pm || !dest_ac_pm){
+		return
+	}
+
 	if(clientId){
-		descr_ac.getPublicMethod().setFieldValue("client_id",clientId);
-		
-		dest_ac.getPublicMethod().setFieldValue("client_id",clientId);
-		
+		descr_ac_pm.setFieldValue("client_id",clientId);
+		dest_ac_pm.setFieldValue("client_id",clientId);
 	}
 	else{
-		descr_ac.getPublicMethod().getField("client_id").resetValue();
-		
-		dest_ac.getPublicMethod().getField("client_id").resetValue();		
+		descr_ac_pm.getField("client_id").resetValue();
+		dest_ac_pm.getField("client_id").resetValue();		
 	}
 	
 	descr_ac.setEnabled((clientId!==null));

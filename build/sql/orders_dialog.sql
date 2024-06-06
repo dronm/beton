@@ -80,7 +80,7 @@ CREATE OR REPLACE VIEW public.orders_dialog AS
 		(e_user.id IS NOT NULL) tm_exists,
 		(e_user.tm_id IS NOT NULL) tm_activated,
 		e_user.tm_photo,
-		--e_user.id AS ,
+		
 		o.contact_id AS contact_id,
 		
 		client_specifications_ref(spec) AS client_specifications_ref,
@@ -101,8 +101,7 @@ CREATE OR REPLACE VIEW public.orders_dialog AS
 	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
 	LEFT JOIN users lm_u ON lm_u.id = o.last_modif_user_id
 	
-	LEFT JOIN client_tels AS tl ON tl.client_id=o.client_id AND tl.tel=o.phone_cel	
-	--LEFT JOIN notifications.ext_users_list AS e_user ON (e_user.ext_obj->'keys'->>'id')::int=tl.id
+	--LEFT JOIN client_tels AS tl ON tl.client_id=o.client_id AND tl.tel=o.phone_cel	
 	
 	LEFT JOIN contacts AS ct ON ct.id = o.contact_id
 	LEFT JOIN notifications.ext_users_photo_list AS e_user ON e_user.ext_contact_id = o.contact_id

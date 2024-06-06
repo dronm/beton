@@ -1,137 +1,36 @@
--- FUNCTION: public.vehicle_schedule_states_process()
+-- View: order_garbage_list
 
--- DROP FUNCTION IF EXISTS public.vehicle_schedule_states_process();
+-- DROP VIEW order_garbage_list;
 
-CREATE OR REPLACE FUNCTION public.vehicle_schedule_states_process()
-    RETURNS trigger
-    LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE NOT LEAKPROOF
-AS $BODY$
-DECLARE
-	v_veh_at_work_count int;
-	v_old_state vehicle_states;
-	v_controled_states vehicle_states[];
-	veh_count int;
-	v_vehicle_feature vehicles.feature%TYPE;
-	--v_do_control_max_count boolean;
-BEGIN
-	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
-		/*
-		IF (NEW.state='free'::vehicle_states)
-		AND (now()::date=NEW.date_time::date AND  now()::time<(constant_first_shift_start_time()+constant_day_shift_length()::interval)) THEN
-			--ON DAY SHIFT ONLY!!!!
-
-			--check if it is ITS shift
-			SELECT true INTO v_do_control_max_count FROM vehicle_schedule_states AS st
-			WHERE st.date_time::date=NEW.date_time::date
-				AND st.schedule_id=NEW.schedule_id
-				AND st.state='shift'::vehicle_states;
-
-			--check vehicle counts
-			IF NOT FOUND THEN			
-				v_controled_states = ARRAY['free'::vehicle_states,'assigned'::vehicle_states,'busy'::vehicle_states,'at_dest'::vehicle_states,'left_for_base'::vehicle_states];
-
-				--current (old) state
-				SELECT
-					coalesce(vehicle_schedule_states.state,'out'::vehicle_states) INTO v_old_state
-				FROM vehicle_schedule_states
-				WHERE vehicle_schedule_states.schedule_id = NEW.schedule_id
-				ORDER BY vehicle_schedule_states.date_time DESC
-				LIMIT 1;
-
-				IF NOT FOUND THEN
-					v_old_state = 'out'::vehicle_states;
-				END IF;
-
-				v_do_control_max_count = (NOT v_old_state = ANY(v_controled_states));
-
-				IF v_do_control_max_count THEN
-					--need feature
-					SELECT v.feature INTO v_vehicle_feature
-					FROM vehicle_schedules AS vs
-					LEFT JOIN vehicles AS v ON v.id=vs.vehicle_id
-					WHERE vs.id=NEW.schedule_id;
-				
-					v_do_control_max_count = ( (v_vehicle_feature IS NOT NULL) 
-					AND (v_vehicle_feature=constant_own_vehicles_feature() OR v_vehicle_feature=constant_backup_vehicles_feature()) );
-				END IF;
-			
-				IF v_do_control_max_count THEN
-					SELECT * INTO v_veh_at_work_count FROM get_working_vehicles_count_main(NEW.date_time::date);
-
-					veh_count = constant_max_vehicle_at_work();
-					IF v_veh_at_work_count>=veh_count THEN
-						RAISE EXCEPTION 'Максимально допустимое количество машин на линии: %. Нет возможности добавить еще.',veh_count;
-					END IF;
-				END IF;
-			END IF;
-		END IF;
-		*/
+CREATE OR REPLACE VIEW order_garbage_list AS 
+	SELECT
+		o.id,
+		order_garbage_num(o.*) AS number,
+		clients_ref(cl) AS clients_ref,
+		o.client_id,
+		destinations_ref(d) AS destinations_ref,
+		o.destination_id,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_type_id,
+		o.unload_type AS unload_type,
+		o.comment_text AS comment_text,
 		
-		IF NEW.state='free'::vehicle_states AND coalesce(NEW.tracker_id,'')<>'' AND NEW.production_base_id IS NULL THEN
-			NEW.production_base_id = veh_cur_production_base_id(NEW.tracker_id);
-		END IF;
-				
-		RETURN NEW;
-			
-	ELSIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
-	
-		UPDATE productions
-		SET
-			vehicle_schedule_state_id=NULL,
-			shipment_id=NULL
-		WHERE shipment_id = OLD.shipment_id;
+		coalesce(ct.name::text, o.descr::text) AS descr,
+		coalesce(ct.tel::text, o.phone_cel::text) AS phone_cel,
 		
-		RETURN OLD;
-	
-	ELSIF TG_WHEN='AFTER' AND TG_OP='INSERT' THEN
-	
-		PERFORM pg_notify(
-				'VehicleScheduleState.insert'
-			,json_build_object(
-				'params',json_build_object(
-					'id',NEW.id,
-					'lsn', pg_current_wal_lsn()
-				)
-			)::text
-		);
-	
-		RETURN NEW;
+		o.date_time,
+		o.quant,
+		users_ref(u) AS users_ref,
+		o.user_id,
+		order_garbage_ref(o) AS orders_ref,
+		contacts_ref(ct) AS contacts_ref		
+		
+   FROM order_garbage o
+   LEFT JOIN clients cl ON cl.id = o.client_id
+   LEFT JOIN destinations d ON d.id = o.destination_id
+   LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+   LEFT JOIN contacts ct ON ct.id = o.contact_id
+   LEFT JOIN users u ON u.id = o.user_id
+  ORDER BY o.date_time DESC;
 
-	ELSIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
-	
-		PERFORM pg_notify(
-				'VehicleScheduleState.update'
-			,json_build_object(
-				'params',json_build_object(
-					'id',NEW.id,
-					'lsn', pg_current_wal_lsn()
-				)
-			)::text
-		);
-	
-		RETURN NEW;
-
-	ELSIF TG_WHEN='AFTER' AND TG_OP='DELETE' THEN
-	
-		PERFORM pg_notify(
-				'VehicleScheduleState.delete'
-			,json_build_object(
-				'params',json_build_object(
-					'id',OLD.id,
-					'lsn', pg_current_wal_lsn()
-				)
-			)::text
-		);
-	
-		RETURN OLD;
-	END IF;
-	
-	
-END;
-$BODY$;
-
-ALTER FUNCTION public.vehicle_schedule_states_process()
-    OWNER TO beton;
-
+ALTER TABLE order_garbage_list OWNER TO beton;

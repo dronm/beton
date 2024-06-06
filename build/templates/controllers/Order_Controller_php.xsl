@@ -31,6 +31,8 @@ require_once(USER_MODELS_PATH.'OrderMakeList_Model.php');
 require_once(USER_MODELS_PATH.'ConcreteType_Model.php');
 require_once(USER_MODELS_PATH.'Lang_Model.php');
 
+require_once(FUNC_PATH.'EventSrv.php');
+
 require_once('common/MyDate.php');
 
 require_once(ABSOLUTE_PATH.'functions/Beton.php');
@@ -446,8 +448,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	}
 	
 	public function delete($pm){
-		/* SMS насоснику */
 		$order_id = $this->getExtDbVal($pm,'id');
+
+		/* SMS насоснику */
 		$ar_doc = $this->getDbLink()->query_first(sprintf(
 			"SELECT
 				o.pump_vehicle_id
@@ -500,8 +503,76 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			);
 		}
 					
+		//from 04/06/2024 copy deleted orders to a different table, set user who did it and time.
+		$fields = 'client_id,
+			destination_id,
+			concrete_type_id,
+			unload_type,
+			comment_text,
+			descr,
+			date_time,
+			time_to,
+			quant,
+			phone_cel,
+			unload_speed,
+			user_id,
+			client_mark,
+			"number",
+			date_time_to,
+			lang_id,
+			total,
+			concrete_price,
+			destination_price,
+			unload_price,
+			pump_vehicle_id,
+			pay_cash,
+			total_edit,
+			payed,
+			under_control,
+			create_date_time,
+			ext_production,
+			contact_id,
+			client_specification_id,
+			f_val,
+			w_val
+		';
+
+		$link = $this->getDbLinkMaster();
+		$link->query("BEGIN");
+		try{
+			$link->query(sprintf(
+				"INSERT INTO order_garbage
+					(%s,
+					last_modif_user_id, last_modif_date_time
+					)
+				SELECT 
+					%s,
+					%d,
+					now()
+				FROM orders 
+				WHERE orders.id = %d"
+				,$fields, $fields
+				,$_SESSION["user_id"]
+				,$order_id
+			));
+
+			parent::delete($pm);
+
+			$link->query("COMMIT");
+		}catch(Exception $e){
+			$link->query("ROLLBACK");
+			throw $e;
+		}
+
+		//+event OrderGarbage.insert
+		$event_par = [];
+		$ar = $link->query_first("SELECT pg_current_wal_lsn() AS lsn");
+		if(is_array($ar) &amp;&amp; count($ar) &amp;&amp; isset($ar['lsn'])){
+		     $event_par["lsn"] = $ar["lsn"];
+		}
+		EventSrv::publishAsync('OrderGarbage.insert',$event_par);
+
 		Graph_Controller::clearCacheOnOrderId($this->getDbLink(),$pm->getParamValue('id'));
-		parent::delete($pm);
 	}
 	
 	public function get_make_orders_list($pm){

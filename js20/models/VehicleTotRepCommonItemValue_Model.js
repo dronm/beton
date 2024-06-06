@@ -58,6 +58,7 @@ function VehicleTotRepCommonItemValue_Model(options){
 	
 	options.fields.value = new FieldFloat("value",filed_options);
 	
+			
 		VehicleTotRepCommonItemValue_Model.superclass.constructor.call(this,id,options);
 }
 extend(VehicleTotRepCommonItemValue_Model,ModelXML);

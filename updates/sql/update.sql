@@ -21250,3 +21250,986 @@ ALTER FUNCTION public.vehicle_schedule_states_process()
 -- ******************* update 03/06/2024 17:33:16 ******************
 
 alter table excel_templates alter column update_dt set default now();
+
+		
+
+
+-- ******************* update 04/06/2024 15:06:38 ******************
+
+	-- ********** Adding new table from model **********
+	CREATE TABLE public.order_garbage()
+	INHERITS (orders);
+
+
+
+-- ******************* update 04/06/2024 15:57:06 ******************
+-- View: order_garbage_list
+
+-- DROP VIEW order_garbage_list;
+
+CREATE OR REPLACE VIEW order_garbage_list AS 
+	SELECT
+		o.id,
+		order_num(o.*) AS number,
+		clients_ref(cl) AS clients_ref,
+		o.client_id,
+		destinations_ref(d) AS destinations_ref,
+		o.destination_id,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_type_id,
+		o.unload_type AS unload_type,
+		o.comment_text AS comment_text,
+		
+		coalesce(ct.name::text, o.descr::text) AS descr,
+		coalesce(ct.tel::text, o.phone_cel::text) AS phone_cel,
+		
+		o.date_time,
+		o.quant,
+		users_ref(u) AS users_ref,
+		o.user_id,
+		orders_ref(o) AS orders_ref,
+		contacts_ref(ct) AS contacts_ref		
+		
+   FROM order_garbage o
+   LEFT JOIN clients cl ON cl.id = o.client_id
+   LEFT JOIN destinations d ON d.id = o.destination_id
+   LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+   LEFT JOIN contacts ct ON ct.id = o.contact_id
+   LEFT JOIN users u ON u.id = o.user_id
+  ORDER BY o.date_time DESC;
+
+ALTER TABLE order_garbage_list OWNER TO beton;
+
+
+-- ******************* update 05/06/2024 07:23:41 ******************
+-- View: public.order_garbage_dialog
+
+-- DROP VIEW public.order_garbage_dialog;
+
+CREATE OR REPLACE VIEW public.order_garbage_dialog AS 
+
+	SELECT * FROM orders_dialog;
+	
+ALTER TABLE public.order_garbage_dialog OWNER TO beton;
+
+
+-- ******************* update 05/06/2024 07:24:50 ******************
+-- View: public.order_garbage_dialog
+
+ DROP VIEW public.order_garbage_dialog;
+
+CREATE OR REPLACE VIEW public.order_garbage_dialog AS 
+
+	SELECT
+		o.id,
+		order_num(o.*) AS number,		
+		clients_ref(cl) AS clients_ref,		
+		
+		destinations_ref(d) AS destinations_ref,
+		o.destination_price AS destination_cost,		
+		--d.price AS destination_price,		
+		CASE
+			WHEN coalesce(d.special_price,FALSE) THEN
+				--coalesce(d.price,0)
+				period_value('destination_price', d.id, o.date_time)::numeric(15,2)
+			ELSE
+			coalesce(
+				(SELECT sh_p.price
+				FROM shipment_for_owner_costs sh_p
+				WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=d.distance
+				ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+				LIMIT 1
+				),			
+			coalesce(d.price,0))			
+		END  AS destination_price,
+		
+		d.time_route,
+		d.distance,
+		
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_price AS concrete_cost,		
+		--concr.price AS concrete_price,
+		coalesce(
+			/*(SELECT
+				ct_p.price
+			FROM concrete_costs ct_p
+			WHERE ct_p.date<=o.date_time::date AND ct_p.concrete_type_id=o.concrete_type_id
+			ORDER BY ct_p.date DESC
+			LIMIT 1
+			),*/
+			(SELECT pr.price FROM client_price_list(o.client_id,o.date_time)AS pr WHERE pr.concrete_type_id=o.concrete_type_id),
+			coalesce(concr.price,0)
+		) AS concrete_price,
+		
+		o.unload_type,
+		o.comment_text,
+		
+		coalesce(ct.name::text, o.descr::text) AS descr,
+		coalesce(ct.tel::text, o.phone_cel::text) AS phone_cel,
+		
+		o.unload_speed,
+		o.date_time,
+		o.time_to,		
+		o.quant,
+		langs_ref(l) AS langs_ref,
+		o.total,
+		o.total_edit,
+		o.pay_cash,
+		o.unload_price AS unload_cost,
+		o.payed,
+		o.under_control,
+		
+		pv.phone_cel AS pump_vehicle_phone_cel,
+		pump_vehicles_ref(pv,v) AS pump_vehicles_ref,
+		pump_prices_ref(ppr) AS pump_prices_ref,
+		
+		users_ref(u) AS users_ref,
+		
+		d.distance AS destination_distance,
+		
+		users_ref(lm_u) AS last_modif_users_ref,
+		o.last_modif_date_time,
+		
+		o.create_date_time,
+		
+		o.ext_production,
+		
+		(e_user.id IS NOT NULL) tm_exists,
+		(e_user.tm_id IS NOT NULL) tm_activated,
+		e_user.tm_photo,
+		--e_user.id AS ,
+		o.contact_id AS contact_id,
+		
+		client_specifications_ref(spec) AS client_specifications_ref,
+		
+		o.f_val,
+		o.w_val,
+		
+		debts.debt_total AS client_debt
+		
+	FROM order_garbage o
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations d ON d.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN langs l ON l.id = o.lang_id
+	LEFT JOIN pump_vehicles pv ON pv.id = o.pump_vehicle_id
+	LEFT JOIN users u ON u.id = o.user_id
+	LEFT JOIN pump_prices ppr ON ppr.id = pv.pump_price_id
+	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
+	LEFT JOIN users lm_u ON lm_u.id = o.last_modif_user_id
+	
+	LEFT JOIN client_tels AS tl ON tl.client_id=o.client_id AND tl.tel=o.phone_cel	
+	--LEFT JOIN notifications.ext_users_list AS e_user ON (e_user.ext_obj->'keys'->>'id')::int=tl.id
+	
+	LEFT JOIN contacts AS ct ON ct.id = o.contact_id
+	LEFT JOIN notifications.ext_users_photo_list AS e_user ON e_user.ext_contact_id = o.contact_id
+	LEFT JOIN client_specifications AS spec ON spec.id = o.client_specification_id
+	LEFT JOIN (
+		SELECT
+			d.client_id,
+			sum(d.debt_total) AS debt_total
+		FROM client_debts AS d		
+		GROUP BY d.client_id
+	) AS debts ON debts.client_id = o.client_id
+	
+	ORDER BY o.date_time;
+
+	
+ALTER TABLE public.order_garbage_dialog OWNER TO beton;
+
+
+-- ******************* update 05/06/2024 08:20:45 ******************
+-- View: public.orders_dialog
+
+-- DROP VIEW public.orders_dialog;
+
+CREATE OR REPLACE VIEW public.orders_dialog AS 
+	SELECT
+		o.id,
+		order_num(o.*) AS number,		
+		clients_ref(cl) AS clients_ref,		
+		
+		destinations_ref(d) AS destinations_ref,
+		o.destination_price AS destination_cost,		
+		--d.price AS destination_price,		
+		CASE
+			WHEN coalesce(d.special_price,FALSE) THEN
+				--coalesce(d.price,0)
+				period_value('destination_price', d.id, o.date_time)::numeric(15,2)
+			ELSE
+			coalesce(
+				(SELECT sh_p.price
+				FROM shipment_for_owner_costs sh_p
+				WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=d.distance
+				ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+				LIMIT 1
+				),			
+			coalesce(d.price,0))			
+		END  AS destination_price,
+		
+		d.time_route,
+		d.distance,
+		
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_price AS concrete_cost,		
+		--concr.price AS concrete_price,
+		coalesce(
+			/*(SELECT
+				ct_p.price
+			FROM concrete_costs ct_p
+			WHERE ct_p.date<=o.date_time::date AND ct_p.concrete_type_id=o.concrete_type_id
+			ORDER BY ct_p.date DESC
+			LIMIT 1
+			),*/
+			(SELECT pr.price FROM client_price_list(o.client_id,o.date_time)AS pr WHERE pr.concrete_type_id=o.concrete_type_id),
+			coalesce(concr.price,0)
+		) AS concrete_price,
+		
+		o.unload_type,
+		o.comment_text,
+		
+		coalesce(ct.name::text, o.descr::text) AS descr,
+		coalesce(ct.tel::text, o.phone_cel::text) AS phone_cel,
+		
+		o.unload_speed,
+		o.date_time,
+		o.time_to,		
+		o.quant,
+		langs_ref(l) AS langs_ref,
+		o.total,
+		o.total_edit,
+		o.pay_cash,
+		o.unload_price AS unload_cost,
+		o.payed,
+		o.under_control,
+		
+		pv.phone_cel AS pump_vehicle_phone_cel,
+		pump_vehicles_ref(pv,v) AS pump_vehicles_ref,
+		pump_prices_ref(ppr) AS pump_prices_ref,
+		
+		users_ref(u) AS users_ref,
+		
+		d.distance AS destination_distance,
+		
+		users_ref(lm_u) AS last_modif_users_ref,
+		o.last_modif_date_time,
+		
+		o.create_date_time,
+		
+		o.ext_production,
+		
+		(e_user.id IS NOT NULL) tm_exists,
+		(e_user.tm_id IS NOT NULL) tm_activated,
+		e_user.tm_photo,
+		--e_user.id AS ,
+		o.contact_id AS contact_id,
+		
+		client_specifications_ref(spec) AS client_specifications_ref,
+		
+		o.f_val,
+		o.w_val,
+		
+		--debts.debt_total AS client_debt
+		0.0  AS client_debt
+		
+	FROM orders o
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations d ON d.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN langs l ON l.id = o.lang_id
+	LEFT JOIN pump_vehicles pv ON pv.id = o.pump_vehicle_id
+	LEFT JOIN users u ON u.id = o.user_id
+	LEFT JOIN pump_prices ppr ON ppr.id = pv.pump_price_id
+	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
+	LEFT JOIN users lm_u ON lm_u.id = o.last_modif_user_id
+	
+	LEFT JOIN client_tels AS tl ON tl.client_id=o.client_id AND tl.tel=o.phone_cel	
+	--LEFT JOIN notifications.ext_users_list AS e_user ON (e_user.ext_obj->'keys'->>'id')::int=tl.id
+	
+	LEFT JOIN contacts AS ct ON ct.id = o.contact_id
+	LEFT JOIN notifications.ext_users_photo_list AS e_user ON e_user.ext_contact_id = o.contact_id
+	LEFT JOIN client_specifications AS spec ON spec.id = o.client_specification_id
+	/*LEFT JOIN (
+		SELECT
+			d.client_id,
+			sum(d.debt_total) AS debt_total
+		FROM client_debts AS d		
+		GROUP BY d.client_id
+	) AS debts ON debts.client_id = o.client_id*/
+	
+	ORDER BY o.date_time;
+
+ALTER TABLE public.orders_dialog OWNER TO beton;
+
+
+
+-- ******************* update 05/06/2024 08:24:05 ******************
+-- View: public.orders_dialog
+
+-- DROP VIEW public.orders_dialog;
+
+CREATE OR REPLACE VIEW public.orders_dialog AS 
+	SELECT
+		o.id,
+		order_num(o.*) AS number,		
+		clients_ref(cl) AS clients_ref,		
+		
+		destinations_ref(d) AS destinations_ref,
+		o.destination_price AS destination_cost,		
+		--d.price AS destination_price,		
+		CASE
+			WHEN coalesce(d.special_price,FALSE) THEN
+				--coalesce(d.price,0)
+				period_value('destination_price', d.id, o.date_time)::numeric(15,2)
+			ELSE
+			coalesce(
+				(SELECT sh_p.price
+				FROM shipment_for_owner_costs sh_p
+				WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=d.distance
+				ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+				LIMIT 1
+				),			
+			coalesce(d.price,0))			
+		END  AS destination_price,
+		
+		d.time_route,
+		d.distance,
+		
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_price AS concrete_cost,		
+		--concr.price AS concrete_price,
+		coalesce(
+			/*(SELECT
+				ct_p.price
+			FROM concrete_costs ct_p
+			WHERE ct_p.date<=o.date_time::date AND ct_p.concrete_type_id=o.concrete_type_id
+			ORDER BY ct_p.date DESC
+			LIMIT 1
+			),*/
+			(SELECT pr.price FROM client_price_list(o.client_id,o.date_time)AS pr WHERE pr.concrete_type_id=o.concrete_type_id),
+			coalesce(concr.price,0)
+		) AS concrete_price,
+		
+		o.unload_type,
+		o.comment_text,
+		
+		coalesce(ct.name::text, o.descr::text) AS descr,
+		coalesce(ct.tel::text, o.phone_cel::text) AS phone_cel,
+		
+		o.unload_speed,
+		o.date_time,
+		o.time_to,		
+		o.quant,
+		langs_ref(l) AS langs_ref,
+		o.total,
+		o.total_edit,
+		o.pay_cash,
+		o.unload_price AS unload_cost,
+		o.payed,
+		o.under_control,
+		
+		pv.phone_cel AS pump_vehicle_phone_cel,
+		pump_vehicles_ref(pv,v) AS pump_vehicles_ref,
+		pump_prices_ref(ppr) AS pump_prices_ref,
+		
+		users_ref(u) AS users_ref,
+		
+		d.distance AS destination_distance,
+		
+		users_ref(lm_u) AS last_modif_users_ref,
+		o.last_modif_date_time,
+		
+		o.create_date_time,
+		
+		o.ext_production,
+		
+		/*(e_user.id IS NOT NULL) tm_exists,
+		(e_user.tm_id IS NOT NULL) tm_activated,
+		e_user.tm_photo,*/
+		false AS tm_exists,
+		false AS  tm_activated,
+		NULL AS tm_photo,
+		
+		o.contact_id AS contact_id,
+		
+		client_specifications_ref(spec) AS client_specifications_ref,
+		
+		o.f_val,
+		o.w_val,
+		
+		debts.debt_total AS client_debt
+		
+	FROM orders o
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations d ON d.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN langs l ON l.id = o.lang_id
+	LEFT JOIN pump_vehicles pv ON pv.id = o.pump_vehicle_id
+	LEFT JOIN users u ON u.id = o.user_id
+	LEFT JOIN pump_prices ppr ON ppr.id = pv.pump_price_id
+	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
+	LEFT JOIN users lm_u ON lm_u.id = o.last_modif_user_id
+	
+	LEFT JOIN client_tels AS tl ON tl.client_id=o.client_id AND tl.tel=o.phone_cel	
+	
+	LEFT JOIN contacts AS ct ON ct.id = o.contact_id
+	--LEFT JOIN notifications.ext_users_photo_list AS e_user ON e_user.ext_contact_id = o.contact_id
+	LEFT JOIN client_specifications AS spec ON spec.id = o.client_specification_id
+	LEFT JOIN (
+		SELECT
+			d.client_id,
+			sum(d.debt_total) AS debt_total
+		FROM client_debts AS d		
+		GROUP BY d.client_id
+	) AS debts ON debts.client_id = o.client_id
+	
+	ORDER BY o.date_time;
+
+ALTER TABLE public.orders_dialog OWNER TO beton;
+
+
+
+-- ******************* update 05/06/2024 08:24:22 ******************
+-- View: public.orders_dialog
+
+-- DROP VIEW public.orders_dialog;
+
+CREATE OR REPLACE VIEW public.orders_dialog AS 
+	SELECT
+		o.id,
+		order_num(o.*) AS number,		
+		clients_ref(cl) AS clients_ref,		
+		
+		destinations_ref(d) AS destinations_ref,
+		o.destination_price AS destination_cost,		
+		--d.price AS destination_price,		
+		CASE
+			WHEN coalesce(d.special_price,FALSE) THEN
+				--coalesce(d.price,0)
+				period_value('destination_price', d.id, o.date_time)::numeric(15,2)
+			ELSE
+			coalesce(
+				(SELECT sh_p.price
+				FROM shipment_for_owner_costs sh_p
+				WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=d.distance
+				ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+				LIMIT 1
+				),			
+			coalesce(d.price,0))			
+		END  AS destination_price,
+		
+		d.time_route,
+		d.distance,
+		
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_price AS concrete_cost,		
+		--concr.price AS concrete_price,
+		coalesce(
+			/*(SELECT
+				ct_p.price
+			FROM concrete_costs ct_p
+			WHERE ct_p.date<=o.date_time::date AND ct_p.concrete_type_id=o.concrete_type_id
+			ORDER BY ct_p.date DESC
+			LIMIT 1
+			),*/
+			(SELECT pr.price FROM client_price_list(o.client_id,o.date_time)AS pr WHERE pr.concrete_type_id=o.concrete_type_id),
+			coalesce(concr.price,0)
+		) AS concrete_price,
+		
+		o.unload_type,
+		o.comment_text,
+		
+		coalesce(ct.name::text, o.descr::text) AS descr,
+		coalesce(ct.tel::text, o.phone_cel::text) AS phone_cel,
+		
+		o.unload_speed,
+		o.date_time,
+		o.time_to,		
+		o.quant,
+		langs_ref(l) AS langs_ref,
+		o.total,
+		o.total_edit,
+		o.pay_cash,
+		o.unload_price AS unload_cost,
+		o.payed,
+		o.under_control,
+		
+		pv.phone_cel AS pump_vehicle_phone_cel,
+		pump_vehicles_ref(pv,v) AS pump_vehicles_ref,
+		pump_prices_ref(ppr) AS pump_prices_ref,
+		
+		users_ref(u) AS users_ref,
+		
+		d.distance AS destination_distance,
+		
+		users_ref(lm_u) AS last_modif_users_ref,
+		o.last_modif_date_time,
+		
+		o.create_date_time,
+		
+		o.ext_production,
+		
+		(e_user.id IS NOT NULL) tm_exists,
+		(e_user.tm_id IS NOT NULL) tm_activated,
+		e_user.tm_photo,
+		
+		o.contact_id AS contact_id,
+		
+		client_specifications_ref(spec) AS client_specifications_ref,
+		
+		o.f_val,
+		o.w_val,
+		
+		debts.debt_total AS client_debt
+		
+	FROM orders o
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations d ON d.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN langs l ON l.id = o.lang_id
+	LEFT JOIN pump_vehicles pv ON pv.id = o.pump_vehicle_id
+	LEFT JOIN users u ON u.id = o.user_id
+	LEFT JOIN pump_prices ppr ON ppr.id = pv.pump_price_id
+	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
+	LEFT JOIN users lm_u ON lm_u.id = o.last_modif_user_id
+	
+	LEFT JOIN client_tels AS tl ON tl.client_id=o.client_id AND tl.tel=o.phone_cel	
+	
+	LEFT JOIN contacts AS ct ON ct.id = o.contact_id
+	LEFT JOIN notifications.ext_users_photo_list AS e_user ON e_user.ext_contact_id = o.contact_id
+	LEFT JOIN client_specifications AS spec ON spec.id = o.client_specification_id
+	LEFT JOIN (
+		SELECT
+			d.client_id,
+			sum(d.debt_total) AS debt_total
+		FROM client_debts AS d		
+		GROUP BY d.client_id
+	) AS debts ON debts.client_id = o.client_id
+	
+	ORDER BY o.date_time;
+
+ALTER TABLE public.orders_dialog OWNER TO beton;
+
+
+
+-- ******************* update 05/06/2024 08:25:17 ******************
+-- View: public.orders_dialog
+
+-- DROP VIEW public.orders_dialog;
+
+CREATE OR REPLACE VIEW public.orders_dialog AS 
+	SELECT
+		o.id,
+		order_num(o.*) AS number,		
+		clients_ref(cl) AS clients_ref,		
+		
+		destinations_ref(d) AS destinations_ref,
+		o.destination_price AS destination_cost,		
+		--d.price AS destination_price,		
+		CASE
+			WHEN coalesce(d.special_price,FALSE) THEN
+				--coalesce(d.price,0)
+				period_value('destination_price', d.id, o.date_time)::numeric(15,2)
+			ELSE
+			coalesce(
+				(SELECT sh_p.price
+				FROM shipment_for_owner_costs sh_p
+				WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=d.distance
+				ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+				LIMIT 1
+				),			
+			coalesce(d.price,0))			
+		END  AS destination_price,
+		
+		d.time_route,
+		d.distance,
+		
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_price AS concrete_cost,		
+		--concr.price AS concrete_price,
+		coalesce(
+			/*(SELECT
+				ct_p.price
+			FROM concrete_costs ct_p
+			WHERE ct_p.date<=o.date_time::date AND ct_p.concrete_type_id=o.concrete_type_id
+			ORDER BY ct_p.date DESC
+			LIMIT 1
+			),*/
+			(SELECT pr.price FROM client_price_list(o.client_id,o.date_time)AS pr WHERE pr.concrete_type_id=o.concrete_type_id),
+			coalesce(concr.price,0)
+		) AS concrete_price,
+		
+		o.unload_type,
+		o.comment_text,
+		
+		coalesce(ct.name::text, o.descr::text) AS descr,
+		coalesce(ct.tel::text, o.phone_cel::text) AS phone_cel,
+		
+		o.unload_speed,
+		o.date_time,
+		o.time_to,		
+		o.quant,
+		langs_ref(l) AS langs_ref,
+		o.total,
+		o.total_edit,
+		o.pay_cash,
+		o.unload_price AS unload_cost,
+		o.payed,
+		o.under_control,
+		
+		pv.phone_cel AS pump_vehicle_phone_cel,
+		pump_vehicles_ref(pv,v) AS pump_vehicles_ref,
+		pump_prices_ref(ppr) AS pump_prices_ref,
+		
+		users_ref(u) AS users_ref,
+		
+		d.distance AS destination_distance,
+		
+		users_ref(lm_u) AS last_modif_users_ref,
+		o.last_modif_date_time,
+		
+		o.create_date_time,
+		
+		o.ext_production,
+		
+		(e_user.id IS NOT NULL) tm_exists,
+		(e_user.tm_id IS NOT NULL) tm_activated,
+		e_user.tm_photo,
+		
+		o.contact_id AS contact_id,
+		
+		client_specifications_ref(spec) AS client_specifications_ref,
+		
+		o.f_val,
+		o.w_val,
+		
+		debts.debt_total AS client_debt
+		
+	FROM orders o
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations d ON d.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN langs l ON l.id = o.lang_id
+	LEFT JOIN pump_vehicles pv ON pv.id = o.pump_vehicle_id
+	LEFT JOIN users u ON u.id = o.user_id
+	LEFT JOIN pump_prices ppr ON ppr.id = pv.pump_price_id
+	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
+	LEFT JOIN users lm_u ON lm_u.id = o.last_modif_user_id
+	
+	--LEFT JOIN client_tels AS tl ON tl.client_id=o.client_id AND tl.tel=o.phone_cel	
+	
+	LEFT JOIN contacts AS ct ON ct.id = o.contact_id
+	LEFT JOIN notifications.ext_users_photo_list AS e_user ON e_user.ext_contact_id = o.contact_id
+	LEFT JOIN client_specifications AS spec ON spec.id = o.client_specification_id
+	LEFT JOIN (
+		SELECT
+			d.client_id,
+			sum(d.debt_total) AS debt_total
+		FROM client_debts AS d		
+		GROUP BY d.client_id
+	) AS debts ON debts.client_id = o.client_id
+	
+	ORDER BY o.date_time;
+
+ALTER TABLE public.orders_dialog OWNER TO beton;
+
+
+
+-- ******************* update 05/06/2024 08:49:54 ******************
+
+	-- ********** Adding new table from model **********
+	CREATE TABLE public.order_garbage
+	(id serial NOT NULL,client_id int NOT NULL REFERENCES clients(id),destination_id int NOT NULL REFERENCES destinations(id),concrete_type_id int NOT NULL REFERENCES concrete_types(id),unload_type unload_types,comment_text text,descr text,date_time timestamp NOT NULL,date_time_to timestamp,quant  numeric(19,4),phone_cel  varchar(15),unload_speed  numeric(19,4),user_id int REFERENCES users(id),lang_id int REFERENCES langs(id),total  numeric(15,2),concrete_price  numeric(15,2),destination_price  numeric(15,2),unload_price  numeric(15,2),pump_vehicle_id int REFERENCES pump_vehicles(id),pay_cash bool
+			DEFAULT FALSE,total_edit bool
+			DEFAULT FALSE,payed bool
+			DEFAULT FALSE,under_control bool
+			DEFAULT FALSE,last_modif_user_id int REFERENCES users(id),last_modif_date_time timestampTZ,create_date_time timestampTZ
+			DEFAULT CURRENT_TIMESTAMP,ext_production bool
+			DEFAULT FALSE,contact_id int REFERENCES contacts(id),client_specification_id int REFERENCES client_specifications(id),f_val int,w_val int,CONSTRAINT order_garbage_pkey PRIMARY KEY (id)
+	);
+	DROP INDEX IF EXISTS date_time_index;
+	CREATE INDEX date_time_index
+	ON order_garbage(date_time);
+	DROP INDEX IF EXISTS client_id_index;
+	CREATE INDEX client_id_index
+	ON order_garbage(client_id);
+	DROP INDEX IF EXISTS concrete_type_id_index;
+	CREATE INDEX concrete_type_id_index
+	ON order_garbage(concrete_type_id);
+	DROP INDEX IF EXISTS destination_id_index;
+	CREATE INDEX destination_id_index
+	ON order_garbage(destination_id);
+	ALTER TABLE public.order_garbage OWNER TO beton;
+
+
+
+-- ******************* update 05/06/2024 08:58:30 ******************
+alter table order_garbage add column "number" int;
+
+
+
+-- ******************* update 05/06/2024 08:58:39 ******************
+-- FUNCTION: public.order_garbage_num(order_garbage)
+
+-- DROP FUNCTION IF EXISTS public.order_garbage_num(order_garbage);
+
+CREATE OR REPLACE FUNCTION public.order_garbage_num(
+	order_garbage)
+    RETURNS character varying
+    LANGUAGE 'sql'
+    COST 100
+    IMMUTABLE
+AS $BODY$
+	SELECT 
+	CASE WHEN EXTRACT(DAY FROM $1.date_time)<10 THEN
+		'0' || EXTRACT(DAY FROM $1.date_time)::varchar || '-' || trim(to_char($1.number,'000'))
+	ELSE
+		EXTRACT(DAY FROM $1.date_time)::varchar || '-' || trim(to_char($1.number,'000'))
+	END;
+$BODY$;
+
+ALTER FUNCTION public.order_garbage_num(order_garbage)
+    OWNER TO beton;
+
+
+
+-- ******************* update 05/06/2024 08:59:39 ******************
+alter table order_garbage add column time_to time without time zone;
+
+
+
+-- ******************* update 05/06/2024 09:02:14 ******************
+-- Function: public.order_garbage_ref(order_garbage)
+
+-- DROP FUNCTION public.order_garbage_ref(order_garbage);
+
+CREATE OR REPLACE FUNCTION public.order_garbage_ref(order_garbage)
+  RETURNS json AS
+$BODY$
+	SELECT json_build_object(
+		'keys',json_build_object(
+			'id',$1.id    
+			),	
+		'descr','Удаленная заявка №'||order_garbage_num($1)::text||' от '||to_char($1.date_time,'DD/MM/YY HH24:MI'),
+		'dataType','order_garbage'
+	);
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION public.order_garbage_ref(order_garbage) OWNER TO beton;
+
+
+
+-- ******************* update 05/06/2024 09:02:18 ******************
+-- View: public.orders_dialog
+
+-- DROP VIEW public.orders_dialog;
+
+CREATE OR REPLACE VIEW public.orders_dialog AS 
+	SELECT
+		o.id,
+		order_num(o.*) AS number,		
+		clients_ref(cl) AS clients_ref,		
+		
+		destinations_ref(d) AS destinations_ref,
+		o.destination_price AS destination_cost,		
+		--d.price AS destination_price,		
+		CASE
+			WHEN coalesce(d.special_price,FALSE) THEN
+				--coalesce(d.price,0)
+				period_value('destination_price', d.id, o.date_time)::numeric(15,2)
+			ELSE
+			coalesce(
+				(SELECT sh_p.price
+				FROM shipment_for_owner_costs sh_p
+				WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=d.distance
+				ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+				LIMIT 1
+				),			
+			coalesce(d.price,0))			
+		END  AS destination_price,
+		
+		d.time_route,
+		d.distance,
+		
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_price AS concrete_cost,		
+		--concr.price AS concrete_price,
+		coalesce(
+			/*(SELECT
+				ct_p.price
+			FROM concrete_costs ct_p
+			WHERE ct_p.date<=o.date_time::date AND ct_p.concrete_type_id=o.concrete_type_id
+			ORDER BY ct_p.date DESC
+			LIMIT 1
+			),*/
+			(SELECT pr.price FROM client_price_list(o.client_id,o.date_time)AS pr WHERE pr.concrete_type_id=o.concrete_type_id),
+			coalesce(concr.price,0)
+		) AS concrete_price,
+		
+		o.unload_type,
+		o.comment_text,
+		
+		coalesce(ct.name::text, o.descr::text) AS descr,
+		coalesce(ct.tel::text, o.phone_cel::text) AS phone_cel,
+		
+		o.unload_speed,
+		o.date_time,
+		o.time_to,		
+		o.quant,
+		langs_ref(l) AS langs_ref,
+		o.total,
+		o.total_edit,
+		o.pay_cash,
+		o.unload_price AS unload_cost,
+		o.payed,
+		o.under_control,
+		
+		pv.phone_cel AS pump_vehicle_phone_cel,
+		pump_vehicles_ref(pv,v) AS pump_vehicles_ref,
+		pump_prices_ref(ppr) AS pump_prices_ref,
+		
+		users_ref(u) AS users_ref,
+		
+		d.distance AS destination_distance,
+		
+		users_ref(lm_u) AS last_modif_users_ref,
+		o.last_modif_date_time,
+		
+		o.create_date_time,
+		
+		o.ext_production,
+		
+		(e_user.id IS NOT NULL) tm_exists,
+		(e_user.tm_id IS NOT NULL) tm_activated,
+		e_user.tm_photo,
+		
+		o.contact_id AS contact_id,
+		
+		client_specifications_ref(spec) AS client_specifications_ref,
+		
+		o.f_val,
+		o.w_val,
+		
+		debts.debt_total AS client_debt
+		
+	FROM orders o
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN destinations d ON d.id = o.destination_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN langs l ON l.id = o.lang_id
+	LEFT JOIN pump_vehicles pv ON pv.id = o.pump_vehicle_id
+	LEFT JOIN users u ON u.id = o.user_id
+	LEFT JOIN pump_prices ppr ON ppr.id = pv.pump_price_id
+	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
+	LEFT JOIN users lm_u ON lm_u.id = o.last_modif_user_id
+	
+	--LEFT JOIN client_tels AS tl ON tl.client_id=o.client_id AND tl.tel=o.phone_cel	
+	
+	LEFT JOIN contacts AS ct ON ct.id = o.contact_id
+	LEFT JOIN notifications.ext_users_photo_list AS e_user ON e_user.ext_contact_id = o.contact_id
+	LEFT JOIN client_specifications AS spec ON spec.id = o.client_specification_id
+	LEFT JOIN (
+		SELECT
+			d.client_id,
+			sum(d.debt_total) AS debt_total
+		FROM client_debts AS d		
+		GROUP BY d.client_id
+	) AS debts ON debts.client_id = o.client_id
+	
+	ORDER BY o.date_time;
+
+ALTER TABLE public.orders_dialog OWNER TO beton;
+
+
+
+-- ******************* update 05/06/2024 09:02:22 ******************
+-- View: order_garbage_list
+
+-- DROP VIEW order_garbage_list;
+
+CREATE OR REPLACE VIEW order_garbage_list AS 
+	SELECT
+		o.id,
+		order_garbage_num(o.*) AS number,
+		clients_ref(cl) AS clients_ref,
+		o.client_id,
+		destinations_ref(d) AS destinations_ref,
+		o.destination_id,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_type_id,
+		o.unload_type AS unload_type,
+		o.comment_text AS comment_text,
+		
+		coalesce(ct.name::text, o.descr::text) AS descr,
+		coalesce(ct.tel::text, o.phone_cel::text) AS phone_cel,
+		
+		o.date_time,
+		o.quant,
+		users_ref(u) AS users_ref,
+		o.user_id,
+		order_garbage_ref(o) AS orders_ref,
+		contacts_ref(ct) AS contacts_ref		
+		
+   FROM order_garbage o
+   LEFT JOIN clients cl ON cl.id = o.client_id
+   LEFT JOIN destinations d ON d.id = o.destination_id
+   LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+   LEFT JOIN contacts ct ON ct.id = o.contact_id
+   LEFT JOIN users u ON u.id = o.user_id
+  ORDER BY o.date_time DESC;
+
+ALTER TABLE order_garbage_list OWNER TO beton;
+
+
+-- ******************* update 05/06/2024 09:35:20 ******************
+alter table order_garbage add column client_mark integer;
+
+
+
+-- ******************* update 06/06/2024 09:24:12 ******************
+
+	DROP INDEX IF EXISTS vehicle_tot_rep_item_vals_drv_per;
+	CREATE UNIQUE INDEX vehicle_tot_rep_item_vals_drv_per
+	ON vehicle_tot_rep_item_vals(vehicle_id,period,vehicle_tot_rep_item_id);
+	
+	DROP INDEX IF EXISTS vehicle_tot_rep_common_item_vals_owner_per;
+	CREATE UNIQUE INDEX vehicle_tot_rep_common_item_vals_owner_per
+	ON vehicle_tot_rep_common_item_vals(vehicle_owner_id,period,vehicle_tot_rep_common_item_id);
+
+
+
+-- ******************* update 06/06/2024 12:03:58 ******************
+
+	-- Adding menu item
+	INSERT INTO views
+	(id,c,f,t,section,descr,limited)
+	VALUES (
+	'50022',
+	NULL,
+	NULL,
+	'VehicleOwnerTotIncomeAllRep',
+	'Отчеты',
+	'Итоговый отчет для владельцев (все)',
+	FALSE
+	);
+	
+
+-- ******************* update 06/06/2024 17:11:54 ******************
+
+	-- Adding menu item
+	INSERT INTO views
+	(id,c,f,t,section,descr,limited)
+	VALUES (
+	'30026',
+	'PeriodValue_Controller',
+	'get_water_ship_cost_list',
+	'WaterShipCostPeriodValueList',
+	'Формы',
+	'Периодические значения стоимости доставки воды',
+	FALSE
+	);
+	
+
+-- ******************* update 06/06/2024 17:14:41 ******************
+delete from views where id='30026'

@@ -16,10 +16,12 @@ try{
 	$dbLinkMaster->persistent = TRUE;
 	$dbLinkMaster->appname = APP_NAME;
 	$dbLinkMaster->technicalemail = TECH_EMAIL;
-	$dbLinkMaster->reportError = DEBUG;
+	$dbLinkMaster->detailedError = DEBUG;
 	$dbLinkMaster->database	= DB_NAME;
 	$dbLinkMaster->productionConnectError = ERR_SQL_SERVER_CON;
 	$dbLinkMaster->productionSQLError = ERR_SQL_QUERY;	
+	//$dbLinkMaster->logQueries = DEBUG;
+	
 	if (defined('QUERY_SHOW'))$dbLinkMaster->showqueries = QUERY_SHOW;
 	if (defined('QUERY_LOG_FILE'))$dbLinkMaster->logfile = QUERY_LOG_FILE;
 	if (defined('QUERY_EXPLAIN'))$dbLinkMaster->explain = QUERY_EXPLAIN;
@@ -37,7 +39,7 @@ try{
 		$dbLink->persistent=true;
 		$dbLink->appname = APP_NAME;
 		$dbLink->technicalemail = TECH_EMAIL;
-		$dbLink->reportError = DEBUG;
+		$dbLink->detailedError = DEBUG;
 		$dbLink->database= DB_NAME;			
 		$dbLink->productionConnectError = ERR_SQL_SERVER_CON;
 		$dbLink->productionSQLError = ERR_SQL_QUERY;		

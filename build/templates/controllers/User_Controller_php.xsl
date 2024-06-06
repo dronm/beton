@@ -672,10 +672,13 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 						
 					)
 				FROM role_view_restrictions AS restr WHERE restr.role_id = u.role_id) AS role_view_restriction,
-				users_login_roles(u.id) AS allowed_roles
+			users_login_roles(u.id) AS allowed_roles,
+
+			u_ct.contact_id as login_contact_id
 				
 			FROM users AS u
 			LEFT JOIN users_dialog AS ud ON ud.id=u.id
+			LEFT JOIN entity_contacts AS u_ct ON u_ct.entity_type = 'users' AND u_ct.entity_id = u.id
 			WHERE (u.name=%s OR u.email=%s) AND u.pwd=md5(%s)",
 			$this->getExtDbVal($pm,'name'),
 			$this->getExtDbVal($pm,'name'),
@@ -691,6 +694,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		}else{
 			$this->set_logged($ar,$pubKey);
 			$_SESSION['width_type'] = $pm->getParamValue("width_type");			
+
+			//base contact
+			$_SESSION['login_contact_id'] = $ar["login_contact_id"];
 		}
 	}
 	
@@ -1364,7 +1370,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					) AS role_view_restriction,
 					ct.tel_ext AS ct_tel_ext,
 					users_login_roles(u.id) AS allowed_roles,
-					u_ct.contact_id AS login_contct_id
+					u_ct.contact_id AS login_contact_id
 					
 				FROM notifications.ext_users AS ex_u
 				LEFT JOIN entity_contacts AS u_ct ON u_ct.entity_type = 'users' AND u_ct.contact_id = ex_u.ext_contact_id
@@ -1420,7 +1426,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				}
 				
 				//Этот контакт будет базовым для смены ролей, запомним, что через него залогинились!
-				$_SESSION['login_contct_id'] = $ar['login_contct_id'];
+				$_SESSION['login_contact_id'] = $ar['login_contact_id'];
 				
 				$this->add_auth_model($pubKey, session_id(), md5($ar['pwd']), $this->calc_session_expiration_time());
 			}
@@ -1654,10 +1660,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	 */
 	public function select_login_role($pm){
 		//Обязятально должны были залогиниться через контакт!
-		if(!isset($_SESSION['user_id']) || !$_SESSION['user_id'] || !isset($_SESSION['login_contct_id'])){
+		if(!isset($_SESSION['user_id']) || !$_SESSION['user_id'] || !isset($_SESSION['login_contact_id'])){
 			throw new Exception('Session user_id not set');
 		}
-		$login_contct_id = $_SESSION['login_contct_id'];
+		$login_contact_id = $_SESSION['login_contact_id'];
 		
 		//check selected role and ban
 		$ar = $this->getDbLinkMaster()->query_first(sprintf(
@@ -1700,7 +1706,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			LIMIT 1"			
 			,$_SESSION['user_id']
 			,$this->getExtDbVal($pm, 'role_id')
-			,$login_contct_id
+			,$login_contact_id
 		));
 		
 		if (!is_array($ar) || !count($ar)){
@@ -1724,7 +1730,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$_SESSION['photo_url'] = $photo_url;
 			
 			//base contact
-			$_SESSION['login_contct_id'] = $login_contct_id;
+			$_SESSION['login_contact_id'] = $login_contact_id;
 			
 			$this->add_auth_model($pubKey, session_id(), md5($ar['pwd']), $this->calc_session_expiration_time());
 		}

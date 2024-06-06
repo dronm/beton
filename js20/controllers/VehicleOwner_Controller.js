@@ -1,5 +1,5 @@
 /**
- * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017 - 2024
  
  * THIS FILE IS GENERATED FROM TEMPLATE build/templates/controllers/Controller_js20.xsl
  * ALL DIRECT MODIFICATIONS WILL BE LOST WITH THE NEXT BUILD PROCESS!!!
@@ -32,6 +32,7 @@ function VehicleOwner_Controller(options){
 	this.addComplete();
 	this.add_get_tot_report();
 	this.add_get_tot_income_report();
+	this.add_get_tot_income_report_all();
 		
 }
 extend(VehicleOwner_Controller,ControllerObjServer);
@@ -216,6 +217,26 @@ extend(VehicleOwner_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldInt("vehicle_owner_id",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			VehicleOwner_Controller.prototype.add_get_tot_income_report_all = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_tot_income_report_all',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("templ",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("inline",options));
 	
 			
 	this.addPublicMethod(pm);

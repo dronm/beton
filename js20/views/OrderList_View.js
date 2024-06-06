@@ -5,8 +5,8 @@ function OrderList_View(id,options){
 
 	OrderList_View.superclass.constructor.call(this,id,options);
 
-	var model = options.models.OrderList_Model;
-	var contr = new Order_Controller();
+	var model = options.orderModel || options.models.OrderList_Model;
+	var contr = options.controller || new Order_Controller();
 	
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
@@ -91,12 +91,16 @@ function OrderList_View(id,options){
 		"model":model,
 		"controller":contr,
 		"editInline":false,
-		"editWinClass":OrderDialog_Form,
+		"editWinClass": options.dialogForm || OrderDialog_Form,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
 			"cmdFilter":true,
 			"filters":filters,
-			"variantStorage":options.variantStorage
+			"variantStorage":options.variantStorage,
+			"cmdInsert":!options.readOnly,
+			"cmdEdit":true,
+			"cmdDelete":!options.readOnly
 		}),
+		"readOnly":options.readOnly,
 		"popUpMenu":popup_menu,
 		"head":new GridHead(id+"-grid:head",{
 			"elements":[

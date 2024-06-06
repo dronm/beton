@@ -107,7 +107,9 @@ function PeriodValueList_View(id,options){
 								new GridColumnDateTime({
 									"field":model.getField("date_time")
 								})
-							]
+							],
+							"sortable":true,
+							"sort":"desc"														
 						})
 						,new GridCellHead(id+":grid:head:val",{
 							"value":"Значение",

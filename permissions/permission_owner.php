@@ -114,6 +114,12 @@ $permissions = array();
 				
 					$permissions['Vehicle_Controller_get_total_shipped']=TRUE;
 				
+					$permissions['OrderGarbage_Controller_delete']=TRUE;
+				
+					$permissions['OrderGarbage_Controller_get_list']=TRUE;
+				
+					$permissions['OrderGarbage_Controller_get_object']=TRUE;
+				
 					$permissions['Order_Controller_insert']=TRUE;
 				
 					$permissions['Order_Controller_update']=TRUE;
@@ -1067,6 +1073,8 @@ $permissions = array();
 					$permissions['VehicleOwner_Controller_get_tot_report']=TRUE;
 				
 					$permissions['VehicleOwner_Controller_get_tot_income_report']=TRUE;
+				
+					$permissions['VehicleOwner_Controller_get_tot_income_report_all']=TRUE;
 				
 					$permissions['VehicleOwnerClient_Controller_insert']=TRUE;
 				

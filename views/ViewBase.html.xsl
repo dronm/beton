@@ -153,8 +153,10 @@
 	
 	if (document.getElementById("weather")){
 		application.m_weather = new Weather("weather",{"refreshInterval":600});
-		application.m_weather.toDOM();
+		application.m_weather.toDOM();		
 	}
+	
+	<xsl:if test="not(/document/model[@id='ModelVars']/row/role_id='vehicle_owner') and not(/document/model[@id='ModelVars']/row/role_id='client')">
 	if(application.showTmChat()){
 		application.m_tmChat = new TmChat_View("Chat");
 		application.m_tmChat.toDOM(document.getElementById("windowData"));
@@ -188,6 +190,7 @@
 			//app.m_userChat.show();
 		});
 	}
+	</xsl:if>
 		
 	//
 	window.scrollTo(0, 0);	

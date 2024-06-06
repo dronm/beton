@@ -1186,13 +1186,32 @@ add conception of ObligatoryFilter like global, but is applied only if no filter
 
 
 
+1.00331
+1) Make new table for deleted orders. In "on delete" trigger put information into that table. New List
+	- OrderGarbage_Model added new model.
+	- OrderGarbageList_Model, OrderGarbageList_View.js new Javascript model.
+	- OrderGarbageDialog_Model, OrderGarbageDialog_View.js Javascript dialog forms.
+	- Order_Controller->delete() copy to garbage table + delete in transaction + event for OrderGarbage.insert. Changed controller behaviour.
+	- new sql functions: order_garbage_num(), order_garbage_ref() 
+
+2) Report for vehicle owner: but same report but for all vehicles.
+	- VehicleOwnerTotRepAll_View.js added new file.
+	- VehicleOwner_Controller->get_tot_income_report_all() added new public method.
+
+3) PeriodValueList_View.js added default sorting by date_time DESC
+
+
+
+
+3) Chat: click does not work sometimes on child windows.
+
 
 
 
 Tasks:
-	1) Make new table for deleted orders. In on delete trigger put information into that table. New List
 	2) Report for vehicle owner: make the same report but for all owners/vehicles.
 	3) Check contact transfer on call to a new client. Old client must be deprived from this contact.
+	4) Water price: dynamic constant 3000->3500->4000
 
 
 

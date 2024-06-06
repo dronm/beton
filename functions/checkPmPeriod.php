@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'db_con_f.php');
+require_once(dirname(__FILE__).'/db_con_f.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ControllerSQL.php');
 
 function checkPublicMethodPeriod($pm, $model, $fieldId, $allowedDays){
