@@ -1186,7 +1186,7 @@ add conception of ObligatoryFilter like global, but is applied only if no filter
 
 
 
-1.00331
+1.00331 2024-06-07
 1) Make new table for deleted orders. In "on delete" trigger put information into that table. New List
 	- OrderGarbage_Model added new model.
 	- OrderGarbageList_Model, OrderGarbageList_View.js new Javascript model.
@@ -1201,8 +1201,13 @@ add conception of ObligatoryFilter like global, but is applied only if no filter
 3) PeriodValueList_View.js added default sorting by date_time DESC
 
 
+1.00332
+1) VehicleScheduleMakeOrderGrid.js field state added production base description.
+	vehicle_states_all.sql different approach to retrieve production base when shift state.
 
 
+
+- shift + base name
 3) Chat: click does not work sometimes on child windows.
 
 
@@ -1211,7 +1216,6 @@ add conception of ObligatoryFilter like global, but is applied only if no filter
 Tasks:
 	2) Report for vehicle owner: make the same report but for all owners/vehicles.
 	3) Check contact transfer on call to a new client. Old client must be deprived from this contact.
-	4) Water price: dynamic constant 3000->3500->4000
 
 
 

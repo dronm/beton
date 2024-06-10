@@ -111,8 +111,17 @@ CREATE OR REPLACE VIEW public.vehicle_states_all AS
 		--d.phone_cel AS driver_tel
 		ct.tel::varchar(15) AS driver_tel
 		,v.tracker_id
-		,production_bases_ref(production_bases_ref_t) AS production_bases_ref,
-		production_bases_ref_t.name AS production_base_name, -- for sorting
+		
+		,case
+			when st.state <>'shift' then production_bases_ref(production_bases_ref_t)
+			else production_bases_ref(vs_pb)
+		end AS production_bases_ref,
+		
+		case
+			when st.state <>'shift' then production_bases_ref_t.name
+			else vs_pb.name
+		end AS production_base_name, -- for sorting
+		
 		dest.name AS destination_name
 		
 	FROM vehicle_schedules vs
@@ -120,13 +129,14 @@ CREATE OR REPLACE VIEW public.vehicle_states_all AS
 	LEFT JOIN drivers d ON d.id = vs.driver_id
 	LEFT JOIN vehicles v ON v.id = vs.vehicle_id
 	LEFT JOIN vehicle_schedule_states st ON
-		st.id = (SELECT vehicle_schedule_states.id 
+		st.id = (SELECT
+				vehicle_schedule_states.id 
 			FROM vehicle_schedule_states
 			WHERE vehicle_schedule_states.schedule_id = vs.id
 			ORDER BY vehicle_schedule_states.date_time DESC NULLS LAST
 			LIMIT 1
 		)
-	--LEFT JOIN production_bases AS production_bases_ref_t ON production_bases_ref_t.id = vs.production_base_id
+	LEFT JOIN production_bases AS vs_pb ON vs_pb.id = vs.production_base_id
 	LEFT JOIN production_bases AS production_bases_ref_t ON production_bases_ref_t.id = st.production_base_id
 	
 	LEFT JOIN shipments AS sh ON sh.id=st.shipment_id

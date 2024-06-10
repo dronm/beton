@@ -210,7 +210,8 @@ function VehicleScheduleMakeOrderGrid(id,options){
 										var st = fields.state.getValue();
 										if(st == "shift"){
 											cell.getNode().title = "Должен работать согласно графика";
-											return "смена";
+											let b_descr = self.getProdBaseDescr(fields, 4);
+											return "см."+ b_descr;
 											
 										}else if(st == "free"){											
 											var b_descr = self.getProdBaseDescr(fields, 6);
