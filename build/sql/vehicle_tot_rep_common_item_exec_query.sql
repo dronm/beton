@@ -9,10 +9,16 @@ DECLARE
 	v_query text;
 	v_val numeric(15, 2);
 BEGIN
+	IF coalesce(in_query, '') = '' THEN
+		RETURN 0.00;
+	END IF;
+	
 	v_query = REPLACE(in_query, '{{VEHICLE_OWNER_ID}}', in_vehicle_owner_id::text );
 	v_query = REPLACE(v_query, '{{DATE_FROM}}', in_date_time_from::text);
 	v_query = REPLACE(v_query, '{{DATE_TO}}', in_date_time_to::text);
+	
 	EXECUTE v_query INTO v_val;
+	
 	RETURN coalesce(v_val, 0.00);
 END;
 $$

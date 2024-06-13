@@ -116,5 +116,5 @@ CREATE OR REPLACE VIEW public.orders_dialog AS
 	
 	ORDER BY o.date_time;
 
-ALTER TABLE public.orders_dialog OWNER TO beton;
+ALTER TABLE public.orders_dialog OWNER TO ;
 

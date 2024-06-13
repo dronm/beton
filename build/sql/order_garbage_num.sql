@@ -18,5 +18,5 @@ AS $BODY$
 $BODY$;
 
 ALTER FUNCTION public.order_garbage_num(order_garbage)
-    OWNER TO beton;
+    OWNER TO ;
 

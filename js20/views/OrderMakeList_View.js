@@ -268,7 +268,7 @@ OrderMakeList_View.prototype.m_endShiftMS;
  * Все обновляется разом за один запрос из нескольких моделей
  */
 OrderMakeList_View.prototype.refresh = function(callBack, removeWait){
-	this.m_refreshMethod.setFieldValue("date",this.getElement("order_make_filter").getDateFrom());
+	this.m_refreshMethod.setFieldValue("date", this.getElement("order_make_filter").getDateFrom());
 	var self = this;
 	
 	this.m_refreshMethod.run({

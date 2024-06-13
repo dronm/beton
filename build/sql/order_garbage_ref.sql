@@ -15,5 +15,5 @@ $BODY$
 $BODY$
   LANGUAGE sql VOLATILE
   COST 100;
-ALTER FUNCTION public.order_garbage_ref(order_garbage) OWNER TO beton;
+ALTER FUNCTION public.order_garbage_ref(order_garbage) OWNER TO ;
 

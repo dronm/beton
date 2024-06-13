@@ -119,4 +119,4 @@ CREATE OR REPLACE VIEW public.order_garbage_dialog AS
 	ORDER BY o.date_time;
 
 	
-ALTER TABLE public.order_garbage_dialog OWNER TO beton;
+ALTER TABLE public.order_garbage_dialog OWNER TO ;

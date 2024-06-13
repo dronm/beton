@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-06-06 17:19:47</lastBuild></version>
+		<lastBuild>2024-06-14 03:45:32</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -236,6 +236,7 @@
 		<version dateOpen="2024-06-03 15:25:06" dateClose="2024-06-04 06:07:18">1.00330</version>
 		<version dateOpen="2024-06-04 15:49:23" dateClose="2024-06-06 17:19:51">1.00331</version>
 		<version dateOpen="2024-06-10 05:53:07" dateClose="2024-06-10 05:53:32">1.00332</version>
+		<version dateOpen="2024-06-10 13:14:37" dateClose="2024-06-14 03:45:44">1.00333</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -6141,7 +6142,7 @@
 				<field id="date_to" dataType="Date" require="TRUE"/>
 				<field id="vehicle_owner_id" dataType="Int"/>
 			</publicMethod>
-			<publicMethod id="get_tot_income_report_all">
+			<publicMethod id="get_tot_income_report_all" condFields="TRUE">
 				<field id="templ" dataType="String"/>
 				<field id="inline" dataType="Int"/>
 			</publicMethod>
@@ -7174,6 +7175,7 @@
 		<serverTemplate id="QualityPassport"/>
 		<serverTemplate id="ShipmentMediaList" class="list"/>
 		<serverTemplate id="ChatStatusList" class="list"/>
+		<serverTemplate id="VehicleOwnerTotIncomeAllRep"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="js20/tmpl/FatalException.html"/>
@@ -7812,7 +7814,7 @@
 		<jsScript file="js20/views/QualityPassportList_View.js"/>
 		<jsScript file="js20/views/ShipmentMediaList_View.js"/>
 		<jsScript file="js20/views/ChatStatusList_View.js"/>
-		<jsScript file="js20/views/VehicleOwnerTotRepAll_View.js"/>
+		<jsScript file="js20/views/VehicleOwnerTotIncomeAllRep_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="js20/forms/ViewList_Form.js"/>
 		<jsScript file="js20/forms/MainMenuConstructor_Form.js"/>

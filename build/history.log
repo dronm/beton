@@ -1201,18 +1201,26 @@ add conception of ObligatoryFilter like global, but is applied only if no filter
 3) PeriodValueList_View.js added default sorting by date_time DESC
 
 
-1.00332
+1.00332 2024-06-10
 1) VehicleScheduleMakeOrderGrid.js field state added production base description.
 	vehicle_states_all.sql different approach to retrieve production base when shift state.
 
 
+1.00333 2024-06-11
+1) Contact_Controller->upsert() read-only server.
+
+
+1.00334
+1) SessionVarManager added key array to hold all keys even with undefined values. Otherwise two queries were issued. 
+
+
+
 
 - shift + base name
-3) Chat: click does not work sometimes on child windows.
-
-
-
-
+- Chat: click does not work sometimes on child windows.
+- Main window: unnecessary query SessionVar->get_values("role_view_restrictions") - two times!!!
+- ViewBase.php line 2143, andefined array key HTTP_HOST
+- Client_Controller->get_list() retrieves all records?
 Tasks:
 	2) Report for vehicle owner: make the same report but for all owners/vehicles.
 	3) Check contact transfer on call to a new client. Old client must be deprived from this contact.

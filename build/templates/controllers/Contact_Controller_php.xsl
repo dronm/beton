@@ -29,12 +29,19 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 <xsl:template name="extra_methods">
 
 	public function upsert($pm){
-		$this->addNewModel(sprintf(
-			"SELECT contacts_upsert(%s, %s, %s %s) AS ref"
+		$tel_db = $this->getExtDbVal($pm, 'tel');
+
+		$this->getDbLinkMaster()->query(sprintf(
+			"SELECT contacts_upsert(%s, %s, %s, %s) AS ref"
 			,$this->getExtDbVal($pm, 'name')
-			,$this->getExtDbVal($pm, 'tel')
+			,$tel_db
 			,$this->getExtDbVal($pm, 'email')
 			,$this->getExtDbVal($pm, 'tel_ext')
+		));
+
+		$this->addNewModel(sprintf(
+			"SELECT contacts_ref(contacts) AS contacts_ref FROM contacts WHERE tel = %s"
+			,$tel_db
 		), 'Ref_Model');
 	}
 

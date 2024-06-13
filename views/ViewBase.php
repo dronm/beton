@@ -1440,7 +1440,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/views/QualityPassportList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/QualityPassportList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/ShipmentMediaList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ShipmentMediaList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/ChatStatusList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ChatStatusList_View.js')) ));
-		$this->addJsModel(new ModelJavaScript('js20/views/VehicleOwnerTotRepAll_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/VehicleOwnerTotRepAll_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/views/VehicleOwnerTotIncomeAllRep_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/VehicleOwnerTotIncomeAllRep_View.js')) ));
 		
 		$this->addJsModel(new ModelJavaScript('js20/forms/ViewList_Form.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/forms/ViewList_Form.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/forms/MainMenuConstructor_Form.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/forms/MainMenuConstructor_Form.js')) ));

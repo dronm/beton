@@ -26,6 +26,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
 
 require_once('common/MyDate.php');
 require_once(ABSOLUTE_PATH.'functions/Beton.php');
+require_once(FRAME_WORK_PATH.'basic_classes/ConditionParamsSQL.php');
 
 class VehicleOwner_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
@@ -217,6 +218,17 @@ class VehicleOwner_Controller extends ControllerSQL{
 			
 		$pm = new PublicMethod('get_tot_income_report_all');
 		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
 				
 	$opts=array();
 					
@@ -610,19 +622,17 @@ class VehicleOwner_Controller extends ControllerSQL{
 
 	//report for all owners/vehicles
 	public function get_tot_income_report_all($pm){
+		$link = $this->getDbLink();
 		//period
 		$cond = new ConditionParamsSQL($pm, $link);
-		$dt_from = $cond->getDbVal('date_time','ge',DT_DATETIME);
-		if (!isset($dt_from)){
+		$date_from_db = $cond->getDbVal('date_time','ge',DT_DATETIME);
+		if (!isset($date_from_db)){
 			throw new Exception('Не задана дата начала!');
 		}		
-		$dt_to = $cond->getDbVal('date_time','le',DT_DATETIME);
-		if (!isset($dt_to)){
+		$date_to_db = $cond->getDbVal('date_time','le',DT_DATETIME);
+		if (!isset($date_to_db)){
 			throw new Exception('Не задана дата окончания!');
 		}		
-
-		$date_from_db = "'".date('Y-m-d H:i:s', $dt_from)."'";
-		$date_to_db = "'".date('Y-m-d H:i:s', $dt_to)."'";
 
 		$q = sprintf("
 			with
@@ -679,7 +689,7 @@ class VehicleOwner_Controller extends ControllerSQL{
 						coalesce(
 							it_com_v.value,
 							CASE
-							WHEN it_com.query is null then 0
+							WHEN coalesce(it_com.query, '') = '' OR b.vehicle_owner_id is null then 0
 							ELSE
 								vehicle_tot_rep_common_item_exec_query(
 									it_com.query,
@@ -709,6 +719,14 @@ class VehicleOwner_Controller extends ControllerSQL{
 					sub.quant,	
 					sub.it_com_id,
 					sub.it_com_name,
+					CASE
+						WHEN sub.it_com_is_income THEN sub.it_com_name
+						ELSE ''
+					END AS it_com_name_in, 
+					CASE
+						WHEN sub.it_com_is_income THEN ''
+						ELSE sub.it_com_name
+					END AS it_com_name_out, 
 					sub.it_com_is_income,
 					sub.it_com_val	
 			from (
@@ -744,7 +762,7 @@ class VehicleOwner_Controller extends ControllerSQL{
 			order by
 				veh_on.name,
 				sub.mon,
-				sub.it_com_is_income,
+				sub.it_com_is_income DESC,
 				sub.it_com_name
 		", $date_from_db, $date_to_db);
 

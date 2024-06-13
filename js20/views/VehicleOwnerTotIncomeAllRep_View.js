@@ -1,12 +1,12 @@
 
-function VehicleOwnerTotRepAll_View(id,options){
+function VehicleOwnerTotIncomeAllRep_View(id,options){
 
 	options = options || {};
 	
 	var contr = new VehicleOwner_Controller();	
 	options.publicMethod = contr.getPublicMethod("get_tot_income_report_all");
 	options.reportViewId = "ViewHTMLXSLT";
-	options.templateId = "VehicleOwnerTotRepAll";
+	options.templateId = "VehicleOwnerTotIncomeAllRep";
 	
 	options.cmdMake = true;
 	options.cmdPrint = true;
@@ -43,7 +43,7 @@ function VehicleOwnerTotRepAll_View(id,options){
 		}
 	};
 
-	VehicleOwnerTotRepAll_View.superclass.constructor.call(this, id, options);
+	VehicleOwnerTotIncomeAllRep_View.superclass.constructor.call(this, id, options);
 	
 }
-extend(VehicleOwnerTotRepAll_View,ViewReport);
+extend(VehicleOwnerTotIncomeAllRep_View,ViewReport);

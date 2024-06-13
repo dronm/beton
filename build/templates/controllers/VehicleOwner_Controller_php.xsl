@@ -20,6 +20,7 @@
 
 require_once('common/MyDate.php');
 require_once(ABSOLUTE_PATH.'functions/Beton.php');
+require_once(FRAME_WORK_PATH.'basic_classes/ConditionParamsSQL.php');
 
 class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@parentId"/>{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
@@ -408,19 +409,17 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 
 	//report for all owners/vehicles
 	public function get_tot_income_report_all($pm){
+		$link = $this->getDbLink();
 		//period
 		$cond = new ConditionParamsSQL($pm, $link);
-		$dt_from = $cond->getDbVal('date_time','ge',DT_DATETIME);
-		if (!isset($dt_from)){
+		$date_from_db = $cond->getDbVal('date_time','ge',DT_DATETIME);
+		if (!isset($date_from_db)){
 			throw new Exception('Не задана дата начала!');
 		}		
-		$dt_to = $cond->getDbVal('date_time','le',DT_DATETIME);
-		if (!isset($dt_to)){
+		$date_to_db = $cond->getDbVal('date_time','le',DT_DATETIME);
+		if (!isset($date_to_db)){
 			throw new Exception('Не задана дата окончания!');
 		}		
-
-		$date_from_db = "'".date('Y-m-d H:i:s', $dt_from)."'";
-		$date_to_db = "'".date('Y-m-d H:i:s', $dt_to)."'";
 
 		$q = sprintf("
 			with
@@ -477,7 +476,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 						coalesce(
 							it_com_v.value,
 							CASE
-							WHEN it_com.query is null then 0
+							WHEN coalesce(it_com.query, '') = '' OR b.vehicle_owner_id is null then 0
 							ELSE
 								vehicle_tot_rep_common_item_exec_query(
 									it_com.query,
@@ -542,7 +541,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 			order by
 				veh_on.name,
 				sub.mon,
-				sub.it_com_is_income,
+				sub.it_com_is_income DESC,
 				sub.it_com_name
 		", $date_from_db, $date_to_db);
 
