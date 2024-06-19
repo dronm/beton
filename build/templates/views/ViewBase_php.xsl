@@ -147,7 +147,7 @@ class ViewBase extends ViewHTMLXSLT {
 		
 		$currentPath = $_SERVER['PHP_SELF'];
 		$pathInfo = pathinfo($currentPath);
-		$hostName = $_SERVER['HTTP_HOST'];
+		$hostName = isset($_SERVER['HTTP_HOST'])? $_SERVER['HTTP_HOST'] : '';
 		$is_https = isset($_SERVER['HTTPS']);
 		$protocol = $is_https? 'https://':'http://';
 		$dir = $protocol.$hostName.$pathInfo['dirname'];

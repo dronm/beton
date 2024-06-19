@@ -912,9 +912,15 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			throw new Exception('Не задана дата окончания!');
 		}		
 		
+		//production base filter
+		$production_base_id = $cond->getDbVal('production_base_id','e',DT_INT);
+
 		Order_Controller::add_production_bases($link);
 		if(isset($_SESSION['production_bases']) &amp;&amp; count($_SESSION['production_bases'])){
 			foreach($_SESSION['production_bases'] as $prod_id){
+				if(isset($production_base_id) &amp;&amp; $production_base_id != 'null' &amp;&amp; $production_base_id != $prod_id){
+					continue;
+				}
 				$this->addNewModel(
 					sprintf("SELECT * FROM material_actions_prod_base".$prod_id."(%s, %s)",
 						$dt_from,

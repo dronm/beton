@@ -1240,3 +1240,13 @@ select {
 .selected_chat_user{
 	background-color:green !important;
 }
+
+.item_in {
+	background-color: #fffad1 !important;
+}
+.item_out {
+	background-color: #fcebeb !important;
+}
+.total_out {
+	background-color: #bdbdbd !important;
+}

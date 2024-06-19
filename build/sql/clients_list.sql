@@ -13,7 +13,6 @@ CREATE OR REPLACE VIEW public.clients_list AS
 		cl.client_come_from_id,
 		cl.phone_cel,		
 		
-		--COALESCE(o.quant, 0::double precision) > 0::double precision AS ours,
 		coalesce( (SELECT TRUE FROM orders o WHERE o.client_id=cl.id LIMIT 1),FALSE) AS ours,
 		
 		cl.client_kind,
@@ -65,7 +64,8 @@ CREATE OR REPLACE VIEW public.clients_list AS
 	  	GROUP BY orders.client_id
 	) o ON o.client_id = cl.id
 	*/
-	ORDER BY cl.name;
+	ORDER BY cl.name
+	;
 
-ALTER TABLE public.clients_list OWNER TO beton;
+ALTER TABLE public.clients_list2 OWNER TO beton;
 

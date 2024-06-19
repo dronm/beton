@@ -53,9 +53,9 @@ function ClientList_View(id,options){
 									new GridColumn({
 										"field":model.getField("name")
 									})
-								],
-								"sortable":true,
-								"sort":"asc"
+								]
+								// "sortable":true,
+								// "sort":"asc"
 							})
 							,new GridCellHead(id+":grid:head:contact_list",{
 								"value":"Контакты",
@@ -114,8 +114,8 @@ function ClientList_View(id,options){
 									new GridColumn({
 										"field":model.getField("inn")
 									})
-								],
-								"sortable":true
+								]
+								// "sortable":true
 							})						
 							
 						]

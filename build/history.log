@@ -1210,21 +1210,30 @@ add conception of ObligatoryFilter like global, but is applied only if no filter
 1) Contact_Controller->upsert() read-only server.
 
 
-1.00334
+1.00334 2024-06-14
 1) SessionVarManager added key array to hold all keys even with undefined values. Otherwise two queries were issued. 
 
 
 
+1.00335
+1) app_srv: Event on shipment 
+2) ClientList_View.js removed default sorting. Query is too slow with ORDER BY + LIMIT
+3) RepMaterialAction_View.js, RawMaterial_Controller->get_material_actions_list()
+	- new filter production_base_id
+	- make filter always visible;
+	- make current shift a default period
 
-- shift + base name
+
++ shift + base name
 - Chat: click does not work sometimes on child windows.
-- Main window: unnecessary query SessionVar->get_values("role_view_restrictions") - two times!!!
-- ViewBase.php line 2143, andefined array key HTTP_HOST
++ Main window: unnecessary query SessionVar->get_values("role_view_restrictions") - two times!!!
++ ViewBase.php line 2143, andefined array key HTTP_HOST
 - Client_Controller->get_list() retrieves all records?
 Tasks:
 	2) Report for vehicle owner: make the same report but for all owners/vehicles.
 	3) Check contact transfer on call to a new client. Old client must be deprived from this contact.
-
+basic_classes/ViewExport.php line 103, DOMDocument->loadXML(), namespace prefix xsi for nil on descr is not 
+defined in Entity line 1.
 
 
 
@@ -1251,11 +1260,11 @@ Map_View.js Map_View.prototype.addZones(model)
 
 - Установка заявок по кнопке в Elkon
 
-- Autoreload SrvConf on publish, script.php to send ws event
++ Autoreload SrvConf on publish, script.php to send ws event. Event Service.reload_config
 
 + Новая программа весы, установка соезинения https
 
-- Список активных с ФИО - геперссылка для карточки, по датам!
++ Список активных с ФИО - геперссылка для карточки, по датам!. UserChat
 
 - Возможность скрыть/показать колонки
 

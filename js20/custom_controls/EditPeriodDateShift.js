@@ -25,7 +25,7 @@ function EditPeriodDateShift(id,options){
 	options.upTitle = "Следующая смена";
 
 	options.periodSelectClass = PeriodSelectBeton;
-	options.periodSelectOptions = {"periodShift":true};
+	options.periodSelectOptions = options.periodSelectOptions || {"periodShift":true}; //value:shift || period:shift ????
 
 	this.DEF_FROM_TIME = constants.first_shift_start_time.getValue();
 	

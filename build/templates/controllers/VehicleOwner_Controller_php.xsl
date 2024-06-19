@@ -474,7 +474,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 					coalesce(it_com.is_income, false) as it_com_is_income,
 					coalesce(
 						coalesce(
-							it_com_v.value,
+							CASE WHEN coalesce(it_com.is_income, false) THEN 1 ELSE -1 END * it_com_v.value,
 							CASE
 							WHEN coalesce(it_com.query, '') = '' OR b.vehicle_owner_id is null then 0
 							ELSE
@@ -546,6 +546,20 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		", $date_from_db, $date_to_db);
 
 		$this->addNewModel($q, 'VehicleOwnerList_Model');
+
+		$this->addNewModel(
+			"SELECT
+				(SELECT 
+					count(*) as tot_com_it_income
+				FROM vehicle_tot_rep_common_items
+				WHERE coalesce(is_income, FALSE)) AS tot_com_it_in,
+				(SELECT 
+					count(*) as tot_com_it_income
+				FROM vehicle_tot_rep_common_items
+				WHERE coalesce(is_income, FALSE) = FALSE) AS tot_com_it_out
+			"
+			,'Head_Model'		
+		);
 	}
 
 </xsl:template>

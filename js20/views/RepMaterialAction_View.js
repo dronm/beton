@@ -18,14 +18,17 @@ function RepMaterialAction_View(id,options){
 	
 	options.cmdMake = true;
 	options.cmdPrint = true;
-	options.cmdFilter = true;
+	options.cmdFilter = false;
 	options.cmdExcel = true;
 	options.cmdPdf = false;
 	
 	var period_ctrl = new EditPeriodDateShift(id+":filter-ctrl-period",{
 		"valueFrom":(options.templateParams)? options.templateParams.date_from:DateHelper.getStartOfShift(DateHelper.time()),
 		"valueTo":(options.templateParams)? options.templateParams.date_to:DateHelper.getEndOfShift(DateHelper.time()),
-		"field":new FieldDateTime("date_time")
+		"field":new FieldDateTime("date_time"),
+		"cmdUpFast":false,
+		"cmdDownFast":false,
+		"periodSelectOptions":{"periodShift":true, "value": "shift"}
 	});
 	
 	options.filters = {
@@ -49,9 +52,38 @@ function RepMaterialAction_View(id,options){
 				}
 			]
 		}
+		,"production_base":{
+			"binding":new CommandBinding({
+				"control":new ProductionBaseEdit(id+":filter-ctrl-production_base",{"labelCaption":"База:","contClassName":"form-group-filter"}),
+				"field":new FieldInt("production_base_id")
+			}),
+			"sign":"e"
+		}
 	};
+
+	this.m_filter = new ModelFilter({"filters":options.filters});	
+
+	options.openFilterOnInit = false;
+	options.addElement = function(){
+		this.addElement(new GridCmdFilterView(id+":filter_view",{
+			"filter":this.m_filter,
+			"cmdSet":false,
+			"cmdUnset":false
+		}));	
+	}
 
 	RepMaterialAction_View.superclass.constructor.call(this, id, options);
 	
+	// period_ctrl.getControlPeriodSelect().setValue("shift");
 }
 extend(RepMaterialAction_View,ViewReport);
+
+RepMaterialAction_View.prototype.fillParams = function(){	
+	var pm = this.getPublicMethod();
+	try{
+		this.m_filter.applyFiltersToPublicMethod(pm);
+	}
+	catch(e){
+		throw Error(e.message);
+	}
+}

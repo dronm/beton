@@ -687,7 +687,7 @@ class VehicleOwner_Controller extends ControllerSQL{
 					coalesce(it_com.is_income, false) as it_com_is_income,
 					coalesce(
 						coalesce(
-							it_com_v.value,
+							CASE WHEN coalesce(it_com.is_income, false) THEN 1 ELSE -1 END * it_com_v.value,
 							CASE
 							WHEN coalesce(it_com.query, '') = '' OR b.vehicle_owner_id is null then 0
 							ELSE
@@ -712,7 +712,8 @@ class VehicleOwner_Controller extends ControllerSQL{
 					and it_com_v.vehicle_tot_rep_common_item_id = it_com.id
 			)
 			select
-					sub.mon,
+					sub.mon as mon,
+					format_mon_rus(sub.mon, 2) as mon_descr,
 					sub.vehicle_owner_id,
 					veh_on.name as vehicle_owner_name,
 					sub.balance_start,
@@ -767,6 +768,20 @@ class VehicleOwner_Controller extends ControllerSQL{
 		", $date_from_db, $date_to_db);
 
 		$this->addNewModel($q, 'VehicleOwnerList_Model');
+
+		$this->addNewModel(
+			"SELECT
+				(SELECT 
+					count(*) as tot_com_it_income
+				FROM vehicle_tot_rep_common_items
+				WHERE coalesce(is_income, FALSE)) AS tot_com_it_in,
+				(SELECT 
+					count(*) as tot_com_it_income
+				FROM vehicle_tot_rep_common_items
+				WHERE coalesce(is_income, FALSE) = FALSE) AS tot_com_it_out
+			"
+			,'Head_Model'		
+		);
 	}
 
 

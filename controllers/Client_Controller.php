@@ -26,6 +26,8 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
 
 require_once(FRAME_WORK_PATH.'basic_classes/ParamsSQL.php');
 
+require_once(USER_MODELS_PATH.'ClientList_Model.php');
+
 class Client_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL){
 		parent::__construct($dbLinkMaster);
@@ -663,6 +665,12 @@ class Client_Controller extends ControllerSQL{
 		}
 		return $where;
 	}
-	
+/*
+	public function get_list($pm){
+		$list_model = new ClientList_Model($this->getDbLink());
+		$this->modelGetList($list_model,$pm);
+		
+	}	
+	*/
 }
 ?>
