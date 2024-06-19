@@ -1215,7 +1215,7 @@ add conception of ObligatoryFilter like global, but is applied only if no filter
 
 
 
-1.00335
+1.00335 2024-06-19
 1) app_srv: Event on shipment 
 2) ClientList_View.js removed default sorting. Query is too slow with ORDER BY + LIMIT
 3) RepMaterialAction_View.js, RawMaterial_Controller->get_material_actions_list()
