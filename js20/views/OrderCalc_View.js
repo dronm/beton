@@ -385,6 +385,7 @@ OrderCalc_View.prototype.onSelectPumpVehicle = function(f){
 	}
 }
 
+//this function is also called when document is opened!
 OrderCalc_View.prototype.setPayCash = function(){
 	var field_set = document.getElementById(this.getId()+":sum_totals");
 	if(this.m_getPayCash()){
@@ -398,6 +399,16 @@ OrderCalc_View.prototype.setPayCash = function(){
 		this.getElement("destination_cost").reset();
 		this.getElement("concrete_cost").reset();
 		this.getElement("unload_cost").reset();
+	}
+	//if model value does not match gui - warning that saving is necessary.
+	let m = this.m_dialogContext.getModel();
+	if(
+		m.getFieldValue("total") != this.getElement("total").getValue() ||
+		m.getFieldValue("unload_cost") != this.getElement("unload_cost").getValue() ||
+		m.getFieldValue("concrete_cost") != this.getElement("concrete_cost").getValue() ||
+		m.getFieldValue("destination_cost") != this.getElement("destination_cost").getValue()
+	){
+		window.showTempWarn("Пересчитана сумма, запишите документ!", null, 10000);
 	}
 }
 

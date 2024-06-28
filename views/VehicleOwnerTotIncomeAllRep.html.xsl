@@ -8,15 +8,15 @@
 <xsl:output method="html"/> 
 
 <xsl:key name="mon" match="row" use="mon/."/>
-<xsl:key name="it_com_name_out" match="row" use="it_com_name_out/."/>
-<xsl:key name="it_com_name_in" match="row" use="it_com_name_in/."/>
+<xsl:key name="it_name_out" match="row" use="it_name_out/."/>
+<xsl:key name="it_name_in" match="row" use="it_name_in/."/>
 <xsl:key name="owners" match="row" use="vehicle_owner_name/."/>
-<xsl:key name="per_in" match="row" use="concat(mon/., '|', it_com_name_in/.)"/>
-<xsl:key name="per_out" match="row" use="concat(mon/., '|', it_com_name_out/.)"/>
-<xsl:key name="owner_per_in" match="row" use="concat(vehicle_owner_name/., '|', mon/., '|', it_com_name_in/.)"/>
-<xsl:key name="owner_per_out" match="row" use="concat(vehicle_owner_name/., '|', mon/., '|', it_com_name_out/.)"/>
+<xsl:key name="per_in" match="row" use="concat(mon/., '|', it_name_in/.)"/>
+<xsl:key name="per_out" match="row" use="concat(mon/., '|', it_name_out/.)"/>
+<xsl:key name="owner_per_in" match="row" use="concat(vehicle_owner_name/., '|', mon/., '|', it_name_in/.)"/>
+<xsl:key name="owner_per_out" match="row" use="concat(vehicle_owner_name/., '|', mon/., '|', it_name_out/.)"/>
 <xsl:key name="owner_per" match="row" use="concat(vehicle_owner_name/., '|', mon/.)"/>
-<!-- <xsl:key name="it_com_name_in" match="row" use="it_com_name_in/."/> -->
+<!-- <xsl:key name="it_name_in" match="row" use="it_name_in/."/> -->
 
 <xsl:decimal-format name="num_money" decimal-separator="," grouping-separator=" "/>
 <xsl:decimal-format name="num_quant" decimal-separator="," grouping-separator=" "/>
@@ -70,10 +70,10 @@
 <!-- table -->
 <xsl:template match="model[@id='VehicleOwnerList_Model']">
 	<xsl:variable name="model_id" select="@id"/>	
-	<xsl:variable name="tot_com_it_in" select="number(/document/model[@id='Head_Model']/row/tot_com_it_in)"/>	
-	<xsl:variable name="tot_com_it_out" select="number(/document/model[@id='Head_Model']/row/tot_com_it_out)"/>	
+	<xsl:variable name="tot_it_in" select="number(/document/model[@id='Head_Model']/row/tot_it_in)"/>	
+	<xsl:variable name="tot_it_out" select="number(/document/model[@id='Head_Model']/row/tot_it_out)"/>	
 	<!-- one is for total out sum -->
-	<xsl:variable name="tot_com_it" select="$tot_com_it_in + $tot_com_it_out + 1"/>	
+	<xsl:variable name="tot_it" select="$tot_it_in + $tot_it_out + 1"/>	
 	<table id="{$model_id}" class="table table-bordered table-responsive table-striped">
 		<thead>
 			<tr>
@@ -83,7 +83,7 @@
 				<xsl:for-each select="//row[generate-id() =
 				generate-id(key('mon', mon/.)[1])]">
 					<xsl:sort select="mon/."/>
-					<th colspan="{$tot_com_it}" align="center">
+					<th colspan="{$tot_it}" align="center">
 						<xsl:value-of select="mon_descr/."/>
 					</th>
 				</xsl:for-each>
@@ -97,24 +97,24 @@
 
 					<!-- header in -->
 					<xsl:for-each select="//row[generate-id() =
-					generate-id(key('it_com_name_in', it_com_name_in/.)[1])]">
-						<xsl:sort select="it_com_name_in/."/>
+					generate-id(key('it_name_in', it_name_in/.)[1])]">
+						<xsl:sort select="it_name_in/."/>
 
-						<xsl:if test="string-length(it_com_name_in/.) &gt; 0">
+						<xsl:if test="string-length(it_name_in/.) &gt; 0">
 							<th align="center" class="item_in">
-								<xsl:value-of select="it_com_name_in/."/>
+								<xsl:value-of select="it_name_in/."/>
 							</th>
 						</xsl:if>
 					</xsl:for-each>
 
 					<!-- header out -->
 					<xsl:for-each select="//row[generate-id() =
-					generate-id(key('it_com_name_out', it_com_name_out/.)[1])]">
-						<xsl:sort select="it_com_name_out/."/>
+					generate-id(key('it_name_out', it_name_out/.)[1])]">
+						<xsl:sort select="it_name_out/."/>
 
-						<xsl:if test="string-length(it_com_name_out/.) &gt; 0">
+						<xsl:if test="string-length(it_name_out/.) &gt; 0">
 							<th align="center" class="item_out">
-								<xsl:value-of select="it_com_name_out/."/>
+								<xsl:value-of select="it_name_out/."/>
 							</th>
 						</xsl:if>
 					</xsl:for-each>
@@ -164,12 +164,12 @@
 
 						<!-- all in items -->
 						<xsl:for-each select="//row[generate-id() =
-						generate-id(key('it_com_name_in', it_com_name_in/.)[1])]">
-							<xsl:if test="string-length(it_com_name_in/.) &gt; 0">
-								<xsl:variable name="it_row" select="key('owner_per_in', concat($owner, '|', $mon, '|', it_com_name_in/.))"/>
+						generate-id(key('it_name_in', it_name_in/.)[1])]">
+							<xsl:if test="string-length(it_name_in/.) &gt; 0">
+								<xsl:variable name="it_row" select="key('owner_per_in', concat($owner, '|', $mon, '|', it_name_in/.))"/>
 								<td align="right" class="item_in" >
 									<xsl:call-template name="format_money">
-										<xsl:with-param name="val" select="$it_row/it_com_val/."/>
+										<xsl:with-param name="val" select="$it_row/it_val/."/>
 									</xsl:call-template>
 								</td>
 							</xsl:if>
@@ -177,12 +177,12 @@
 
 						<!-- all out items -->
 						<xsl:for-each select="//row[generate-id() =
-						generate-id(key('it_com_name_out', it_com_name_out/.)[1])]">
-							<xsl:if test="string-length(it_com_name_out/.) &gt; 0">
-								<xsl:variable name="it_row" select="key('owner_per_out', concat($owner, '|', $mon, '|', it_com_name_out/.))"/>
+						generate-id(key('it_name_out', it_name_out/.)[1])]">
+							<xsl:if test="string-length(it_name_out/.) &gt; 0">
+								<xsl:variable name="it_row" select="key('owner_per_out', concat($owner, '|', $mon, '|', it_name_out/.))"/>
 								<td align="right" class="item_out">
 									<xsl:call-template name="format_money">
-										<xsl:with-param name="val" select="$it_row/it_com_val/."/>
+										<xsl:with-param name="val" select="$it_row/it_val/."/>
 									</xsl:call-template>
 								</td>
 							</xsl:if>
@@ -192,7 +192,7 @@
 						<xsl:variable name="tot_row" select="key('owner_per', concat($owner, '|', $mon/.))"/>
 						<td align="right" class="total_out">
 							<xsl:call-template name="format_money">
-									<xsl:with-param name="val" select="sum($tot_row[not(it_com_is_income='true')]/it_com_val/.)"/>
+									<xsl:with-param name="val" select="sum($tot_row[not(it_is_income='true')]/it_val/.)"/>
 							</xsl:call-template>
 						</td>
 					</xsl:for-each>
@@ -201,21 +201,21 @@
 					<xsl:variable name="tot_row" select="key('owners', $owner)"/>
 					<td align="right" class="item_in">
 						<xsl:call-template name="format_money">
-							<xsl:with-param name="val" select="sum($tot_row[it_com_is_income='true']/it_com_val/.)"/>
+							<xsl:with-param name="val" select="sum($tot_row[it_is_income='true']/it_val/.)"/>
 						</xsl:call-template>
 					</td>
 
 					<!-- total out -->
 					<td align="right" class="item_out">
 						<xsl:call-template name="format_money">
-							<xsl:with-param name="val" select="sum($tot_row[not(it_com_is_income='true')]/it_com_val/.)"/>
+							<xsl:with-param name="val" select="sum($tot_row[not(it_is_income='true')]/it_val/.)"/>
 						</xsl:call-template>
 					</td>
 
 					<!-- balance end -->
 					<td align="right">
 						<xsl:call-template name="format_money">
-							<xsl:with-param name="val" select="$balance_start + sum($tot_row[it_com_is_income='true']/it_com_val/.) + sum($tot_row[not(it_com_is_income='true')]/it_com_val/.)"/>
+							<xsl:with-param name="val" select="$balance_start + sum($tot_row[it_is_income='true']/it_val/.) + sum($tot_row[not(it_is_income='true')]/it_val/.)"/>
 						</xsl:call-template>
 					</td>
 				</tr>
@@ -250,11 +250,11 @@
 
 					<!-- income -->
 					<xsl:for-each select="//row[generate-id() =
-					generate-id(key('it_com_name_in', it_com_name_in/.)[1])]">
-						<xsl:sort select="it_com_name_in/."/>
+					generate-id(key('it_name_in', it_name_in/.)[1])]">
+						<xsl:sort select="it_name_in/."/>
 
-						<xsl:if test="string-length(it_com_name_in/.) &gt; 0">
-							<xsl:variable name="per_it" select="key('per_in',concat($mon,'|',it_com_name_in/.))"/>
+						<xsl:if test="string-length(it_name_in/.) &gt; 0">
+							<xsl:variable name="per_it" select="key('per_in',concat($mon,'|',it_name_in/.))"/>
 							<td align="right" class="item_in">
 								<xsl:call-template name="format_money">
 									<xsl:with-param name="val" select="0"/>
@@ -265,11 +265,11 @@
 
 					<!-- outcome -->
 					<xsl:for-each select="//row[generate-id() =
-					generate-id(key('it_com_name_out', it_com_name_out/.)[1])]">
-						<xsl:sort select="it_com_name_out/."/>
+					generate-id(key('it_name_out', it_name_out/.)[1])]">
+						<xsl:sort select="it_name_out/."/>
 
-						<xsl:if test="string-length(it_com_name_out/.) &gt; 0">
-							<xsl:variable name="per_it" select="key('per_out',concat($mon,'|',it_com_name_out/.))"/>
+						<xsl:if test="string-length(it_name_out/.) &gt; 0">
+							<xsl:variable name="per_it" select="key('per_out',concat($mon,'|',it_name_out/.))"/>
 							<td align="right" class="item_out">
 								<xsl:call-template name="format_money">
 									<xsl:with-param name="val" select="0"/>

@@ -163,15 +163,12 @@
 		
 		EventHelper.add(document.getElementById("tm_status"), "click", function(e){
 			let app = window.getApp();
-			app.m_tmChat.onToggleClick(e);
-			/*
-			if(app.m_tmChat.m_opened){
-				app.m_tmChat.hide();				
-			}else{				
+			let chat_n = document.getElementById("Chat");
+			if(!chat_n){
+				app.m_tmChat= new TmChat_View("Chat");
 				app.m_tmChat.toDOM(document.getElementById("windowData"));
-				app.m_tmChat.show();
 			}
-			*/
+			app.m_tmChat.onToggleClick(e);
 		});
 		
 	}
@@ -185,9 +182,13 @@
 		
 		EventHelper.add(document.getElementById("user_chat_status"), "click", function(e){
 			let app = window.getApp();
+			let chat_n = document.getElementById("UserChat_View");
+			if(!chat_n){
+				app.m_userChat = new UserChat_View("UserChat_View");
+				app.m_userChat.setTotUnviewdMsg(parseInt(application.getServVar("chat_unviewed_count"), 10));
+				app.m_userChat.toDOM(document.getElementById("windowData"));
+			}
 			app.m_userChat.onToggleClick(e);
-			//app.m_userChat.toDOM(document.getElementById("windowData"));
-			//app.m_userChat.show();
 		});
 	}
 	</xsl:if>

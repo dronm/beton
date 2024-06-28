@@ -676,7 +676,7 @@ class VehicleOwner_Controller extends ControllerSQL{
 					veh_data.mon,
 					veh_data.vehicle_owner_id
 			),
-			owner_it_data as (
+			owner_it_com_data as (
 				select
 					b.mon,
 					b.vehicle_owner_id,
@@ -710,6 +710,36 @@ class VehicleOwner_Controller extends ControllerSQL{
 					it_com_v.vehicle_owner_id = b.vehicle_owner_id
 					and it_com_v.period = b.mon	
 					and it_com_v.vehicle_tot_rep_common_item_id = it_com.id
+			),
+			owner_it_data as (
+				select
+					b.mon,
+					b.vehicle_owner_id,
+					it.id as it_id,
+					it.name as it_name,
+					coalesce(it.is_income, false) as it_is_income,
+					coalesce(
+						coalesce(
+							CASE WHEN coalesce(it.is_income, false) THEN 1 ELSE -1 END * it_v.value,
+							CASE
+							WHEN coalesce(it.query, '') = '' OR b.vehicle_owner_id is null then 0
+							ELSE
+								vehicle_tot_rep_item_exec_query(
+									it.query,
+									b.vehicle_id,
+									(select d1 from per),
+									(select d2 from per)
+								)
+							END
+						)
+					,0) AS it_val
+					
+				from veh_data as b
+				CROSS join vehicle_tot_rep_items as it
+				left join vehicle_tot_rep_item_vals as it_v on
+					it_v.vehicle_id = b.vehicle_id
+					and it_v.period = b.mon	
+					and it_v.vehicle_tot_rep_item_id = it.id
 			)
 			select
 					sub.mon as mon,
@@ -718,33 +748,47 @@ class VehicleOwner_Controller extends ControllerSQL{
 					veh_on.name as vehicle_owner_name,
 					sub.balance_start,
 					sub.quant,	
-					sub.it_com_id,
-					sub.it_com_name,
+					sub.it_id,
+					sub.it_name,
 					CASE
-						WHEN sub.it_com_is_income THEN sub.it_com_name
+						WHEN sub.it_is_income THEN sub.it_name
 						ELSE ''
-					END AS it_com_name_in, 
+					END AS it_name_in, 
 					CASE
-						WHEN sub.it_com_is_income THEN ''
-						ELSE sub.it_com_name
-					END AS it_com_name_out, 
-					sub.it_com_is_income,
-					sub.it_com_val	
-			from (
-				(select
+						WHEN sub.it_is_income THEN ''
+						ELSE sub.it_name
+					END AS it_name_out, 
+					sub.it_is_income,
+					sub.it_is_common,
+					sub.it_val	
+			FROM (
+				(SELECT
+						owner_it_com_data.mon,
+						owner_it_com_data.vehicle_owner_id,
+						owner_it_com_data.balance_start,
+						owner_it_com_data.quant,	
+						owner_it_com_data.it_com_id it_id,
+						owner_it_com_data.it_com_name as it_name,
+						owner_it_com_data.it_com_is_income it_is_income,
+						TRUE it_is_common,
+						owner_it_com_data.it_com_val as it_val	
+				FROM owner_it_com_data)
+				
+				UNION ALL	
+				(SELECT
 						owner_it_data.mon,
 						owner_it_data.vehicle_owner_id,
-						owner_it_data.balance_start,
-						owner_it_data.quant,	
-						owner_it_data.it_com_id,
-						owner_it_data.it_com_name,
-						owner_it_data.it_com_is_income,
-						owner_it_data.it_com_val	
-				from owner_it_data)
-				
-				union all
-				
-				(select
+						0 as balance_start,
+						0 as quant,
+						owner_it_data.it_id,
+						owner_it_data.it_name,
+						owner_it_data.it_is_income,
+						FALSE it_is_common,
+						owner_it_data.it_val	
+				FROM owner_it_data)
+
+				UNION ALL
+				(SELECT
 						bal.period as mon,
 						bal.vehicle_owner_id,
 						bal.value,
@@ -752,33 +796,47 @@ class VehicleOwner_Controller extends ControllerSQL{
 						NULL as it_com_id,
 						NULL as it_com_name,
 						NULL as it_com_is_income,
+						NULL it_is_common,
 						0 as it_com_val		
-				from vehicle_tot_rep_balances as bal
-				where
+				FROM vehicle_tot_rep_balances as bal
+				WHERE
 					bal.period between (select d1 from per) and (select d2 from per)
 					and bal.vehicle_owner_id not in (select owner_data.vehicle_owner_id from owner_data)
 				)
 			) as sub	
-			left join vehicle_owners as veh_on on veh_on.id = sub.vehicle_owner_id
-			order by
+			LEFT JOIN vehicle_owners as veh_on on veh_on.id = sub.vehicle_owner_id
+			ORDER BY
 				veh_on.name,
 				sub.mon,
-				sub.it_com_is_income DESC,
-				sub.it_com_name
+				sub.it_is_income DESC,
+				sub.it_is_common,
+				sub.it_name
 		", $date_from_db, $date_to_db);
-
 		$this->addNewModel($q, 'VehicleOwnerList_Model');
 
 		$this->addNewModel(
 			"SELECT
 				(SELECT 
-					count(*) as tot_com_it_income
+					count(*)
 				FROM vehicle_tot_rep_common_items
-				WHERE coalesce(is_income, FALSE)) AS tot_com_it_in,
+				WHERE coalesce(is_income, FALSE)) +
 				(SELECT 
-					count(*) as tot_com_it_income
+					count(*)
+				FROM vehicle_tot_rep_items
+				WHERE coalesce(is_income, FALSE))
+				AS tot_it_in,
+
+				(SELECT 
+					count(*)
 				FROM vehicle_tot_rep_common_items
-				WHERE coalesce(is_income, FALSE) = FALSE) AS tot_com_it_out
+				WHERE coalesce(is_income, FALSE) = FALSE
+				) + 
+				(SELECT 
+					count(*)
+				FROM vehicle_tot_rep_items
+				WHERE coalesce(is_income, FALSE) = FALSE
+				) 
+				AS tot_it_out
 			"
 			,'Head_Model'		
 		);

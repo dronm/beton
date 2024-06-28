@@ -103,8 +103,15 @@ if(isset($_REQUEST['tp']) && $_REQUEST['tp'] == 'out'){
 		$out_err = isset($_REQUEST['out_error'])? trim($_REQUEST['out_error']) : 'No error text';
 		$err_text = 'false';
 	}
+	//added on 2024-06-21: if it is a getting code message - do not issue "TmOutMessage.sent" event
+	//Text starting with: "Код авторизации: " - no events!!!
 	$dbLink->query(sprintf(
 		"WITH
+		code_text as (
+			SELECT
+				'Код авторизации: ' AS txt,
+				length('Код авторизации: ') AS n
+		),
 		msg_d AS (
 			SELECT
 				m.id AS msg_id,
@@ -119,19 +126,27 @@ if(isset($_REQUEST['tp']) && $_REQUEST['tp'] == 'out'){
 			WHERE m.id = %d
 		)
 		SELECT
-			pg_notify('TmOutMessage.sent',
-				json_build_object(
-					'params',json_build_object(
-						'res', %s,
-						'errText', '%s',
-						'text',(SELECT text FROM msg_d),
-						'ext_obj',(SELECT ext_obj FROM msg_d),
-						'sender',(SELECT sender FROM msg_d),
-						'media_type',(SELECT media_type FROM msg_d),
-						'msg_id',(SELECT msg_id FROM msg_d)
-					)
-				)::text			
-			)"
+			case
+			when
+				(select txt from code_text) = substring((SELECT text FROM msg_d), 1, (select n from code_text))
+			then
+				pg_notify('TmOutMessage.sent',
+					json_build_object(
+						'params',json_build_object(
+							'res', %s,
+							'errText', '%s',
+							'text',(SELECT text FROM msg_d),
+							'ext_obj',(SELECT ext_obj FROM msg_d),
+							'sender',(SELECT sender FROM msg_d),
+							'media_type',(SELECT media_type FROM msg_d),
+							'msg_id',(SELECT msg_id FROM msg_d)
+						)
+					)::text			
+				)			
+			else
+				(SELECT notifications.set_sent((SELECT msg_id FROM msg_d)))
+			end
+		"
 		,$_REQUEST['id']
 		,$res
 		,$err_text		

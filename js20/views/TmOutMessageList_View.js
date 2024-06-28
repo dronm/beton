@@ -3,7 +3,7 @@
  */
 function TmOutMessageList_View(id,options){	
 
-	options.HEAD_TITLE = "Изходящие сообщения Telegram";
+	options.HEAD_TITLE = "Исходящие сообщения Telegram";
 
 	TmUserList_View.superclass.constructor.call(this,id,options);
 

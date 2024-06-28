@@ -12,4 +12,4 @@ $$
 $$
   LANGUAGE sql VOLATILE
   COST 100;
-ALTER FUNCTION notifications.set_sent(in_msg_id int) OWNER TO concrete1;
+ALTER FUNCTION notifications.set_sent(in_msg_id int) OWNER TO ;
