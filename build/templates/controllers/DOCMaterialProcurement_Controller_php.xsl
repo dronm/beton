@@ -24,6 +24,8 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelWhereSQL.php');
 
+require_once(ABSOLUTE_PATH.'functions/checkPmPeriod.php');
+
 class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
 		parent::__construct($dbLinkMaster, $dbLink);<xsl:apply-templates/>
@@ -143,6 +145,11 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		//$this->get_list($pm);
 	}
 	
+	public function get_list($pm){	
+		checkPublicMethodPeriod($pm, new DOCMaterialProcurementList_Model($this->getDbLink()), "date_time", 370);
+		parent::get_list($pm);
+	}
+
 	/*
 	public function get_material_list($pm){
 		$link = $this->getDbLink();

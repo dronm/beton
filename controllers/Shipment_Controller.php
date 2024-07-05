@@ -47,6 +47,8 @@ require_once(ABSOLUTE_PATH.'functions/notifications.php');
 require_once(USER_CONTROLLERS_PATH.'ExcelTemplate_Controller.php');
 require_once(USER_CONTROLLERS_PATH.'Order_Controller.php');
 
+require_once(ABSOLUTE_PATH.'functions/checkPmPeriod.php');
+
 class Shipment_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
 		parent::__construct($dbLinkMaster, $dbLink);
@@ -1493,6 +1495,7 @@ class Shipment_Controller extends ControllerSQL{
 		);
 	}
 	public function get_list_for_order(){
+		checkPublicMethodPeriod($pm, new ShipmentForOrderList_Model($this->getDbLink()), "ship_date_time", 370);
 		$this->modelGetList(new ShipmentForOrderList_Model($this->getDbLink()),
 			$this->getPublicMethod('get_list_for_order')
 		);
@@ -1615,59 +1618,27 @@ class Shipment_Controller extends ControllerSQL{
 	}
 
 	public function get_list($pm){
+		checkPublicMethodPeriod($pm, new ShipmentList_Model($this->getDbLink()), "ship_date_time", 370);
 		$this->modelGetList(new ShipmentList_Model($this->getDbLink()),$pm);
 	}	
 
 	public function get_list_for_veh_owner($pm){	
-		/*
-		$model = new ShipmentForVehOwnerList_Model($this->getDbLink());
-		$is_insert = NULL;
-		$where = NULL;
-		$order = NULL;
-		$limit = NULL;
-		$fields = NULL;
-		$grp_fields = NULL;
-		$agg_fields = NULL;
-		$calc_total = NULL;
-		$this->setQueryOptionsFromParams($model,$pm,$is_insert,$where,$order,
-			$limit,$fields,$grp_fields,$agg_fields,$calc_total
-		);	
-		
-		if(!$order){
-			$order = new ModelOrderSQL();
-			$order->addField($model->getFieldById('ship_date_time'),'DESC');
-		}
-		
-		$q = $this->get_list_for_veh_owner_query();
-		$join = NULL;$group = NULL;
-		$model->addParamsToSelectQuery(
-			$q,
-			$where,
-			$order,
-			$limit,
-			$join,$group,
-			$calc_total
-		);
-		$model->selectQuery($q,$calc_total,$where,NULL,TRUE);
-		
-		//
-		$this->addModel($model);
-		*/
-		
+		checkPublicMethodPeriod($pm, new ShipmentForVehOwnerList_Model($this->getDbLink()), "ship_date_time", 370);
 		$this->modelGetList(new ShipmentForVehOwnerList_Model($this->getDbLink()),$pm);
 	}
 	
 	public function get_pump_list($pm){
-	
+		checkPublicMethodPeriod($pm, new ShipmentPumpList_Model($this->getDbLink()), "ship_date_time", 370);
 		$this->modelGetList(new ShipmentPumpList_Model($this->getDbLink()),$pm);
 	}
 
 	public function get_pump_list_for_veh_owner($pm){
-	
+		checkPublicMethodPeriod($pm, new ShipmentPumpForVehOwnerList_Model($this->getDbLink()), "ship_date_time", 370);
 		$this->modelGetList(new ShipmentPumpForVehOwnerList_Model($this->getDbLink()),$pm);
 	}
 	
 	public function get_shipment_date_list($pm){
+		checkPublicMethodPeriod($pm, new ShipmentDateList_Model($this->getDbLink()), "ship_date", 370);
 		$this->modelGetList(new ShipmentDateList_Model($this->getDbLink()),$pm);
 	}
 	public function get_time_list($pm){
@@ -1842,6 +1813,7 @@ class Shipment_Controller extends ControllerSQL{
 	}
 	
 	public function get_list_for_client_veh_owner($pm){	
+		checkPublicMethodPeriod($pm, new ShipmentForClientVehOwnerList_Model($this->getDbLink()), "ship_date_time", 370);
 		$this->modelGetList(new ShipmentForClientVehOwnerList_Model($this->getDbLink()),$pm);
 	}
 
@@ -1977,6 +1949,7 @@ class Shipment_Controller extends ControllerSQL{
 	}
 	
 	public function get_list_for_client($pm){	
+		checkPublicMethodPeriod($pm, new ShipmentForClientList_Model($this->getDbLink()), "ship_date_time", 370);
 		$this->modelGetList(new ShipmentForClientList_Model($this->getDbLink()),$pm);
 	}
 

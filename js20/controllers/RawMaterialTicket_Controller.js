@@ -20,7 +20,7 @@
 function RawMaterialTicket_Controller(options){
 	options = options || {};
 	options.listModelClass = RawMaterialTicketList_Model;
-	options.objModelClass = RawMaterialTicketList_Model;
+	options.objModelClass = RawMaterialTicketDialog_Model;
 	RawMaterialTicket_Controller.superclass.constructor.call(this,options);	
 	
 	//methods

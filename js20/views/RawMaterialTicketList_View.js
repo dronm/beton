@@ -102,8 +102,8 @@ function RawMaterialTicketList_View(id,options){
 		"editWinClass":null,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd", {
 			"cmdInsert":false,
-			"cmdEdit":(r=="owner" || r=="admin" || r == "boss"),
-			"cmdDelete":(r=="owner" || r=="admin" || r == "boss"),
+			"cmdEdit":(r=="owner" || r=="admin" || r == "boss" || r == "weighing"),
+			"cmdDelete":(r=="owner" || r=="admin" || r == "boss" || r == "weighing"),
 			"cmdFilter":true,
 			"filters":filters,
 			"addCustomCommandsAfter":function(commands){

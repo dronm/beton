@@ -28,4 +28,4 @@ CREATE OR REPLACE VIEW raw_material_tickets_dialog AS
 	LEFT JOIN quarries AS qr ON qr.id = t.quarry_id
 	;
 	
--- ALTER VIEW raw_material_tickets_dialog OWNER TO beton;
+-- ALTER VIEW raw_material_tickets_dialog OWNER TO ;

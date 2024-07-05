@@ -36,23 +36,23 @@ WITH
 		0::numeric AS quant_ordered,
 		
 		--Поставки
-		COALESCE(proc.quant,0)::numeric AS quant_procured,
+		COALESCE(proc.quant, 0)::numeric AS quant_procured,
 		
 		--остатки
-		COALESCE(bal.quant,0)::numeric AS quant_balance,
+		COALESCE(bal.quant, 0)::numeric AS quant_balance,
 		
-		COALESCE(bal_fact.quant,0)::numeric AS quant_fact_balance,
+		COALESCE(bal_fact.quant, 0)::numeric AS quant_fact_balance,
 		
 		--остатки на завтра на утро
 		-- начиная с 12/08/20 без прогноза будующего прихода, просто тек.остаток-расход по подборам от тек.времени до конца смены
 		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
 		--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
-		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
-		COALESCE(bal_fact.quant,0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
+		COALESCE(bal_fact.quant, 0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
+		COALESCE(bal_fact.quant, 0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
 		
-		COALESCE(bal_morn.quant,0)::numeric AS quant_morn_cur_balance,
+		COALESCE(bal_morn.quant, 0)::numeric AS quant_morn_cur_balance,
 		
-		COALESCE(bal_morn_fact.quant,0)::numeric AS quant_morn_fact_cur_balance,
+		COALESCE(bal_morn_fact.quant, 0)::numeric AS quant_morn_fact_cur_balance,
 		
 		--Корректировки
 		(SELECT
@@ -79,18 +79,16 @@ WITH
 	LEFT JOIN (
 		SELECT *
 		FROM rg_materials_balance((SELECT shift_time_from.v FROM shift_time_from)-'1 second'::interval, ARRAY[in_production_base_id], '{}'::int[])
-		--FROM rg_materials_balance((SELECT shift_time_from.v FROM shift_time_from)-'1 second'::interval,'{}'::int[],'{}'::int[])
 	) AS bal_morn ON bal_morn.material_id=m.id
+	
 	LEFT JOIN (
 		SELECT * FROM rg_material_facts_balance((SELECT shift_time_from.v FROM shift_time_from), ARRAY[in_production_base_id], '{}'::int[], '{}'::int[])
-		--SELECT * FROM rg_material_facts_balance((SELECT shift_time_from.v FROM shift_time_from),'{}')
 	) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
 
 	
 	LEFT JOIN (
 		SELECT *
 		FROM rg_materials_balance(ARRAY[in_production_base_id], '{}'::int[])
-		--FROM rg_materials_balance('{}'::int[],'{}'::int[])
 	) AS bal ON bal.material_id=m.id
 	LEFT JOIN (
 		SELECT

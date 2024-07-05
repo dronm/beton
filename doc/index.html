@@ -443,6 +443,7 @@
 <li><a href="#Chat_Model">Chat_Model</a></li>
 <li><a href="#RawMaterialTicket_Model">RawMaterialTicket_Model</a></li>
 <li><a href="#RawMaterialTicketList_Model">RawMaterialTicketList_Model</a></li>
+<li><a href="#RawMaterialTicketDialog_Model">RawMaterialTicketDialog_Model</a></li>
 <li><a href="#RawMaterialTicketCarrierAggList_Model">RawMaterialTicketCarrierAggList_Model</a></li>
 <li><a href="#ClientSpecification_Model">ClientSpecification_Model</a></li>
 <li><a href="#ClientSpecificationList_Model">ClientSpecificationList_Model</a></li>
@@ -3228,7 +3229,7 @@
 <a href="#RawMaterialTicket_Model">Model: RawMaterialTicket_Model</a><h2>delete</h2>
 <a href="#RawMaterialTicket_Model">Model: RawMaterialTicket_Model</a><h2>get_list</h2>
 <a href="#RawMaterialTicketList_Model">Model: RawMaterialTicketList_Model</a><h2>get_object</h2>
-<a href="#RawMaterialTicketList_Model">Model: RawMaterialTicketList_Model</a><h2>generate</h2>
+<a href="#RawMaterialTicketDialog_Model">Model: RawMaterialTicketDialog_Model</a><h2>generate</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
 <h3>carrier_id</h3>
@@ -17157,6 +17158,108 @@
 <div>Precision:</div>
 <h2>quant_tot</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="RawMaterialTicketDialog_Model" class="content_box">
+<h1>RawMaterialTicketDialog_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>carrier_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>carriers_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>raw_material_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>raw_materials_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quarry_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quarries_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>barcode</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>issue_date_time</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>close_date_time</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>issue_users_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>issue_user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>close_users_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>close_user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>expire_date</h2>
+<div>Type:Date</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

@@ -1224,12 +1224,19 @@ add conception of ObligatoryFilter like global, but is applied only if no filter
 	- make current shift a default period
 
 
-1.00335
+1.00335 2024-06-28
 1) functions/bot/index.php Tm callback: in case of the auth message do not send "TmOutMessage.sent" event.
 2) VehicleOwnerTotIncomeAllRep.xsl added vehicle items. Report is ready without vehicle details.
 	VehicleOwner_Controller->get_tot_income_report_all()
 3) ViewBase.himl.xsl chat reinitialized on page update when menu item is changed.
 4) OrderCalc_View.setPayCash() warning if gui total sum does not match saved sum.
+
+
+1.00336
+1) EventServer: delete event does not work. Corrected Order_Controller
+3) RawMaterialTicketDialog new model for object edit.
+4) RawMaterialTicket allow edit for weighing interface. RawMaterialTickerList_View.js
+5) Period check for list models: Order_Controller, OrderGarbage_Controller, Shipment_Controller, DOCMaterialProcurement_Controller, MaterialFactConsumptionCorrectionc_Controller
 
 
 

@@ -257,7 +257,7 @@ class RawMaterialTicket_Controller extends ControllerSQL{
 		
 		$pm->addParam(new FieldExtString('lsn'));
 		$this->addPublicMethod($pm);
-		$this->setObjectModelId('RawMaterialTicketList_Model');		
+		$this->setObjectModelId('RawMaterialTicketDialog_Model');		
 
 			
 		$pm = new PublicMethod('generate');

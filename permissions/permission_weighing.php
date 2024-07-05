@@ -78,6 +78,12 @@ $permissions = array();
 		
 			$permissions['RawMaterialTicket_Controller_generate']=TRUE;
 		
+			$permissions['RawMaterialTicket_Controller_insert']=TRUE;
+		
+			$permissions['RawMaterialTicket_Controller_update']=TRUE;
+		
+			$permissions['RawMaterialTicket_Controller_delete']=TRUE;
+		
 			$permissions['RawMaterial_Controller_get_list']=TRUE;
 		
 			$permissions['RawMaterial_Controller_complete']=TRUE;

@@ -17,6 +17,9 @@
 
 <xsl:template match="controller"><![CDATA[<?php]]>
 <xsl:call-template name="add_requirements"/>
+
+require_once(ABSOLUTE_PATH.'functions/checkPmPeriod.php');
+
 class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@parentId"/>{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
 		parent::__construct($dbLinkMaster,$dbLink);<xsl:apply-templates/>
@@ -27,6 +30,10 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 </xsl:template>
 
 <xsl:template name="extra_methods">
+	public function get_list($pm){	
+		checkPublicMethodPeriod($pm, new OrderGarbageList_Model($this->getDbLink()), "date_time", 370);
+		parent::get_list($pm);
+	}
 </xsl:template>
 
 </xsl:stylesheet>

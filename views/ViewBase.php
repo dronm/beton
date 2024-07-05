@@ -2093,6 +2093,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/controllers/OrderGarbage_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/OrderGarbage_Controller.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/OrderGarbageList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/OrderGarbageList_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/OrderGarbageDialog_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/OrderGarbageDialog_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/RawMaterialTicketDialog_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/RawMaterialTicketDialog_Model.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

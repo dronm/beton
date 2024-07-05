@@ -68,7 +68,7 @@ BEGIN
 				INSERT INTO konkrid.replicate_events
 					VALUES ('Order.to_konkrid_delete',
 						json_build_object('params',
-							json_build_object('id', OLD.id)
+							json_build_object('create_date_time', OLD.create_date_time::text)
 						)::text
 				);
 				
@@ -76,7 +76,7 @@ BEGIN
 				INSERT INTO beton.replicate_events
 					VALUES ('Order.to_bereg_delete',
 						json_build_object('params',
-							json_build_object('id', OLD.id)
+							json_build_object('create_date_time', OLD.create_date_time::text)
 						)::text
 				);
 			

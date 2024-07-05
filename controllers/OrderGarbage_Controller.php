@@ -23,6 +23,9 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
  */
 
 
+
+require_once(ABSOLUTE_PATH.'functions/checkPmPeriod.php');
+
 class OrderGarbage_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
 		parent::__construct($dbLinkMaster,$dbLink);
@@ -82,5 +85,10 @@ class OrderGarbage_Controller extends ControllerSQL{
 		
 	}	
 	
+	public function get_list($pm){	
+		checkPublicMethodPeriod($pm, new OrderGarbageList_Model($this->getDbLink()), "date_time", 370);
+		parent::get_list($pm);
+	}
+
 }
 ?>

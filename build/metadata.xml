@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-06-21 11:18:46</lastBuild></version>
+		<lastBuild>2024-07-05 05:00:32</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -239,6 +239,7 @@
 		<version dateOpen="2024-06-10 13:14:37" dateClose="2024-06-14 03:45:44">1.00333</version>
 		<version dateOpen="2024-06-14 05:28:56" dateClose="2024-06-19 06:09:32">1.00334</version>
 		<version dateOpen="2024-06-21 11:18:52" dateClose="2024-06-28 06:42:45">1.00335</version>
+		<version dateOpen="2024-07-04 15:19:57" dateClose="2024-07-05 05:00:50">1.00336</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -4409,6 +4410,24 @@
 			<field id="close_user_id" dataType="Int" sysCol="TRUE"/>
 			<field id="expire_date" dataType="Date" alias="Дата окончания срока"/>
 		</model>
+		<model id="RawMaterialTicketDialog" parent="ModelSQL" dataTable="raw_material_tickets_dialog" virtual="TRUE" descr="Журнал талонов на материалы">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="carrier_id" dataType="Int" alias="Перевозчик" refTable="suppliers" refField="id"/>
+			<field id="carriers_ref" dataType="JSON" alias="Перевозчик"/>
+			<field id="raw_material_id" dataType="Int" alias="Материал" refTable="raw_materials" refField="id"/>
+			<field id="raw_materials_ref" dataType="JSON" alias="Материал"/>
+			<field id="quarry_id" dataType="Int" alias="Карьер" refTable="quarries" refField="id"/>
+			<field id="quarries_ref" dataType="JSON" alias="Карьер"/>
+			<field id="barcode" dataType="String" alias="Штрихкод"/>
+			<field id="quant" dataType="Int" alias="Вес, т"/>
+			<field id="issue_date_time" dataType="DateTimeTZ"/>
+			<field id="close_date_time" dataType="DateTimeTZ"/>
+			<field id="issue_users_ref" dataType="JSON" alias="Кто выпустил"/>
+			<field id="issue_user_id" dataType="Int" sysCol="TRUE"/>
+			<field id="close_users_ref" dataType="JSON" alias="Кто погасил"/>
+			<field id="close_user_id" dataType="Int" sysCol="TRUE"/>
+			<field id="expire_date" dataType="Date" alias="Дата окончания срока"/>
+		</model>
 		<model id="RawMaterialTicketCarrierAggList" parent="ModelSQL" dataTable="raw_material_ticket_carrier_agg_list" virtual="TRUE" descr="Журнал талонов на материалы">
 			<aggFunctions>
 				<aggFunction alias="total_quant" expr="sum(quant_tot)"/>
@@ -6491,7 +6510,7 @@
 			<publicMethod id="update" modelId="RawMaterialTicket"/>
 			<publicMethod id="delete" modelId="RawMaterialTicket"/>
 			<publicMethod id="get_list" modelId="RawMaterialTicketList"/>
-			<publicMethod id="get_object" modelId="RawMaterialTicketList"/>
+			<publicMethod id="get_object" modelId="RawMaterialTicketDialog"/>
 			<publicMethod id="generate">
 				<field id="carrier_id" dataType="Int" required="TRUE"/>
 				<field id="raw_material_id" dataType="Int" required="TRUE"/>
@@ -6895,6 +6914,9 @@
 		<permission type="allow" controllerId="RawMaterialTicket" methodId="close_ticket" roleId="weighing"/>
 		<permission type="allow" controllerId="RawMaterialTicket" methodId="get_carrier_agg_list" roleId="weighing"/>
 		<permission type="allow" controllerId="RawMaterialTicket" methodId="generate" roleId="weighing"/>
+		<permission type="allow" controllerId="RawMaterialTicket" methodId="insert" roleId="weighing"/>
+		<permission type="allow" controllerId="RawMaterialTicket" methodId="update" roleId="weighing"/>
+		<permission type="allow" controllerId="RawMaterialTicket" methodId="delete" roleId="weighing"/>
 		<permission type="allow" controllerId="RawMaterial" methodId="get_list" roleId="weighing"/>
 		<permission type="allow" controllerId="RawMaterial" methodId="complete" roleId="weighing"/>
 		<permission type="allow" controllerId="RawMaterial" methodId="get_object" roleId="weighing"/>
@@ -8476,6 +8498,7 @@
 		<jsScript file="js20/controllers/OrderGarbage_Controller.js"/>
 		<jsScript file="js20/models/OrderGarbageList_Model.js"/>
 		<jsScript file="js20/models/OrderGarbageDialog_Model.js"/>
+		<jsScript file="js20/models/RawMaterialTicketDialog_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

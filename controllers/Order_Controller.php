@@ -1951,7 +1951,10 @@ class Order_Controller extends ControllerSQL{
 		$this->modelGetList(new OrderForClientList_Model($this->getDbLink()),$pm);
 	}
 
-	
+	public function get_list($pm){	
+		checkPublicMethodPeriod($pm, new OrderMakeList_Model($this->getDbLink()), "date_time", 370);
+		parent::get_list($pm);
+	}
 
 	//localhost/beton_new/?c=Order_Controller&f=calc_for_site&v=ViewXML&concrete_type_id=1&quant=1&address=Тюмень сакко 5
 	public function calc_for_site($pm){
