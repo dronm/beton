@@ -1232,12 +1232,20 @@ add conception of ObligatoryFilter like global, but is applied only if no filter
 4) OrderCalc_View.setPayCash() warning if gui total sum does not match saved sum.
 
 
-1.00336
+1.00336 2024-07-05
 1) EventServer: delete event does not work. Corrected Order_Controller
 3) RawMaterialTicketDialog new model for object edit.
 4) RawMaterialTicket allow edit for weighing interface. RawMaterialTickerList_View.js
 5) Period check for list models: Order_Controller, OrderGarbage_Controller, Shipment_Controller, DOCMaterialProcurement_Controller, MaterialFactConsumptionCorrectionc_Controller
 
+1.00337 2024-07-30
+1) New model to hold silo materials: SiloMaterial
+2) Correct balance on the front page
+3) Shipment_Controller->get_list_for_order() no date check!
+4) ExcelTemplate_Controller error when converting to pdf.
+5) Silo sorting by elkon name. cement_silos_for_order_list.sql, cement_silos_list.sql
+6) DOCMaterialProcurement_Controller->get_list() when filters are set returns bad file and v=ViewExcel
+	ControllerObjServer.download(): params to string with ServConnector.queryParamsAsString()
 
 
 + shift + base name

@@ -1494,8 +1494,9 @@ class Shipment_Controller extends ControllerSQL{
 			WHERE id=%d",$id)
 		);
 	}
+
+	//this method is callled from gui orders list. So no date check is needed.
 	public function get_list_for_order(){
-		checkPublicMethodPeriod($pm, new ShipmentForOrderList_Model($this->getDbLink()), "ship_date_time", 370);
 		$this->modelGetList(new ShipmentForOrderList_Model($this->getDbLink()),
 			$this->getPublicMethod('get_list_for_order')
 		);

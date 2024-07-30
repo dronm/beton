@@ -1690,6 +1690,16 @@ $permissions = array();
 				
 					$permissions['UserChatMessageView_Controller_set_all_viewed']=TRUE;
 				
+					$permissions['CementSiloMaterial_Controller_insert']=TRUE;
+				
+					$permissions['CementSiloMaterial_Controller_update']=TRUE;
+				
+					$permissions['CementSiloMaterial_Controller_delete']=TRUE;
+				
+					$permissions['CementSiloMaterial_Controller_get_list']=TRUE;
+				
+					$permissions['CementSiloMaterial_Controller_get_object']=TRUE;
+				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }
 ?>

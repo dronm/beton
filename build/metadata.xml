@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-07-05 05:00:32</lastBuild></version>
+		<lastBuild>2024-07-30 06:10:36</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -240,6 +240,7 @@
 		<version dateOpen="2024-06-14 05:28:56" dateClose="2024-06-19 06:09:32">1.00334</version>
 		<version dateOpen="2024-06-21 11:18:52" dateClose="2024-06-28 06:42:45">1.00335</version>
 		<version dateOpen="2024-07-04 15:19:57" dateClose="2024-07-05 05:00:50">1.00336</version>
+		<version dateOpen="2024-07-05 10:36:53" dateClose="2024-07-30 06:10:57">1.00337</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -3886,6 +3887,23 @@
 			<field id="load_capacity" dataType="Float" length="19" precision="4"/>
 			<field id="balance" dataType="Float" length="19" precision="4"/>
 		</model>
+		<model id="CementSiloMaterial" parent="ModelSQLBeton" dataTable="cement_silo_materials" virtual="FALSE">
+			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="cement_silo_id" dataType="Int" refTable="cement_silos" refField="id"/>
+			<field id="material_id" dataType="Int" refTable="raw_materials" refField="id"/>
+			<field id="date_time" dataType="DateTimeTZ" required="TRUE"/>
+			<index id="cement_silo_materials_silo_idx" unique="FALSE">
+				<field id="cement_silo_id"/>
+				<field id="date_time"/>
+			</index>
+		</model>
+		<model id="CementSiloMaterialList" parent="ModelSQLBeton" dataTable="cement_silo_materials_list" virtual="TRUE">
+			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="cement_silo_id" dataType="Int"/>
+			<field id="cement_silos_ref" dataType="JSON"/>
+			<field id="materials_ref" dataType="JSON"/>
+			<field id="date_time" dataType="DateTimeTZ"/>
+		</model>
 		<model id="MaterialStoreForOrderList" parent="ModelSQLBeton" dataTable="material_store_for_order_list" virtual="TRUE">
 			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="production_sites_ref" dataType="JSON"/>
@@ -6794,6 +6812,13 @@
 				<field id="user_id" dataType="Int"/>
 			</publicMethod>
 		</controller>
+		<controller id="CementSiloMaterial" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="CementSiloMaterial"/>
+			<publicMethod id="update" modelId="CementSiloMaterial"/>
+			<publicMethod id="delete" modelId="CementSiloMaterial"/>
+			<publicMethod id="get_list" modelId="CementSiloMaterialList"/>
+			<publicMethod id="get_object" modelId="CementSiloMaterialList"/>
+		</controller>
 	</controllers>
 	<permissions>
 		<permission type="allow" controllerId="all" methodId="all" roleId="owner"/>
@@ -6977,6 +7002,7 @@
 		<view id="10052" c="VehicleTotRepCommonItem_Controller" t="VehicleTotRepCommonItemList" f="get_list" section="Справочники" descr="Общие статьи доходов/расходов для итогового отчета по ТС"/>
 		<view id="10053" c="Firm1c_Controller" t="Firm1cList" f="get_list" section="Справочники" descr="Организации 1с"/>
 		<view id="10054" c="ChatStatus_Controller" t="ChatStatusList" f="get_list" section="Справочники" descr="Статусы чата"/>
+		<view id="10055" c="CementSiloMaterial_Controller" t="CementSiloMaterialList" f="get_list" section="Справочники" descr="Материалы в силосах"/>
 		<view id="20000" c="Order_Controller" t="OrderList" f="get_list" section="Документы" descr="Заявки"/>
 		<view id="20001" c="OrderPump_Controller" t="OrderPumpList" f="get_list" section="Документы" descr="Заявки (насосы)"/>
 		<view id="20002" c="Shipment_Controller" t="ShipmentList" f="get_list" section="Документы" descr="Отгрузки"/>
@@ -7199,6 +7225,7 @@
 		<serverTemplate id="QualityPassport"/>
 		<serverTemplate id="ShipmentMediaList" class="list"/>
 		<serverTemplate id="ChatStatusList" class="list"/>
+		<serverTemplate id="CementSiloMaterialList" class="list"/>
 		<serverTemplate id="VehicleOwnerTotIncomeAllRep"/>
 	</serverTemplates>
 	<jsTemplates>
@@ -7839,6 +7866,7 @@
 		<jsScript file="js20/views/ShipmentMediaList_View.js"/>
 		<jsScript file="js20/views/ChatStatusList_View.js"/>
 		<jsScript file="js20/views/VehicleOwnerTotIncomeAllRep_View.js"/>
+		<jsScript file="js20/views/CementSiloMaterialList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="js20/forms/ViewList_Form.js"/>
 		<jsScript file="js20/forms/MainMenuConstructor_Form.js"/>
@@ -8499,6 +8527,9 @@
 		<jsScript file="js20/models/OrderGarbageList_Model.js"/>
 		<jsScript file="js20/models/OrderGarbageDialog_Model.js"/>
 		<jsScript file="js20/models/RawMaterialTicketDialog_Model.js"/>
+		<jsScript file="js20/models/CementSiloMaterial_Model.js"/>
+		<jsScript file="js20/models/CementSiloMaterialList_Model.js"/>
+		<jsScript file="js20/controllers/CementSiloMaterial_Controller.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

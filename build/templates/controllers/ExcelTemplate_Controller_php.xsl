@@ -349,7 +349,8 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 			$retval = NULL;		
 			$res = exec($cmd, $output, $retval);
 			if($res === FALSE || $retval != 0){
-				throw new Exception("Ошибка конвертации в PDF: ". (is_null($output)||!(is_array($output))||!count($output))? 'неизвестная ошибка':implode($output));
+				$er = "Ошибка конвертации в PDF: ".( (is_null($output)||!(is_array($output))||!count($output))? 'неизвестная ошибка, код:'.$retval : implode($output) );
+				throw new Exception($er);
 			}
 			if(!file_exists($out_fl_pdf)){
 				throw new Exception("Ошибка конвертации в PDF: файл не найден");

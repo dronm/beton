@@ -46,6 +46,22 @@ function CementSiloList_View(id,options){
 										"labelCaption":""
 									},
 									"ctrlBindFieldId":"production_site_id"
+									/*Material is calculated based on sql function: material_in_silo_on_date(silo, date)									
+									"master":true,
+									"detailViewClass":CementSiloMaterialList_View,
+									"detailViewOptions":{
+										"detailFilters":{
+											"CementSiloMaterialList_Model":[
+												{
+												"masterFieldId":"id",
+												"field":"cement_silo_id",
+												"sign":"e",
+												"val":"0"
+												}	
+											]
+										}													
+									}					
+									*/																						
 									
 								})
 							],

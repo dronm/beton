@@ -10,7 +10,13 @@ CREATE OR REPLACE FUNCTION material_in_silo_on_date(in_silo_id int, in_date_time
   RETURNS int AS
 $$
 	with
-	silo as (select production_descr, production_site_id from cement_silos where id = in_silo_id)
+	silo as (
+		select
+			production_descr,
+			production_site_id
+		from cement_silos
+		where id = in_silo_id
+	)
 	select
 		mpr.raw_material_id
 	from raw_material_map_to_production as mpr

@@ -20,6 +20,7 @@
 <li><a href="#Captcha_Controller">Captcha_Controller</a></li>
 <li><a href="#CementSilo_Controller">CementSilo_Controller</a></li>
 <li><a href="#CementSiloBalanceReset_Controller">CementSiloBalanceReset_Controller</a></li>
+<li><a href="#CementSiloMaterial_Controller">CementSiloMaterial_Controller</a></li>
 <li><a href="#Chat_Controller">Chat_Controller</a></li>
 <li><a href="#ChatStatus_Controller">ChatStatus_Controller</a></li>
 <li><a href="#Client_Controller">Client_Controller</a></li>
@@ -395,6 +396,8 @@
 <li><a href="#CementSilo_Model">CementSilo_Model</a></li>
 <li><a href="#CementSiloList_Model">CementSiloList_Model</a></li>
 <li><a href="#CementSiloForOrderList_Model">CementSiloForOrderList_Model</a></li>
+<li><a href="#CementSiloMaterial_Model">CementSiloMaterial_Model</a></li>
+<li><a href="#CementSiloMaterialList_Model">CementSiloMaterialList_Model</a></li>
 <li><a href="#MaterialStoreForOrderList_Model">MaterialStoreForOrderList_Model</a></li>
 <li><a href="#CementSiloBalanceReset_Model">CementSiloBalanceReset_Model</a></li>
 <li><a href="#CementSiloBalanceResetList_Model">CementSiloBalanceResetList_Model</a></li>
@@ -856,6 +859,19 @@
 <a href="#CementSiloBalanceReset_Model">Model: CementSiloBalanceReset_Model</a><h2>get_list</h2>
 <a href="#CementSiloBalanceResetList_Model">Model: CementSiloBalanceResetList_Model</a><h2>get_object</h2>
 <a href="#CementSiloBalanceResetList_Model">Model: CementSiloBalanceResetList_Model</a>
+</div>
+</div>
+<div id="CementSiloMaterial_Controller" class="content_box">
+<h1>CementSiloMaterial_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#CementSiloMaterial_Model">Model: CementSiloMaterial_Model</a><h2>update</h2>
+<a href="#CementSiloMaterial_Model">Model: CementSiloMaterial_Model</a><h2>delete</h2>
+<a href="#CementSiloMaterial_Model">Model: CementSiloMaterial_Model</a><h2>get_list</h2>
+<a href="#CementSiloMaterialList_Model">Model: CementSiloMaterialList_Model</a><h2>get_object</h2>
+<a href="#CementSiloMaterialList_Model">Model: CementSiloMaterialList_Model</a>
 </div>
 </div>
 <div id="Chat_Controller" class="content_box">
@@ -6093,6 +6109,72 @@
 <div>Precision:4</div>
 <h2>visible</h2>
 <div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="CementSiloMaterial_Model" class="content_box">
+<h1>CementSiloMaterial_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>cement_silo_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>material_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="CementSiloMaterialList_Model" class="content_box">
+<h1>CementSiloMaterialList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>cement_silo_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>cement_silos_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>materials_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTimeTZ</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

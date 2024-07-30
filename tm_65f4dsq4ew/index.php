@@ -346,7 +346,7 @@ function processMessage($message) {
 if (php_sapi_name() == 'cli') {
 	// if run from console, set or delete webhook
 	if(!isset($argv) || !is_array($argv) || count($argv)<2){
-		die('Usage: <APP_NAME> <COMMAND>'.PHP_EOL);
+		die('Usage: <APP_NAME> <COMMAND>'.PHP_EOL.'commands: delete, add'.PHP_EOL);
 	}
 	if(isset($argv) && is_array($argv) && count($argv)>=3 && $argv[2] == 'delete'){
 		delWebhook($argv[1]);

@@ -279,7 +279,6 @@ class ExcelTemplate_Controller extends ControllerSQL{
 	}
 	
 	private static function delete_template_file_on_id($dbLink, $templateID){
-
 		$ar = $dbLink->query_first(sprintf(
 			"SELECT
 				file_info->>'name' as file_name,
@@ -565,7 +564,8 @@ class ExcelTemplate_Controller extends ControllerSQL{
 			$retval = NULL;		
 			$res = exec($cmd, $output, $retval);
 			if($res === FALSE || $retval != 0){
-				throw new Exception("Ошибка конвертации в PDF: ". (is_null($output)||!(is_array($output))||!count($output))? 'неизвестная ошибка':implode($output));
+				$er = "Ошибка конвертации в PDF: ".( (is_null($output)||!(is_array($output))||!count($output))? 'неизвестная ошибка, код:'.$retval : implode($output) );
+				throw new Exception($er);
 			}
 			if(!file_exists($out_fl_pdf)){
 				throw new Exception("Ошибка конвертации в PDF: файл не найден");

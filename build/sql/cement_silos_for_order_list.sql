@@ -35,7 +35,9 @@ CREATE OR REPLACE VIEW cement_silos_for_order_list AS
 	) AS cs_state ON cs_state.cement_silo_id = t.id
 	
 	WHERE coalesce(t.visible, FALSE)
-	ORDER BY pst.name, t.name
+	ORDER BY
+		pst.name,
+		t.production_descr
 	;
 	
 ALTER VIEW cement_silos_for_order_list OWNER TO ;

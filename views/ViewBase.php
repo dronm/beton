@@ -1441,6 +1441,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/views/ShipmentMediaList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ShipmentMediaList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/ChatStatusList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ChatStatusList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/VehicleOwnerTotIncomeAllRep_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/VehicleOwnerTotIncomeAllRep_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/views/CementSiloMaterialList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/CementSiloMaterialList_View.js')) ));
 		
 		$this->addJsModel(new ModelJavaScript('js20/forms/ViewList_Form.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/forms/ViewList_Form.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/forms/MainMenuConstructor_Form.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/forms/MainMenuConstructor_Form.js')) ));
@@ -2094,6 +2095,9 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/models/OrderGarbageList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/OrderGarbageList_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/OrderGarbageDialog_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/OrderGarbageDialog_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/RawMaterialTicketDialog_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/RawMaterialTicketDialog_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/CementSiloMaterial_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/CementSiloMaterial_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/CementSiloMaterialList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/CementSiloMaterialList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/controllers/CementSiloMaterial_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/CementSiloMaterial_Controller.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

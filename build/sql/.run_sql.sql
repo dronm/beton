@@ -1,31 +1,43 @@
--- VIEW: raw_material_tickets_dialog
+-- VIEW: cement_silos_for_order_list
 
---DROP VIEW raw_material_tickets_dialog;
+--DROP VIEW cement_silos_for_order_list;
 
-CREATE OR REPLACE VIEW raw_material_tickets_dialog AS
+CREATE OR REPLACE VIEW cement_silos_for_order_list AS
 	SELECT
-		t.id 
-		,t.carrier_id
-		,suppliers_ref(cr) AS carriers_ref
-		,t.raw_material_id
-		,materials_ref(m) AS raw_materials_ref
-		,quarries_ref(qr) AS quarries_ref 
-		,t.barcode
-		,t.quant
-		,t.issue_date_time
-		,t.close_date_time
-		,t.issue_user_id
-		,users_ref(i_u) AS issue_users_ref
-		,t.close_user_id
-		,users_ref(c_u) AS close_users_ref
-		,t.expire_date
+		t.id,
+		t.name,
+		production_sites_ref(pst) AS production_sites_ref,
+		t.load_capacity,
+		bal.quant AS balance,
+		jsonb_build_object(
+			'vehicles_ref',cs_state.vehicles_ref,
+			'vehicle_state',cs_state.vehicle_state
+		) AS vehicle,
+		pst.production_base_id
 		
-	FROM raw_material_tickets AS t
-	LEFT JOIN suppliers AS cr ON cr.id = t.carrier_id
-	LEFT JOIN raw_materials AS m ON m.id = t.raw_material_id
-	LEFT JOIN users AS i_u ON i_u.id = t.issue_user_id
-	LEFT JOIN users AS c_u ON c_u.id = t.close_user_id
-	LEFT JOIN quarries AS qr ON qr.id = t.quarry_id
+	FROM cement_silos AS t	
+	LEFT JOIN production_sites AS pst ON pst.id = t.production_site_id
+	LEFT JOIN rg_cement_balance(NULL) AS bal ON bal.cement_silos_id = t.id
+	LEFT JOIN
+		(SELECT
+			cs.cement_silo_id,
+			cs.date_time,
+			vehicles_ref(vh) AS vehicles_ref,
+			cs.vehicle_state
+		FROM
+			(SELECT cement_silo_id,
+				max(date_time) AS date_time
+			FROM cement_silo_productions
+			GROUP BY cement_silo_id
+			) AS m_period
+		LEFT JOIN cement_silo_productions AS cs ON cs.cement_silo_id=m_period.cement_silo_id AND cs.date_time=m_period.date_time	
+		LEFT JOIN vehicles AS vh ON vh.id=cs.vehicle_id
+	) AS cs_state ON cs_state.cement_silo_id = t.id
+	
+	WHERE coalesce(t.visible, FALSE)
+	ORDER BY
+		pst.name,
+		t.production_descr
 	;
 	
--- ALTER VIEW raw_material_tickets_dialog OWNER TO beton;
+ALTER VIEW cement_silos_for_order_list OWNER TO beton;

@@ -23326,3 +23326,119 @@ CREATE OR REPLACE VIEW raw_material_tickets_dialog AS
 	;
 	
 -- ALTER VIEW raw_material_tickets_dialog OWNER TO beton;
+
+
+-- ******************* update 05/07/2024 10:45:05 ******************
+
+	-- ********** Adding new table from model **********
+	CREATE TABLE public.cement_silo_materials
+	(id serial NOT NULL,cement_silo_id int REFERENCES cement_silos(id),material_id int REFERENCES raw_materials(id),date_time timestampTZ NOT NULL,CONSTRAINT cement_silo_materials_pkey PRIMARY KEY (id)
+	);
+	DROP INDEX IF EXISTS cement_silo_materials_silo_idx;
+	CREATE INDEX cement_silo_materials_silo_idx
+	ON cement_silo_materials(cement_silo_id,date_time);
+	ALTER TABLE public.cement_silo_materials OWNER TO beton;
+
+
+
+-- ******************* update 05/07/2024 10:50:58 ******************
+-- VIEW: cement_silo_materials_list
+
+--DROP VIEW cement_silo_materials_list;
+
+CREATE OR REPLACE VIEW cement_silo_materials_list AS
+	SELECT
+		t.id,
+		t.cement_silo_id,
+		cement_silos_ref(cs) AS cement_silos_ref,		
+		materials_ref(mat) AS materials_ref,
+		t.date_time
+		
+	FROM cement_silo_materials AS t
+	LEFT JOIN cement_silos AS cs ON cs.id=t.cement_silo_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.material_id
+	ORDER BY cs.name, t.date_time DESC
+	;
+	
+ALTER VIEW cement_silo_materials_list OWNER TO beton;
+
+
+-- ******************* update 05/07/2024 11:17:01 ******************
+
+	-- Adding menu item
+	INSERT INTO views
+	(id,c,f,t,section,descr,limited)
+	VALUES (
+	'10055',
+	'CementSiloMaterial_Controller',
+	'get_list',
+	'CementSiloMaterialList',
+	'Справочники',
+	'Материалы в силосах',
+	FALSE
+	);
+	
+
+-- ******************* update 15/07/2024 14:45:42 ******************
+-- VIEW: cement_silos_list
+
+--DROP VIEW cement_silos_list;
+
+CREATE OR REPLACE VIEW cement_silos_list AS
+	SELECT
+		t.*,
+		production_sites_ref(pst) AS production_sites_ref
+	FROM cement_silos AS t
+	LEFT JOIN production_sites AS pst ON pst.id=t.production_site_id
+	ORDER BY
+		pst.name,
+		t.production_descr
+	;
+	
+ALTER VIEW cement_silos_list OWNER TO beton;
+
+
+-- ******************* update 15/07/2024 14:47:48 ******************
+-- VIEW: cement_silos_for_order_list
+
+--DROP VIEW cement_silos_for_order_list;
+
+CREATE OR REPLACE VIEW cement_silos_for_order_list AS
+	SELECT
+		t.id,
+		t.name,
+		production_sites_ref(pst) AS production_sites_ref,
+		t.load_capacity,
+		bal.quant AS balance,
+		jsonb_build_object(
+			'vehicles_ref',cs_state.vehicles_ref,
+			'vehicle_state',cs_state.vehicle_state
+		) AS vehicle,
+		pst.production_base_id
+		
+	FROM cement_silos AS t	
+	LEFT JOIN production_sites AS pst ON pst.id = t.production_site_id
+	LEFT JOIN rg_cement_balance(NULL) AS bal ON bal.cement_silos_id = t.id
+	LEFT JOIN
+		(SELECT
+			cs.cement_silo_id,
+			cs.date_time,
+			vehicles_ref(vh) AS vehicles_ref,
+			cs.vehicle_state
+		FROM
+			(SELECT cement_silo_id,
+				max(date_time) AS date_time
+			FROM cement_silo_productions
+			GROUP BY cement_silo_id
+			) AS m_period
+		LEFT JOIN cement_silo_productions AS cs ON cs.cement_silo_id=m_period.cement_silo_id AND cs.date_time=m_period.date_time	
+		LEFT JOIN vehicles AS vh ON vh.id=cs.vehicle_id
+	) AS cs_state ON cs_state.cement_silo_id = t.id
+	
+	WHERE coalesce(t.visible, FALSE)
+	ORDER BY
+		pst.name,
+		t.production_descr
+	;
+	
+ALTER VIEW cement_silos_for_order_list OWNER TO beton;
