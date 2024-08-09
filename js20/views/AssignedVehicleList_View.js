@@ -29,6 +29,7 @@ function AssignedVehicleList_View(id,options){
 		options.templateOptions = options.templateOptions || {};
 		var menu_n = DOMHelper.getElementsByAttr("navbar", document.body, "class", true);
 		options.templateOptions.MENU_EXISTS = (menu_n&&menu_n.length);
+		options.templateOptions.PROD_SITE_W = 12 / this.PROD_SITE_COUNT;
 	}
 	
 	var constants = {

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-07-30 06:10:36</lastBuild></version>
+		<lastBuild>2024-08-09 06:04:29</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -241,6 +241,7 @@
 		<version dateOpen="2024-06-21 11:18:52" dateClose="2024-06-28 06:42:45">1.00335</version>
 		<version dateOpen="2024-07-04 15:19:57" dateClose="2024-07-05 05:00:50">1.00336</version>
 		<version dateOpen="2024-07-05 10:36:53" dateClose="2024-07-30 06:10:57">1.00337</version>
+		<version dateOpen="2024-08-02 16:03:37" dateClose="2024-08-09 06:04:48">1.00338</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1478,6 +1479,9 @@
 		<model id="OrderMakeList" parent="ModelSQLBeton" dataTable="orders_make_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
 			<field id="clients_ref" dataType="JSON"/>
+			<field id="client_id" dataType="Int"/>
+			<field id="destination_id" dataType="Int"/>
+			<field id="user_id" dataType="Int"/>
 			<field id="destinations_ref" dataType="JSON"/>
 			<field id="concrete_types_ref" dataType="JSON"/>
 			<field id="f_val" dataType="Int" alias="F"/>

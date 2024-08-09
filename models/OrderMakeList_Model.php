@@ -43,6 +43,30 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		$this->addField($f_clients_ref);
 		//********************
 		
+		//*** Field client_id ***
+		$f_opts = array();
+		$f_opts['id']="client_id";
+						
+		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
+		$this->addField($f_client_id);
+		//********************
+		
+		//*** Field destination_id ***
+		$f_opts = array();
+		$f_opts['id']="destination_id";
+						
+		$f_destination_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destination_id",$f_opts);
+		$this->addField($f_destination_id);
+		//********************
+		
+		//*** Field user_id ***
+		$f_opts = array();
+		$f_opts['id']="user_id";
+						
+		$f_user_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_id",$f_opts);
+		$this->addField($f_user_id);
+		//********************
+		
 		//*** Field destinations_ref ***
 		$f_opts = array();
 		$f_opts['id']="destinations_ref";

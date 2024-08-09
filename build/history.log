@@ -1246,6 +1246,19 @@ add conception of ObligatoryFilter like global, but is applied only if no filter
 5) Silo sorting by elkon name. cement_silos_for_order_list.sql, cement_silos_list.sql
 6) DOCMaterialProcurement_Controller->get_list() when filters are set returns bad file and v=ViewExcel
 	ControllerObjServer.download(): params to string with ServConnector.queryParamsAsString()
+7) material_actions_prod_base1, material_actions_prod_base2, material_actions_prod_base3 sorting by production_sites.name+silo.production_descr
+
+
+
+1.00338 08.09.24
+1) OrderMakeList_Model. If filtered with client, set date results to error: client_id attribute not found for model OrderMakeList_Model.
+also added destination_id, user_id
+changed order_makes_list.sql and OrderMakeList_Model
+2) AssignedVehicleList adjustments:
+	- tmpl/AssignedVehicleList.html
+	- js/AssignedVehicleList_View.js added new template param
+
+
 
 
 + shift + base name

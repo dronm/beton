@@ -47,6 +47,33 @@ function OrderMakeList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.client_id = new FieldInt("client_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.destination_id = new FieldInt("destination_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.user_id = new FieldInt("user_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.destinations_ref = new FieldJSON("destinations_ref",filed_options);
 	
 				

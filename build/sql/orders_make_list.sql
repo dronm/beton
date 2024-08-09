@@ -2,19 +2,19 @@
 
 -- DROP VIEW public.orders_make_list;
 
-CREATE OR REPLACE VIEW public.orders_make_list AS 
+CREATE OR REPLACE VIEW public.orders_make_list
+ AS
  SELECT o.id,
     clients_ref(cl.*) AS clients_ref,
     destinations_ref(d.*) AS destinations_ref,
     concrete_types_ref(concr.*) AS concrete_types_ref,
     o.comment_text,
-	CASE
-		WHEN ct.id IS NOT NULL AND position(',' IN ct.descr) > 0 THEN
-			substring(ct.descr from 1 for position(',' in ct.descr)-1)
-		WHEN ct.id IS NOT NULL THEN ct.descr
-		ELSE o.descr 
-	END AS descr,
-    coalesce(ct.tel::text, o.phone_cel::text) AS phone_cel,
+        CASE
+            WHEN ct.id IS NOT NULL AND POSITION((','::text) IN (ct.descr)) > 0 THEN SUBSTRING(ct.descr FROM 1 FOR POSITION((','::text) IN (ct.descr)) - 1)
+            WHEN ct.id IS NOT NULL THEN ct.descr
+            ELSE o.descr
+        END AS descr,
+    COALESCE(ct.tel::text, o.phone_cel::text) AS phone_cel,
     o.unload_speed,
     o.date_time,
     o.date_time_to,
@@ -64,25 +64,30 @@ CREATE OR REPLACE VIEW public.orders_make_list AS
          LIMIT 1) AS pump_vehicle_owners_ref,
     pvh.pump_length AS pump_vehicle_length,
     pvh.comment_text AS pump_vehicle_comment,
-    
     o.contact_id,
-    
-    coalesce(o.f_val,
-	    coalesce((SELECT qp.f_val FROM quality_passports qp WHERE qp.order_id = o.id LIMIT 1), concr.f_val)
-    ) AS f_val,
-    coalesce(o.w_val,
-    	coalesce((SELECT qp.w_val FROM quality_passports qp WHERE qp.order_id = o.id LIMIT 1), concr.w_val)
-    ) AS w_val
-    
+    COALESCE(o.f_val, COALESCE(( SELECT qp.f_val
+           FROM quality_passports qp
+          WHERE qp.order_id = o.id
+         LIMIT 1), concr.f_val)) AS f_val,
+    COALESCE(o.w_val, COALESCE(( SELECT qp.w_val
+           FROM quality_passports qp
+          WHERE qp.order_id = o.id
+         LIMIT 1), concr.w_val)) AS w_val,
+         
+   o.client_id, --added for filter json column
+   o.destination_id,
+   o.user_id
+         
    FROM orders o
      LEFT JOIN clients cl ON cl.id = o.client_id
      LEFT JOIN destinations d ON d.id = o.destination_id
      LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
      LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
      LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
-     LEFT JOIN contacts AS ct ON ct.id = o.contact_id
-     
+     LEFT JOIN contacts ct ON ct.id = o.contact_id
   ORDER BY o.date_time;
 
-ALTER TABLE public.orders_make_list OWNER TO beton;
+ALTER TABLE public.orders_make_list
+    OWNER TO ;
+
 

@@ -55,7 +55,7 @@ AS $BODY$
 		coalesce(ra.quant_deb_correction,0) - coalesce(ra.quant_kred_correction,0) AS quant_correction,
 		coalesce(bal_start.quant, 0) + coalesce(ra.quant_deb, 0) + coalesce(ra.quant_deb_correction, 0) - coalesce(ra.quant_kred, 0) - coalesce(ra.quant_kred_correction, 0) AS quant_end
 	FROM cement_silos AS sil	
-	
+	LEFT JOIN production_sites AS pst ON pst.id = sil.production_site_id
 	--цепляем остаток начальный: только силосы по этой базе
 	LEFT JOIN (SELECT
 			rg.cement_silos_id,
@@ -113,7 +113,11 @@ AS $BODY$
 	) AS ra ON ra.cement_silos_id = sil.id 
 		
 	WHERE sil.id IN (SELECT prod_base_silos.id FROM prod_base_silos)
-	ORDER BY sil.name
+	ORDER BY
+		pst.name,
+		sil.production_descr	
+		--sil.weigh_app_name
+		--sil.name
 	)
 	
 	UNION ALL
