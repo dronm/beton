@@ -131,7 +131,7 @@ function ShipmentForClientList_View(id,options){
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("destinations_ref"),
-									"ctrlClass":DestinationForClientEdit,
+									"ctrlClass":ext_user? DestinationForClientEdit:DestinationEdit,
 									"searchOptions":{
 										"field":new FieldInt("destination_id"),
 										"searchType":"on_match",

@@ -1259,13 +1259,23 @@ changed order_makes_list.sql and OrderMakeList_Model
 	- js/AssignedVehicleList_View.js added new template param
 
 
+1.00339
+1) Reports:
+	Shipment_Controller->get_pump_list(),
+	Shipment_Controller->get_list_for_client() error: period not set.
+Поставил сразу, заменив Shipment_Controller.php, User_Controller.php
+2) ShipmentForClientList_View.js destination filter shows enum, not DestionationEdit
+	different classes for ext users and Beton users: DestinationEdit, DestinationForClientEdit
+3) DOCMaterialProcurementList_View add column after Vehicle, ПунктОтправления
 
+- Silo Model which returns additional info:
+	producing bool, vehicle under production (plate)
+	Events: prodiction start(with vehicle), production end (already exists)
 
 + shift + base name
 + Chat: click does not work sometimes on child windows.
 + Main window: unnecessary query SessionVar->get_values("role_view_restrictions") - two times!!!
 + ViewBase.php line 2143, andefined array key HTTP_HOST
-- Client_Controller->get_list() retrieves all records? slow query
 Tasks:
 	2) Report for vehicle owner: make the same report but for all owners/vehicles.
 	3) Check contact transfer on call to a new client. Old client must be deprived from this contact.

@@ -1629,12 +1629,12 @@ class Shipment_Controller extends ControllerSQL{
 	}
 	
 	public function get_pump_list($pm){
-		checkPublicMethodPeriod($pm, new ShipmentPumpList_Model($this->getDbLink()), "ship_date_time", 370);
+		checkPublicMethodPeriod($pm, new ShipmentPumpList_Model($this->getDbLink()), "date_time", 370);
 		$this->modelGetList(new ShipmentPumpList_Model($this->getDbLink()),$pm);
 	}
 
 	public function get_pump_list_for_veh_owner($pm){
-		checkPublicMethodPeriod($pm, new ShipmentPumpForVehOwnerList_Model($this->getDbLink()), "ship_date_time", 370);
+		checkPublicMethodPeriod($pm, new ShipmentPumpForVehOwnerList_Model($this->getDbLink()), "date_time", 370);
 		$this->modelGetList(new ShipmentPumpForVehOwnerList_Model($this->getDbLink()),$pm);
 	}
 	
@@ -1814,7 +1814,7 @@ class Shipment_Controller extends ControllerSQL{
 	}
 	
 	public function get_list_for_client_veh_owner($pm){	
-		checkPublicMethodPeriod($pm, new ShipmentForClientVehOwnerList_Model($this->getDbLink()), "ship_date_time", 370);
+		checkPublicMethodPeriod($pm, new ShipmentForClientVehOwnerList_Model($this->getDbLink()), "ship_date", 370);
 		$this->modelGetList(new ShipmentForClientVehOwnerList_Model($this->getDbLink()),$pm);
 	}
 
@@ -1950,7 +1950,7 @@ class Shipment_Controller extends ControllerSQL{
 	}
 	
 	public function get_list_for_client($pm){	
-		checkPublicMethodPeriod($pm, new ShipmentForClientList_Model($this->getDbLink()), "ship_date_time", 370);
+		checkPublicMethodPeriod($pm, new ShipmentForClientList_Model($this->getDbLink()), "ship_date", 370);
 		$this->modelGetList(new ShipmentForClientList_Model($this->getDbLink()),$pm);
 	}
 

@@ -1,6 +1,9 @@
 /** Copyright (c) 2019
  *	Andrey Mikhalevich, Katren ltd.
  */
+
+// import {PopUpMenu} from '../controls/PopUpMenu.js';
+
 function ClientList_View(id,options){	
 
 	options.addElement = function(){
@@ -12,7 +15,6 @@ function ClientList_View(id,options){
 		
 		var popup_menu = new PopUpMenu();
 		var pagClass = window.getApp().getPaginationClass();
-		var self = this;
 		//GridAjxScroll
 		this.addElement(new GridAjx(id+":grid",{
 			"model":model,

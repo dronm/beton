@@ -1,6 +1,19 @@
-/** Copyright (c) 2019, 2023
+/** Copyright (c) 2019, 2023, 2024
  *	Andrey Mikhalevich, Katren ltd.
  */
+
+// import {EditPeriodDateShift} from '../custom_controls/EditPeriodDateShift.js';
+// import {CommandBinding} from '../controls/CommandBinding.js';
+// import {PopUpMenu} from '../controls/PopUpMenu.js';
+// import {GridAjx} from '../controls/GridAjx.js';
+// import {FieldDateTime} from '../core/FieldDateTime.js';
+// import {FieldInt} from '../core/FieldInt.js';
+// import {DOCMaterialProcurement_Controller} from '../controllers/DOCMaterialProcurement_Controller.js';
+// import {DOCMaterialProcurementList_Model} from '../models/DOCMaterialProcurementList_Model.js';
+// import {MaterialSelect} from '../custom_controls/MaterialSelect.js';
+// import {SupplierEdit} from '../custom_controls/SupplierEdit.js';
+// import {DOCMaterialProcurementDialog_Form} from '../forms/DOCMaterialProcurementDialog_Form.js';
+
 function DOCMaterialProcurementList_View(id,options){	
 
 	if(!options.detailFilters){
@@ -193,6 +206,14 @@ function DOCMaterialProcurementList_View(id,options){
 								})
 							],
 							"sortable":true
+						})
+						,new GridCellHead(id+":grid:head:sender_name",{
+							"value":"Пункт отправления",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("sender_name")
+								})
+							]
 						})
 						/*,new GridCellHead(id+":grid:head:driver",{
 							"value":"Водитель",

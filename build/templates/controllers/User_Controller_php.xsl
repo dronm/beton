@@ -476,10 +476,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			GlobalFilter::set('OrderForClientList_Model', $filter, TRUE);
 
 			$filter = new ModelWhereSQL();
-			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
+			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date");
 			$f1->setValue($date_from);
 			$filter->addField($f1,'&gt;=');		
-			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date_time");
+			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "ship_date");
 			$f2->setValue($date_to);
 			$filter->addField($f2,'&lt;=');				
 			GlobalFilter::set('ShipmentForClientVehOwnerList_Model', $filter, TRUE);
