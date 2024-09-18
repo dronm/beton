@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-08-27 17:00:35</lastBuild></version>
+		<lastBuild>2024-09-18 06:18:32</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -243,6 +243,7 @@
 		<version dateOpen="2024-07-05 10:36:53" dateClose="2024-07-30 06:10:57">1.00337</version>
 		<version dateOpen="2024-08-02 16:03:37" dateClose="2024-08-09 06:04:48">1.00338</version>
 		<version dateOpen="2024-08-09 14:50:01" dateClose="2024-08-27 17:00:38">1.00339</version>
+		<version dateOpen="2024-09-11 12:42:35" dateClose="2024-09-18 06:18:35">1.00340</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1245,6 +1246,8 @@
 			<field id="pump_prices" dataType="JSONB"/>
 			<field id="specialist_inform" dataType="Bool"/>
 			<field id="driver_ship_inform" dataType="Bool"/>
+			<field id="min_order_quant" dataType="Int" alias="Минимальное количество м3 для заявки"/>
+			<field id="min_order_time_interval" dataType="Interval" alias="Минимальный интервал между заявками"/>
 		</model>
 		<model id="PumpVehicleList" parent="ModelSQLBeton" dataTable="pump_veh_list" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -1266,6 +1269,8 @@
 			<field id="specialist_inform" dataType="Bool"/>
 			<field id="contact_list" dataType="JSON" alias="Контакты"/>
 			<field id="driver_ship_inform" dataType="Bool"/>
+			<field id="min_order_quant" dataType="Int" alias="Минимальное количество м3 для заявки"/>
+			<field id="min_order_time_interval" dataType="Interval" alias="Минимальный интервал между заявками"/>
 			<globalFilter id="vehicle_owner_list" fieldId="vehicle_owners_ar"/>
 		</model>
 		<model id="PumpVehicleWorkList" parent="ModelSQLBeton" dataTable="pump_veh_work_list" virtual="TRUE">
@@ -1282,6 +1287,8 @@
 			<field id="phone_cels" dataType="JSONB"/>
 			<field id="pump_prices" dataType="JSONB"/>
 			<field id="pump_vehicle_owners_ar" dataType="Array"/>
+			<field id="min_order_quant" dataType="Int" alias="Минимальное количество м3 для заявки"/>
+			<field id="min_order_time_interval" dataType="Interval" alias="Минимальный интервал между заявками"/>
 			<globalFilter id="vehicle_owner_list" fieldId="pump_vehicle_owners_ar"/>
 		</model>
 		<model id="Order" parent="ModelSQLBeton" dataTable="orders" virtual="FALSE">
@@ -5980,6 +5987,12 @@
 			</publicMethod>
 			<publicMethod id="get_contact_refs">
 				<field id="id" dataType="Int" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="check_order_min_vals">
+				<field id="pump_vehicle_id" dataType="Int" required="TRUE"/>
+				<field id="order_id" dataType="Int" required="FALSE"/>
+				<field id="order_quant" dataType="Float" length="19" precision="3" required="TRUE"/>
+				<field id="order_date_time" dataType="DateTime" length="19" precision="3" required="TRUE"/>
 			</publicMethod>
 		</controller>
 		<controller id="PumpPrice" parentId="ControllerSQL" state="TRUE" noState="FALSE">

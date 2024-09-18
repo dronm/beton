@@ -139,6 +139,24 @@ function PumpVehicleWorkList_Model(options){
 	
 	options.fields.pump_vehicle_owners_ar = new FieldArray("pump_vehicle_owners_ar",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Минимальное количество м3 для заявки';
+	filed_options.autoInc = false;	
+	
+	options.fields.min_order_quant = new FieldInt("min_order_quant",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Минимальный интервал между заявками';
+	filed_options.autoInc = false;	
+	
+	options.fields.min_order_time_interval = new FieldInterval("min_order_time_interval",filed_options);
+	
 			
 		PumpVehicleWorkList_Model.superclass.constructor.call(this,id,options);
 }

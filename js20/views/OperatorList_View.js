@@ -642,10 +642,6 @@ OperatorList_View.prototype.showProdDetails = function(prodData,node){
 		
 		//new 
 		var v_opts = {};
-		v_opts.attrs = v_opts.attrs || {};
-		v_opts.attrs.style = "display: none;";
-		v_opts.attrs.colspan = tr.cells.length;
-		v_opts.tagName = "TD";
 		
 		//setting keys
 		var grid = this.getElement("grid");
@@ -674,14 +670,19 @@ OperatorList_View.prototype.showProdDetails = function(prodData,node){
 		if(!app.m_detailViews)app.m_detailViews = {};
 		app.m_detailViews[detail_view_id] = new ProductionMaterialList_View(detail_view_id,v_opts);
 		
+		let viewCont = document.createElement("TD");
+		viewCont.setAttribute("style", "display: none;");
+		viewCont.setAttribute("colspan", tr.cells.length);
+
 		if(tr.nextSibling){
 			tr.parentNode.insertBefore(this.m_detailRow[prodData.production_id], tr.nextSibling);	
 		}
 		else{
 			tr.parentNode.appendChild(this.m_detailRow[prodData.production_id]);	
 		}
-		app.m_detailViews[detail_view_id].toDOM(this.m_detailRow[prodData.production_id]);
-		$(app.m_detailViews[detail_view_id].getNode()).slideToggle(300);
+		app.m_detailViews[detail_view_id].toDOM(viewCont);
+		this.m_detailRow[prodData.production_id].appendChild(viewCont);
+		$(viewCont).slideToggle(300);
 	}
 	else{
 		var tr = DOMHelper.getParentByTagName(node,"TR");

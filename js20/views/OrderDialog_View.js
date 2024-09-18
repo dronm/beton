@@ -26,6 +26,9 @@ function OrderDialog_View(id,options){
 			"controller":options.controller,
 			"onSetTime":function(newTime){
 				self.getElement("date_time_time").setValue(DateHelper.format(newTime,"H:i"));
+				if(self.m_onChangeTime){
+					self.m_onChangeTime();
+				}
 			},
 			"onSetSpeed":function(newSpeed){
 				self.getElement("unload_speed").setValue(Math.round(newSpeed,2));
@@ -48,10 +51,16 @@ function OrderDialog_View(id,options){
 			"cmdClear":false,			
 			"onSelect":function(){
 				self.getAvailSpots();
+				if(self.m_onChangeDate){
+					self.m_onChangeDate();
+				}
 			},			
 			"events":{
 				"onkeyup":function(e){
 					self.getAvailSpots();
+					if(self.m_onChangeDate){
+						self.m_onChangeDate();
+					}
 				}
 			}
 		});	
@@ -61,7 +70,14 @@ function OrderDialog_View(id,options){
 			"required":true,
 			"value":options.dateTime_time,
 			"attrs":{"style":"width:150px;display:inline;","class":"form-control"},
-			"inline":true
+			"inline":true,
+			"events":{
+				"change":function(){
+					if(self.m_onChangeTime){
+						self.m_onChangeTime();
+					}
+				}
+			}
 		}));	
 	
 		this.addElement(new EditCheckBox(id+":pay_cash",{
@@ -371,6 +387,10 @@ extend(OrderDialog_View,ViewObjectAjx);
 
 //contact_id value. Has no associated control field
 OrderDialog_View.prototype.m_selectedContactId;
+
+//callbacks
+OrderDialog_View.prototype.m_onChangeDate;
+OrderDialog_View.prototype.m_onChangeTime;
 
 OrderDialog_View.prototype.showTMInvite = function(){
 	var tm_ctrl = this.getElement("descr").getErrorControl();

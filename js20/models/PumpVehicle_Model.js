@@ -124,6 +124,24 @@ function PumpVehicle_Model(options){
 	
 	options.fields.driver_ship_inform = new FieldBool("driver_ship_inform",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Минимальное количество м3 для заявки';
+	filed_options.autoInc = false;	
+	
+	options.fields.min_order_quant = new FieldInt("min_order_quant",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Минимальный интервал между заявками';
+	filed_options.autoInc = false;	
+	
+	options.fields.min_order_time_interval = new FieldInterval("min_order_time_interval",filed_options);
+	
 		PumpVehicle_Model.superclass.constructor.call(this,id,options);
 }
 extend(PumpVehicle_Model,ModelXML);

@@ -13,13 +13,13 @@
  * @param {object} options.models All data models
  * @param {object} options.variantStorage {name,model}
  */	
-
+/*
 import {ViewObjectAjx} from '../controls/ViewObjectAjx.js';
 
 import {ClientNameEdit} from '../custom_controls/ClientNameEdit.js';
 import {ClientNameFullEdit} from '../custom_controls/ClientNameFullEdit.js';
 import {Client_Controller} from '../controllers/Client_Controller.js';
-
+*/
 function ClientDialog_View(id,options){	
 
 	options = options || {};

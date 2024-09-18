@@ -1236,3 +1236,11 @@ AppBeton.prototype.getChatStatusRef = function() {
 	}
 	return this.m_chatStatusRef;
 }
+
+//controlePumpVehicle returns true if for this role
+//pump vehicle extra parameters are controled.
+AppBeton.prototype.controlePumpVehicle = function() {
+	let role_id = this.getServVar("role_id");
+	return true;
+	// return !(role_id == "admin" || role_id == "boss" || role_id == "owner");
+}

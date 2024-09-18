@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInterval.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLArray.php');
@@ -177,6 +178,26 @@ class PumpVehicleList_Model extends ModelSQLBeton{
 						
 		$f_driver_ship_inform=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"driver_ship_inform",$f_opts);
 		$this->addField($f_driver_ship_inform);
+		//********************
+		
+		//*** Field min_order_quant ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Минимальное количество м3 для заявки';
+		$f_opts['id']="min_order_quant";
+						
+		$f_min_order_quant=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"min_order_quant",$f_opts);
+		$this->addField($f_min_order_quant);
+		//********************
+		
+		//*** Field min_order_time_interval ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Минимальный интервал между заявками';
+		$f_opts['id']="min_order_time_interval";
+						
+		$f_min_order_time_interval=new FieldSQLInterval($this->getDbLink(),$this->getDbName(),$this->getTableName(),"min_order_time_interval",$f_opts);
+		$this->addField($f_min_order_time_interval);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

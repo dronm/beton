@@ -20,6 +20,8 @@ function PumpVehicleDialog_View(id,options){
 	options.controller = new PumpVehicle_Controller();
 	options.model = options.models.PumpVehicleList_Model;
 	
+	let min_vals_enabled = !window.getApp().controlePumpVehicle();
+
 	options.addElement = function(){
 		this.addElement(new VehicleEdit(id+":pump_vehicles_ref",{
 		}));	
@@ -54,6 +56,19 @@ function PumpVehicleDialog_View(id,options){
 			"title": "Если установлен, водитель будет получать уведомления при отгрузке" 
 		}));	
 
+		this.addElement(new EditFloat(id+":min_order_quant",{
+			"precision":2,
+			"labelCaption": "Мин. кол-во для заявки, м3:",
+			"title": "При выборе данного насоса в заявку будет контролироваться количество по заявке. Если количество по заявке меньше минимального, заявка не будет поставлена.",
+			"enabled":min_vals_enabled
+		}));	
+
+		this.addElement(new EditTime(id+":min_order_time_interval",{
+			"labelCaption": "Мин. время между заявками:",
+			"title": "При выборе данного насоса в заявку будет контролироваться временной интервал между другими заявками с этим насосом. Если временной интервал меньше заданного, заявка не будет поставлена.",
+			"enabled":min_vals_enabled
+		}));	
+
 		this.addElement(new EntityContactList_View(id+":contacts_list",{
 			"detail":true
 		}));		
@@ -72,6 +87,8 @@ function PumpVehicleDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("deleted")})
 		,new DataBinding({"control":this.getElement("specialist_inform")})
 		,new DataBinding({"control":this.getElement("driver_ship_inform")})
+		,new DataBinding({"control":this.getElement("min_order_quant")})
+		,new DataBinding({"control":this.getElement("min_order_time_interval")})
 		,new DataBinding({"control":this.getElement("pump_prices")})
 	]);
 	
@@ -83,6 +100,8 @@ function PumpVehicleDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("deleted")})
 		,new CommandBinding({"control":this.getElement("specialist_inform")})
 		,new CommandBinding({"control":this.getElement("driver_ship_inform")})
+		,new CommandBinding({"control":this.getElement("min_order_quant")})
+		,new CommandBinding({"control":this.getElement("min_order_time_interval")})
 		,new CommandBinding({"control":this.getElement("pump_prices"), "fieldId":"pump_prices"})
 	]);
 	

@@ -422,7 +422,6 @@ ProductionMaterialList_View.prototype.onEditCons = function(fields){
 }
 
 ProductionMaterialList_View.prototype.onEditComment = function(fields){
-
 	this.m_editMode = true;
 	var el = fields.production_comment? fields.production_comment.getValue():null;
 	var comment_text = el? el.comment_text:"";

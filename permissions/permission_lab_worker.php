@@ -812,6 +812,8 @@ $permissions = array();
 				
 					$permissions['PumpVehicle_Controller_get_contact_refs']=TRUE;
 				
+					$permissions['PumpVehicle_Controller_check_order_min_vals']=TRUE;
+				
 					$permissions['PumpPrice_Controller_insert']=TRUE;
 				
 					$permissions['PumpPrice_Controller_update']=TRUE;

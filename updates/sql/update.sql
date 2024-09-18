@@ -27348,3 +27348,1522 @@ CREATE OR REPLACE VIEW public.orders_make_list
 
 ALTER TABLE public.orders_make_list
     OWNER TO beton;
+
+
+
+
+-- ******************* update 17/09/2024 10:24:26 ******************
+
+		ALTER TABLE public.pump_vehicles ADD COLUMN min_order_quant int,ADD COLUMN min_order_time_interval interval;
+
+
+
+-- ******************* update 17/09/2024 10:26:57 ******************
+-- View: public.pump_veh_list
+
+-- DROP VIEW public.pump_veh_list CASCADE;
+
+CREATE OR REPLACE VIEW public.pump_veh_list AS 
+	SELECT
+		pv.id,
+		pv.phone_cel,
+		vehicles_ref(v) AS pump_vehicles_ref,
+		pump_prices_ref(ppr) AS pump_prices_ref,
+		
+		v.make,
+		v.owner,
+		v.feature,
+		v.plate,
+		pv.deleted,
+		pv.pump_length,
+		--vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		
+		(SELECT
+			owners.r->'fields'->'owner'
+		FROM
+		(
+			SELECT jsonb_array_elements(v.vehicle_owners->'rows') AS r
+		) AS owners
+		ORDER BY owners.r->'fields'->'dt_from' DESC
+		LIMIT 1
+		) AS vehicle_owners_ref,
+		
+		pv.comment_text,
+		
+		--v.vehicle_owner_id,
+		(SELECT
+			CASE WHEN owners.r->'fields'->'owner'->'keys'->>'id'='null' THEN NULL
+				ELSE (owners.r->'fields'->'owner'->'keys'->>'id')::int
+			END	
+		FROM
+		(
+			SELECT jsonb_array_elements(v.vehicle_owners->'rows') AS r
+		) AS owners
+		ORDER BY owners.r->'fields'->'dt_from' DESC
+		LIMIT 1
+		) AS vehicle_owner_id,
+		
+		
+		pv.phone_cels,
+		pv.pump_prices,
+		
+		v.vehicle_owners_ar,
+		pump_vehicles_ref(
+			pv,
+			v,
+			(SELECT vh_o FROM vehicle_owners AS vh_o
+			WHERE vh_o.id = 
+				(SELECT
+					CASE WHEN owners.r->'fields'->'owner'->'keys'->>'id'='null' THEN NULL
+						ELSE (owners.r->'fields'->'owner'->'keys'->>'id')::int
+					END	
+				FROM
+				(
+					SELECT jsonb_array_elements(v.vehicle_owners->'rows') AS r
+				) AS owners
+				ORDER BY owners.r->'fields'->'dt_from' DESC
+				LIMIT 1
+				)			
+			)
+		) AS self_ref,
+		
+		pv.specialist_inform,
+		
+		(SELECT
+			json_agg(
+				json_build_object(
+					'name', ct.name,
+					'tel', ct.tel,
+					'tel_ext', ct.tel_ext,
+					'email', ct.email,
+					'post', p.name
+				)
+			)
+		FROM entity_contacts AS en
+		LEFT JOIN contacts AS ct ON ct.id = en.contact_id
+		LEFT JOIN posts AS p ON p.id = ct.post_id
+		WHERE en.entity_type = 'pump_vehicles' AND en.entity_id = pv.id
+		) AS contact_list,	
+		
+		pv.driver_ship_inform,
+		
+		pv.min_order_quant,
+		pv.min_order_time_interval
+		
+		
+	FROM pump_vehicles pv
+	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
+	LEFT JOIN pump_prices ppr ON ppr.id = pv.pump_price_id
+	--LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+	ORDER BY v.plate;
+
+ALTER TABLE public.pump_veh_list
+  OWNER TO beton;
+
+
+
+-- ******************* update 17/09/2024 10:27:46 ******************
+-- View: public.pump_veh_work_list
+
+-- DROP VIEW public.pump_veh_work_list;
+-- CASCADE;
+
+CREATE OR REPLACE VIEW public.pump_veh_work_list AS 
+	SELECT
+		pv.id,
+		pv.phone_cel,
+		vehicles_ref(v) AS pump_vehicles_ref,
+		pump_prices_ref(ppr) AS pump_prices_ref,
+		
+		v.make,
+		v.owner,
+		v.feature,
+		v.plate,
+		pv.pump_length,
+		
+		vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		/*
+		(SELECT
+			owners.r->'fields'->'owner'
+		FROM
+		(
+			SELECT jsonb_array_elements(v.vehicle_owners->'rows') AS r
+		) AS owners
+		ORDER BY owners.r->'fields'->'dt_from' DESC
+		LIMIT 1
+		) AS vehicle_owners_ref,		
+		*/
+		
+		v.vehicle_owner_id AS pump_vehicle_owner_id,
+		/*
+		(SELECT
+			(owners.r->'fields'->'owner'->'keys'->>'id')::int
+		FROM
+		(
+			SELECT jsonb_array_elements(v.vehicle_owners->'rows') AS r
+		) AS owners
+		ORDER BY owners.r->'fields'->'dt_from' DESC
+		LIMIT 1
+		) AS pump_vehicle_owner_id,		
+		*/
+		
+		pv.phone_cels,
+		pv.pump_prices,
+		
+		v.vehicle_owners_ar AS pump_vehicle_owners_ar,
+		
+		pv.min_order_quant,
+		pv.min_order_time_interval
+		
+		
+	FROM pump_vehicles pv
+	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
+	LEFT JOIN pump_prices ppr ON ppr.id = pv.pump_price_id
+	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+	WHERE coalesce(pv.deleted,FALSE)=FALSE	
+	ORDER BY v.plate;
+
+ALTER TABLE public.pump_veh_work_list
+  OWNER TO beton;
+
+
+
+-- ******************* update 17/09/2024 13:23:43 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp)
+
+-- DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp);
+
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp)
+  RETURNS bool AS
+$$
+	WITH veh AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh) = 0 AND (SELECT min_order_time_interval FROM veh) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh) > 0 AND in_qunat < (SELECT min_order_quant FROM veh) THEN FALSE
+			WHEN (SELECT min_order_time_interval FROM veh) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					(in_date_time - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time < in_date_time 
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) > (SELECT min_order_time_interval FROM veh))
+					OR
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time > in_date_time 
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - in_date_time > (SELECT min_order_time_interval FROM veh))
+					
+					THEN FALSE
+			
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp) OWNER TO beton;
+
+
+-- ******************* update 17/09/2024 13:35:59 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp)
+
+-- DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp);
+
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp)
+  RETURNS bool AS
+$$
+	WITH veh AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh) = 0 AND (SELECT min_order_time_interval FROM veh) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh) > 0 AND in_qunat < (SELECT min_order_quant FROM veh) THEN FALSE
+			/*
+			WHEN (SELECT min_order_time_interval FROM veh) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					(in_date_time - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time < in_date_time 
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) > (SELECT min_order_time_interval FROM veh))
+					OR
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time > in_date_time 
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - in_date_time > (SELECT min_order_time_interval FROM veh))
+					
+					THEN FALSE
+			*/
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp) OWNER TO beton;
+
+
+-- ******************* update 17/09/2024 13:36:31 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp)
+
+-- DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp);
+
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp)
+  RETURNS bool AS
+$$
+	WITH veh AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh) = 0 AND (SELECT min_order_time_interval FROM veh) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh) > 0 AND in_qunat > (SELECT min_order_quant FROM veh) THEN FALSE
+			/*
+			WHEN (SELECT min_order_time_interval FROM veh) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					(in_date_time - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time < in_date_time 
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) > (SELECT min_order_time_interval FROM veh))
+					OR
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time > in_date_time 
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - in_date_time > (SELECT min_order_time_interval FROM veh))
+					
+					THEN FALSE
+			*/
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp) OWNER TO beton;
+
+
+-- ******************* update 17/09/2024 13:39:27 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp)
+
+-- DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp);
+
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp)
+  RETURNS bool AS
+$$
+	WITH veh AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh) = 0 AND (SELECT min_order_time_interval FROM veh) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh) > 0 AND in_qunat > (SELECT min_order_quant FROM veh) THEN FALSE
+			WHEN (SELECT min_order_time_interval FROM veh) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					(in_date_time - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time < in_date_time 
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) > (SELECT min_order_time_interval FROM veh))
+					OR
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time > in_date_time 
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - in_date_time > (SELECT min_order_time_interval FROM veh))
+					
+					THEN FALSE
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp) OWNER TO beton;
+
+
+-- ******************* update 17/09/2024 13:40:02 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp)
+
+ DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp);
+/*
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp)
+  RETURNS bool AS
+$$
+	WITH veh AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh) = 0 AND (SELECT min_order_time_interval FROM veh) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh) > 0 AND in_qunat > (SELECT min_order_quant FROM veh) THEN FALSE
+			WHEN (SELECT min_order_time_interval FROM veh) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					(in_date_time - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time < in_date_time 
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) > (SELECT min_order_time_interval FROM veh))
+					OR
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time > in_date_time 
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - in_date_time > (SELECT min_order_time_interval FROM veh))
+					
+					THEN FALSE
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp) OWNER TO beton;
+*/
+
+
+-- ******************* update 17/09/2024 13:41:01 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp, in_order_id int)
+
+-- DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp, in_order_id int);
+ 
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp, in_order_id int)
+  RETURNS bool AS
+$$
+	WITH veh AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh) = 0 AND (SELECT min_order_time_interval FROM veh) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh) > 0 AND in_qunat > (SELECT min_order_quant FROM veh) THEN FALSE
+			WHEN (SELECT min_order_time_interval FROM veh) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					(in_date_time - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time < in_date_time 
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) > (SELECT min_order_time_interval FROM veh))
+					OR
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time > in_date_time 
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - in_date_time > (SELECT min_order_time_interval FROM veh))
+					
+					THEN FALSE
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp, in_order_id int) OWNER TO beton;
+
+
+
+-- ******************* update 17/09/2024 13:48:18 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp, in_order_id int)
+
+ DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp, in_order_id int);
+/* 
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp, in_order_id int)
+  RETURNS bool AS
+$$
+	WITH
+	order_data AS (
+		SELECT
+			orders.quant,
+			orders.pump_vehicle_id,
+			orders.date_time
+		FROM orders
+		WHERE orders.id = in_order_id
+	)
+	,params AS (
+		SELECT
+			CASE
+				WHEN in_order_id IS NULL THEN in_pump_vehicle_id
+				ELSE (SELECT pump_vehicle_id FROM order_data)
+			END AS pump_vehicle_id,
+			CASE
+				WHEN in_order_id IS NULL THEN in_qunat
+				ELSE (SELECT quant FROM order_data)
+			END AS qunat,
+			CASE
+				WHEN in_order_id IS NULL THEN in_date_time
+				ELSE (SELECT date_time FROM order_data)
+			END AS date_time			
+	)
+	
+	
+	,veh_data AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh_data) = 0 AND (SELECT min_order_time_interval FROM veh_data) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh_data) > 0 AND (SELECT quant FROM params) > (SELECT min_order_quant FROM veh_data) THEN FALSE
+			WHEN (SELECT min_order_time_interval FROM veh_data) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					((SELECT date_time FROM params) - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time < (SELECT date_time FROM params) 
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) > (SELECT min_order_time_interval FROM veh_data))
+					
+					OR
+					
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time > (SELECT date_time FROM params) 
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - (SELECT date_time FROM params) > (SELECT min_order_time_interval FROM veh_data))
+					
+					THEN FALSE
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_qunat numeric(19,2), in_date_time timestamp, in_order_id int) OWNER TO beton;
+
+*/
+
+
+-- ******************* update 17/09/2024 13:48:43 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+
+-- DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int);
+ 
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+  RETURNS bool AS
+$$
+	WITH
+	order_data AS (
+		SELECT
+			orders.quant,
+			orders.pump_vehicle_id,
+			orders.date_time
+		FROM orders
+		WHERE orders.id = in_order_id
+	)
+	,params AS (
+		SELECT
+			CASE
+				WHEN in_order_id IS NULL THEN in_pump_vehicle_id
+				ELSE (SELECT pump_vehicle_id FROM order_data)
+			END AS pump_vehicle_id,
+			CASE
+				WHEN in_order_id IS NULL THEN in_quant
+				ELSE (SELECT quant FROM order_data)
+			END AS quant,
+			CASE
+				WHEN in_order_id IS NULL THEN in_date_time
+				ELSE (SELECT date_time FROM order_data)
+			END AS date_time			
+	)
+	
+	
+	,veh_data AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh_data) = 0 AND (SELECT min_order_time_interval FROM veh_data) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh_data) > 0 AND (SELECT quant FROM params) > (SELECT min_order_quant FROM veh_data) THEN FALSE
+			WHEN (SELECT min_order_time_interval FROM veh_data) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					((SELECT date_time FROM params) - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time < (SELECT date_time FROM params) 
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) > (SELECT min_order_time_interval FROM veh_data))
+					
+					OR
+					
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time > (SELECT date_time FROM params) 
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - (SELECT date_time FROM params) > (SELECT min_order_time_interval FROM veh_data))
+					
+					THEN FALSE
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int) OWNER TO beton;
+
+
+
+
+-- ******************* update 17/09/2024 13:51:04 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+
+-- DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int);
+ 
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+  RETURNS bool AS
+$$
+	WITH
+	order_data AS (
+		SELECT
+			orders.id,
+			orders.quant,
+			orders.pump_vehicle_id,
+			orders.date_time
+		FROM orders
+		WHERE orders.id = in_order_id
+	)
+	,params AS (
+		SELECT
+			CASE
+				WHEN in_order_id IS NULL THEN in_pump_vehicle_id
+				ELSE (SELECT pump_vehicle_id FROM order_data)
+			END AS pump_vehicle_id,
+			CASE
+				WHEN in_order_id IS NULL THEN in_quant
+				ELSE (SELECT quant FROM order_data)
+			END AS quant,
+			CASE
+				WHEN in_order_id IS NULL THEN in_date_time
+				ELSE (SELECT date_time FROM order_data)
+			END AS date_time			
+	)
+	
+	
+	,veh_data AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh_data) = 0 AND (SELECT min_order_time_interval FROM veh_data) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh_data) > 0 AND (SELECT quant FROM params) > (SELECT min_order_quant FROM veh_data) THEN FALSE
+			WHEN (SELECT min_order_time_interval FROM veh_data) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					((SELECT date_time FROM params) - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time <= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) > (SELECT min_order_time_interval FROM veh_data))
+					
+					OR
+					
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time >= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - (SELECT date_time FROM params) > (SELECT min_order_time_interval FROM veh_data))
+					
+					THEN FALSE
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int) OWNER TO beton;
+
+
+
+
+-- ******************* update 17/09/2024 13:54:48 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+
+-- DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int);
+ 
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+  RETURNS bool AS
+$$
+	WITH
+	order_data AS (
+		SELECT
+			orders.id,
+			orders.quant,
+			orders.pump_vehicle_id,
+			orders.date_time
+		FROM orders
+		WHERE orders.id = in_order_id
+	)
+	,params AS (
+		SELECT
+			CASE
+				WHEN in_order_id IS NULL THEN in_pump_vehicle_id
+				ELSE (SELECT pump_vehicle_id FROM order_data)
+			END AS pump_vehicle_id,
+			CASE
+				WHEN in_order_id IS NULL THEN in_quant
+				ELSE (SELECT quant FROM order_data)
+			END AS quant,
+			CASE
+				WHEN in_order_id IS NULL THEN in_date_time
+				ELSE (SELECT date_time FROM order_data)
+			END AS date_time			
+	)
+	
+	
+	,veh_data AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh_data) = 0 AND (SELECT min_order_time_interval FROM veh_data) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh_data) > 0 AND (SELECT quant FROM params) > (SELECT min_order_quant FROM veh_data) THEN FALSE
+			WHEN (SELECT min_order_time_interval FROM veh_data) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					((SELECT date_time FROM params) - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time <= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) < (SELECT min_order_time_interval FROM veh_data))
+					
+					OR
+					
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time >= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - (SELECT date_time FROM params) < (SELECT min_order_time_interval FROM veh_data))
+					
+					THEN FALSE
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int) OWNER TO beton;
+
+
+
+
+-- ******************* update 17/09/2024 14:19:43 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+
+-- DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int);
+ 
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+  RETURNS bool AS
+$$
+	WITH
+	order_data AS (
+		SELECT
+			orders.id,
+			orders.quant,
+			orders.pump_vehicle_id,
+			orders.date_time
+		FROM orders
+		WHERE orders.id = in_order_id
+	)
+	,params AS (
+		SELECT
+			CASE
+				WHEN in_order_id IS NULL THEN in_pump_vehicle_id
+				ELSE (SELECT pump_vehicle_id FROM order_data)
+			END AS pump_vehicle_id,
+			CASE
+				WHEN in_order_id IS NULL THEN in_quant
+				ELSE (SELECT quant FROM order_data)
+			END AS quant,
+			CASE
+				WHEN in_order_id IS NULL THEN in_date_time
+				ELSE (SELECT date_time FROM order_data)
+			END AS date_time			
+	)
+	
+	
+	,veh_data AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh_data) = 0 AND (SELECT min_order_time_interval FROM veh_data) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh_data) > 0 AND (SELECT quant FROM params) > (SELECT min_order_quant FROM veh_data) THEN FALSE
+			WHEN (SELECT min_order_time_interval FROM veh_data) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					((SELECT date_time FROM params) - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time <= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) < (SELECT min_order_time_interval FROM veh_data))
+					
+					/*OR
+					
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time >= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - (SELECT date_time FROM params) < (SELECT min_order_time_interval FROM veh_data))
+					*/
+					THEN FALSE
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int) OWNER TO beton;
+
+
+
+
+-- ******************* update 17/09/2024 14:20:24 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+
+-- DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int);
+ 
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+  RETURNS bool AS
+$$
+	WITH
+	order_data AS (
+		SELECT
+			orders.id,
+			orders.quant,
+			orders.pump_vehicle_id,
+			orders.date_time
+		FROM orders
+		WHERE orders.id = in_order_id
+	)
+	,params AS (
+		SELECT
+			CASE
+				WHEN in_order_id IS NULL THEN in_pump_vehicle_id
+				ELSE (SELECT pump_vehicle_id FROM order_data)
+			END AS pump_vehicle_id,
+			CASE
+				WHEN in_order_id IS NULL THEN in_quant
+				ELSE (SELECT quant FROM order_data)
+			END AS quant,
+			CASE
+				WHEN in_order_id IS NULL THEN in_date_time
+				ELSE (SELECT date_time FROM order_data)
+			END AS date_time			
+	)
+	
+	
+	,veh_data AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh_data) = 0 AND (SELECT min_order_time_interval FROM veh_data) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh_data) > 0 AND (SELECT quant FROM params) > (SELECT min_order_quant FROM veh_data) THEN FALSE
+			WHEN (SELECT min_order_time_interval FROM veh_data) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					/*((SELECT date_time FROM params) - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time <= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) < (SELECT min_order_time_interval FROM veh_data))
+					
+					OR
+					*/
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time >= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - (SELECT date_time FROM params) < (SELECT min_order_time_interval FROM veh_data))
+					
+					THEN FALSE
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int) OWNER TO beton;
+
+
+
+
+-- ******************* update 17/09/2024 14:20:37 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+
+-- DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int);
+ 
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+  RETURNS bool AS
+$$
+	WITH
+	order_data AS (
+		SELECT
+			orders.id,
+			orders.quant,
+			orders.pump_vehicle_id,
+			orders.date_time
+		FROM orders
+		WHERE orders.id = in_order_id
+	)
+	,params AS (
+		SELECT
+			CASE
+				WHEN in_order_id IS NULL THEN in_pump_vehicle_id
+				ELSE (SELECT pump_vehicle_id FROM order_data)
+			END AS pump_vehicle_id,
+			CASE
+				WHEN in_order_id IS NULL THEN in_quant
+				ELSE (SELECT quant FROM order_data)
+			END AS quant,
+			CASE
+				WHEN in_order_id IS NULL THEN in_date_time
+				ELSE (SELECT date_time FROM order_data)
+			END AS date_time			
+	)
+	
+	
+	,veh_data AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh_data) = 0 AND (SELECT min_order_time_interval FROM veh_data) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh_data) > 0 AND (SELECT quant FROM params) > (SELECT min_order_quant FROM veh_data) THEN FALSE
+			WHEN (SELECT min_order_time_interval FROM veh_data) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					/*((SELECT date_time FROM params) - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time <= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) < (SELECT min_order_time_interval FROM veh_data))
+					
+					OR
+					*/
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time >= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - (SELECT date_time FROM params) < (SELECT min_order_time_interval FROM veh_data))
+					
+					THEN FALSE
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int) OWNER TO beton;
+
+
+
+
+-- ******************* update 17/09/2024 14:20:58 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+
+-- DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int);
+ 
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+  RETURNS bool AS
+$$
+	WITH
+	order_data AS (
+		SELECT
+			orders.id,
+			orders.quant,
+			orders.pump_vehicle_id,
+			orders.date_time
+		FROM orders
+		WHERE orders.id = in_order_id
+	)
+	,params AS (
+		SELECT
+			CASE
+				WHEN in_order_id IS NULL THEN in_pump_vehicle_id
+				ELSE (SELECT pump_vehicle_id FROM order_data)
+			END AS pump_vehicle_id,
+			CASE
+				WHEN in_order_id IS NULL THEN in_quant
+				ELSE (SELECT quant FROM order_data)
+			END AS quant,
+			CASE
+				WHEN in_order_id IS NULL THEN in_date_time
+				ELSE (SELECT date_time FROM order_data)
+			END AS date_time			
+	)
+	
+	
+	,veh_data AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh_data) = 0 AND (SELECT min_order_time_interval FROM veh_data) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh_data) > 0 AND (SELECT quant FROM params) > (SELECT min_order_quant FROM veh_data) THEN FALSE
+			/*WHEN (SELECT min_order_time_interval FROM veh_data) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					((SELECT date_time FROM params) - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time <= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) < (SELECT min_order_time_interval FROM veh_data))
+					
+					OR
+					
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time >= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - (SELECT date_time FROM params) < (SELECT min_order_time_interval FROM veh_data))
+					
+					THEN FALSE*/
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int) OWNER TO beton;
+
+
+
+
+-- ******************* update 17/09/2024 14:23:09 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+
+-- DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int);
+ 
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+  RETURNS bool AS
+$$
+	WITH
+	order_data AS (
+		SELECT
+			orders.id,
+			orders.quant,
+			orders.pump_vehicle_id,
+			orders.date_time
+		FROM orders
+		WHERE orders.id = in_order_id
+	)
+	,params AS (
+		SELECT
+			CASE
+				WHEN in_pump_vehicle_id IS NOT NULL THEN in_pump_vehicle_id
+				ELSE (SELECT pump_vehicle_id FROM order_data)
+			END AS pump_vehicle_id,
+			CASE
+				WHEN in_quant IS NOT NULL THEN in_quant
+				ELSE (SELECT quant FROM order_data)
+			END AS quant,
+			CASE
+				WHEN in_date_time IS NOT NULL THEN in_date_time
+				ELSE (SELECT date_time FROM order_data)
+			END AS date_time			
+	)
+	
+	
+	,veh_data AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh_data) = 0 AND (SELECT min_order_time_interval FROM veh_data) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh_data) > 0 AND (SELECT quant FROM params) > (SELECT min_order_quant FROM veh_data) THEN FALSE
+			/*WHEN (SELECT min_order_time_interval FROM veh_data) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					((SELECT date_time FROM params) - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time <= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) < (SELECT min_order_time_interval FROM veh_data))
+					
+					OR
+					
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time >= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - (SELECT date_time FROM params) < (SELECT min_order_time_interval FROM veh_data))
+					
+					THEN FALSE*/
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int) OWNER TO beton;
+
+
+
+
+-- ******************* update 17/09/2024 14:23:27 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+
+-- DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int);
+ 
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+  RETURNS bool AS
+$$
+	WITH
+	order_data AS (
+		SELECT
+			orders.id,
+			orders.quant,
+			orders.pump_vehicle_id,
+			orders.date_time
+		FROM orders
+		WHERE orders.id = in_order_id
+	)
+	,params AS (
+		SELECT
+			CASE
+				WHEN in_pump_vehicle_id IS NOT NULL THEN in_pump_vehicle_id
+				ELSE (SELECT pump_vehicle_id FROM order_data)
+			END AS pump_vehicle_id,
+			CASE
+				WHEN in_quant IS NOT NULL THEN in_quant
+				ELSE (SELECT quant FROM order_data)
+			END AS quant,
+			CASE
+				WHEN in_date_time IS NOT NULL THEN in_date_time
+				ELSE (SELECT date_time FROM order_data)
+			END AS date_time			
+	)
+	
+	
+	,veh_data AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh_data) = 0 AND (SELECT min_order_time_interval FROM veh_data) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh_data) > 0 AND (SELECT quant FROM params) > (SELECT min_order_quant FROM veh_data) THEN FALSE
+			WHEN (SELECT min_order_time_interval FROM veh_data) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					((SELECT date_time FROM params) - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time <= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) < (SELECT min_order_time_interval FROM veh_data))
+					
+					OR
+					
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time >= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - (SELECT date_time FROM params) < (SELECT min_order_time_interval FROM veh_data))
+					
+					THEN FALSE
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int) OWNER TO beton;
+
+
+
+
+-- ******************* update 17/09/2024 15:44:59 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+
+ DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int);
+/* 
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+  RETURNS bool AS
+$$
+	WITH
+	order_data AS (
+		SELECT
+			orders.id,
+			orders.quant,
+			orders.pump_vehicle_id,
+			orders.date_time
+		FROM orders
+		WHERE orders.id = in_order_id
+	)
+	,params AS (
+		SELECT
+			CASE
+				WHEN in_pump_vehicle_id IS NOT NULL THEN in_pump_vehicle_id
+				ELSE (SELECT pump_vehicle_id FROM order_data)
+			END AS pump_vehicle_id,
+			CASE
+				WHEN in_quant IS NOT NULL THEN in_quant
+				ELSE (SELECT quant FROM order_data)
+			END AS quant,
+			CASE
+				WHEN in_date_time IS NOT NULL THEN in_date_time
+				ELSE (SELECT date_time FROM order_data)
+			END AS date_time			
+	)
+	
+	
+	,veh_data AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh_data) = 0 AND (SELECT min_order_time_interval FROM veh_data) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh_data) > 0 AND (SELECT quant FROM params) > (SELECT min_order_quant FROM veh_data) THEN FALSE
+			WHEN (SELECT min_order_time_interval FROM veh_data) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					((SELECT date_time FROM params) - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time <= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) < (SELECT min_order_time_interval FROM veh_data))
+					
+					OR
+					
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time >= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - (SELECT date_time FROM params) < (SELECT min_order_time_interval FROM veh_data))
+					
+					THEN FALSE
+			ELSE TRUE
+		END;
+$$
+  LANGUAGE sql VOLATILE
+  CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int) OWNER TO beton;
+
+*/
+
+
+-- ******************* update 17/09/2024 15:53:33 ******************
+﻿-- Function: pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+
+-- DROP FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int);
+/**
+ * returns result bool, pump_vehicle_min_quant numeric(19,4), pump_vehicle_min_time_interval interval
+ */
+CREATE OR REPLACE FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int)
+  RETURNS RECORD AS
+$$
+	WITH
+	order_data AS (
+		SELECT
+			orders.id,
+			orders.quant,
+			orders.pump_vehicle_id,
+			orders.date_time
+		FROM orders
+		WHERE orders.id = in_order_id
+	)
+	,params AS (
+		SELECT
+			CASE
+				WHEN in_pump_vehicle_id IS NOT NULL THEN in_pump_vehicle_id
+				ELSE (SELECT pump_vehicle_id FROM order_data)
+			END AS pump_vehicle_id,
+			CASE
+				WHEN in_quant IS NOT NULL THEN in_quant
+				ELSE (SELECT quant FROM order_data)
+			END AS quant,
+			CASE
+				WHEN in_date_time IS NOT NULL THEN in_date_time
+				ELSE (SELECT date_time FROM order_data)
+			END AS date_time			
+	)
+	
+	
+	,veh_data AS (
+		SELECT
+			coalesce(min_order_quant, 0) AS min_order_quant,
+			coalesce(min_order_time_interval, '00:00') AS min_order_time_interval
+		FROM pump_vehicles
+		WHERE id = in_pump_vehicle_id
+	)
+	,res AS (
+		SELECT
+		CASE
+			WHEN (SELECT min_order_quant FROM veh_data) = 0 AND (SELECT min_order_time_interval FROM veh_data) = '00:00'::interval THEN TRUE
+			WHEN (SELECT min_order_quant FROM veh_data) > 0 AND (SELECT quant FROM params) > (SELECT min_order_quant FROM veh_data) THEN FALSE
+			WHEN (SELECT min_order_time_interval FROM veh_data) <> '00:00'::interval AND
+					--previous order with the same pump vehicle
+					((SELECT date_time FROM params) - (SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time <= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time DESC
+					LIMIT 1
+					) < (SELECT min_order_time_interval FROM veh_data))
+					
+					OR
+					
+					--next order with the same pump vehicle
+					((SELECT
+						o.date_time
+					FROM orders AS o
+					WHERE
+						o.pump_vehicle_id = in_pump_vehicle_id
+						AND o.date_time >= (SELECT date_time FROM params) 
+						AND (in_order_id IS NULL OR in_order_id <> (SELECT id FROM order_data))
+					ORDER BY o.date_time ASC
+					LIMIT 1
+					) - (SELECT date_time FROM params) < (SELECT min_order_time_interval FROM veh_data))
+					
+					THEN FALSE
+			ELSE TRUE
+		END AS v
+	)
+	SELECT
+		(SELECT v FROM res),
+		case
+			when NOT (SELECT v FROM res) then (select min_order_quant from pump_vehicles where id = (select pump_vehicle_id from params))
+			else null
+		end as min_quant,
+		case
+			when NOT (SELECT v FROM res) then (select min_order_time_interval from pump_vehicles where id = (select pump_vehicle_id from params))
+			else null
+		end as min_interval
+	;
+$$
+  LANGUAGE sql VOLATILE
+  CALLED ON NULL INPUT
+  COST 100;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int) OWNER TO beton;

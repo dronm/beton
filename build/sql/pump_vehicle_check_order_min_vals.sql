@@ -92,6 +92,6 @@ $$
   LANGUAGE sql VOLATILE
   CALLED ON NULL INPUT
   COST 100;
-ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int) OWNER TO beton;
+ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int) OWNER TO ;
 
 

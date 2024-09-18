@@ -81,6 +81,20 @@ class PumpVehicle_Controller extends ControllerSQL{
 				,$f_params);
 		$pm->addParam($param);
 		
+			$f_params = array();
+			
+				$f_params['alias']='Минимальное количество м3 для заявки';
+			$param = new FieldExtInt('min_order_quant'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Минимальный интервал между заявками';
+			$param = new FieldExtInterval('min_order_time_interval'
+				,$f_params);
+		$pm->addParam($param);
+		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		//default event
@@ -154,6 +168,20 @@ class PumpVehicle_Controller extends ControllerSQL{
 		
 			$f_params=array();
 			$param = new FieldExtBool('driver_ship_inform'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Минимальное количество м3 для заявки';
+			$param = new FieldExtInt('min_order_quant'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Минимальный интервал между заявками';
+			$param = new FieldExtInterval('min_order_time_interval'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -272,6 +300,37 @@ class PumpVehicle_Controller extends ControllerSQL{
 			
 		$this->addPublicMethod($pm);
 
+			
+		$pm = new PublicMethod('check_order_min_vals');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('pump_vehicle_id',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('order_id',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=19;
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtFloat('order_quant',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=19;
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtDateTime('order_date_time',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
 		
 	}	
 	
@@ -280,6 +339,30 @@ class PumpVehicle_Controller extends ControllerSQL{
 		parent::get_list($pm);
 	}
 	
+	private static function min_vals_enabled(){
+		return ($_SESSION['role_id']=='owner' || $_SESSION["role_id"]=="admin" || $_SESSION["role_id"]=="boss");
+	}
+
+	private static function before_write_check($pm){
+		//some attrs are not allowed to be changed: min_order_quant, min_order_time_interval
+		if(!self::min_vals_enabled()){
+			$min_order_quant = $pm->getParamValue('min_order_quant');
+			$min_order_time_interval = $pm->getParamValue('min_order_time_interval');
+			if($min_order_time_interval || $min_order_quant){
+				throw new Exception("Запрещено менять минтмальное количество и интервал для заявки!");
+			}
+		}
+	}
+
+	public function insert($pm){
+		self::before_write_check($pm);
+		parent::insert($pm);
+	}
+	public function update($pm){
+		self::before_write_check($pm);
+		parent::update($pm);
+	}
+
 	public function get_contact_refs($pm){
 		$this->addNewModel(sprintf(
 			"SELECT
@@ -291,6 +374,18 @@ class PumpVehicle_Controller extends ControllerSQL{
 			) AS sub"
 			,$this->getExtDbVal($pm, 'id')
 		), 'Ref_Model');		
+	}
+
+	public function check_order_min_vals($pm){
+		$this->addNewModel(sprintf(
+		// throw new Exception(sprintf(
+			"SELECT * FROM pump_vehicles_check_order_min_vals(%d, %f, %s, %s) AS (passed bool, min_quant numeric(19,2), min_time_interval interval)"
+			,$this->getExtDbVal($pm, 'pump_vehicle_id')
+			,$this->getExtDbVal($pm, 'order_quant')
+			,$this->getExtDbVal($pm, 'order_date_time')
+			,$pm->getParamValue('order_id')? $this->getExtDbVal($pm, 'order_id'):'null'
+		), 'CheckResult_Model'
+		);		
 	}
 	
 

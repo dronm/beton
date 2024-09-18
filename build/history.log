@@ -1283,6 +1283,15 @@ basic_classes/ViewExport.php line 103, DOMDocument->loadXML(), namespace prefix 
 defined in Entity line 1.
 
 
+1.00340
+1) Detail table in all rows of the parent table GridCellDetailToggle.js, OperatorList_View.js
+2) PupmVehicle new columns: min_order_quant, min_order_time_interval
+		pump_veh_list.sql
+		pump_veh_work_list.sql
+		PumpVehicle_Controller.php: methods insert/update added checkings before write.
+		PumpVehicleDialog_View.js
+		PumpVehicleList_View.js corrected some fileds, centered.
+		OrderDialog_View.js added properties: m_onChangedDate, m_onChangedTime
 
 
 

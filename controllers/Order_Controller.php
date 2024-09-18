@@ -1042,19 +1042,49 @@ class Order_Controller extends ControllerSQL{
 		);
 	}
 	
+	private static function check_pump_vehicle_min_val($dbLink, $pumpVehicleId, $orderQuant, $orderDateTime, $orderId){
+		if($_SESSION["role_id"] == "admin" || $_SESSION["role_id"] == "owner" || $_SESSION["role_id"] == "boss"){
+			return;
+		}
+
+		$ar = $dbLink->query_first(sprintf(
+			"SELECT * FROM pump_vehicles_check_order_min_vals(%d, %s, %s, %s) AS (passed bool, min_quant numeric(19,2), min_time_interval interval)"
+			,$pumpVehicleId
+			,is_null($orderQuant)? 'NULL':$orderQuant
+			,is_null($orderDateTime)? 'NULL':$orderDateTime
+			,is_null($orderId)? 'NULL':$orderId
+		));
+		if(!is_array($ar)){
+			throw new Exception("pump_vehicles_check_order_min_vals faild");
+		}
+		if($ar['passed']!= 't'){
+			$txt = "Запрещено выбирать этот насос. Минимальный интервал: ".$ar["min_time_interval"].", минимальный объемом: ".$ar["min_quant"]."м3.";
+			throw new Exception($txt);
+		}
+	}
+
 	public function insert($pm){
-	
 		if($_SESSION['role_id']!='owner'||!$pm->getParamValue('user_id')){
 			$pm->setParamValue('user_id',$_SESSION['user_id']);
 		}
-	
+		
+		//check pump vehicle
+		$pump_vehicle_id = $pm->getParamValue("pump_vehicle_id");
+		if($pump_vehicle_id){
+			self::check_pump_vehicle_min_val(
+				$this->getDbLink(),
+				$pump_vehicle_id,
+				$this->getExtDbVal($pm, 'quant'),
+				$this->getExtDbVal($pm, 'date_time'),
+	            NULL	
+			);
+		}
+
 		Graph_Controller::clearCacheOnDate($this->getDbLink(),$pm->getParamValue("date_time"));
-		
-		
+
 		$pm->addParam(new FieldExtInt('ret_id',array('value'=>1)));
 		$id_ar = parent::insert($pm);
 
-		$pump_vehicle_id = $pm->getParamValue("pump_vehicle_id");
 		$ar_doc = $this->getDbLinkMaster()->query_first(sprintf(
 			"SELECT
 				orders_ref(o) AS orders_ref,
@@ -1094,12 +1124,23 @@ class Order_Controller extends ControllerSQL{
 	}
 	
 	public function update($pm){
-	
-		$pm->setParamValue('last_modif_user_id',$_SESSION['user_id']);
-	
-		$order_id = $this->getExtDbVal($pm, 'old_id');
-	
 		$dbLink = $this->getDbLink();
+
+		$pm->setParamValue('last_modif_user_id',$_SESSION['user_id']);
+		$order_id = $this->getExtDbVal($pm, 'old_id');
+		$new_pump_vehicle_id = $this->getExtVal($pm,'pump_vehicle_id');
+
+		//check pump vehicle
+		if($new_pump_vehicle_id){
+			self::check_pump_vehicle_min_val(
+				$dbLink,
+				$new_pump_vehicle_id,
+				$this->getExtVal($pm,'quant'),
+				$this->getExtVal($pm,'date_time'),
+		        $order_id
+			);
+		}
+
 		$ar = $dbLink->query_first(sprintf(
 			"SELECT
 				o.date_time,
@@ -1132,8 +1173,6 @@ class Order_Controller extends ControllerSQL{
 			WHERE o.id=%d",
 			$order_id
 		));
-		
-		$new_pump_vehicle_id = $this->getExtVal($pm,'pump_vehicle_id');
 		
 		if (is_array($ar) && count($ar)){
 			$old_date_time = strtotime($ar['date_time']);

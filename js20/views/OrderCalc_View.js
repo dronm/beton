@@ -26,8 +26,15 @@ function OrderCalc_View(id,options){
 	
 	this.m_dialogContext = options.dialogContext;
 	this.m_readOnly = options.readOnly;
-	
+
 	var self = this;
+
+	this.m_dialogContext.m_onChangeDate = function(){
+		self.checkPumpVehicle();
+	}
+	this.m_dialogContext.m_onChangeTime = function(){
+		self.checkPumpVehicle();
+	}
 	
 	options.addElement = function(){
 		var obj_bs_cl = ("control-label "+window.getBsCol(2));
@@ -52,15 +59,20 @@ function OrderCalc_View(id,options){
 			"labelClassName":obj_bs_cl,
 			"editContClassName":("input-group "+window.getBsCol(2)),
 			"events":{
-				"onchange":function(){
+				"change":function(){
 					self.recalcUnloadCost();
 					self.recalcTotal();
-					if(self.m_getAvailSpots)self.m_getAvailSpots();
+					if(self.m_getAvailSpots){
+						self.m_getAvailSpots();
+					}
 				},
-				"onkeyup":function(e){
+				"keyup":function(e){
+					self.checkPumpVehicle();
 					self.recalcUnloadCost();
 					self.recalcTotal();
-					if(self.m_getAvailSpots)self.m_getAvailSpots();
+					if(self.m_getAvailSpots){
+						self.m_getAvailSpots();
+					}
 				}
 			}			
 		}));
@@ -326,9 +338,71 @@ OrderCalc_View.prototype.recalcUnloadCost = function(){
 	}
 }
 
+OrderCalc_View.prototype.showPumpVehicleWarning = function(minQuant, minTimeInterval, tm, quant){
+	let txt = "Запрещено выбирать этот насос на "+tm+" с объемом "+quant+"м3.";
+	this.getElement("pump_vehicle").getErrorControl().setValue(txt, "danger");
+	if(!this.m_lastPumpVehWarn || (new Date()).getTime() - this.m_lastPumpVehWarn > 10000){
+		window.showTempError(txt+" Заявка не будет записана.", null, 5000);
+		this.m_lastPumpVehWarn = (new Date()).getTime();
+	}
+}
+
+OrderCalc_View.prototype.hidePumpVehicleWarning = function(){
+	this.getElement("pump_vehicle").getErrorControl().clear();
+}
+
+// checkPumpVehicle checks if selected pump is suitable for this order:
+// min_order_quant, min_order_time_interval are contrled.
+OrderCalc_View.prototype.checkPumpVehicle = function(){
+	if(!this.getElement("pump_vehicle").isNull() && window.getApp().controlePumpVehicle()){
+		//do check
+		let order_id = this.m_dialogContext.getElement("id").getValue();
+		let d = this.m_dialogContext.getElement("date_time_date").getValue();
+		if(!DateHelper.isValidDate(d)){
+			this.hidePumpVehicleWarning();
+			return;
+		}
+		let t = this.m_dialogContext.getElement("date_time_time").getValue();
+		console.log(d, t, order_id)
+		let pm = (new PumpVehicle_Controller()).getPublicMethod("check_order_min_vals");
+		if(!order_id){
+			pm.unsetFieldValue("order_id");
+		}else{
+			pm.setFieldValue("order_id", order_id);
+		}
+		let q =this.getElement("quant").getValue(); 
+		if(q == undefined){
+			q = 0;
+		}
+		let dt = DateHelper.format(d, "Y-m-d")+ "T"+ t + ":00";
+
+		pm.setFieldValue("order_quant", q);
+		pm.setFieldValue("order_date_time", dt);
+		pm.setFieldValue("pump_vehicle_id", this.getElement("pump_vehicle").getValue().getKey("id"));
+		let self = this;
+		pm.run({
+			"ok":function(resp){
+				let m = resp.getModel("CheckResult_Model");
+				if(!m || !m.getNextRow()){
+					return;
+				}
+				let res = m.getFieldValue("passed");
+				if(res != "true"){
+					self.showPumpVehicleWarning(m.getFieldValue("min_quant"), m.getFieldValue("min_time_interval"), t, q);
+				}else{
+					self.hidePumpVehicleWarning();
+				}
+			}
+		})
+	}else{
+		this.hidePumpVehicleWarning();
+	}
+}
+
 OrderCalc_View.prototype.onSelectPumpVehicleCont = function(f){
 	this.recalcUnloadCost();
 	this.recalcTotal();
+	this.checkPumpVehicle();
 }
 
 OrderCalc_View.prototype.onSelectPumpVehicle = function(f){

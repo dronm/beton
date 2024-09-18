@@ -32,6 +32,7 @@ function PumpVehicle_Controller(options){
 	this.addGetObject();
 	this.add_get_price();
 	this.add_get_contact_refs();
+	this.add_check_order_min_vals();
 		
 }
 extend(PumpVehicle_Controller,ControllerObjServer);
@@ -104,6 +105,18 @@ extend(PumpVehicle_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldBool("driver_ship_inform",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Минимальное количество м3 для заявки";
+	var field = new FieldInt("min_order_quant",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Минимальный интервал между заявками";
+	var field = new FieldInterval("min_order_time_interval",options);
 	
 	pm.addField(field);
 	
@@ -182,6 +195,18 @@ extend(PumpVehicle_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldBool("driver_ship_inform",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Минимальное количество м3 для заявки";
+	var field = new FieldInt("min_order_quant",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Минимальный интервал между заявками";
+	var field = new FieldInterval("min_order_time_interval",options);
 	
 	pm.addField(field);
 	
@@ -271,6 +296,12 @@ extend(PumpVehicle_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldBool("driver_ship_inform",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Минимальное количество м3 для заявки";
+	pm.addField(new FieldInt("min_order_quant",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Минимальный интервал между заявками";
+	pm.addField(new FieldInterval("min_order_time_interval",f_opts));
 }
 
 			PumpVehicle_Controller.prototype.add_get_work_list = function(){
@@ -340,6 +371,50 @@ extend(PumpVehicle_Controller,ControllerObjServer);
 		options.required = true;
 	
 		pm.addField(new FieldInt("id",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			PumpVehicle_Controller.prototype.add_check_order_min_vals = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('check_order_min_vals',opts);
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("pump_vehicle_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("order_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		options.maxlength = "19";
+	
+		pm.addField(new FieldFloat("order_quant",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		options.maxlength = "19";
+	
+		pm.addField(new FieldDateTime("order_date_time",options));
 	
 			
 	this.addPublicMethod(pm);

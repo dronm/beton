@@ -84,7 +84,11 @@ CREATE OR REPLACE VIEW public.pump_veh_list AS
 		WHERE en.entity_type = 'pump_vehicles' AND en.entity_id = pv.id
 		) AS contact_list,	
 		
-		pv.driver_ship_inform
+		pv.driver_ship_inform,
+		
+		pv.min_order_quant,
+		pv.min_order_time_interval
+		
 		
 	FROM pump_vehicles pv
 	LEFT JOIN vehicles v ON v.id = pv.vehicle_id

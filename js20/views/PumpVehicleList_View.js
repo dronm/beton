@@ -73,6 +73,7 @@ function PumpVehicleList_View(id,options){
 					"elements":[
 						new GridCellHead(id+":grid:head:pump_vehicles_ref",{
 							"value":"Автомобиль",
+							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("pump_vehicles_ref"),
@@ -184,10 +185,38 @@ function PumpVehicleList_View(id,options){
 						})
 						,new GridCellHead(id+":grid:head:pump_length",{
 							"value":"Длина подачи",
+							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumn({
 									"field":model.getField("pump_length"),
 									"ctrlClass":EditInt,
+									"ctrlOptions":{
+										"labelCaption":""
+									}									
+								})
+							]
+						})						
+						,is_v_owner? null:new GridCellHead(id+":grid:head:min_order_quant",{
+							"value":"Мин.кол-во",
+							"colAttrs":{"align":"center", "title":"Минимальное кол-во м3 в заявке."},
+							"columns":[
+								new GridColumn({
+									"field":model.getField("min_order_quant"),
+									"ctrlClass":EditFloat,
+									"ctrlOptions":{
+										"precision":"2",
+										"labelCaption":""
+									}									
+								})
+							]
+						})						
+						,is_v_owner? null:new GridCellHead(id+":grid:head:min_order_time_interval",{
+							"value":"Мин.интервал",
+							"colAttrs":{"align":"center", "title":"Минимальный интервал между заявками."},
+							"columns":[
+								new GridColumn({
+									"field":model.getField("min_order_time_interval"),
+									"ctrlClass":EditTime,
 									"ctrlOptions":{
 										"labelCaption":""
 									}									
@@ -210,6 +239,7 @@ function PumpVehicleList_View(id,options){
 												
 						,is_v_owner? null:new GridCellHead(id+":grid:head:deleted",{
 							"value":"Удален",
+							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumnBool({
 									"field":model.getField("deleted"),
@@ -221,6 +251,7 @@ function PumpVehicleList_View(id,options){
 						})						
 						,is_v_owner? null:new GridCellHead(id+":grid:head:specialist_inform",{
 							"value":"Инф.спец.",
+							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumnBool({
 									"field":model.getField("specialist_inform"),

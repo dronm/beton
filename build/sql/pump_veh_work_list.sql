@@ -45,7 +45,11 @@ CREATE OR REPLACE VIEW public.pump_veh_work_list AS
 		pv.phone_cels,
 		pv.pump_prices,
 		
-		v.vehicle_owners_ar AS pump_vehicle_owners_ar
+		v.vehicle_owners_ar AS pump_vehicle_owners_ar,
+		
+		pv.min_order_quant,
+		pv.min_order_time_interval
+		
 		
 	FROM pump_vehicles pv
 	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
