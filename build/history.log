@@ -1283,7 +1283,7 @@ basic_classes/ViewExport.php line 103, DOMDocument->loadXML(), namespace prefix 
 defined in Entity line 1.
 
 
-1.00340
+1.00340 18-09-2024
 1) Detail table in all rows of the parent table GridCellDetailToggle.js, OperatorList_View.js
 2) PupmVehicle new columns: min_order_quant, min_order_time_interval
 		pump_veh_list.sql
@@ -1295,7 +1295,12 @@ defined in Entity line 1.
 
 
 
+1.00341
+1) ShipmentForOrderList_View.js added editReadPublicMethod, as there is a custom readPublicMethod
+2) Erorr in Order_Controller->check_pump_vehicle_min_val()
 
+Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели
+Удаленные элементы справочника: фильтр вверху, пометка спереди, по возможности у всех справочиников. Example: PumpVehicle
 Движение на базу - контроль всех баз. Поиск ближайшей, смена
 Отобразить, если остлось Х км до базы какой-то знак
 VehiceRoute::getZoneListQuery()

@@ -193,7 +193,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			"SELECT * FROM pump_vehicles_check_order_min_vals(%d, %s, %s, %s) AS (passed bool, min_quant numeric(19,2), min_time_interval interval)"
 			,$pumpVehicleId
 			,is_null($orderQuant)? 'NULL':$orderQuant
-			,is_null($orderDateTime)? 'NULL':$orderDateTime
+			,is_null($orderDateTime)? 'NULL':"'".date("Y-m-d H:i:s", $orderDateTime)."'"
 			,is_null($orderId)? 'NULL':$orderId
 		));
 		if(!is_array($ar)){

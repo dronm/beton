@@ -18,12 +18,13 @@ function ShipmentForOrderList_View(id,options){
 	
 	var popup_menu = new PopUpMenu();
 	
-	var pagClass = window.getApp().getPaginationClass();
+	// var pagClass = window.getApp().getPaginationClass();
 	var grid = new GridAjx(id+":grid",{
 		"className":"table-bordered table-responsive table-make_order",
 		"model":model,
 		"controller":contr,
 		"readPublicMethod":contr.getPublicMethod("get_list_for_order"),
+		"editPublicMethod":contr.getPublicMethod("get_list_for_order"),
 		"editInline":!is_client,
 		"editWinClass":null,
 		"commands":is_client? null:new GridCmdContainerAjx(id+":grid:cmd",{
