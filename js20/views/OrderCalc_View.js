@@ -363,7 +363,6 @@ OrderCalc_View.prototype.checkPumpVehicle = function(){
 			return;
 		}
 		let t = this.m_dialogContext.getElement("date_time_time").getValue();
-		console.log(d, t, order_id)
 		let pm = (new PumpVehicle_Controller()).getPublicMethod("check_order_min_vals");
 		if(!order_id){
 			pm.unsetFieldValue("order_id");

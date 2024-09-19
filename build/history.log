@@ -1299,6 +1299,11 @@ defined in Entity line 1.
 1) ShipmentForOrderList_View.js added editReadPublicMethod, as there is a custom readPublicMethod
 2) Erorr in Order_Controller->check_pump_vehicle_min_val()
 
+
+1.00342
+1) Erorr in Order_Controller->check_pump_vehicle_min_val()
+
+
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели
 Удаленные элементы справочника: фильтр вверху, пометка спереди, по возможности у всех справочиников. Example: PumpVehicle
 Движение на базу - контроль всех баз. Поиск ближайшей, смена

@@ -1044,15 +1044,15 @@ class Order_Controller extends ControllerSQL{
 	
 	private static function check_pump_vehicle_min_val($dbLink, $pumpVehicleId, $orderQuant, $orderDateTime, $orderId){
 		if($_SESSION["role_id"] == "admin" || $_SESSION["role_id"] == "owner" || $_SESSION["role_id"] == "boss"){
-			return;
+			//return;
 		}
 
 		$ar = $dbLink->query_first(sprintf(
 			"SELECT * FROM pump_vehicles_check_order_min_vals(%d, %s, %s, %s) AS (passed bool, min_quant numeric(19,2), min_time_interval interval)"
 			,$pumpVehicleId
-			,is_null($orderQuant)? 'NULL':$orderQuant
-			,is_null($orderDateTime)? 'NULL':"'".date("Y-m-d H:i:s", $orderDateTime)."'"
-			,is_null($orderId)? 'NULL':$orderId
+			,is_null($orderQuant)? 'NULL' : $orderQuant
+			,is_null($orderDateTime)? 'NULL' : $orderDateTime
+			,is_null($orderId)? 'NULL' : $orderId
 		));
 		if(!is_array($ar)){
 			throw new Exception("pump_vehicles_check_order_min_vals faild");
@@ -1070,7 +1070,7 @@ class Order_Controller extends ControllerSQL{
 		
 		//check pump vehicle
 		$pump_vehicle_id = $pm->getParamValue("pump_vehicle_id");
-		if($pump_vehicle_id){
+		if($pump_vehicle_id && $pump_vehicle_id != 'null'){
 			self::check_pump_vehicle_min_val(
 				$this->getDbLink(),
 				$pump_vehicle_id,
@@ -1079,7 +1079,7 @@ class Order_Controller extends ControllerSQL{
 	            NULL	
 			);
 		}
-
+throw new Exception("stopped");
 		Graph_Controller::clearCacheOnDate($this->getDbLink(),$pm->getParamValue("date_time"));
 
 		$pm->addParam(new FieldExtInt('ret_id',array('value'=>1)));
@@ -1131,16 +1131,17 @@ class Order_Controller extends ControllerSQL{
 		$new_pump_vehicle_id = $this->getExtVal($pm,'pump_vehicle_id');
 
 		//check pump vehicle
-		if($new_pump_vehicle_id){
+		if($new_pump_vehicle_id && $new_pump_vehicle_id != 'null'){
 			self::check_pump_vehicle_min_val(
 				$dbLink,
 				$new_pump_vehicle_id,
-				$this->getExtVal($pm,'quant'),
-				$this->getExtVal($pm,'date_time'),
+				$this->getExtVal($pm,'quant')? $this->getExtDbVal($pm, 'quant') : NULL,
+				$this->getExtVal($pm,'date_time')? $this->getExtDbVal($pm, 'date_time') : NULL,
 		        $order_id
 			);
 		}
 
+throw new Exception("stopped");
 		$ar = $dbLink->query_first(sprintf(
 			"SELECT
 				o.date_time,

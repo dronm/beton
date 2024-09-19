@@ -20,7 +20,7 @@ function PumpVehicleDialog_View(id,options){
 	options.controller = new PumpVehicle_Controller();
 	options.model = options.models.PumpVehicleList_Model;
 	
-	let min_vals_enabled = !window.getApp().controlePumpVehicle();
+	let min_vals_enabled = window.getApp().controlePumpVehicle();
 
 	options.addElement = function(){
 		this.addElement(new VehicleEdit(id+":pump_vehicles_ref",{
@@ -60,13 +60,14 @@ function PumpVehicleDialog_View(id,options){
 			"precision":2,
 			"labelCaption": "Мин. кол-во для заявки, м3:",
 			"title": "При выборе данного насоса в заявку будет контролироваться количество по заявке. Если количество по заявке меньше минимального, заявка не будет поставлена.",
-			"enabled":min_vals_enabled
+			"enabled":!min_vals_enabled
 		}));	
 
-		this.addElement(new EditTime(id+":min_order_time_interval",{
+		this.addElement(new EditInterval(id+":min_order_time_interval",{
 			"labelCaption": "Мин. время между заявками:",
+			"editMask":"99:99",
 			"title": "При выборе данного насоса в заявку будет контролироваться временной интервал между другими заявками с этим насосом. Если временной интервал меньше заданного, заявка не будет поставлена.",
-			"enabled":min_vals_enabled
+			"enabled":!min_vals_enabled
 		}));	
 
 		this.addElement(new EntityContactList_View(id+":contacts_list",{

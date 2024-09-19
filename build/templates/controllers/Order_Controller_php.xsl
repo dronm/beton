@@ -192,9 +192,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$ar = $dbLink->query_first(sprintf(
 			"SELECT * FROM pump_vehicles_check_order_min_vals(%d, %s, %s, %s) AS (passed bool, min_quant numeric(19,2), min_time_interval interval)"
 			,$pumpVehicleId
-			,is_null($orderQuant)? 'NULL':$orderQuant
-			,is_null($orderDateTime)? 'NULL':"'".date("Y-m-d H:i:s", $orderDateTime)."'"
-			,is_null($orderId)? 'NULL':$orderId
+			,is_null($orderQuant)? 'NULL' : $orderQuant
+			,is_null($orderDateTime)? 'NULL' : $orderDateTime)
+			,is_null($orderId)? 'NULL' : $orderId
 		));
 		if(!is_array($ar)){
 			throw new Exception("pump_vehicles_check_order_min_vals faild");
@@ -212,7 +212,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		//check pump vehicle
 		$pump_vehicle_id = $pm->getParamValue("pump_vehicle_id");
-		if($pump_vehicle_id){
+		if($pump_vehicle_id &amp;&amp; $pump_vehicle_id != 'null'){
 			self::check_pump_vehicle_min_val(
 				$this->getDbLink(),
 				$pump_vehicle_id,
@@ -273,12 +273,12 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$new_pump_vehicle_id = $this->getExtVal($pm,'pump_vehicle_id');
 
 		//check pump vehicle
-		if($new_pump_vehicle_id){
+		if($new_pump_vehicle_id &amp;&amp; $new_pump_vehicle_id != 'null'){
 			self::check_pump_vehicle_min_val(
 				$dbLink,
 				$new_pump_vehicle_id,
-				$this->getExtVal($pm,'quant'),
-				$this->getExtVal($pm,'date_time'),
+				$this->getExtVal($pm,'quant')? $this->getExtDbVal($pm, 'quant') : NULL,
+				$this->getExtVal($pm,'date_time')? $this->getExtDbVal($pm, 'date_time') : NULL,
 		        $order_id
 			);
 		}

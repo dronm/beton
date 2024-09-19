@@ -378,7 +378,7 @@ class PumpVehicle_Controller extends ControllerSQL{
 
 	public function check_order_min_vals($pm){
 		$this->addNewModel(sprintf(
-		// throw new Exception(sprintf(
+		 // throw new Exception(sprintf(
 			"SELECT * FROM pump_vehicles_check_order_min_vals(%d, %f, %s, %s) AS (passed bool, min_quant numeric(19,2), min_time_interval interval)"
 			,$this->getExtDbVal($pm, 'pump_vehicle_id')
 			,$this->getExtDbVal($pm, 'order_quant')
