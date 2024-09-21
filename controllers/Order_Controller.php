@@ -1044,7 +1044,7 @@ class Order_Controller extends ControllerSQL{
 	
 	private static function check_pump_vehicle_min_val($dbLink, $pumpVehicleId, $orderQuant, $orderDateTime, $orderId){
 		if($_SESSION["role_id"] == "admin" || $_SESSION["role_id"] == "owner" || $_SESSION["role_id"] == "boss"){
-			//return;
+			return;
 		}
 
 		$ar = $dbLink->query_first(sprintf(
@@ -1079,7 +1079,7 @@ class Order_Controller extends ControllerSQL{
 	            NULL	
 			);
 		}
-throw new Exception("stopped");
+
 		Graph_Controller::clearCacheOnDate($this->getDbLink(),$pm->getParamValue("date_time"));
 
 		$pm->addParam(new FieldExtInt('ret_id',array('value'=>1)));
@@ -1141,7 +1141,6 @@ throw new Exception("stopped");
 			);
 		}
 
-throw new Exception("stopped");
 		$ar = $dbLink->query_first(sprintf(
 			"SELECT
 				o.date_time,
