@@ -87,7 +87,14 @@ CREATE OR REPLACE VIEW public.pump_veh_list AS
 		pv.driver_ship_inform,
 		
 		pv.min_order_quant,
-		pv.min_order_time_interval
+		pv.min_order_time_interval,
+		
+		(SELECT
+			array_agg(en.contact_id)
+		FROM entity_contacts AS en
+		WHERE en.entity_type = 'pump_vehicles' AND en.entity_id = pv.id
+		) AS contact_ids
+		
 		
 		
 	FROM pump_vehicles pv

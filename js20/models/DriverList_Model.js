@@ -73,6 +73,15 @@ function DriverList_Model(options){
 	
 	options.fields.contact_list = new FieldJSON("contact_list",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Контакты';
+	filed_options.autoInc = false;	
+	
+	options.fields.contact_ids = new FieldText("contact_ids",filed_options);
+	
 		DriverList_Model.superclass.constructor.call(this,id,options);
 }
 extend(DriverList_Model,ModelXML);

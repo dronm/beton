@@ -76,6 +76,16 @@ class DriverList_Model extends ModelSQLBeton{
 		$f_contact_list=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"contact_list",$f_opts);
 		$this->addField($f_contact_list);
 		//********************
+		
+		//*** Field contact_ids ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Контакты';
+		$f_opts['id']="contact_ids";
+						
+		$f_contact_ids=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"contact_ids",$f_opts);
+		$this->addField($f_contact_ids);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

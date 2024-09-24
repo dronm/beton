@@ -26,8 +26,6 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
 
 require_once(FRAME_WORK_PATH.'basic_classes/ParamsSQL.php');
 
-require_once(USER_MODELS_PATH.'ClientList_Model.php');
-
 class Client_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL){
 		parent::__construct($dbLinkMaster);
@@ -600,77 +598,7 @@ class Client_Controller extends ControllerSQL{
 	}
 	
 	/* !!!ПЕРЕКРЫТИЕ МЕТОДА!!! */
-	public function conditionFromParams($pm,$model){
-		$where = null;
-		$val = $pm->getParamValue('cond_fields');
-		if (isset($val)&&$val!=''){			
-			$condFields = explode(',',$val);
-			$cnt = count($condFields);			
-			if ($cnt>0){		
-				$val = $pm->getParamValue('cond_sgns');
-				$condSgns = (isset($val))? explode(',',$val):array();
-				$val = $pm->getParamValue('cond_vals');				
-				$condVals = (isset($val))? explode(',',$val):array();				
-				$val = $pm->getParamValue('cond_ic');
-				$condInsen = (isset($val))? explode(',',$val):array();
-				$sgn_keys_ar = explode(',',COND_SIGN_KEYS);
-				$sgn_ar = explode(',',COND_SIGNS);
-				if (count($condVals)!=$cnt){
-					throw new Exception('Количество значений условий не совпадает с количеством полей!');
-				}
-				$where = new ModelWhereSQL();
-				for ($i=0;$i<$cnt;$i++){
-					if (count($condSgns)>$i){
-						$ind = array_search($condSgns[$i],$sgn_keys_ar);
-					}
-					else{
-						//default param
-						$ind = array_search('e',$sgn_keys_ar);
-					}
-					if ($ind>=0){
-						//Добавлено
-						if ($condFields[$i]=='tel'){
-							$field = clone $model->getFieldById('id');
-							$ic = false;
-							$tel_db = NULL;
-							$ext_class = new FieldExtString($condFields[$i]);
-							$val_validated = $ext_class->validate($condVals[$i]);
-							FieldSQLString::formatForDb($this->getDbLink(),$val_validated,$tel_db);							
-							$field->setSQLExpression(sprintf(
-								"(SELECT t.client_id FROM client_tels t WHERE t.tel=%s)",
-								$tel_db
-								)								
-							);
-						}
-						else{
-							$field = clone $model->getFieldById($condFields[$i]);
-							$ext_class = str_replace('SQL','Ext',get_class($field));
-							$ext_field = new $ext_class($field->getId());
-						
-							$ext_field->setValue($condVals[$i]);
-							$field->setValue($ext_field->getValue());
-							//echo 'ind='.$i.' val='.$ext_field->getValue();
-							if (count($condInsen)>$i){
-								$ic = ($condInsen[$i]=='1');
-							}
-							else{
-								$ic = false;
-							}
-						}
-						$where->addField($field,
-							$sgn_ar[$ind],NULL,$ic);
-					}
-				}
-			}
-		}
-		return $where;
-	}
-/*
-	public function get_list($pm){
-		$list_model = new ClientList_Model($this->getDbLink());
-		$this->modelGetList($list_model,$pm);
-		
-	}	
-	*/
+	
+	
 }
 ?>

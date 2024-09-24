@@ -95,6 +95,15 @@ function UserList_Model(options){
 	
 	options.fields.contact_list = new FieldJSON("contact_list",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Id list for filter';
+	filed_options.autoInc = false;	
+	
+	options.fields.contact_ids = new FieldText("contact_ids",filed_options);
+	
 		UserList_Model.superclass.constructor.call(this,id,options);
 }
 extend(UserList_Model,ModelXML);

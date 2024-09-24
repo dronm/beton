@@ -365,6 +365,9 @@ extend(Client_Controller,ControllerObjServer);
 	f_opts.alias = "Контакты";
 	pm.addField(new FieldJSON("contact_list",f_opts));
 	var f_opts = {};
+	f_opts.alias = "Ids for filter";
+	pm.addField(new FieldText("contact_ids",f_opts));
+	var f_opts = {};
 	
 	pm.addField(new FieldJSON("descr",f_opts));
 	var f_opts = {};

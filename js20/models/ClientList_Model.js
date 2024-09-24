@@ -44,28 +44,10 @@ function ClientList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Телефон';
-	filed_options.autoInc = false;	
-	
-	options.fields.phone_cel = new FieldString("phone_cel",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Объем';
-	filed_options.autoInc = false;	
-	
-	options.fields.quant = new FieldString("quant",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.client_types_ref = new FieldJSON("client_types_ref",filed_options);
+	options.fields.manager_comment = new FieldString("manager_comment",filed_options);
 	
 				
 	
@@ -75,6 +57,15 @@ function ClientList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.client_type_id = new FieldInt("client_type_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.client_types_ref = new FieldJSON("client_types_ref",filed_options);
 	
 				
 	
@@ -98,10 +89,10 @@ function ClientList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Вид клиента';
+	filed_options.alias = 'Телефон';
 	filed_options.autoInc = false;	
 	
-	options.fields.client_kind = new FieldString("client_kind",filed_options);
+	options.fields.phone_cel = new FieldString("phone_cel",filed_options);
 	
 				
 	
@@ -111,6 +102,24 @@ function ClientList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.ours = new FieldString("ours",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Вид клиента';
+	filed_options.autoInc = false;	
+	
+	options.fields.client_kind = new FieldString("client_kind",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Email';
+	filed_options.autoInc = false;	
+	
+	options.fields.email = new FieldString("email",filed_options);
 	
 				
 	
@@ -156,6 +165,15 @@ function ClientList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.contact_list = new FieldJSON("contact_list",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Ids for filter';
+	filed_options.autoInc = false;	
+	
+	options.fields.contact_ids = new FieldText("contact_ids",filed_options);
 	
 				
 	

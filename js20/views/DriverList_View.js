@@ -44,13 +44,20 @@ function DriverList_View(id,options){
 							"sortable":true,
 							"sort":"asc"						
 						})
-						,new GridCellHead(id+":grid:head:contact_list",{
+						,new GridCellHead(id+":grid:head:contact_ids",{
 							"value":"Контакты",
 							"columns":[
 								new GridColumn({
+									"field":model.getField("contact_ids"),
 									"formatFunction": function(f,cell){
 										window.getApp().formatContactList(f,cell);
 										return "";
+									},
+									"ctrlClass":ContactEdit,
+									"searchOptions":{
+										"searchType":"on_match",
+										"typeChange":false,
+										"condSign":"any"
 									}
 								})
 							]

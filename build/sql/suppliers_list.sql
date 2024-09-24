@@ -20,7 +20,14 @@ CREATE OR REPLACE VIEW suppliers_list AS
 		LEFT JOIN contacts AS ct ON ct.id = en.contact_id
 		LEFT JOIN posts AS p ON p.id = ct.post_id
 		WHERE en.entity_type = 'suppliers' AND en.entity_id = sp.id
-		) AS contact_list
+		) AS contact_list,
+		
+		(SELECT
+			array_agg(en.contact_id)
+		FROM entity_contacts AS en
+		WHERE en.entity_type = 'suppliers' AND en.entity_id = sp.id
+		) AS contact_ids
+		
 	 	
  	FROM suppliers AS sp
 	ORDER BY sp.name;

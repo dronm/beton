@@ -49,7 +49,14 @@ CREATE OR REPLACE VIEW public.clients_list AS
 		
 		clients_ref(cl) AS descr,
 		
-		cl.ref_1c IS NOT NULL AS ref_1c_exists
+		cl.ref_1c IS NOT NULL AS ref_1c_exists,
+		
+		(SELECT
+			array_agg(en.contact_id)
+		FROM entity_contacts AS en
+		WHERE en.entity_type = 'clients' AND en.entity_id = cl.id
+		) AS contact_ids
+		
 		
 	FROM clients cl
 	LEFT JOIN client_types ct ON ct.id = cl.client_type_id
@@ -67,5 +74,5 @@ CREATE OR REPLACE VIEW public.clients_list AS
 	ORDER BY cl.name
 	;
 
-ALTER TABLE public.clients_list2 OWNER TO beton;
+ALTER TABLE public.clients_list OWNER TO beton;
 

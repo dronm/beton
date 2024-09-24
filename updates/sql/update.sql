@@ -29567,3 +29567,447 @@ $$
   CALLED ON NULL INPUT
   COST 100;
  ALTER FUNCTION pump_vehicles_check_order_min_vals(in_pump_vehicle_id int, in_quant numeric(19,2), in_date_time timestamp, in_order_id int) OWNER TO beton;
+
+
+
+
+-- ******************* update 23/09/2024 11:21:58 ******************
+-- View: users_list
+
+-- DROP VIEW users_list;
+
+CREATE OR REPLACE VIEW users_list AS 
+
+	SELECT u.id,
+	    u.name,
+	    u.role_id,
+	    u.phone_cel,
+	    u.tel_ext,
+	    u.email,
+	    u.banned,
+	    ( SELECT
+	    		json_agg(
+	    			json_build_object(
+	    				'name', ct.name,	    				
+	    				'tel', ct.tel,
+	    				'tel_ext', ct.tel_ext,
+	    				'email', ct.email,
+	    				'post', p.name
+	    			)
+	    		) AS json_agg
+		FROM entity_contacts en
+		LEFT JOIN contacts ct ON ct.id = en.contact_id
+		LEFT JOIN posts p ON p.id = ct.post_id
+		WHERE en.entity_type = 'users'::data_types AND en.entity_id = u.id
+	  ) AS contact_list,
+	  
+	    ( SELECT
+	    		array_agg(en.contact_id)
+		FROM entity_contacts en
+		WHERE en.entity_type = 'users'::data_types AND en.entity_id = u.id
+	  ) AS contact_ids
+	  
+	  
+	  FROM users u
+	  ORDER BY u.name
+	;
+ALTER TABLE users_list OWNER TO beton;
+	  
+
+
+-- ******************* update 23/09/2024 12:57:53 ******************
+-- View: public.clients_list
+
+-- DROP VIEW public.clients_list;
+
+CREATE OR REPLACE VIEW public.clients_list AS 
+	SELECT
+		cl.id,
+		cl.name,
+		cl.manager_comment,
+		cl.client_type_id,
+		client_types_ref(ct) AS client_types_ref,
+		client_come_from_ref(ccf) AS client_come_from_ref,
+		cl.client_come_from_id,
+		cl.phone_cel,		
+		
+		coalesce( (SELECT TRUE FROM orders o WHERE o.client_id=cl.id LIMIT 1),FALSE) AS ours,
+		
+		cl.client_kind,
+		cl.email,
+		
+		(SELECT
+			a.dt::date AS dt
+		FROM ast_calls a
+		WHERE a.client_id = cl.id
+		ORDER BY a.dt
+		LIMIT 1
+		) AS first_call_date,
+		
+		users_ref(man) AS users_ref,
+		
+		cl.inn
+		
+		,users_ref(acc) AS accounts_ref,
+		(SELECT
+			json_agg(
+				json_build_object(
+					'name', ct.name,
+					'tel', ct.tel,
+					'tel_ext', ct.tel_ext,
+					'email', ct.email,
+					'post', p.name
+				)
+			)
+		FROM entity_contacts AS en
+		LEFT JOIN contacts AS ct ON ct.id = en.contact_id
+		LEFT JOIN posts AS p ON p.id = ct.post_id
+		WHERE en.entity_type = 'clients' AND en.entity_id = cl.id
+		) AS contact_list,
+		
+		clients_ref(cl) AS descr,
+		
+		cl.ref_1c IS NOT NULL AS ref_1c_exists,
+		
+		(SELECT
+			json_agg(en.contact_id)
+		FROM entity_contacts AS en
+		WHERE en.entity_type = 'clients' AND en.entity_id = cl.id
+		) AS contact_ids
+		
+		
+	FROM clients cl
+	LEFT JOIN client_types ct ON ct.id = cl.client_type_id
+	LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
+	LEFT JOIN users man ON man.id = cl.manager_id
+	LEFT JOIN users acc ON acc.id = cl.user_id
+	/*LEFT JOIN (
+		SELECT
+			orders.client_id,
+	    		sum(orders.quant) AS quant
+	   	FROM orders
+	  	GROUP BY orders.client_id
+	) o ON o.client_id = cl.id
+	*/
+	ORDER BY cl.name
+	;
+
+ALTER TABLE public.clients_list OWNER TO beton;
+
+
+
+-- ******************* update 23/09/2024 13:16:24 ******************
+-- View: public.clients_list
+
+ DROP VIEW public.clients_list;
+
+CREATE OR REPLACE VIEW public.clients_list AS 
+	SELECT
+		cl.id,
+		cl.name,
+		cl.manager_comment,
+		cl.client_type_id,
+		client_types_ref(ct) AS client_types_ref,
+		client_come_from_ref(ccf) AS client_come_from_ref,
+		cl.client_come_from_id,
+		cl.phone_cel,		
+		
+		coalesce( (SELECT TRUE FROM orders o WHERE o.client_id=cl.id LIMIT 1),FALSE) AS ours,
+		
+		cl.client_kind,
+		cl.email,
+		
+		(SELECT
+			a.dt::date AS dt
+		FROM ast_calls a
+		WHERE a.client_id = cl.id
+		ORDER BY a.dt
+		LIMIT 1
+		) AS first_call_date,
+		
+		users_ref(man) AS users_ref,
+		
+		cl.inn
+		
+		,users_ref(acc) AS accounts_ref,
+		(SELECT
+			json_agg(
+				json_build_object(
+					'name', ct.name,
+					'tel', ct.tel,
+					'tel_ext', ct.tel_ext,
+					'email', ct.email,
+					'post', p.name
+				)
+			)
+		FROM entity_contacts AS en
+		LEFT JOIN contacts AS ct ON ct.id = en.contact_id
+		LEFT JOIN posts AS p ON p.id = ct.post_id
+		WHERE en.entity_type = 'clients' AND en.entity_id = cl.id
+		) AS contact_list,
+		
+		clients_ref(cl) AS descr,
+		
+		cl.ref_1c IS NOT NULL AS ref_1c_exists,
+		
+		(SELECT
+			array_agg(en.contact_id)
+		FROM entity_contacts AS en
+		WHERE en.entity_type = 'clients' AND en.entity_id = cl.id
+		) AS contact_ids
+		
+		
+	FROM clients cl
+	LEFT JOIN client_types ct ON ct.id = cl.client_type_id
+	LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
+	LEFT JOIN users man ON man.id = cl.manager_id
+	LEFT JOIN users acc ON acc.id = cl.user_id
+	/*LEFT JOIN (
+		SELECT
+			orders.client_id,
+	    		sum(orders.quant) AS quant
+	   	FROM orders
+	  	GROUP BY orders.client_id
+	) o ON o.client_id = cl.id
+	*/
+	ORDER BY cl.name
+	;
+
+ALTER TABLE public.clients_list OWNER TO beton;
+
+
+
+-- ******************* update 23/09/2024 13:47:05 ******************
+-- View: public.pump_veh_list
+
+-- DROP VIEW public.pump_veh_list CASCADE;
+
+CREATE OR REPLACE VIEW public.pump_veh_list AS 
+	SELECT
+		pv.id,
+		pv.phone_cel,
+		vehicles_ref(v) AS pump_vehicles_ref,
+		pump_prices_ref(ppr) AS pump_prices_ref,
+		
+		v.make,
+		v.owner,
+		v.feature,
+		v.plate,
+		pv.deleted,
+		pv.pump_length,
+		--vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		
+		(SELECT
+			owners.r->'fields'->'owner'
+		FROM
+		(
+			SELECT jsonb_array_elements(v.vehicle_owners->'rows') AS r
+		) AS owners
+		ORDER BY owners.r->'fields'->'dt_from' DESC
+		LIMIT 1
+		) AS vehicle_owners_ref,
+		
+		pv.comment_text,
+		
+		--v.vehicle_owner_id,
+		(SELECT
+			CASE WHEN owners.r->'fields'->'owner'->'keys'->>'id'='null' THEN NULL
+				ELSE (owners.r->'fields'->'owner'->'keys'->>'id')::int
+			END	
+		FROM
+		(
+			SELECT jsonb_array_elements(v.vehicle_owners->'rows') AS r
+		) AS owners
+		ORDER BY owners.r->'fields'->'dt_from' DESC
+		LIMIT 1
+		) AS vehicle_owner_id,
+		
+		
+		pv.phone_cels,
+		pv.pump_prices,
+		
+		v.vehicle_owners_ar,
+		pump_vehicles_ref(
+			pv,
+			v,
+			(SELECT vh_o FROM vehicle_owners AS vh_o
+			WHERE vh_o.id = 
+				(SELECT
+					CASE WHEN owners.r->'fields'->'owner'->'keys'->>'id'='null' THEN NULL
+						ELSE (owners.r->'fields'->'owner'->'keys'->>'id')::int
+					END	
+				FROM
+				(
+					SELECT jsonb_array_elements(v.vehicle_owners->'rows') AS r
+				) AS owners
+				ORDER BY owners.r->'fields'->'dt_from' DESC
+				LIMIT 1
+				)			
+			)
+		) AS self_ref,
+		
+		pv.specialist_inform,
+		
+		(SELECT
+			json_agg(
+				json_build_object(
+					'name', ct.name,
+					'tel', ct.tel,
+					'tel_ext', ct.tel_ext,
+					'email', ct.email,
+					'post', p.name
+				)
+			)
+		FROM entity_contacts AS en
+		LEFT JOIN contacts AS ct ON ct.id = en.contact_id
+		LEFT JOIN posts AS p ON p.id = ct.post_id
+		WHERE en.entity_type = 'pump_vehicles' AND en.entity_id = pv.id
+		) AS contact_list,	
+		
+		pv.driver_ship_inform,
+		
+		pv.min_order_quant,
+		pv.min_order_time_interval,
+		
+		(SELECT
+			array_agg(en.contact_id)
+		FROM entity_contacts AS en
+		WHERE en.entity_type = 'pump_vehicles' AND en.entity_id = pv.id
+		) AS contact_ids
+		
+		
+		
+	FROM pump_vehicles pv
+	LEFT JOIN vehicles v ON v.id = pv.vehicle_id
+	LEFT JOIN pump_prices ppr ON ppr.id = pv.pump_price_id
+	--LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+	ORDER BY v.plate;
+
+ALTER TABLE public.pump_veh_list
+  OWNER TO beton;
+
+
+
+-- ******************* update 23/09/2024 13:52:14 ******************
+-- View: drivers_list
+
+-- DROP VIEW drivers_list;
+
+CREATE OR REPLACE VIEW drivers_list AS 
+	SELECT
+	 	dr.id,
+	 	dr.name,
+	 	dr.driver_licence,
+	 	dr.driver_licence_class,
+		(SELECT
+			json_agg(
+				json_build_object(
+					'name', ct.name,
+					'tel', ct.tel,
+					'tel_ext', ct.tel_ext,
+					'email', ct.email,
+					'post', p.name
+				)
+			)
+		FROM entity_contacts AS en
+		LEFT JOIN contacts AS ct ON ct.id = en.contact_id
+		LEFT JOIN posts AS p ON p.id = ct.post_id
+		WHERE en.entity_type = 'drivers' AND en.entity_id = dr.id
+		) AS contact_list,
+		
+		(SELECT
+			array_agg(en.contact_id)
+		FROM entity_contacts AS en
+		WHERE en.entity_type = 'drivers' AND en.entity_id = dr.id
+		) AS contact_ids
+		
+	 	
+ 	FROM drivers AS dr
+	ORDER BY dr.name;
+
+ALTER TABLE drivers_list OWNER TO beton;
+
+
+
+-- ******************* update 23/09/2024 13:57:25 ******************
+-- View: suppliers_list
+
+-- DROP VIEW suppliers_list;
+
+CREATE OR REPLACE VIEW suppliers_list AS 
+	SELECT
+	 	sp.id,
+	 	sp.name,
+		(SELECT
+			json_agg(
+				json_build_object(
+					'name', ct.name,
+					'tel', ct.tel,
+					'tel_ext', ct.tel_ext,
+					'email', ct.email,
+					'post', p.name
+				)
+			)
+		FROM entity_contacts AS en
+		LEFT JOIN contacts AS ct ON ct.id = en.contact_id
+		LEFT JOIN posts AS p ON p.id = ct.post_id
+		WHERE en.entity_type = 'suppliers' AND en.entity_id = sp.id
+		) AS contact_list,
+		
+		(SELECT
+			array_agg(en.contact_id)
+		FROM entity_contacts AS en
+		WHERE en.entity_type = 'suppliers' AND en.entity_id = sp.id
+		) AS contact_ids
+		
+	 	
+ 	FROM suppliers AS sp
+	ORDER BY sp.name;
+
+ALTER TABLE suppliers_list OWNER TO beton;
+
+
+
+-- ******************* update 23/09/2024 14:03:18 ******************
+-- VIEW: user_operator_list
+
+--DROP VIEW user_operator_list;
+
+CREATE OR REPLACE VIEW user_operator_list AS
+	SELECT
+		u.id,
+		u.name,
+		u.email,
+		u.phone_cel,
+		production_sites_ref(ps) AS production_sites_ref,
+		
+		(SELECT
+			json_agg(
+				json_build_object(
+					'name', ct.name,
+					'tel', ct.tel,
+					'tel_ext', ct.tel_ext,
+					'email', ct.email,
+					'post', p.name
+				)
+			)
+		FROM entity_contacts AS en
+		LEFT JOIN contacts AS ct ON ct.id = en.contact_id
+		LEFT JOIN posts AS p ON p.id = ct.post_id
+		WHERE en.entity_type = 'users' AND en.entity_id = u.id
+		) AS contact_list,
+		
+		(SELECT
+			array_agg(en.contact_id)
+		FROM entity_contacts AS en
+		WHERE en.entity_type = 'users' AND en.entity_id = u.id
+		) AS contact_ids
+		
+		
+	FROM users AS u
+	LEFT JOIN production_sites AS ps ON ps.id=u.production_site_id
+	WHERE role_id='operator' AND NOT coalesce(banned,FALSE)
+	ORDER BY u.name
+	;
+	
+ALTER VIEW user_operator_list OWNER TO beton;

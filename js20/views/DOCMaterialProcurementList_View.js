@@ -266,7 +266,7 @@ function DOCMaterialProcurementList_View(id,options){
 					"elements":[
 						new GridCell(id+":grid:foot:sp1",{
 							"value":"Итого",
-							"colSpan":"8"
+							"colSpan":"9"
 						})
 						,new GridCellFoot(id+":grid:foot:tot_quant_net",{
 							"attrs":{"align":"right"},

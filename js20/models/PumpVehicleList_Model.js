@@ -188,6 +188,15 @@ function PumpVehicleList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Ids for search';
+	filed_options.autoInc = false;	
+	
+	options.fields.contact_ids = new FieldText("contact_ids",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	
 	filed_options.autoInc = false;	
 	

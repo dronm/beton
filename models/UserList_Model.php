@@ -9,6 +9,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLEnum.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
@@ -88,6 +89,16 @@ class UserList_Model extends ModelSQLBeton{
 						
 		$f_contact_list=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"contact_list",$f_opts);
 		$this->addField($f_contact_list);
+		//********************
+		
+		//*** Field contact_ids ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Id list for filter';
+		$f_opts['id']="contact_ids";
+						
+		$f_contact_ids=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"contact_ids",$f_opts);
+		$this->addField($f_contact_ids);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

@@ -50,6 +50,15 @@ function SupplierList_Model(options){
 	
 	options.fields.contact_list = new FieldJSON("contact_list",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Контакты';
+	filed_options.autoInc = false;	
+	
+	options.fields.contact_ids = new FieldTex("contact_ids",filed_options);
+	
 		SupplierList_Model.superclass.constructor.call(this,id,options);
 }
 extend(SupplierList_Model,ModelXML);

@@ -24,7 +24,14 @@ CREATE OR REPLACE VIEW user_operator_list AS
 		LEFT JOIN contacts AS ct ON ct.id = en.contact_id
 		LEFT JOIN posts AS p ON p.id = ct.post_id
 		WHERE en.entity_type = 'users' AND en.entity_id = u.id
-		) AS contact_list
+		) AS contact_list,
+		
+		(SELECT
+			array_agg(en.contact_id)
+		FROM entity_contacts AS en
+		WHERE en.entity_type = 'users' AND en.entity_id = u.id
+		) AS contact_ids
+		
 		
 	FROM users AS u
 	LEFT JOIN production_sites AS ps ON ps.id=u.production_site_id
