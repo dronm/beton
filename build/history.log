@@ -1307,7 +1307,7 @@ defined in Entity line 1.
 1.00342
 1) DOCMaterialProcurementList_View column with total is misplaced by 1 to the left.
 2) ControllerSQL.php =ANY() filter
-
+3) Search in contact field: pump_vehicles, users, clients, suppliers
 
 
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели
