@@ -475,11 +475,27 @@ OrderCalc_View.prototype.setPayCash = function(){
 	}
 	//if model value does not match gui - warning that saving is necessary.
 	let m = this.m_dialogContext.getModel();
+	let total = m.getFieldValue("total");
+	if(isNaN(total)){
+		total = 0;
+	}
+	let unloadCost = m.getFieldValue("unload_cost");
+	if(isNaN(unloadCost)){
+		unloadCost = 0;
+	}
+	let concrCost = m.getFieldValue("concrete_cost");
+	if(isNaN(concrCost)){
+		concrCost = 0;
+	}
+	let destCost = m.getFieldValue("destination_cost");
+	if(isNaN(destCost)){
+		destCost = 0;
+	}
 	if(
-		m.getFieldValue("total") != this.getElement("total").getValue() ||
-		m.getFieldValue("unload_cost") != this.getElement("unload_cost").getValue() ||
-		m.getFieldValue("concrete_cost") != this.getElement("concrete_cost").getValue() ||
-		m.getFieldValue("destination_cost") != this.getElement("destination_cost").getValue()
+		total != this.getElement("total").getValue() ||
+		unloadCost != this.getElement("unload_cost").getValue() ||
+		concrCost != this.getElement("concrete_cost").getValue() ||
+		destCost != this.getElement("destination_cost").getValue()
 	){
 		window.showTempWarn("Пересчитана сумма, запишите документ!", null, 10000);
 	}

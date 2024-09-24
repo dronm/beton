@@ -1309,6 +1309,14 @@ defined in Entity line 1.
 2) ControllerSQL.php =ANY() filter
 3) Search in contact field: pump_vehicles, users, clients, suppliers
 
+1.00343
+1) Сумма документа пересчитана, запишите OrderCalc_View.setPayCash()
+[object Object] в контакте
+
+1.00344
+1) Error in Supplier type field contact_ids "Tex"
+
+
 
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели
 Удаленные элементы справочника: фильтр вверху, пометка спереди, по возможности у всех справочиников. Example: PumpVehicle

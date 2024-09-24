@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-09-24 06:30:03</lastBuild></version>
+		<lastBuild>2024-09-24 09:57:10</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -247,6 +247,7 @@
 		<version dateOpen="2024-09-18 17:17:05" dateClose="2024-09-18 17:19:42">1.00341</version>
 		<version dateOpen="2024-09-19 17:11:45" dateClose="2024-09-19 18:22:11">1.00342</version>
 		<version dateOpen="2024-09-20 07:53:22" dateClose="2024-09-24 06:30:07">1.00343</version>
+		<version dateOpen="2024-09-24 09:55:59" dateClose="2024-09-24 09:57:13">1.00344</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -2252,7 +2253,7 @@
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
 			<field id="name" dataType="String" length="100" alias="Наименование"/>
 			<field id="contact_list" dataType="JSON" alias="Контакты"/>
-			<field id="contact_ids" dataType="Tex" alias="Контакты"/>
+			<field id="contact_ids" dataType="Text" alias="Контакты"/>
 		</model>
 		<model id="DOCMaterialProcurement" parent="ModelSQLDOC" dataTable="doc_material_procurements" virtual="FALSE" modelType="DOC" docTypeId="material_procurement">
 			<defaultOrder>

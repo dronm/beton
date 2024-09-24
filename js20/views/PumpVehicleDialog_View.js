@@ -41,17 +41,18 @@ function PumpVehicleDialog_View(id,options){
 			"maxLength": 100
 		}));	
 		
-		this.addElement(new EditCheckBox(id+":deleted",{
+		//EditCheckBox
+		this.addElement(new EditSwitcher(id+":deleted",{
 			"labelCaption": "Удален:",
 			"title": "Признак активности данной карточки"
 		}));	
 		
-		this.addElement(new EditCheckBox(id+":specialist_inform",{
+		this.addElement(new EditSwitcher(id+":specialist_inform",{
 			"labelCaption": "Информировать специалиста:",
 			"title": "Если установлен, специалист будет получать уведомления"
 		}));	
 		
-		this.addElement(new EditCheckBox(id+":driver_ship_inform",{
+		this.addElement(new EditSwitcher(id+":driver_ship_inform",{
 			"labelCaption": "Информировать водителя (отгрузка):",
 			"title": "Если установлен, водитель будет получать уведомления при отгрузке" 
 		}));	

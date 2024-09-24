@@ -38,16 +38,15 @@ function PumpVehicleList_View(id,options){
 				"field":new FieldString("feature")}),
 			"sign":"e"		
 		}
-		// ,"deleted":{
-		// 	"binding":new CommandBinding({
-		// 		"control":new EditSwitcher(id+":filter-ctrl-deleted",{
-		// 			"labelCaption":"Удаленные:",
-		// 			"contClassName":"form-group-filter"
-		// 		}),
-		// 		"field":new FieldBool("deleted")}),
-		// 	"sign":"e"		
-		// }
-
+		,"deleted":{
+			"binding":new CommandBinding({
+				"control":new EditSwitcher(id+":filter-ctrl-deleted",{
+					"labelCaption":"Удаленные:",
+					"contClassName":"form-group-filter"
+				}),
+				"field":new FieldBool("deleted")}),
+			"sign":"e"		
+		}
 	}
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();

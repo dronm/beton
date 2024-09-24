@@ -57,7 +57,7 @@ function SupplierList_Model(options){
 	filed_options.alias = 'Контакты';
 	filed_options.autoInc = false;	
 	
-	options.fields.contact_ids = new FieldTex("contact_ids",filed_options);
+	options.fields.contact_ids = new FieldText("contact_ids",filed_options);
 	
 		SupplierList_Model.superclass.constructor.call(this,id,options);
 }
