@@ -1250,3 +1250,7 @@ select {
 .total_out {
 	background-color: #bdbdbd !important;
 }
+
+tr.deleted_row {
+	text-decoration: line-through;
+}

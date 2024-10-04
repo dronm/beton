@@ -41,11 +41,13 @@ function PumpVehicleList_View(id,options){
 		,"deleted":{
 			"binding":new CommandBinding({
 				"control":new EditSwitcher(id+":filter-ctrl-deleted",{
-					"labelCaption":"Удаленные:",
-					"contClassName":"form-group-filter"
+					"labelCaption":"Не показывать удаленные:",
+					"contClassName":"form-group-filter",
+					"checked":false
 				}),
 				"field":new FieldBool("deleted")}),
-			"sign":"e"		
+			"sign":"ne",
+			"falseValueNoFilter":true
 		}
 	}
 	var popup_menu = new PopUpMenu();
@@ -55,6 +57,15 @@ function PumpVehicleList_View(id,options){
 		"controller":contr,
 		"editInline":false,
 		"editWinClass":PumpVehicle_Form,
+		"onEventSetRowOptions":function(rowOpts){
+			if(this.getModel().getFieldValue("deleted")){
+				rowOpts.attrs = rowOpts.attrs || {};
+				rowOpts.attrs["class"] = rowOpts.attrs["class"] || "";
+				rowOpts.attrs["class"]+= rowOpts.attrs["class"]==""? "":" ";
+				rowOpts.attrs["class"]+= "deleted_row";
+				rowOpts.attrs.title = "Элемент удален";
+			}
+		},
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
 			"cmdFilter":true,
 			"filters":filters,
@@ -244,18 +255,18 @@ function PumpVehicleList_View(id,options){
 							]
 						})						
 												
-						,is_v_owner? null:new GridCellHead(id+":grid:head:deleted",{
-							"value":"Удален",
-							"colAttrs":{"align":"center"},
-							"columns":[
-								new GridColumnBool({
-									"field":model.getField("deleted"),
-									"showFalse":false,
-									"ctrlClass":EditCheckBox,
-									"ctrlBindFieldId":"deleted"
-								})
-							]
-						})						
+						// ,is_v_owner? null:new GridCellHead(id+":grid:head:deleted",{
+						// 	"value":"Удален",
+						// 	"colAttrs":{"align":"center"},
+						// 	"columns":[
+						// 		new GridColumnBool({
+						// 			"field":model.getField("deleted"),
+						// 			"showFalse":false,
+						// 			"ctrlClass":EditCheckBox,
+						// 			"ctrlBindFieldId":"deleted"
+						// 		})
+						// 	]
+						// })						
 						,is_v_owner? null:new GridCellHead(id+":grid:head:specialist_inform",{
 							"value":"Инф.спец.",
 							"colAttrs":{"align":"center"},
@@ -298,7 +309,7 @@ function PumpVehicleList_View(id,options){
 			{"countPerPage":constants.doc_per_page_count.getValue()}),		
 		
 		"autoRefresh":false,
-		"refreshInterval":constants.grid_refresh_interval.getValue()*1000,
+		"refreshInterval":null, //constants.grid_refresh_interval.getValue()*1000,
 		"rowSelect":false,
 		"focus":true
 	}));	

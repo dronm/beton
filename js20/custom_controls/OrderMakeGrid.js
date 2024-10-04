@@ -389,7 +389,7 @@ function OrderMakeGrid(id,options){
 							}
 						})						
 						,new GridCell(id+":order_make_grid:foot:total_sp2",{
-							"colSpan":"3"
+							"colSpan":"5"
 						})						
 						,!editable? null:new GridCellFoot(id+":order_make_grid:foot:tot_total",{
 							"attrs":{"align":"right"},

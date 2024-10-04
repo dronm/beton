@@ -11,6 +11,20 @@ function EmployeeList_View(id,options){
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
 	
+	let filters = {
+		"deleted":{
+			"binding":new CommandBinding({
+				"control":new EditSwitcher(id+":filter-ctrl-employed",{
+					"labelCaption":"Не показывать удаленные:",
+					"contClassName":"form-group-filter",
+					"checked":false
+				}),
+				"field":new FieldBool("employed")}),
+			"sign":"ne",
+			"falseValueNoFilter":true
+		}
+	};
+
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
@@ -18,7 +32,17 @@ function EmployeeList_View(id,options){
 		"controller":contr,
 		"editInline":true,
 		"editWinClass":null,
+		"onEventSetRowOptions":function(rowOpts){
+			if(this.getModel().getFieldValue("employed")){
+				rowOpts.attrs = rowOpts.attrs || {};
+				rowOpts.attrs["class"] = rowOpts.attrs["class"] || "";
+				rowOpts.attrs["class"]+= rowOpts.attrs["class"]==""? "":" ";
+				rowOpts.attrs["class"]+= "deleted_row";
+				rowOpts.attrs.title = "Элемент удален";
+			}
+		},
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
+			"filters":filters,
 			"addCustomCommandsAfter":function(commands){
 				commands.push(new SendNotificationCmd(id+":grid:cmd:sendNotif",{
 					"showCmdControl":true,
@@ -54,7 +78,11 @@ function EmployeeList_View(id,options){
 						new GridCellHead(id+":grid:head:employed",{
 							"value":"Работает",
 							"columns":[
-								new GridColumnBool({"field":model.getField("employed")})
+							new GridColumnBool({
+									"field":model.getField("employed"),
+									"showFalse":false
+									// "ctrlClass":EditSwitcher
+								})
 							]
 						}),
 						new GridCellHead(id+":grid:head:users_ref",{

@@ -38,7 +38,7 @@ function UserDialog_View(id,options){
 		}));
 		*/
 
-		this.addElement(new EditCheckBox(id+":banned",{
+		this.addElement(new EditSwitcher(id+":banned",{
 			"labelCaption":"Доступ запрещен:",
 		}));
 

@@ -300,6 +300,9 @@ extend(User_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Контакты";
 	pm.addField(new FieldJSON("contact_list",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Id list for filter";
+	pm.addField(new FieldText("contact_ids",f_opts));
 }
 
 			User_Controller.prototype.addGetObject = function(){

@@ -37,23 +37,6 @@ function log_msg($msg){
 }
 
 function downloadFile($token, $fullFileId){
-        /*$resp = apiRequestJson($token, "getFile",
-                array(
-                        'file_id' => $fullFileId
-                ),
-                TRUE
-        );
-        if(!is_array($resp)||!count($resp)
-        ||!isset($resp["file_path"])
-        ){
-                return;
-        }       
-        $dir = TM_STORE;
-        file_put_contents(
-                $dir. '/'. $resp["file_unique_id"],
-                file_get_contents(sprintf('https://api.telegram.org/file/bot%s/%s', $token, $resp["file_path"]))
-        );
-        */
 	$file_id = apiDownloadFile($token, $fullFileId, TM_STORE);
 	syncStore(TM_STORE. '/'. $file_id);//$resp["file_unique_id"]
 	
@@ -142,7 +125,6 @@ function processMessage($message) {
 		}catch(Exception $e){
 			log_tm_error($dbTMConn, $q_params['id'], $tm_params['token'], $chat_id, $e->getMessage());
 		}
-		
 	
 	} else if (isset($message['text']) && strpos($message['text'], "/stop") === 0) {
 		// stop now

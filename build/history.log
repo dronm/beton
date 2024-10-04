@@ -1317,9 +1317,20 @@ defined in Entity line 1.
 1) Error in Supplier type field contact_ids "Tex"
 
 
+1.00345
+1) User_Controller->do_login() if logged with name/password there is no Telegram photo
+2) Make default filters for: PumpVehicleList, UserList, EmployeeList
+
+
+1.00346
+1) On deleting shipment, delete first quality passport if exists.
+
+
+1.00347
+1) MakeOrderGrid.js totals shifted to the left colSpan set to 5 instead of 3
 
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели
-Удаленные элементы справочника: фильтр вверху, пометка спереди, по возможности у всех справочиников. Example: PumpVehicle
+XXX Удаленные элементы справочника: фильтр вверху, пометка спереди, по возможности у всех справочиников. Example: PumpVehicle
 Движение на базу - контроль всех баз. Поиск ближайшей, смена
 Отобразить, если остлось Х км до базы какой-то знак
 VehiceRoute::getZoneListQuery()

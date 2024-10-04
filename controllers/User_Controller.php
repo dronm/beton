@@ -1356,6 +1356,21 @@ class User_Controller extends ControllerSQL{
 
 			//base contact
 			$_SESSION['login_contact_id'] = $ar["login_contact_id"];
+
+			if(!isset($_SESSION["tm_photo"])){
+				//login with "login" method
+				$ar = $this->getDbLink()->query_first(sprintf(
+					"SELECT
+						encode(ex_u.tm_photo_preview, 'base64') AS tm_photo
+					FROM notifications.ext_users AS ex_u
+					WHERE ex_u.app_id = %d AND ex_u.ext_contact_id = %d"
+					,MS_APP_ID
+					,$_SESSION["login_contact_id"]
+				));
+				if(is_array($ar) && count($ar)){
+					$_SESSION["tm_photo"] = $ar["tm_photo"];
+				}
+			}
 		}
 	}
 	
