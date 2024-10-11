@@ -43,6 +43,7 @@ function EmployeeList_View(id,options){
 		},
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
 			"filters":filters,
+			"variantStorage":options.variantStorage,
 			"addCustomCommandsAfter":function(commands){
 				commands.push(new SendNotificationCmd(id+":grid:cmd:sendNotif",{
 					"showCmdControl":true,

@@ -98,8 +98,7 @@ class ViewBase extends ViewHTMLXSLT {
 			<xsl:apply-templates select="metadata/jsScripts/jsScript[@standalone='TRUE']"/>
 			$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'lib.js', NULL, date("Y-m-dTH:i:s", filemtime(USER_JS_PATH.'<xsl:value-of select="@file"/>')) ));
 			$script_id = VERSION;
-		}
-		else{		
+		} else{		
 			<xsl:apply-templates select="metadata/jsScripts"/>			
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

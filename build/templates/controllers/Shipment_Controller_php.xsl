@@ -22,6 +22,7 @@ require_once(USER_MODELS_PATH.'ShipmentOperator_Model.php');
 require_once(USER_MODELS_PATH.'ShipmentForOrderList_Model.php');
 require_once(USER_MODELS_PATH.'ShipmentPumpList_Model.php');
 require_once(USER_MODELS_PATH.'ShipmentTimeList_Model.php');
+require_once(USER_MODELS_PATH.'ShipmentForDocList_Model.php');
 
 require_once(USER_CONTROLLERS_PATH.'Graph_Controller.php');
 
@@ -1305,6 +1306,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		return 'Паспорт №'.$ar['num'].'.pdf';
 	}
 	
+	public function get_list_for_doc($pm){	
+		$this->modelGetList(new ShipmentForDocList_Model($this->getDbLink()), $pm);
+	}
 }
 <![CDATA[?>]]>
 </xsl:template>

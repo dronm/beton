@@ -17,7 +17,7 @@ function ShipmentGridCmdDelete(id,options){
 	
 	var self = this;
 	this.m_btn = new ButtonCmd(id+"btn",{
-		"caption":"Удалить ",
+		"caption":" Удалить ",
 		"glyph":"glyphicon-remove",
 		"title":"Удалить отгрузку",
 		"onClick":function(){

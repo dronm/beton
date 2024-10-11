@@ -16,6 +16,8 @@ BEGIN
 	
 	DELETE FROM vehicle_schedule_states WHERE shipment_id = OLD.id;
 	
+	DELETE FROM quality_passports WHERE shipment_id = OLD.id;
+	
 	--specification
 	SELECT
 		coalesce(o.client_specification_id, 0)

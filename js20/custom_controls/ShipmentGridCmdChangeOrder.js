@@ -17,7 +17,7 @@ function ShipmentGridCmdChangeOrder(id,options){
 	
 	var self = this;
 	this.m_btn = new ButtonCmd(id+"btn",{
-		"caption":"Сменить заявку ",
+		"caption":" Сменить заявку ",
 		"glyph":"glyphicon-refresh",
 		"title":"Перенести отгрузку в другую заявку",
 		"onClick":function(){

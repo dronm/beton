@@ -15,7 +15,7 @@ function ShipmentGridCmdPrintPass(id,options){
 
 	options.showCmdControl = (options.showCmdControl!=undefined)? options.showCmdControl:true;	
 	options.glyph = "glyphicon-print";
-	options.caption = "Паспорт";
+	options.caption = " Паспорт";
 	options.title = "Печать паспорта качества";
 	
 	this.m_grid = options.grid;

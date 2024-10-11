@@ -58,6 +58,7 @@ function Shipment_Controller(options){
 	this.add_get_passport_all();
 	this.add_get_passport_stamp_ship();
 	this.add_get_passport_stamp_all();
+	this.add_get_list_for_doc();
 		
 }
 extend(Shipment_Controller,ControllerObjServer);
@@ -987,6 +988,24 @@ extend(Shipment_Controller,ControllerObjServer);
 		pm.addField(new FieldInt("id",options));
 	
 			
+	this.addPublicMethod(pm);
+}
+
+			Shipment_Controller.prototype.add_get_list_for_doc = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_list_for_doc',opts);
+	
+	pm.addField(new FieldInt(this.PARAM_COUNT));
+	pm.addField(new FieldInt(this.PARAM_FROM));
+	pm.addField(new FieldString(this.PARAM_COND_FIELDS));
+	pm.addField(new FieldString(this.PARAM_COND_SGNS));
+	pm.addField(new FieldString(this.PARAM_COND_VALS));
+	pm.addField(new FieldString(this.PARAM_COND_ICASE));
+	pm.addField(new FieldString(this.PARAM_ORD_FIELDS));
+	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
+	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
+	pm.addField(new FieldString(this.PARAM_FIELD_LSN));
+
 	this.addPublicMethod(pm);
 }
 

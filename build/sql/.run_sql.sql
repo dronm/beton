@@ -1,43 +1,49 @@
--- VIEW: user_operator_list
+-- FUNCTION: public.set_vehicle_free()
 
---DROP VIEW user_operator_list;
+-- DROP FUNCTION public.set_vehicle_free();
 
-CREATE OR REPLACE VIEW user_operator_list AS
-	SELECT
-		u.id,
-		u.name,
-		u.email,
-		u.phone_cel,
-		production_sites_ref(ps) AS production_sites_ref,
-		
-		(SELECT
-			json_agg(
-				json_build_object(
-					'name', ct.name,
-					'tel', ct.tel,
-					'tel_ext', ct.tel_ext,
-					'email', ct.email,
-					'post', p.name
-				)
-			)
-		FROM entity_contacts AS en
-		LEFT JOIN contacts AS ct ON ct.id = en.contact_id
-		LEFT JOIN posts AS p ON p.id = ct.post_id
-		WHERE en.entity_type = 'users' AND en.entity_id = u.id
-		) AS contact_list,
-		
-		(SELECT
-			array_agg(en.contact_id)
-		FROM entity_contacts AS en
-		WHERE en.entity_type = 'users' AND en.entity_id = u.id
-		) AS contact_ids
-		
-		
-	FROM users AS u
-	LEFT JOIN production_sites AS ps ON ps.id=u.production_site_id
-	WHERE role_id='operator' AND NOT coalesce(banned,FALSE)
-	ORDER BY u.name
-	;
+CREATE OR REPLACE FUNCTION public.set_vehicle_free()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
+DECLARE
+	spec_id int;
+BEGIN
+
+	DELETE FROM vehicle_route_cashe WHERE shipment_id = OLD.id;
 	
-ALTER VIEW user_operator_list OWNER TO beton;
+	DELETE FROM vehicle_schedule_states WHERE shipment_id = OLD.id;
+	
+	DELETE FROM quality_passports WHERE shipment_id = OLD.id;
+	
+	--specification
+	SELECT
+		coalesce(o.client_specification_id, 0)
+	INTO
+		spec_id
+	FROM orders AS o
+	WHERE o.id=OLD.order_id;
+	
+	IF spec_id > 0 THEN
+		DELETE FROM client_specification_flows WHERE client_specification_id = spec_id AND shipment_id = OLD.id;
+	END IF;
+	
+	
+	--log
+	PERFORM doc_log_delete('shipment'::doc_types,OLD.id);
+
+	--register actions
+	PERFORM ra_materials_remove_acts('shipment'::doc_types,OLD.id);
+	PERFORM ra_material_consumption_remove_acts('shipment'::doc_types,OLD.id);
+	
+	RETURN OLD;
+END;
+$BODY$;
+
+ALTER FUNCTION public.set_vehicle_free()
+    OWNER TO beton;
+
+--GRANT EXECUTE ON FUNCTION public.set_vehicle_free() TO ;
 

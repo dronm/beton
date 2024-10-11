@@ -164,8 +164,7 @@ class ViewBase extends ViewHTMLXSLT {
 			$this->addJsModel(new ModelJavaScript('js20/assets/js/core/libraries/jquery.min.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/assets/js/core/libraries/jquery.min.js')) ));$this->addJsModel(new ModelJavaScript('js20/assets/js/core/libraries/bootstrap.min.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/assets/js/core/libraries/bootstrap.min.js')) ));$this->addJsModel(new ModelJavaScript('js20/assets/js/plugins/loaders/blockui.min.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/assets/js/plugins/loaders/blockui.min.js')) ));$this->addJsModel(new ModelJavaScript('js20/assets/js/core/app.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/assets/js/core/app.js')) ));$this->addJsModel(new ModelJavaScript('js20/assets/js/plugins/forms/styling/switchery.min.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/assets/js/plugins/forms/styling/switchery.min.js')) ));$this->addJsModel(new ModelJavaScript('js20/assets/js/plugins/forms/styling/uniform.min.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/assets/js/plugins/forms/styling/uniform.min.js')) ));$this->addJsModel(new ModelJavaScript('js20/ext/bootstrap-datepicker/bootstrap-datepicker.min.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/ext/bootstrap-datepicker/bootstrap-datepicker.min.js')) ));$this->addJsModel(new ModelJavaScript('js20/ext/bootstrap-datepicker/bootstrap-datepicker.ru.min.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/ext/bootstrap-datepicker/bootstrap-datepicker.ru.min.js')) ));$this->addJsModel(new ModelJavaScript('js20/ext/cleave/cleave.min.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/ext/cleave/cleave.min.js')) ));$this->addJsModel(new ModelJavaScript('js20/ext/cleave/cleave-phone.ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/ext/cleave/cleave-phone.ru.js')) ));$this->addJsModel(new ModelJavaScript('js20/ext/mustache/mustache.min.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/ext/mustache/mustache.min.js')) ));$this->addJsModel(new ModelJavaScript('js20/ext/jshash-2.2/md5-min.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/ext/jshash-2.2/md5-min.js')) ));$this->addJsModel(new ModelJavaScript('js20/ext/OpenLayers/OpenLayers.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/ext/OpenLayers/OpenLayers.js')) ));$this->addJsModel(new ModelJavaScript('js20/ext/chart.js-2.8.0/Chart.min.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/ext/chart.js-2.8.0/Chart.min.js')) ));
 			$this->addJsModel(new ModelJavaScript(USER_JS_PATH.'lib.js', NULL, date("Y-m-dTH:i:s", filemtime(USER_JS_PATH.'')) ));
 			$script_id = VERSION;
-		}
-		else{		
+		} else{		
 			
 		
 		
@@ -1617,6 +1616,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/Client1cEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/Client1cEdit.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/Firm1cEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/Firm1cEdit.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ChatStatusEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ChatStatusEdit.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ShipmentDocRep_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ShipmentDocRep_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/rs_ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/rs_ru.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/rs_common_ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/rs_common_ru.js')) ));
 		
@@ -2101,6 +2101,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/models/CementSiloMaterial_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/CementSiloMaterial_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/CementSiloMaterialList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/CementSiloMaterialList_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controllers/CementSiloMaterial_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/CementSiloMaterial_Controller.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/ShipmentForDocList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ShipmentForDocList_Model.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

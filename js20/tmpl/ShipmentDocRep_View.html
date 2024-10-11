@@ -1,0 +1,46 @@
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h6 class="panel-title">Выбор экипажей
+		</h6>
+		<div id="{{ID}}:cmdFetchShipmentList">
+		</div>
+		<div class="heading-elements">
+			<ul class="icons-list">
+					<li>
+						<a id="{{ID}}:vehSchedSelTgl" data-action="collapse" class="">
+						</a>
+					</li>
+				</ul>
+		</div>				
+	</div>
+	<div class="panel-body ShipmentDocRep-vehicle_select">
+		<ul>
+			{{#VEHICLES}}
+			<li>
+				<input id="{{ID}}:veh_sched_sel_{{VEHICLE_SCHEDULE_ID}}" type="checkbox" vehicle_schedule_id="{{VEHICLE_SCHEDULE_ID}}" class="schedule_select">
+				</input>
+				<label for="{{ID}}:veh_sched_sel_{{VEHICLE_SCHEDULE_ID}}">{{VEHICLE_DESCR}}, {{DRIVER_DESCR}}</label>
+			</li>
+			{{/VEHICLES}}
+		</ul>
+	</div>
+</div>
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h6 class="panel-title">Документы отгрузки
+		</h6>
+		<div class="heading-elements">
+			<ul class="icons-list">
+					<li>
+						<a id="{{ID}}:vehSchedDocTgl" data-action="collapse" class="">
+						</a>
+					</li>
+				</ul>
+		</div>				
+	</div>
+	<div class="panel-body ShipmentDocRep-vehicle_select">
+		<div id="{{ID}}:doc_grid_cont">
+		</div>
+	</div>
+</div>

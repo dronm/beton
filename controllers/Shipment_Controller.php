@@ -28,6 +28,7 @@ require_once(USER_MODELS_PATH.'ShipmentOperator_Model.php');
 require_once(USER_MODELS_PATH.'ShipmentForOrderList_Model.php');
 require_once(USER_MODELS_PATH.'ShipmentPumpList_Model.php');
 require_once(USER_MODELS_PATH.'ShipmentTimeList_Model.php');
+require_once(USER_MODELS_PATH.'ShipmentForDocList_Model.php');
 
 require_once(USER_CONTROLLERS_PATH.'Graph_Controller.php');
 
@@ -798,6 +799,22 @@ class Shipment_Controller extends ControllerSQL{
 		$pm->addParam(new FieldExtInt('id',$opts));
 	
 			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_list_for_doc');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
 		$this->addPublicMethod($pm);
 
 		
@@ -2060,5 +2077,8 @@ class Shipment_Controller extends ControllerSQL{
 		return 'Паспорт №'.$ar['num'].'.pdf';
 	}
 	
+	public function get_list_for_doc($pm){	
+		$this->modelGetList(new ShipmentForDocList_Model($this->getDbLink()), $pm);
+	}
 }
 ?>

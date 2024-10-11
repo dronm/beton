@@ -37,8 +37,8 @@ function ShipmentForOrderList_View(id,options){
 				commands.push(new ShipmentGridCmdPrintPass(id+":grid:cmd:printPass", {"grid": grid}));
 				//commands.push(new ShipmentGridCmdPrintPassShip(id+":grid:cmd:printPassShip"));
 				//commands.push(new ShipmentGridCmdPrintPassAll(id+":grid:cmd:printPassAll"));								
-				//commands.push(new ShipmentGridCmdPrintTTN(id+":grid:cmd:printTTN"));				
-				//commands.push(new ShipmentGridCmdPrintPutevoiList(id+":grid:cmd:printPutevoiList"));								
+				commands.push(new ShipmentGridCmdPrintTTN(id+":grid:cmd:printTTN"));				
+				commands.push(new ShipmentGridCmdPrintPutevoiList(id+":grid:cmd:printPutevoiList"));								
 				commands.push(new ShipmentGridCmdChangeOrder(id+":grid:cmd:Change"));
 				commands.push(new ShipmentGridCmdDelete(id+":grid:cmd:delete"));
 			}

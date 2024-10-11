@@ -1317,17 +1317,23 @@ defined in Entity line 1.
 1) Error in Supplier type field contact_ids "Tex"
 
 
-1.00345
+1.00345 2024-10-04
 1) User_Controller->do_login() if logged with name/password there is no Telegram photo
 2) Make default filters for: PumpVehicleList, UserList, EmployeeList
+3) MakeOrderGrid.js totals shifted to the left colSpan set to 5 instead of 3
+4) On deleting shipment, delete first quality passport if exists.
+	set_vehicle_free()
+5) css files: there are no digits after ? sign.
+	ModelStyleSheet.php added midified parameter.
 
 
-1.00346
-1) On deleting shipment, delete first quality passport if exists.
+1.00346 2024-10-11
+1) TTN, PutList
+	ExcelTemplate_Controller->downloadFilledTemplate() corrected error.
+2) ShipmentDocRep_View.js
+	New model ShipmentForDocList_Model
+	New view
 
-
-1.00347
-1) MakeOrderGrid.js totals shifted to the left colSpan set to 5 instead of 3
 
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели
 XXX Удаленные элементы справочника: фильтр вверху, пометка спереди, по возможности у всех справочиников. Example: PumpVehicle

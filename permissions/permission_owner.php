@@ -390,6 +390,8 @@ $permissions = array();
 				
 					$permissions['Shipment_Controller_get_passport_stamp_all']=TRUE;
 				
+					$permissions['Shipment_Controller_get_list_for_doc']=TRUE;
+				
 					$permissions['Login_Controller_get_list']=TRUE;
 				
 					$permissions['Login_Controller_get_object']=TRUE;

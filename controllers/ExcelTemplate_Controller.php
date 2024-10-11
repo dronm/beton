@@ -531,6 +531,17 @@ class ExcelTemplate_Controller extends ControllerSQL{
 		$fl_name = '';
 		self::genFilledTemplate($dbLink, $templateName, $paramArray, $erEmpty, $out_fl, $fl_name);		
 		$fl_name_parts = pathinfo($fl_name,  PATHINFO_EXTENSION);
+		$fl_ext = '';
+		if(is_array($fl_name_parts) && isset($fl_name_parts['extension'])){
+			$fl_ext = $fl_name_parts['extension'];
+		}else if (gettype($fl_name_parts) == "string"){
+			$fl_ext = $fl_name_parts;
+		}
+		if(!strlen($fl_ext)){
+			$fl_ext = '.xlsx';
+		}else if($fl_ext[0] != '.'){
+			$fl_ext = '.'.$fl_ext;
+		}
 		try{
 			$fl_mime = getMimeTypeOnExt($fl_name);
 			ob_clean();
@@ -538,7 +549,7 @@ class ExcelTemplate_Controller extends ControllerSQL{
 				$out_fl,
 				$fl_mime,
 				'attachment;',
-				$fileName. isset($fl_name_parts['extension'])? $fl_name_parts['extension'] : '.xlsx'
+				$fileName. $fl_ext
 			);
 			
 			return TRUE;

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-10-04 06:17:16</lastBuild></version>
+		<lastBuild>2024-10-11 06:59:39</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -249,6 +249,7 @@
 		<version dateOpen="2024-09-20 07:53:22" dateClose="2024-09-24 06:30:07">1.00343</version>
 		<version dateOpen="2024-09-24 09:55:59" dateClose="2024-09-24 09:57:13">1.00344</version>
 		<version dateOpen="2024-09-24 11:23:24" dateClose="2024-10-04 06:17:36">1.00345</version>
+		<version dateOpen="2024-10-09 08:04:45" dateClose="2024-10-11 06:59:42">1.00346</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1853,6 +1854,24 @@
 			<sql/>
 			<globalFilter id="client_id"/>
 			<globalFilter id="client_from_date" fieldId="ship_date"/>
+		</model>
+		<model id="ShipmentForDocList" parent="ModelSQLBeton" dataTable="shipments_for_doc_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер"/>
+			<field id="ship_date_time" dataType="DateTime" alias="Дата отгрузки"/>
+			<field id="production_site_id" dataType="Int" alias="Завод"/>
+			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
+			<field id="client_id" dataType="Int" alias="Клиент"/>
+			<field id="clients_ref" dataType="JSON" alias="Клиент"/>
+			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
+			<field id="destination_id" dataType="Int" alias="Объект"/>
+			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
+			<field id="concrete_type_id" dataType="Int" alias="Марка"/>
+			<field id="quant" dataType="Float" alias="Количество"/>
+			<field id="vehicles_ref" dataType="JSON" alias="Автомобиль"/>
+			<field id="vehicle_id" dataType="Int" alias="Автомобиль"/>
+			<field id="drivers_ref" dataType="JSON" alias="Водитель"/>
+			<field id="driver_id" dataType="Int" alias="Водитель"/>
+			<field id="vehicle_schedule_id" dataType="Int"/>
 		</model>
 		<model id="OrderForClientList" parent="ModelSQLBeton" dataTable="orders_for_client_list" virtual="TRUE">
 			<defaultOrder>
@@ -5509,6 +5528,7 @@
 			<publicMethod id="get_passport_stamp_all">
 				<field id="id" dataType="Int"/>
 			</publicMethod>
+			<publicMethod id="get_list_for_doc" modelId="ShipmentForDocList" condFields="TRUE"/>
 		</controller>
 		<controller id="Login" parentId="ControllerSQL" state="TRUE" noState="TRUE">
 			<publicMethod id="get_list" modelId="LoginList"/>
@@ -7118,6 +7138,7 @@
 		<view id="50020" t="VehicleOwnerTotIncomeRep" section="Отчеты" descr="Итоговый отчет для владельцев"/>
 		<view id="50021" t="RepMaterialActionByShift" section="Отчеты" descr="Отчет по движению материала по датам"/>
 		<view id="50022" t="VehicleOwnerTotIncomeAllRep" section="Отчеты" descr="Итоговый отчет для владельцев (все)"/>
+		<view id="50023" t="ShipmentDocRep" section="Отчеты" descr="Отгрузочные документы: путевой лист, ТТН"/>
 		<view id="40000" c="Constant_Controller" t="ConstantList" f="get_list" section="Константы" descr="Все константы"/>
 	</views>
 	<serverTemplates>
@@ -7303,6 +7324,7 @@
 		<jsTemplate id="VehicleScheduleEdit_View" file="js20/tmpl/VehicleScheduleEdit_View.html"/>
 		<jsTemplate id="VehicleOwnerTotIncomeRep_View" file="js20/tmpl/VehicleOwnerTotIncomeRep_View.html"/>
 		<jsTemplate id="UserChatUserList" file="js20/tmpl/UserChatUserList.html"/>
+		<jsTemplate id="ShipmentDocRep_View" file="js20/tmpl/ShipmentDocRep_View.html"/>
 	</jsTemplates>
 	<jsScripts>
 		<!-- Core JS files -->
@@ -8077,6 +8099,7 @@
 		<jsScript file="js20/custom_controls/Client1cEdit.js"/>
 		<jsScript file="js20/custom_controls/Firm1cEdit.js"/>
 		<jsScript file="js20/custom_controls/ChatStatusEdit.js"/>
+		<jsScript file="js20/custom_controls/ShipmentDocRep_View.js"/>
 		<jsScript file="js20/views/rs_ru.js"/>
 		<jsScript file="js20/views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -8563,6 +8586,7 @@
 		<jsScript file="js20/models/CementSiloMaterial_Model.js"/>
 		<jsScript file="js20/models/CementSiloMaterialList_Model.js"/>
 		<jsScript file="js20/controllers/CementSiloMaterial_Controller.js"/>
+		<jsScript file="js20/models/ShipmentForDocList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

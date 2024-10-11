@@ -1254,3 +1254,8 @@ select {
 tr.deleted_row {
 	text-decoration: line-through;
 }
+
+.ShipmentDocRep-vehicle_select{
+	max-height: 300px;
+	overflow-y: auto;
+}
