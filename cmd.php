@@ -11,13 +11,16 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtString.php');
 
 try{
+	$db_name = (defined('DB_NAME_MASTER'))? DB_NAME_MASTER : DB_NAME;
+	$port = (defined('DB_PORT_MASTER'))? DB_PORT_MASTER : DB_PORT;		
+	
 	//master connection for writing
 	$dbLinkMaster = new DB_Sql();
 	$dbLinkMaster->persistent = TRUE;
 	$dbLinkMaster->appname = APP_NAME;
 	$dbLinkMaster->technicalemail = TECH_EMAIL;
 	$dbLinkMaster->detailedError = DEBUG;
-	$dbLinkMaster->database	= DB_NAME;
+	$dbLinkMaster->database	= $db_name;
 	$dbLinkMaster->productionConnectError = ERR_SQL_SERVER_CON;
 	$dbLinkMaster->productionSQLError = ERR_SQL_QUERY;	
 	//$dbLinkMaster->logQueries = DEBUG;
@@ -26,11 +29,13 @@ try{
 	if (defined('QUERY_LOG_FILE'))$dbLinkMaster->logfile = QUERY_LOG_FILE;
 	if (defined('QUERY_EXPLAIN'))$dbLinkMaster->explain = QUERY_EXPLAIN;
 	
-	$port = (defined('DB_PORT_MASTER'))? DB_PORT_MASTER : DB_PORT;
 	$dbLinkMaster->connect(DB_SERVER_MASTER, DB_USER, DB_PASSWORD, $port);
 	//$dbLinkMaster->set_error_verbosity((DEBUG)? PGSQL_ERRORS_VERBOSE:PGSQL_ERRORS_TERSE);
 	
-	if (DB_SERVER_MASTER == DB_SERVER && (!defined('DB_PORT_MASTER') || DB_PORT_MASTER == DB_PORT) ){	
+	if (DB_SERVER_MASTER == DB_SERVER
+	&& (!defined('DB_PORT_MASTER') || DB_PORT_MASTER == DB_PORT)
+	&& (!defined('DB_NAME_MASTER') || DB_NAME_MASTER == DB_NAME) )
+	{	
 		$dbLink = $dbLinkMaster;
 	}
 	else{
@@ -40,7 +45,7 @@ try{
 		$dbLink->appname = APP_NAME;
 		$dbLink->technicalemail = TECH_EMAIL;
 		$dbLink->detailedError = DEBUG;
-		$dbLink->database= DB_NAME;			
+		$dbLink->database = DB_NAME;			
 		$dbLink->productionConnectError = ERR_SQL_SERVER_CON;
 		$dbLink->productionSQLError = ERR_SQL_QUERY;		
 		if (defined('QUERY_SHOW'))$dbLink->showqueries = QUERY_SHOW;

@@ -24,7 +24,7 @@ function ShipmentForOrderList_View(id,options){
 		"model":model,
 		"controller":contr,
 		"readPublicMethod":contr.getPublicMethod("get_list_for_order"),
-		"editPublicMethod":contr.getPublicMethod("get_list_for_order"),
+		// "editPublicMethod":contr.getPublicMethod("get_list_for_order"),
 		"editInline":!is_client,
 		"editWinClass":null,
 		"commands":is_client? null:new GridCmdContainerAjx(id+":grid:cmd",{
@@ -130,7 +130,6 @@ function ShipmentForOrderList_View(id,options){
 										"enabled":false,
 										"className":window.getBsCol(1)
 									}
-									
 								})
 							]
 						})

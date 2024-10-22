@@ -1,49 +1,100 @@
--- FUNCTION: public.set_vehicle_free()
+-- FUNCTION: public.order_after_process()
 
--- DROP FUNCTION public.set_vehicle_free();
+-- DROP FUNCTION IF EXISTS public.order_after_process();
 
-CREATE OR REPLACE FUNCTION public.set_vehicle_free()
+CREATE OR REPLACE FUNCTION public.order_after_process()
     RETURNS trigger
     LANGUAGE 'plpgsql'
     COST 100
     VOLATILE NOT LEAKPROOF
 AS $BODY$
+
 DECLARE
-	spec_id int;
-BEGIN
-
-	DELETE FROM vehicle_route_cashe WHERE shipment_id = OLD.id;
+	v_f boolean;
+BEGIN	
+	IF TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
 	
-	DELETE FROM vehicle_schedule_states WHERE shipment_id = OLD.id;
+		IF NEW.date_time::date >= '2024-05-07' THEN
+			--only if it is not fully shipped!
+			SELECT coalesce(SUM(quant), 0) <> NEW.quant INTO v_f FROM shipments WHERE order_id = NEW.id;
+			
+			IF v_f THEN
+				--not all shipped
+				IF current_database() = 'bereg' AND NEW.client_id = (const_konkrid_client_val()->'keys'->>'id')::int THEN
+					INSERT INTO konkrid.replicate_events
+						VALUES ('Order.to_konkrid_' || LOWER(TG_OP),
+							json_build_object('params',
+								json_build_object('id', NEW.id)
+							)::text
+					);
+					
+				ELSIF current_database() = 'concrete1' THEN
+					INSERT INTO beton.replicate_events
+						VALUES ('Order.to_bereg_' || LOWER(TG_OP),
+							json_build_object('params',
+								json_build_object('id', NEW.id)
+							)::text
+					);
+				
+				END IF;
+			END IF;	
+		END IF;
 	
-	DELETE FROM quality_passports WHERE shipment_id = OLD.id;
+		IF TG_OP = 'INSERT' OR (TG_OP='UPDATE'
+			AND NEW.phone_cel<>''
+			AND (
+				(NEW.client_id<>OLD.client_id)
+				OR (NEW.phone_cel<>OLD.phone_cel)
+			)
+			)
+		THEN		
+			SELECT
+				TRUE
+			INTO v_f FROM client_tels
+			WHERE client_id = NEW.client_id
+				AND tel=NEW.phone_cel;
+			
+			IF v_f IS NULL THEN
+				
+				BEGIN
+					INSERT INTO client_tels
+						(client_id,tel,name)
+					VALUES (NEW.client_id,NEW.phone_cel,NEW.descr);
+				EXCEPTION WHEN OTHERS THEN
+				END;
+			END IF;
+			
+		END IF;
+		
+		RETURN NEW;
+		
+	ELSIF TG_WHEN='AFTER' AND TG_OP='DELETE' THEN
+		IF OLD.date_time::date >= '2024-05-07' THEN
+			IF current_database() = 'bereg' AND OLD.client_id = (const_konkrid_client_val()->'keys'->>'id')::int THEN
+				INSERT INTO konkrid.replicate_events
+					VALUES ('Order.to_konkrid_delete',
+						json_build_object('params',
+							json_build_object('create_date_time', OLD.create_date_time::text)
+						)::text
+				);
+				
+			ELSIF current_database() = 'concrete1' THEN
+				INSERT INTO beton.replicate_events
+					VALUES ('Order.to_bereg_delete',
+						json_build_object('params',
+							json_build_object('create_date_time', OLD.create_date_time::text)
+						)::text
+				);
+			
+			END IF;
+		END IF;	
 	
-	--specification
-	SELECT
-		coalesce(o.client_specification_id, 0)
-	INTO
-		spec_id
-	FROM orders AS o
-	WHERE o.id=OLD.order_id;
+		RETURN OLD;
+	END IF;	
 	
-	IF spec_id > 0 THEN
-		DELETE FROM client_specification_flows WHERE client_specification_id = spec_id AND shipment_id = OLD.id;
-	END IF;
-	
-	
-	--log
-	PERFORM doc_log_delete('shipment'::doc_types,OLD.id);
-
-	--register actions
-	PERFORM ra_materials_remove_acts('shipment'::doc_types,OLD.id);
-	PERFORM ra_material_consumption_remove_acts('shipment'::doc_types,OLD.id);
-	
-	RETURN OLD;
 END;
 $BODY$;
 
-ALTER FUNCTION public.set_vehicle_free()
+ALTER FUNCTION public.order_after_process()
     OWNER TO beton;
-
---GRANT EXECUTE ON FUNCTION public.set_vehicle_free() TO ;
 

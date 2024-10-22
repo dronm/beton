@@ -1335,6 +1335,22 @@ defined in Entity line 1.
 	New view
 
 
+1.00347
+1) Incoming messages from Telegram with auth codes come to every user.
+	functions/bot/index.php
+	Query code text condition is incorrect.
+
+
+1.00348
+1) ProductionSiteForEditList_View.js: no data when edit.
+	Added field vs_state to ShipmentDialog_Model
+	ProductionSite->get_object method points to model ProductionSiteForEditList_Model
+	No editReadPublicMethod!!! in ProductionSiteForEditList_View and ShipmentForOrderList
+2) Order_Controller->send_messages() concrete_types official_name instead of name.
+
+
+
+
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели
 XXX Удаленные элементы справочника: фильтр вверху, пометка спереди, по возможности у всех справочиников. Example: PumpVehicle
 Движение на базу - контроль всех баз. Поиск ближайшей, смена

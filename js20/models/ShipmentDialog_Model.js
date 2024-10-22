@@ -270,6 +270,15 @@ function ShipmentDialog_Model(options){
 	
 	options.fields.pump_for_client_cost_edit = new FieldBool("pump_for_client_cost_edit",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Статус';
+	filed_options.autoInc = false;	
+	
+	options.fields.vs_state = new FieldString("vs_state",filed_options);
+	
 			
 			
 		ShipmentDialog_Model.superclass.constructor.call(this,id,options);

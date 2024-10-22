@@ -110,6 +110,7 @@ CREATE OR REPLACE VIEW public.shipments_dialog AS
 		) AS pump_for_client_cost_default
 		
 		,orders_ref(o) AS orders_ref
+		,null as vs_state
 		
 		
 	FROM shipments sh

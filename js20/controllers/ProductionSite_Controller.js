@@ -1,5 +1,5 @@
 /**
- * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017 - 2024
  
  * THIS FILE IS GENERATED FROM TEMPLATE build/templates/controllers/Controller_js20.xsl
  * ALL DIRECT MODIFICATIONS WILL BE LOST WITH THE NEXT BUILD PROCESS!!!
@@ -20,7 +20,7 @@
 function ProductionSite_Controller(options){
 	options = options || {};
 	options.listModelClass = ProductionSite_Model;
-	options.objModelClass = ProductionSite_Model;
+	options.objModelClass = ProductionSiteForEditList_Model;
 	ProductionSite_Controller.superclass.constructor.call(this,options);	
 	
 	//methods
@@ -244,6 +244,9 @@ extend(ProductionSite_Controller,ControllerObjServer);
 	var f_opts = {};
 		
 	pm.addField(new FieldInt("id",f_opts));
+	var f_opts = {};
+		
+	pm.addField(new FieldString("name",f_opts));
 	
 	pm.addField(new FieldString("mode"));
 	pm.addField(new FieldString("lsn"));

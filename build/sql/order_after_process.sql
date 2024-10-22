@@ -15,23 +15,29 @@ BEGIN
 	IF TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
 	
 		IF NEW.date_time::date >= '2024-05-07' THEN
-			IF current_database() = 'bereg' AND NEW.client_id = (const_konkrid_client_val()->'keys'->>'id')::int THEN
-				INSERT INTO konkrid.replicate_events
-					VALUES ('Order.to_konkrid_' || LOWER(TG_OP),
-						json_build_object('params',
-							json_build_object('id', NEW.id)
-						)::text
-				);
-				
-			ELSIF current_database() = 'concrete1' THEN
-				INSERT INTO beton.replicate_events
-					VALUES ('Order.to_bereg_' || LOWER(TG_OP),
-						json_build_object('params',
-							json_build_object('id', NEW.id)
-						)::text
-				);
+			--only if it is not fully shipped!
+			SELECT coalesce(SUM(quant), 0) <> NEW.quant INTO v_f FROM shipments WHERE order_id = NEW.id;
 			
-			END IF;
+			IF v_f THEN
+				--not all shipped
+				IF current_database() = 'bereg' AND NEW.client_id = (const_konkrid_client_val()->'keys'->>'id')::int THEN
+					INSERT INTO konkrid.replicate_events
+						VALUES ('Order.to_konkrid_' || LOWER(TG_OP),
+							json_build_object('params',
+								json_build_object('id', NEW.id)
+							)::text
+					);
+					
+				ELSIF current_database() = 'concrete1' THEN
+					INSERT INTO beton.replicate_events
+						VALUES ('Order.to_bereg_' || LOWER(TG_OP),
+							json_build_object('params',
+								json_build_object('id', NEW.id)
+							)::text
+					);
+				
+				END IF;
+			END IF;	
 		END IF;
 	
 		IF TG_OP = 'INSERT' OR (TG_OP='UPDATE'

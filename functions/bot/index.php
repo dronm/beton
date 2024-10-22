@@ -95,7 +95,7 @@ if(!isset($_REQUEST) || !isset($_REQUEST['k']) || !isset($_REQUEST['id']) ){
 $dbLink = db_con();
 
 if(isset($_REQUEST['tp']) && $_REQUEST['tp'] == 'out'){
-	//outcoming message success or error
+	//outgoing message success or error
 	$res = 'true';
 	$err_text = '';
 	if(!isset($_REQUEST['out_res']) || $_REQUEST['out_res'] != '1'){
@@ -126,10 +126,12 @@ if(isset($_REQUEST['tp']) && $_REQUEST['tp'] == 'out'){
 			WHERE m.id = %d
 		)
 		SELECT
-			case
-			when
+			CASE
+			WHEN
 				(select txt from code_text) = substring((SELECT text FROM msg_d), 1, (select n from code_text))
-			then
+			THEN
+				(SELECT notifications.set_sent((SELECT msg_id FROM msg_d)))
+			ELSE
 				pg_notify('TmOutMessage.sent',
 					json_build_object(
 						'params',json_build_object(
@@ -143,9 +145,7 @@ if(isset($_REQUEST['tp']) && $_REQUEST['tp'] == 'out'){
 						)
 					)::text			
 				)			
-			else
-				(SELECT notifications.set_sent((SELECT msg_id FROM msg_d)))
-			end
+			END
 		"
 		,$_REQUEST['id']
 		,$res

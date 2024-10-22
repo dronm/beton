@@ -29,6 +29,7 @@ function ProductionSiteForEditList_View(id,options){
 		"model":model,
 		"controller":contr,
 		"readPublicMethod":contr.getPublicMethod("get_list_for_edit"),
+		// "editPublicMethod":contr.getPublicMethod("get_list_for_edit"),
 		"editInline":true,
 		"editWinClass":null,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{

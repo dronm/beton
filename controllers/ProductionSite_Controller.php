@@ -230,9 +230,12 @@ class ProductionSite_Controller extends ControllerSQL{
 		$pm->addParam(new FieldExtInt('id'
 		));
 		
+		$pm->addParam(new FieldExtString('name'
+		));
+		
 		$pm->addParam(new FieldExtString('lsn'));
 		$this->addPublicMethod($pm);
-		$this->setObjectModelId('ProductionSite_Model');		
+		$this->setObjectModelId('ProductionSiteForEditList_Model');		
 
 			
 		$pm = new PublicMethod('get_list_for_edit');

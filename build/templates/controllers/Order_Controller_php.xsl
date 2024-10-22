@@ -144,7 +144,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 						if ($is_dest){
 							$q.=',';
 						}
-						$q.='(SELECT name FROM concrete_types WHERE id='.$concrete_type_id.') AS concrete';
+						$q.='(SELECT official_name FROM concrete_types WHERE id='.$concrete_type_id.') AS concrete';
 					}
 					$ar = $dbLink->query_first($q);
 					foreach($ar as $key=>$val){
