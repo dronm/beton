@@ -37,7 +37,6 @@ class ProductionSiteForEditList_Model extends ModelSQLBeton{
 		
 		//*** Field name ***
 		$f_opts = array();
-		$f_opts['primaryKey'] = TRUE;
 		$f_opts['length']=100;
 		$f_opts['id']="name";
 						

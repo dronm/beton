@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-10-22 07:03:11</lastBuild></version>
+		<lastBuild>2024-10-22 07:15:12</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -251,6 +251,7 @@
 		<version dateOpen="2024-09-24 11:23:24" dateClose="2024-10-04 06:17:36">1.00345</version>
 		<version dateOpen="2024-10-09 08:04:45" dateClose="2024-10-11 06:59:42">1.00346</version>
 		<version dateOpen="2024-10-22 06:44:42" dateClose="2024-10-22 07:03:14">1.00347</version>
+		<version dateOpen="2024-10-22 07:08:26" dateClose="2024-10-22 07:15:15">1.00348</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1696,7 +1697,7 @@
 				<field id="name"/>
 			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
-			<field id="name" dataType="String" length="100" primaryKey="TRUE"/>
+			<field id="name" dataType="String" length="100"/>
 			<field id="elkon_connection" dataType="JSONB"/>
 			<field id="active" dataType="Bool" alias="Активен"/>
 			<field id="last_elkon_production_id" dataType="Int"/>

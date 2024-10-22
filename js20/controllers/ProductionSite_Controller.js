@@ -244,9 +244,6 @@ extend(ProductionSite_Controller,ControllerObjServer);
 	var f_opts = {};
 		
 	pm.addField(new FieldInt("id",f_opts));
-	var f_opts = {};
-		
-	pm.addField(new FieldString("name",f_opts));
 	
 	pm.addField(new FieldString("mode"));
 	pm.addField(new FieldString("lsn"));

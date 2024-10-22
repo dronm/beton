@@ -92,7 +92,10 @@ function ProductionSiteForEditList_View(id,options){
 							"value":"№ производства Elkon",
 							"columns":[
 								new GridColumn({
-									"field":model.getField("last_elkon_production_id")
+									"field":model.getField("last_elkon_production_id"),
+									"ctrlOptions":{
+										"cmdCalc":false
+									}
 								})
 							]
 						})
