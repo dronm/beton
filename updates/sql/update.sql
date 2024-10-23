@@ -30166,3 +30166,207 @@ $BODY$;
 
 ALTER FUNCTION public.order_after_process()
     OWNER TO beton;
+
+
+
+-- ******************* update 23/10/2024 06:49:07 ******************
+-- View: public.sms_pump_order
+
+ DROP VIEW public.sms_pump_order;
+
+CREATE OR REPLACE VIEW public.sms_pump_order
+AS
+	SELECT
+		o.id AS order_id,
+		format_cel_standart(pvh.phone_cel) AS phone_cel,
+		sms_templates_text(
+			ARRAY[
+				format('("quant","%s")'::text, o.quant::text)::template_value,
+				format('("time","%s")'::text,
+				time5_descr(o.date_time::time without time zone)::text)::template_value,
+				format('("date","%s")'::text, date8_descr(o.date_time::date)::text)::template_value,
+				format('("dest","%s")'::text, dest.name::text)::template_value,
+				format('("concrete","%s")'::text, ct.official_name::text)::template_value
+			],
+			(SELECT t.pattern FROM sms_patterns t
+				WHERE t.sms_type = 'order_for_pump'::sms_types AND t.lang_id = 1
+			)
+		) AS message
+	FROM orders o
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+	WHERE o.pump_vehicle_id IS NOT NULL AND pvh.phone_cel IS NOT NULL AND pvh.phone_cel::text <> ''::text AND o.quant <> 0::double precision;
+
+ALTER TABLE public.sms_pump_order
+    OWNER TO beton;
+
+--GRANT ALL ON TABLE public.sms_pump_order TO ;
+
+
+
+-- ******************* update 23/10/2024 06:50:28 ******************
+-- View: sms_pump_remind
+
+--DROP VIEW sms_pump_remind;
+
+CREATE OR REPLACE VIEW sms_pump_remind AS 
+	SELECT
+		pvh.phone_cel,
+		o.date_time,		
+		sms_templates_text(
+			ARRAY[
+			format('("quant","%s")',
+				o.quant::text)::template_value,
+			format('("time","%s")',
+				time5_descr(o.date_time::time)::text)::template_value,
+			format('("dest","%s")',
+				dest.name::text)::template_value,				
+			format('("concrete","%s")',
+				ct.official_name::text)::template_value
+			],
+			(SELECT t.pattern FROM sms_patterns t
+			WHERE t.sms_type='remind_for_pump'::sms_types
+			AND t.lang_id=1)
+		) AS message		
+	FROM orders o	
+	LEFT JOIN concrete_types ct ON ct.id=o.concrete_type_id	
+	LEFT JOIN destinations dest ON
+		dest.id=o.destination_id		
+	LEFT JOIN pump_vehicles pvh ON pvh.id=o.pump_vehicle_id
+	LEFT JOIN vehicles vh ON vh.id=pvh.vehicle_id
+	WHERE o.pump_vehicle_id IS NOT NULL
+		AND pvh.phone_cel IS NOT NULL
+		AND pvh.phone_cel<>''
+		AND o.quant<>0
+	;
+ALTER TABLE sms_pump_remind OWNER TO beton;
+
+
+-- ******************* update 23/10/2024 06:51:13 ******************
+-- View: sms_pump_order_del
+
+-- DROP VIEW sms_pump_order_del;
+
+CREATE OR REPLACE VIEW sms_pump_order_del AS 
+ SELECT
+ 	o.id AS order_id,
+	pvh.phone_cel,
+	sms_templates_text(
+		ARRAY[
+			format('("quant","%s")'::text, o.quant::text)::template_value,
+			format('("date","%s")'::text, date5_descr(o.date_time::date)::text)::template_value,
+			format('("time","%s")'::text, time5_descr(o.date_time::time without time zone)::text)::template_value,
+			format('("date","%s")'::text, date8_descr(o.date_time::date)::text)::template_value,
+			format('("dest","%s")'::text, dest.name::text)::template_value,
+			format('("concrete","%s")'::text, ct.official_name::text)::template_value,
+			format('("client","%s")'::text, cl.name::text)::template_value,
+			format('("name","%s")'::text, o.descr)::template_value,
+			format('("tel","%s")'::text,format_cel_phone(o.phone_cel::text))::template_value, format('("car","%s")'::text,
+			vh.plate::text)::template_value
+		],
+		( SELECT t.pattern
+		FROM sms_patterns t
+		WHERE t.sms_type = 'order_for_pump_del'::sms_types AND t.lang_id = 1
+		)
+	) AS message,	
+	clients_ref(cl) AS ext_obj
+	
+	FROM orders o
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+	LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	WHERE
+		o.pump_vehicle_id IS NOT NULL
+		AND pvh.phone_cel IS NOT NULL
+		AND pvh.phone_cel::text <> ''::text
+		AND o.quant <> 0::double precision
+	;
+
+ALTER TABLE sms_pump_order_del
+  OWNER TO beton;
+
+
+
+-- ******************* update 23/10/2024 06:51:22 ******************
+-- View: sms_pump_order_ins
+
+-- DROP VIEW sms_pump_order_ins;
+
+CREATE OR REPLACE VIEW sms_pump_order_ins AS 
+ SELECT o.id AS order_id,
+    pvh.phone_cel,
+    sms_templates_text(
+    	ARRAY[
+    		format('("quant","%s")'::text, o.quant::text)::template_value,
+    		format('("date","%s")'::text, date5_descr(o.date_time::date)::text)::template_value,
+    		format('("time","%s")'::text, time5_descr(o.date_time::time without time zone)::text)::template_value,
+    		format('("date","%s")'::text, date8_descr(o.date_time::date)::text)::template_value,
+    		format('("dest","%s")'::text, dest.name::text)::template_value,
+    		format('("concrete","%s")'::text, ct.official_name::text)::template_value,
+    		format('("client","%s")'::text, cl.name::text)::template_value,
+    		format('("name","%s")'::text, o.descr)::template_value,
+    		format('("tel","%s")'::text,'+7'||format_cel_standart(o.phone_cel::text))::template_value,
+    		format('("car","%s")'::text, vh.plate::text)::template_value
+    	],
+    	( SELECT t.pattern
+           FROM sms_patterns t
+          WHERE t.sms_type = 'order_for_pump_ins'::sms_types AND t.lang_id = 1
+       )
+   ) AS message,
+   clients_ref(cl) AS ext_obj
+   
+   FROM orders o
+     LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+     LEFT JOIN destinations dest ON dest.id = o.destination_id
+     LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+     LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
+     LEFT JOIN clients cl ON cl.id = o.client_id
+  WHERE o.pump_vehicle_id IS NOT NULL AND pvh.phone_cel IS NOT NULL AND pvh.phone_cel::text <> ''::text AND o.quant <> 0::double precision;
+
+ALTER TABLE sms_pump_order_ins
+  OWNER TO beton;
+
+
+
+-- ******************* update 23/10/2024 06:51:32 ******************
+-- View: sms_pump_order_upd
+
+-- DROP VIEW sms_pump_order_upd;
+
+CREATE OR REPLACE VIEW sms_pump_order_upd AS 
+ SELECT
+ 	o.id AS order_id,
+    pvh.phone_cel,
+    sms_templates_text(
+    	ARRAY[
+    		format('("quant","%s")'::text, o.quant::text)::template_value,
+    		format('("date","%s")'::text, date5_descr(o.date_time::date)::text)::template_value,
+    		format('("time","%s")'::text, time5_descr(o.date_time::time without time zone)::text)::template_value,
+    		format('("date","%s")'::text, date8_descr(o.date_time::date)::text)::template_value,
+    		format('("dest","%s")'::text, dest.name::text)::template_value,
+    		format('("concrete","%s")'::text, ct.official_name::text)::template_value,
+    		format('("client","%s")'::text, cl.name::text)::template_value,
+    		format('("name","%s")'::text, o.descr)::template_value,
+    		format('("tel","%s")'::text, format_cel_phone(o.phone_cel::text))::template_value,
+    		format('("car","%s")'::text, vh.plate::text)::template_value
+    	],
+    	( SELECT t.pattern
+           FROM sms_patterns t
+          WHERE t.sms_type = 'order_for_pump_upd'::sms_types AND t.lang_id = 1
+        )
+   ) AS message,
+   clients_ref(cl) AS ext_obj
+   
+   FROM orders o
+     LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+     LEFT JOIN destinations dest ON dest.id = o.destination_id
+     LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+     LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
+     LEFT JOIN clients cl ON cl.id = o.client_id
+  WHERE o.pump_vehicle_id IS NOT NULL AND pvh.phone_cel IS NOT NULL AND pvh.phone_cel::text <> ''::text AND o.quant <> 0::double precision;
+
+ALTER TABLE sms_pump_order_upd
+  OWNER TO beton;

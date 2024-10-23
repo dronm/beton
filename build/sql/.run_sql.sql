@@ -1,100 +1,33 @@
--- FUNCTION: public.order_after_process()
+-- View: public.sms_pump_order
 
--- DROP FUNCTION IF EXISTS public.order_after_process();
+ DROP VIEW public.sms_pump_order;
 
-CREATE OR REPLACE FUNCTION public.order_after_process()
-    RETURNS trigger
-    LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE NOT LEAKPROOF
-AS $BODY$
-
-DECLARE
-	v_f boolean;
-BEGIN	
-	IF TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
-	
-		IF NEW.date_time::date >= '2024-05-07' THEN
-			--only if it is not fully shipped!
-			SELECT coalesce(SUM(quant), 0) <> NEW.quant INTO v_f FROM shipments WHERE order_id = NEW.id;
-			
-			IF v_f THEN
-				--not all shipped
-				IF current_database() = 'bereg' AND NEW.client_id = (const_konkrid_client_val()->'keys'->>'id')::int THEN
-					INSERT INTO konkrid.replicate_events
-						VALUES ('Order.to_konkrid_' || LOWER(TG_OP),
-							json_build_object('params',
-								json_build_object('id', NEW.id)
-							)::text
-					);
-					
-				ELSIF current_database() = 'concrete1' THEN
-					INSERT INTO beton.replicate_events
-						VALUES ('Order.to_bereg_' || LOWER(TG_OP),
-							json_build_object('params',
-								json_build_object('id', NEW.id)
-							)::text
-					);
-				
-				END IF;
-			END IF;	
-		END IF;
-	
-		IF TG_OP = 'INSERT' OR (TG_OP='UPDATE'
-			AND NEW.phone_cel<>''
-			AND (
-				(NEW.client_id<>OLD.client_id)
-				OR (NEW.phone_cel<>OLD.phone_cel)
+CREATE OR REPLACE VIEW public.sms_pump_order
+AS
+	SELECT
+		o.id AS order_id,
+		format_cel_standart(pvh.phone_cel) AS phone_cel,
+		sms_templates_text(
+			ARRAY[
+				format('("quant","%s")'::text, o.quant::text)::template_value,
+				format('("time","%s")'::text,
+				time5_descr(o.date_time::time without time zone)::text)::template_value,
+				format('("date","%s")'::text, date8_descr(o.date_time::date)::text)::template_value,
+				format('("dest","%s")'::text, dest.name::text)::template_value,
+				format('("concrete","%s")'::text, ct.official_name::text)::template_value
+			],
+			(SELECT t.pattern FROM sms_patterns t
+				WHERE t.sms_type = 'order_for_pump'::sms_types AND t.lang_id = 1
 			)
-			)
-		THEN		
-			SELECT
-				TRUE
-			INTO v_f FROM client_tels
-			WHERE client_id = NEW.client_id
-				AND tel=NEW.phone_cel;
-			
-			IF v_f IS NULL THEN
-				
-				BEGIN
-					INSERT INTO client_tels
-						(client_id,tel,name)
-					VALUES (NEW.client_id,NEW.phone_cel,NEW.descr);
-				EXCEPTION WHEN OTHERS THEN
-				END;
-			END IF;
-			
-		END IF;
-		
-		RETURN NEW;
-		
-	ELSIF TG_WHEN='AFTER' AND TG_OP='DELETE' THEN
-		IF OLD.date_time::date >= '2024-05-07' THEN
-			IF current_database() = 'bereg' AND OLD.client_id = (const_konkrid_client_val()->'keys'->>'id')::int THEN
-				INSERT INTO konkrid.replicate_events
-					VALUES ('Order.to_konkrid_delete',
-						json_build_object('params',
-							json_build_object('create_date_time', OLD.create_date_time::text)
-						)::text
-				);
-				
-			ELSIF current_database() = 'concrete1' THEN
-				INSERT INTO beton.replicate_events
-					VALUES ('Order.to_bereg_delete',
-						json_build_object('params',
-							json_build_object('create_date_time', OLD.create_date_time::text)
-						)::text
-				);
-			
-			END IF;
-		END IF;	
-	
-		RETURN OLD;
-	END IF;	
-	
-END;
-$BODY$;
+		) AS message
+	FROM orders o
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+	WHERE o.pump_vehicle_id IS NOT NULL AND pvh.phone_cel IS NOT NULL AND pvh.phone_cel::text <> ''::text AND o.quant <> 0::double precision;
 
-ALTER FUNCTION public.order_after_process()
+ALTER TABLE public.sms_pump_order
     OWNER TO beton;
+
+--GRANT ALL ON TABLE public.sms_pump_order TO ;
 

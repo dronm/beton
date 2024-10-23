@@ -15,7 +15,7 @@ CREATE OR REPLACE VIEW sms_pump_remind AS
 			format('("dest","%s")',
 				dest.name::text)::template_value,				
 			format('("concrete","%s")',
-				ct.name::text)::template_value
+				ct.official_name::text)::template_value
 			],
 			(SELECT t.pattern FROM sms_patterns t
 			WHERE t.sms_type='remind_for_pump'::sms_types

@@ -1341,7 +1341,7 @@ defined in Entity line 1.
 	Query code text condition is incorrect.
 
 
-1.00348
+1.00348 2024-10-21
 1) ProductionSiteForEditList_View.js: no data when edit.
 	Added field vs_state to ShipmentDialog_Model
 	ProductionSite->get_object method points to model ProductionSiteForEditList_Model
@@ -1349,6 +1349,16 @@ defined in Entity line 1.
 2) Order_Controller->send_messages() concrete_types official_name instead of name.
 3) ProductionSiteForEditList_View.js field last_elkon_production_id no edit calc
 4) Model ProductionSiteForEditList_Model error in keys: name was a key. Corrected.
+
+
+1.00349
+1) ShipmentForVehOwnerList_View.js columns are mismatched.
+			total_sp2 changed to 2 instead of 3.
+2) RawMaterialTicketList two periods!! in filter.
+3) RawMaterialTicketIssueBtn default value for closing date: end of year.
+4) Shipment_Controller->sendShipSMS() concrete_types.name=>concrete_types.official_name.
+	all order sms: sms_pump_order_ship_ins.sql => concrete_types.official_name.
+
 
 
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели

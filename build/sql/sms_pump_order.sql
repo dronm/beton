@@ -14,7 +14,7 @@ AS
 				time5_descr(o.date_time::time without time zone)::text)::template_value,
 				format('("date","%s")'::text, date8_descr(o.date_time::date)::text)::template_value,
 				format('("dest","%s")'::text, dest.name::text)::template_value,
-				format('("concrete","%s")'::text, ct.name::text)::template_value
+				format('("concrete","%s")'::text, ct.official_name::text)::template_value
 			],
 			(SELECT t.pattern FROM sms_patterns t
 				WHERE t.sms_type = 'order_for_pump'::sms_types AND t.lang_id = 1
@@ -29,5 +29,5 @@ AS
 ALTER TABLE public.sms_pump_order
     OWNER TO ;
 
-GRANT ALL ON TABLE public.sms_pump_order TO ;
+--GRANT ALL ON TABLE public.sms_pump_order TO ;
 

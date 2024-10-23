@@ -42,26 +42,27 @@ function RawMaterialTicketList_View(id,options){
 				}
 			]
 		}
-		,"close_period":{
-			"binding":new CommandBinding({
-				"control":close_period_ctrl,
-				"field":close_period_ctrl.getField()
-			}),
-			"bindings":[
-				{"binding":new CommandBinding({
-					"control":close_period_ctrl.getControlFrom(),
-					"field":close_period_ctrl.getField()
-					}),
-				"sign":"ge"
-				},
-				{"binding":new CommandBinding({
-					"control":close_period_ctrl.getControlTo(),
-					"field":close_period_ctrl.getField()
-					}),
-				"sign":"le"
-				}
-			]
-		}
+		//hide close period
+		// ,"close_period":{
+		// 	"binding":new CommandBinding({
+		// 		"control":close_period_ctrl,
+		// 		"field":close_period_ctrl.getField()
+		// 	}),
+		// 	"bindings":[
+		// 		{"binding":new CommandBinding({
+		// 			"control":close_period_ctrl.getControlFrom(),
+		// 			"field":close_period_ctrl.getField()
+		// 			}),
+		// 		"sign":"ge"
+		// 		},
+		// 		{"binding":new CommandBinding({
+		// 			"control":close_period_ctrl.getControlTo(),
+		// 			"field":close_period_ctrl.getField()
+		// 			}),
+		// 		"sign":"le"
+		// 		}
+		// 	]
+		// }
 		
 		,"carrier":{
 			"binding":new CommandBinding({
@@ -192,15 +193,15 @@ function RawMaterialTicketList_View(id,options){
 							"sortable":true,
 							"sort":"desc"
 						})
-						,new GridCellHead(id+":grid:head:expire_date",{
-							"value":"Дата окончания",
-							"columns":[
-								new GridColumnDate({
-									"field":model.getField("expire_date")
-									,"ctrlClass":EditDate
-								})
-							]
-						})
+						// ,new GridCellHead(id+":grid:head:expire_date",{
+						// 	"value":"Дата окончания",
+						// 	"columns":[
+						// 		new GridColumnDate({
+						// 			"field":model.getField("expire_date")
+						// 			,"ctrlClass":EditDate
+						// 		})
+						// 	]
+						// })
 						
 						,new GridCellHead(id+":grid:head:issue_users_ref",{
 							"value":"Кто выдал",

@@ -359,7 +359,7 @@ function ShipmentForVehOwnerList_View(id,options){
 							"gridColumn":new GridColumnFloat({"id":"tot_quant"})
 						})
 						,new GridCell(id+":grid:foot:total_sp2",{
-							"colSpan":smpl_v? "3":"2"
+							"colSpan":smpl_v? "2":"2"
 						})																	
 						,new GridCellFoot(id+":grid:foot:tot_cost",{
 							"attrs":{"align":"right", "nowrap":"nowrap"},

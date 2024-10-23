@@ -13,7 +13,7 @@ CREATE OR REPLACE VIEW sms_pump_order_del AS
 			format('("time","%s")'::text, time5_descr(o.date_time::time without time zone)::text)::template_value,
 			format('("date","%s")'::text, date8_descr(o.date_time::date)::text)::template_value,
 			format('("dest","%s")'::text, dest.name::text)::template_value,
-			format('("concrete","%s")'::text, ct.name::text)::template_value,
+			format('("concrete","%s")'::text, ct.official_name::text)::template_value,
 			format('("client","%s")'::text, cl.name::text)::template_value,
 			format('("name","%s")'::text, o.descr)::template_value,
 			format('("tel","%s")'::text,format_cel_phone(o.phone_cel::text))::template_value, format('("car","%s")'::text,

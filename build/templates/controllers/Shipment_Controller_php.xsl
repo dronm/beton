@@ -528,7 +528,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			orders.id AS order_id,
 			orders.phone_cel,
 			coalesce(shipments.quant) AS quant,
-			concrete_types.name AS concrete,
+			concrete_types.official_name AS concrete,
 			d.name AS d_name,
 			format_cel_standart(coalesce(d.phone_cel,'')) AS d_phone,
 			v.plate AS v_plate,

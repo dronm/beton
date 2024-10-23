@@ -73,7 +73,8 @@ RawMaterialTicketIssueBtn.prototype.onClick = function(){
 				,"cmdCalc":false
 			})			
 			,new EditDate("dialog:cont:expire_date",{
-				"labelCaption":"Окончание срока:"
+				"labelCaption":"Окончание срока:",
+				"value":DateHelper.yearEnd(DateHelper.time())
 			})			
 			
 			,new EditInt("dialog:cont:barcode_from",{
