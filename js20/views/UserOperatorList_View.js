@@ -50,7 +50,7 @@ function UserOperatorList_View(id,options){
 							"value":"Контакты",
 							"columns":[
 								new GridColumn({
-									"field":model.getField("contact_ids"),
+									// "field":model.getField("contact_ids"),
 									"formatFunction": function(f,cell){
 										window.getApp().formatContactList(f,cell);
 										return "";

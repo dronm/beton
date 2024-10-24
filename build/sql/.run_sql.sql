@@ -1,33 +1,39 @@
--- View: public.sms_pump_order
+-- View: public.users_dialog
 
- DROP VIEW public.sms_pump_order;
+-- DROP VIEW public.users_dialog;
+--ALTER VIEW users_dialog RENAME COLUMN chat_status_ref to chat_statuses_ref;
 
-CREATE OR REPLACE VIEW public.sms_pump_order
-AS
-	SELECT
-		o.id AS order_id,
-		format_cel_standart(pvh.phone_cel) AS phone_cel,
-		sms_templates_text(
-			ARRAY[
-				format('("quant","%s")'::text, o.quant::text)::template_value,
-				format('("time","%s")'::text,
-				time5_descr(o.date_time::time without time zone)::text)::template_value,
-				format('("date","%s")'::text, date8_descr(o.date_time::date)::text)::template_value,
-				format('("dest","%s")'::text, dest.name::text)::template_value,
-				format('("concrete","%s")'::text, ct.official_name::text)::template_value
-			],
-			(SELECT t.pattern FROM sms_patterns t
-				WHERE t.sms_type = 'order_for_pump'::sms_types AND t.lang_id = 1
-			)
-		) AS message
-	FROM orders o
-	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
-	LEFT JOIN destinations dest ON dest.id = o.destination_id
-	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
-	WHERE o.pump_vehicle_id IS NOT NULL AND pvh.phone_cel IS NOT NULL AND pvh.phone_cel::text <> ''::text AND o.quant <> 0::double precision;
+CREATE OR REPLACE VIEW public.users_dialog
+ AS
+ SELECT users.id,
+	users.name,
+	users.email,
+	users.pwd,
+	users.role_id,
+	users.tel_ext,
+	users.phone_cel,
+	users.create_dt,
+	users.banned,
+	users.time_zone_locale_id,
+	users.production_site_id,
+	users.elkon_user_name,
+	time_zone_locales.name AS user_time_locale,
+	production_sites_ref(ps.*) AS production_sites_ref,
+	
+	(SELECT
+		chat_statuses_ref(chat_statuses)
+	FROM user_chat_statuses AS t
+	LEFT JOIN chat_statuses ON chat_statuses.id = t.chat_status_id
+	WHERE t.user_id = users.id
+	) AS chat_statuses_ref,
+	
+	null as contact_ids
+	
+FROM users
+LEFT JOIN time_zone_locales ON time_zone_locales.id = users.time_zone_locale_id
+LEFT JOIN production_sites ps ON ps.id = users.production_site_id;
 
-ALTER TABLE public.sms_pump_order
+ALTER TABLE public.users_dialog
     OWNER TO beton;
 
---GRANT ALL ON TABLE public.sms_pump_order TO ;
 
