@@ -1360,7 +1360,7 @@ defined in Entity line 1.
 	all order sms: sms_pump_order_ship_ins.sql => concrete_types.official_name.
 
 
-1.00350
+1.00350 2024-10-24
 1) UserOperatorList field contact_ids removed field, left just formatFunction
 2) ViewGridEditInline: problem with insert options. setReadBind()
 
