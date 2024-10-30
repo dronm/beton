@@ -96,6 +96,10 @@ $permissions = array();
 				
 					$permissions['Vehicle_Controller_complete_makes']=TRUE;
 				
+					$permissions['Vehicle_Controller_complete_leasors']=TRUE;
+				
+					$permissions['Vehicle_Controller_complete_insurance_issuers']=TRUE;
+				
 					$permissions['Vehicle_Controller_check_for_broken_trackers']=TRUE;
 				
 					$permissions['Vehicle_Controller_vehicles_with_trackers']=TRUE;
@@ -113,6 +117,8 @@ $permissions = array();
 					$permissions['Vehicle_Controller_get_stops_at_dest']=TRUE;
 				
 					$permissions['Vehicle_Controller_get_total_shipped']=TRUE;
+				
+					$permissions['Vehicle_Controller_vehicle_list_report']=TRUE;
 				
 					$permissions['OrderGarbage_Controller_delete']=TRUE;
 				
@@ -1215,6 +1221,16 @@ $permissions = array();
 					$permissions['OwnerList_Controller_get_list']=TRUE;
 				
 					$permissions['OwnerList_Controller_get_object']=TRUE;
+				
+					$permissions['InsuranceList_Controller_insert']=TRUE;
+				
+					$permissions['InsuranceList_Controller_update']=TRUE;
+				
+					$permissions['InsuranceList_Controller_delete']=TRUE;
+				
+					$permissions['InsuranceList_Controller_get_list']=TRUE;
+				
+					$permissions['InsuranceList_Controller_get_object']=TRUE;
 				
 					$permissions['ClientLocalList_Controller_insert']=TRUE;
 				

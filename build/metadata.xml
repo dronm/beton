@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-10-23 06:58:09</lastBuild></version>
+		<lastBuild>2024-10-30 14:57:19</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -254,6 +254,7 @@
 		<version dateOpen="2024-10-22 07:08:26" dateClose="2024-10-22 07:15:15">1.00348</version>
 		<version dateOpen="2024-10-23 06:57:40" dateClose="2024-10-23 06:58:31">1.00349</version>
 		<version dateOpen="2024-10-24 05:01:10" dateClose="2024-10-24 05:02:13">1.00350</version>
+		<version dateOpen="2024-10-30 07:41:47" dateClose="2024-10-30 14:57:22">1.00351</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1015,6 +1016,13 @@
 			<field id="vehicle_owners_ar" dataType="Array"/>
 			<field id="ord_num" dataType="Int"/>
 			<field id="weight_t" dataType="Int" alias="Масса, тонн"/>
+			<field id="vin" dataType="String" length="17" alias="VIN"/>
+			<field id="leasor" dataType="Text" alias="Leasor name"/>
+			<field id="leasing_contract_date" dataType="Date"/>
+			<field id="leasing_contract_num" dataType="Text"/>
+			<field id="leasing_total" dataType="Float" length="15" precision="2"/>
+			<field id="insurance_osago" dataType="JSONB" alias="Insurance osago data"/>
+			<field id="insurance_kasko" dataType="JSONB" alias="Insurance kasko data"/>
 			<index id="vehicles_plate_idx" unique="TRUE">
 				<expression>lower(plate)</expression>
 			</index>
@@ -1024,6 +1032,9 @@
 			</index>
 			<index id="vehicles_owner_owners_ar_idx">
 				<field id="vehicle_owners_ar"/>
+			</index>
+			<index id="vehicles_leasor_idx" type="gin">
+				<expression>leasor gin_trgm_ops</expression>
 			</index>
 		</model>
 		<model id="VehicleDialog" parent="ModelSQLBeton" dataTable="vehicles_dialog" virtual="TRUE">
@@ -1044,6 +1055,13 @@
 			<field id="vehicle_owners_ar" dataType="Array"/>
 			<field id="ord_num" dataType="Int"/>
 			<field id="weight_t" dataType="Int" alias="Масса, тонн"/>
+			<field id="vin" dataType="String" length="17" alias="VIN"/>
+			<field id="leasor" dataType="Text"/>
+			<field id="leasing_contract_date" dataType="Date"/>
+			<field id="leasing_contract_num" dataType="Text"/>
+			<field id="leasing_total" dataType="Float" length="15" precision="2"/>
+			<field id="insurance_osago" dataType="JSONB" alias="Insurance osago data"/>
+			<field id="insurance_kasko" dataType="JSONB" alias="Insurance kasko data"/>
 			<globalFilter id="vehicle_owner_list" fieldId="vehicle_owners_ar"/>
 		</model>
 		<model id="Driver" parent="ModelSQLBeton" dataTable="drivers" virtual="FALSE">
@@ -2635,6 +2653,12 @@
 		<model id="VehicleMakeList" parent="ModelSQLBeton" dataTable="vehicle_make_list_view" virtual="TRUE">
 			<field id="make" dataType="String"/>
 		</model>
+		<model id="InsuranceIssuerList" parent="ModelSQLBeton" dataTable="insurance_issuers_list" virtual="TRUE">
+			<field id="issuer" dataType="String"/>
+		</model>
+		<model id="LeasorList" parent="ModelSQLBeton" dataTable="leasors_list" virtual="TRUE">
+			<field id="leasor" dataType="String"/>
+		</model>
 		<model id="LabData" parent="ModelSQLBeton" dataTable="lab_data" virtual="FALSE">
 			<field id="shipment_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE" required="TRUE" refTable="shipments" refField="id" alias="Отгрузка"/>
 			<field id="ok_sm" dataType="Float" alias="ОК см"/>
@@ -4080,6 +4104,13 @@
 			<field id="dt_from" dataType="DateTime"/>
 			<field id="owner" dataType="JSONB"/>
 		</model>
+		<model id="InsuranceList" parentJS="ModelJSON" virtual="TRUE" server="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="dt_from" dataType="Date"/>
+			<field id="dt_to" dataType="Date"/>
+			<field id="issuer" dataType="Text"/>
+			<field id="total" dataType="Float" precision="2" length="15"/>
+		</model>
 		<model id="PumpVehiclePriceList" parentJS="ModelJSON" virtual="TRUE" server="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="dt_from" dataType="DateTime"/>
@@ -5142,6 +5173,16 @@
 				<field id="ic" dataType="Int"/>
 				<field id="mid" dataType="Int"/>
 			</publicMethod>
+			<publicMethod id="complete_leasors" modelId="LeasorList">
+				<field id="leasor" dataType="String"/>
+				<field id="ic" dataType="Int"/>
+				<field id="mid" dataType="Int"/>
+			</publicMethod>
+			<publicMethod id="complete_insurance_issuers" modelId="InsuranceIssuerList">
+				<field id="issuer" dataType="String"/>
+				<field id="ic" dataType="Int"/>
+				<field id="mid" dataType="Int"/>
+			</publicMethod>
 			<publicMethod id="check_for_broken_trackers"/>
 			<publicMethod id="vehicles_with_trackers"/>
 			<publicMethod id="get_current_position">
@@ -5167,6 +5208,9 @@
 				<field id="templ" dataType="String"/>
 			</publicMethod>
 			<publicMethod id="get_total_shipped"/>
+			<publicMethod id="vehicle_list_report" condFields="TRUE">
+				<field id="templ" dataType="String"/>
+			</publicMethod>
 		</controller>
 		<controller id="OrderGarbage" parentId="ControllerSQL" state="TRUE" noState="FALSE">
 			<publicMethod id="delete" modelId="OrderGarbage"/>
@@ -6365,6 +6409,13 @@
 			<publicMethod id="get_list" modelId="OwnerList"/>
 			<publicMethod id="get_object" modelId="OwnerList"/>
 		</controller>
+		<controller id="InsuranceList" parentIdJS="ControllerObjClient" server="FALSE">
+			<publicMethod id="insert" modelId="InsuranceList"/>
+			<publicMethod id="update" modelId="InsuranceList"/>
+			<publicMethod id="delete" modelId="InsuranceList"/>
+			<publicMethod id="get_list" modelId="InsuranceList"/>
+			<publicMethod id="get_object" modelId="InsuranceList"/>
+		</controller>
 		<controller id="ClientLocalList" parentIdJS="ControllerObjClient" server="FALSE">
 			<publicMethod id="insert" modelId="ClientLocalList"/>
 			<publicMethod id="update" modelId="ClientLocalList"/>
@@ -7144,6 +7195,7 @@
 		<view id="50021" t="RepMaterialActionByShift" section="Отчеты" descr="Отчет по движению материала по датам"/>
 		<view id="50022" t="VehicleOwnerTotIncomeAllRep" section="Отчеты" descr="Итоговый отчет для владельцев (все)"/>
 		<view id="50023" t="ShipmentDocRep" section="Отчеты" descr="Отгрузочные документы: путевой лист, ТТН"/>
+		<view id="50024" t="VehicleListReport" section="Отчеты" descr="Отчет по спику ТС (страховки, лизинг)"/>
 		<view id="40000" c="Constant_Controller" t="ConstantList" f="get_list" section="Константы" descr="Все константы"/>
 	</views>
 	<serverTemplates>
@@ -7916,6 +7968,7 @@
 		<jsScript file="js20/views/VehicleTotRepItemList_View.js"/>
 		<jsScript file="js20/views/VehicleTotRepCommonItemList_View.js"/>
 		<jsScript file="js20/views/VehicleTotRepBalanceList_View.js"/>
+		<jsScript file="js20/views/VehicleListReport_View.js"/>
 		<jsScript file="js20/views/TaskImportanceLevelList_View.js"/>
 		<jsScript file="js20/views/ProgUpdateList_View.js"/>
 		<jsScript file="js20/views/ProgUpdateDetailList_View.js"/>
@@ -8069,6 +8122,7 @@
 		<jsScript file="js20/custom_controls/VehicleScheduleMakeOrderGrid.js"/>
 		<jsScript file="js20/custom_controls/MaterialMakeOrderGrid.js"/>
 		<jsScript file="js20/custom_controls/OwnerListGrid.js"/>
+		<jsScript file="js20/custom_controls/InsuranceListGrid.js"/>
 		<jsScript file="js20/custom_controls/ClientLocalListGrid.js"/>
 		<jsScript file="js20/custom_controls/PumpVehiclePriceListGrid.js"/>
 		<jsScript file="js20/custom_controls/CementSiloEdit.js"/>
@@ -8105,6 +8159,8 @@
 		<jsScript file="js20/custom_controls/Firm1cEdit.js"/>
 		<jsScript file="js20/custom_controls/ChatStatusEdit.js"/>
 		<jsScript file="js20/custom_controls/ShipmentDocRep_View.js"/>
+		<jsScript file="js20/custom_controls/InsuranceIssuerEdit.js"/>
+		<jsScript file="js20/custom_controls/LeasorEdit.js"/>
 		<jsScript file="js20/views/rs_ru.js"/>
 		<jsScript file="js20/views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -8592,6 +8648,10 @@
 		<jsScript file="js20/models/CementSiloMaterialList_Model.js"/>
 		<jsScript file="js20/controllers/CementSiloMaterial_Controller.js"/>
 		<jsScript file="js20/models/ShipmentForDocList_Model.js"/>
+		<jsScript file="js20/controllers/InsuranceList_Controller.js"/>
+		<jsScript file="js20/models/InsuranceList_Model.js"/>
+		<jsScript file="js20/models/InsuranceIssuerList_Model.js"/>
+		<jsScript file="js20/models/LeasorList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

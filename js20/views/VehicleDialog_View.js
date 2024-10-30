@@ -49,6 +49,24 @@ function VehicleDialog_View(id,options){
 
 	this.addElement(new OwnerListGrid(id+":owners",{
 	}));	
+	this.addElement(new InsuranceListGrid(id+":insurance_osago",{
+	}));	
+	this.addElement(new InsuranceListGrid(id+":insurance_kasko",{
+	}));	
+
+	this.addElement(new LeasorEdit(id+":leasor",{
+	}));	
+	this.addElement(new EditMoney(id+":leasing_total",{
+		"labelCaption":"Сумма по договору:"
+	}));	
+
+	this.addElement(new EditDate(id+":leasing_contract_date",{
+		"labelCaption":"Дата договора:",
+	}));	
+	this.addElement(new EditString(id+":leasing_contract_num",{
+		"maxLength":"100",
+		"labelCaption":"Номер договора:",
+	}));	
 
 	this.addElement(new EditInt(id+":ord_num",{
 		"labelCaption":"Порядковый номер:",
@@ -58,6 +76,10 @@ function VehicleDialog_View(id,options){
 		"labelCaption":"Масса, тонн:",
 	}));	
 	
+	this.addElement(new EditString(id+":vin",{
+		"labelCaption":"VIN:",
+		"maxLength": 17
+	}));	
 	//****************************************************	
 	
 	//read
@@ -67,6 +89,12 @@ function VehicleDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("driver")})
 		,new DataBinding({"control":this.getElement("make")})
 		,new DataBinding({"control":this.getElement("owners"),"fieldId":"vehicle_owners"})
+		,new DataBinding({"control":this.getElement("insurance_osago"),"fieldId":"insurance_osago"})
+		,new DataBinding({"control":this.getElement("insurance_kasko"),"fieldId":"insurance_kasko"})
+		,new DataBinding({"control":this.getElement("leasor"),"fieldId":"leasor"})
+		,new DataBinding({"control":this.getElement("leasing_total"),"fieldId":"leasing_total"})
+		,new DataBinding({"control":this.getElement("leasing_contract_num"),"fieldId":"leasing_contract_num"})
+		,new DataBinding({"control":this.getElement("leasing_contract_date"),"fieldId":"leasing_contract_date"})
 		,new DataBinding({"control":this.getElement("feature")})
 		,new DataBinding({"control":this.getElement("tracker_id")})
 		,new DataBinding({"control":this.getElement("sim_id")})
@@ -75,6 +103,7 @@ function VehicleDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("tracker_sat_num")})
 		,new DataBinding({"control":this.getElement("ord_num")})
 		,new DataBinding({"control":this.getElement("weight_t")})		
+		,new DataBinding({"control":this.getElement("vin")})		
 	];
 	this.setDataBindings(r_bd);
 	
@@ -85,7 +114,14 @@ function VehicleDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("driver"),"fieldId":"driver_id"})
 		,new CommandBinding({"control":this.getElement("make")})
 		,new CommandBinding({"control":this.getElement("owners"),"fieldId":"vehicle_owners"})
+		,new CommandBinding({"control":this.getElement("insurance_osago"),"fieldId":"insurance_osago"})
+		,new CommandBinding({"control":this.getElement("insurance_kasko"),"fieldId":"insurance_kasko"})
+		,new CommandBinding({"control":this.getElement("leasor"),"fieldId":"leasor"})
+		,new CommandBinding({"control":this.getElement("leasing_total"),"fieldId":"leasing_total"})
+		,new CommandBinding({"control":this.getElement("leasing_contract_num"),"fieldId":"leasing_contract_num"})
+		,new CommandBinding({"control":this.getElement("leasing_contract_date"),"fieldId":"leasing_contract_date"})
 		,new CommandBinding({"control":this.getElement("feature")})
+		,new CommandBinding({"control":this.getElement("vin")})
 		,new CommandBinding({"control":this.getElement("tracker_id")})
 		,new CommandBinding({"control":this.getElement("ord_num")})
 		,new CommandBinding({"control":this.getElement("weight_t")})		

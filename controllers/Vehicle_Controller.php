@@ -25,6 +25,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
 
 
 require_once(FRAME_WORK_PATH.'basic_classes/ParamsSQL.php');
+require_once(FRAME_WORK_PATH.'basic_classes/CondParamsSQL.php');
 require_once('common/SMSService.php');
 
 require_once(FUNC_PATH.'VehicleRoute.php');
@@ -137,6 +138,49 @@ class Vehicle_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Масса, тонн';
 			$param = new FieldExtInt('weight_t'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='VIN';
+			$param = new FieldExtString('vin'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Leasor name';
+			$param = new FieldExtText('leasor'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtDate('leasing_contract_date'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtText('leasing_contract_num'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtFloat('leasing_total'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Insurance osago data';
+			$param = new FieldExtJSONB('insurance_osago'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Insurance kasko data';
+			$param = new FieldExtJSONB('insurance_kasko'
 				,$f_params);
 		$pm->addParam($param);
 		
@@ -255,6 +299,49 @@ class Vehicle_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Масса, тонн';
 			$param = new FieldExtInt('weight_t'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='VIN';
+			$param = new FieldExtString('vin'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Leasor name';
+			$param = new FieldExtText('leasor'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtDate('leasing_contract_date'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtText('leasing_contract_num'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtFloat('leasing_total'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Insurance osago data';
+			$param = new FieldExtJSONB('insurance_osago'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Insurance kasko data';
+			$param = new FieldExtJSONB('insurance_kasko'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -391,6 +478,48 @@ class Vehicle_Controller extends ControllerSQL{
 		$this->addPublicMethod($pm);
 
 			
+		$pm = new PublicMethod('complete_leasors');
+		
+				
+	$opts=array();
+			
+		$pm->addParam(new FieldExtString('leasor',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('ic',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('mid',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('complete_insurance_issuers');
+		
+				
+	$opts=array();
+			
+		$pm->addParam(new FieldExtString('issuer',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('ic',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('mid',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
 		$pm = new PublicMethod('check_for_broken_trackers');
 		
 		$this->addPublicMethod($pm);
@@ -511,6 +640,28 @@ class Vehicle_Controller extends ControllerSQL{
 		
 		$this->addPublicMethod($pm);
 
+			
+		$pm = new PublicMethod('vehicle_list_report');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('templ',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
 		
 	}
 	
@@ -556,7 +707,7 @@ class Vehicle_Controller extends ControllerSQL{
 		$params->setValidated('feature',DT_STRING);
 		$this->addNewModel(vsprintf(
 			"SELECT * FROM vehicle_feature_list_view
-			WHERE lower(feature) LIKE '%%'||%s||'%%'",
+			WHERE lower(feature) ILIKE '%%'||%s||'%%'",
 			$params->getArray()),
 			'VehicleFeatureList_Model'
 		);	
@@ -566,11 +717,34 @@ class Vehicle_Controller extends ControllerSQL{
 		$params->setValidated('make',DT_STRING);
 		$this->addNewModel(vsprintf(
 			"SELECT * FROM vehicle_make_list_view
-			WHERE lower(make) LIKE '%%'||%s||'%%'",
+			WHERE lower(make) ILIKE '%%'||%s||'%%'",
 			$params->getArray()),
 			'VehicleMakeList_Model'
 		);	
 	}
+
+	public function complete_insurance_issuers($pm){
+		$params = new ParamsSQL($pm,$this->getDbLink());
+		$params->setValidated('issuer',DT_STRING);
+		$this->addNewModel(vsprintf(
+			"SELECT * FROM insurance_issuers_list
+			WHERE lower(issuer) ILIKE '%%'||%s||'%%'",
+			$params->getArray()),
+			'InsuranceIssuerList_Model'
+		);	
+	}
+
+	public function complete_leasors($pm){
+		$params = new ParamsSQL($pm,$this->getDbLink());
+		$params->setValidated('leasor',DT_STRING);
+		$this->addNewModel(vsprintf(
+			"SELECT * FROM leasors_list
+			WHERE lower(leasor) ILIKE '%%'||%s||'%%'",
+			$params->getArray()),
+			'LeasorList_Model'
+		);	
+	}
+
 	public function vehicles_with_trackers($pm){
 		$this->addNewModel(
 			sprintf(
@@ -879,6 +1053,48 @@ class Vehicle_Controller extends ControllerSQL{
 			'TotalShipped_Model'
 		);
 		
+	}
+
+	public function vehicle_list_report($pm){
+		$cond = new CondParamsSQL($pm,$this->getDbLink());
+		$vehicle_id = ($cond->paramExists('vehicle_id','e'))?
+			$cond->getValForDb('vehicle_id','e',DT_INT) : 0;
+		$this->addNewModel(
+			sprintf('SELECT
+						make,
+						vin,
+						plate,
+						owner,
+						driver,
+						leasor,
+						leasing_contract,
+						leasing_total,
+						ins_osago_issuer,
+						ins_osago_total,
+						ins_osago_period,
+						ins_kasko_issuer,
+						ins_kasko_total,
+						ins_kasko_period
+				FROM vehicle_list_report(
+				%s::date,
+				%s::date,
+				%d
+			)',
+			$cond->getValForDb('date','ge',DT_DATETIME),
+			$cond->getValForDb('date','le',DT_DATETIME),
+			$vehicle_id),
+			'VehicleListReport_Model'
+		);
+
+		$this->addNewModel(sprintf(
+			"SELECT
+				to_char(%s::date, 'DD/MM/YY') as date_from,
+				to_char(%s::date, 'DD/MM/YY') as date_to",
+			$cond->getValForDb('date','ge',DT_DATETIME),
+			$cond->getValForDb('date','ge',DT_DATETIME)
+			),
+			'ModelVars'
+		);	
 	}
 }
 ?>

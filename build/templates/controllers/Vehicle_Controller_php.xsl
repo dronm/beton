@@ -19,6 +19,7 @@
 <xsl:call-template name="add_requirements"/>
 
 require_once(FRAME_WORK_PATH.'basic_classes/ParamsSQL.php');
+require_once(FRAME_WORK_PATH.'basic_classes/CondParamsSQL.php');
 require_once('common/SMSService.php');
 
 require_once(FUNC_PATH.'VehicleRoute.php');
@@ -71,7 +72,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$params->setValidated('feature',DT_STRING);
 		$this->addNewModel(vsprintf(
 			"SELECT * FROM vehicle_feature_list_view
-			WHERE lower(feature) LIKE '%%'||%s||'%%'",
+			WHERE lower(feature) ILIKE '%%'||%s||'%%'",
 			$params->getArray()),
 			'VehicleFeatureList_Model'
 		);	
@@ -81,11 +82,34 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$params->setValidated('make',DT_STRING);
 		$this->addNewModel(vsprintf(
 			"SELECT * FROM vehicle_make_list_view
-			WHERE lower(make) LIKE '%%'||%s||'%%'",
+			WHERE lower(make) ILIKE '%%'||%s||'%%'",
 			$params->getArray()),
 			'VehicleMakeList_Model'
 		);	
 	}
+
+	public function complete_insurance_issuers($pm){
+		$params = new ParamsSQL($pm,$this->getDbLink());
+		$params->setValidated('issuer',DT_STRING);
+		$this->addNewModel(vsprintf(
+			"SELECT * FROM insurance_issuers_list
+			WHERE lower(issuer) ILIKE '%%'||%s||'%%'",
+			$params->getArray()),
+			'InsuranceIssuerList_Model'
+		);	
+	}
+
+	public function complete_leasors($pm){
+		$params = new ParamsSQL($pm,$this->getDbLink());
+		$params->setValidated('leasor',DT_STRING);
+		$this->addNewModel(vsprintf(
+			"SELECT * FROM leasors_list
+			WHERE lower(leasor) ILIKE '%%'||%s||'%%'",
+			$params->getArray()),
+			'LeasorList_Model'
+		);	
+	}
+
 	public function vehicles_with_trackers($pm){
 		$this->addNewModel(
 			sprintf(
@@ -394,6 +418,48 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			'TotalShipped_Model'
 		);
 		
+	}
+
+	public function vehicle_list_report($pm){
+		$cond = new CondParamsSQL($pm,$this->getDbLink());
+		$vehicle_id = ($cond->paramExists('vehicle_id','e'))?
+			$cond->getValForDb('vehicle_id','e',DT_INT) : 0;
+		$this->addNewModel(
+			sprintf('SELECT
+						make,
+						vin,
+						plate,
+						owner,
+						driver,
+						leasor,
+						leasing_contract,
+						leasing_total,
+						ins_osago_issuer,
+						ins_osago_total,
+						ins_osago_period,
+						ins_kasko_issuer,
+						ins_kasko_total,
+						ins_kasko_period
+				FROM vehicle_list_report(
+				%s::date,
+				%s::date,
+				%d
+			)',
+			$cond->getValForDb('date','ge',DT_DATETIME),
+			$cond->getValForDb('date','le',DT_DATETIME),
+			$vehicle_id),
+			'VehicleListReport_Model'
+		);
+
+		$this->addNewModel(sprintf(
+			"SELECT
+				to_char(%s::date, 'DD/MM/YY') as date_from,
+				to_char(%s::date, 'DD/MM/YY') as date_to",
+			$cond->getValForDb('date','ge',DT_DATETIME),
+			$cond->getValForDb('date','ge',DT_DATETIME)
+			),
+			'ModelVars'
+		);	
 	}
 }
 <![CDATA[?>]]>

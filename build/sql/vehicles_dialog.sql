@@ -52,7 +52,14 @@ CREATE OR REPLACE VIEW public.vehicles_dialog AS
 		v.vehicle_owners_ar,
 		
 		v.ord_num,
-		v.weight_t
+		v.weight_t,
+
+		v.vin,
+		v.leasor,
+		v.leasing_contract_date,
+		v.leasing_contract_num,
+		v.insurance_osago,
+		v.insurance_kasko
 		
 	FROM vehicles v
 	LEFT JOIN drivers dr ON dr.id = v.driver_id

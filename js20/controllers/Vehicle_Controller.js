@@ -33,6 +33,8 @@ function Vehicle_Controller(options){
 	this.add_get_vehicle_statistics();
 	this.add_complete_features();
 	this.add_complete_makes();
+	this.add_complete_leasors();
+	this.add_complete_insurance_issuers();
 	this.add_check_for_broken_trackers();
 	this.add_vehicles_with_trackers();
 	this.add_get_current_position();
@@ -42,6 +44,7 @@ function Vehicle_Controller(options){
 	this.add_get_tool_tip();
 	this.add_get_stops_at_dest();
 	this.add_get_total_shipped();
+	this.add_vehicle_list_report();
 		
 }
 extend(Vehicle_Controller,ControllerObjServer);
@@ -138,6 +141,48 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Масса, тонн";
 	var field = new FieldInt("weight_t",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "VIN";
+	var field = new FieldString("vin",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Leasor name";
+	var field = new FieldText("leasor",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldDate("leasing_contract_date",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldText("leasing_contract_num",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("leasing_total",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Insurance osago data";
+	var field = new FieldJSONB("insurance_osago",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Insurance kasko data";
+	var field = new FieldJSONB("insurance_kasko",options);
 	
 	pm.addField(field);
 	
@@ -243,6 +288,48 @@ extend(Vehicle_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "VIN";
+	var field = new FieldString("vin",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Leasor name";
+	var field = new FieldText("leasor",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldDate("leasing_contract_date",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldText("leasing_contract_num",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("leasing_total",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Insurance osago data";
+	var field = new FieldJSONB("insurance_osago",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Insurance kasko data";
+	var field = new FieldJSONB("insurance_kasko",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -323,6 +410,27 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Масса, тонн";
 	pm.addField(new FieldInt("weight_t",f_opts));
+	var f_opts = {};
+	f_opts.alias = "VIN";
+	pm.addField(new FieldString("vin",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldText("leasor",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldDate("leasing_contract_date",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldText("leasing_contract_num",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("leasing_total",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Insurance osago data";
+	pm.addField(new FieldJSONB("insurance_osago",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Insurance kasko data";
+	pm.addField(new FieldJSONB("insurance_kasko",f_opts));
 }
 
 			Vehicle_Controller.prototype.addGetObject = function(){
@@ -396,6 +504,58 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldString("make",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("ic",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("mid",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Vehicle_Controller.prototype.add_complete_leasors = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('complete_leasors',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("leasor",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("ic",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("mid",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Vehicle_Controller.prototype.add_complete_insurance_issuers = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('complete_insurance_issuers',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("issuer",options));
 	
 				
 	
@@ -565,6 +725,31 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('get_total_shipped',opts);
 	
+	this.addPublicMethod(pm);
+}
+
+			Vehicle_Controller.prototype.add_vehicle_list_report = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('vehicle_list_report',opts);
+	
+	pm.addField(new FieldInt(this.PARAM_COUNT));
+	pm.addField(new FieldInt(this.PARAM_FROM));
+	pm.addField(new FieldString(this.PARAM_COND_FIELDS));
+	pm.addField(new FieldString(this.PARAM_COND_SGNS));
+	pm.addField(new FieldString(this.PARAM_COND_VALS));
+	pm.addField(new FieldString(this.PARAM_COND_ICASE));
+	pm.addField(new FieldString(this.PARAM_ORD_FIELDS));
+	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
+	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
+	pm.addField(new FieldString(this.PARAM_FIELD_LSN));
+
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("templ",options));
+	
+			
 	this.addPublicMethod(pm);
 }
 

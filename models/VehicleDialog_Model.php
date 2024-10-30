@@ -9,7 +9,9 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLArray.php');
@@ -186,6 +188,70 @@ class VehicleDialog_Model extends ModelSQLBeton{
 						
 		$f_weight_t=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"weight_t",$f_opts);
 		$this->addField($f_weight_t);
+		//********************
+		
+		//*** Field vin ***
+		$f_opts = array();
+		
+		$f_opts['alias']='VIN';
+		$f_opts['length']=17;
+		$f_opts['id']="vin";
+						
+		$f_vin=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vin",$f_opts);
+		$this->addField($f_vin);
+		//********************
+		
+		//*** Field leasor ***
+		$f_opts = array();
+		$f_opts['id']="leasor";
+						
+		$f_leasor=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"leasor",$f_opts);
+		$this->addField($f_leasor);
+		//********************
+		
+		//*** Field leasing_contract_date ***
+		$f_opts = array();
+		$f_opts['id']="leasing_contract_date";
+						
+		$f_leasing_contract_date=new FieldSQLDate($this->getDbLink(),$this->getDbName(),$this->getTableName(),"leasing_contract_date",$f_opts);
+		$this->addField($f_leasing_contract_date);
+		//********************
+		
+		//*** Field leasing_contract_num ***
+		$f_opts = array();
+		$f_opts['id']="leasing_contract_num";
+						
+		$f_leasing_contract_num=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"leasing_contract_num",$f_opts);
+		$this->addField($f_leasing_contract_num);
+		//********************
+		
+		//*** Field leasing_total ***
+		$f_opts = array();
+		$f_opts['length']=15;
+		$f_opts['id']="leasing_total";
+						
+		$f_leasing_total=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"leasing_total",$f_opts);
+		$this->addField($f_leasing_total);
+		//********************
+		
+		//*** Field insurance_osago ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Insurance osago data';
+		$f_opts['id']="insurance_osago";
+						
+		$f_insurance_osago=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"insurance_osago",$f_opts);
+		$this->addField($f_insurance_osago);
+		//********************
+		
+		//*** Field insurance_kasko ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Insurance kasko data';
+		$f_opts['id']="insurance_kasko";
+						
+		$f_insurance_kasko=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"insurance_kasko",$f_opts);
+		$this->addField($f_insurance_kasko);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

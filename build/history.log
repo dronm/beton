@@ -1366,6 +1366,26 @@ defined in Entity line 1.
 
 
 
+1.00351
+1) Vehicle new fields:
+	- leasing fields
+	- insurance_kasko, insurance_osaga jsonb, issuer, total, period_from, period_to
+	- vin text length 17
+Vehicle_Model, Vehicle_Controller, VehicleDialog_Model, vehicles_dialog.sql, VehicleDialog_View.js
+InsuranceList_Model
+InsuranceList_Controller
+InsuranceListGrid.js
+vehicle_list_report.sql
+insurance_issuers_list.sql
+leasors_list.sql
+vehicles_dialog.sql
+VehicleDialog_View.js
+VehicleListReport_View.js
+VehicleListReport.html.xsl
+
+
+
+
 
 
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели

@@ -61,6 +61,7 @@
 <li><a href="#GPSTracker_Controller">GPSTracker_Controller</a></li>
 <li><a href="#GornyiCarrierMatch_Controller">GornyiCarrierMatch_Controller</a></li>
 <li><a href="#Graph_Controller">Graph_Controller</a></li>
+<li><a href="#InsuranceList_Controller">InsuranceList_Controller</a></li>
 <li><a href="#LabChart_Controller">LabChart_Controller</a></li>
 <li><a href="#LabData_Controller">LabData_Controller</a></li>
 <li><a href="#LabEntry_Controller">LabEntry_Controller</a></li>
@@ -291,6 +292,8 @@
 <li><a href="#SMSPatternList_Model">SMSPatternList_Model</a></li>
 <li><a href="#VehicleFeatureList_Model">VehicleFeatureList_Model</a></li>
 <li><a href="#VehicleMakeList_Model">VehicleMakeList_Model</a></li>
+<li><a href="#InsuranceIssuerList_Model">InsuranceIssuerList_Model</a></li>
+<li><a href="#LeasorList_Model">LeasorList_Model</a></li>
 <li><a href="#LabData_Model">LabData_Model</a></li>
 <li><a href="#LabDataList_Model">LabDataList_Model</a></li>
 <li><a href="#LabEntry_Model">LabEntry_Model</a></li>
@@ -407,6 +410,7 @@
 <li><a href="#RGMaterialFact_Model">RGMaterialFact_Model</a></li>
 <li><a href="#RAMaterialFact_Model">RAMaterialFact_Model</a></li>
 <li><a href="#OwnerList_Model">OwnerList_Model</a></li>
+<li><a href="#InsuranceList_Model">InsuranceList_Model</a></li>
 <li><a href="#PumpVehiclePriceList_Model">PumpVehiclePriceList_Model</a></li>
 <li><a href="#ELKONLog_Model">ELKONLog_Model</a></li>
 <li><a href="#ELKONLogList_Model">ELKONLogList_Model</a></li>
@@ -1837,6 +1841,19 @@
 								Нет</p>
 </div>
 </div>
+</div>
+</div>
+<div id="InsuranceList_Controller" class="content_box">
+<h1>InsuranceList_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#InsuranceList_Model">Model: InsuranceList_Model</a><h2>update</h2>
+<a href="#InsuranceList_Model">Model: InsuranceList_Model</a><h2>delete</h2>
+<a href="#InsuranceList_Model">Model: InsuranceList_Model</a><h2>get_list</h2>
+<a href="#InsuranceList_Model">Model: InsuranceList_Model</a><h2>get_object</h2>
+<a href="#InsuranceList_Model">Model: InsuranceList_Model</a>
 </div>
 </div>
 <div id="LabChart_Controller" class="content_box">
@@ -4534,7 +4551,9 @@
 </div>
 <h2>complete_features</h2>
 <a href="#VehicleFeatureList_Model">Model: VehicleFeatureList_Model</a><h2>complete_makes</h2>
-<a href="#VehicleMakeList_Model">Model: VehicleMakeList_Model</a><h2>check_for_broken_trackers</h2>
+<a href="#VehicleMakeList_Model">Model: VehicleMakeList_Model</a><h2>complete_leasors</h2>
+<a href="#LeasorList_Model">Model: LeasorList_Model</a><h2>complete_insurance_issuers</h2>
+<a href="#InsuranceIssuerList_Model">Model: InsuranceIssuerList_Model</a><h2>check_for_broken_trackers</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2"></div>
 <h2>vehicles_with_trackers</h2>
@@ -4644,6 +4663,17 @@
 <h2>get_total_shipped</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2"></div>
+<h2>vehicle_list_report</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>templ</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
 </div>
 </div>
 <div id="VehicleDriverForSchedGen_Controller" class="content_box">
@@ -9784,6 +9814,54 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="InsuranceIssuerList_Model" class="content_box">
+<h1>InsuranceIssuerList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>issuer</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="InsuranceList_Model" class="content_box">
+<h1>InsuranceList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>dt_from</h2>
+<div>Type:Date</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>dt_to</h2>
+<div>Type:Date</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>issuer</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>total</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+</div>
+</div>
 <div id="LabData_Model" class="content_box">
 <h1>LabData_Model</h1>
 <div class="content_item">
@@ -10470,6 +10548,18 @@
 <div>Type:String</div>
 <div>Primary key:FALSE</div>
 <div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="LeasorList_Model" class="content_box">
+<h1>LeasorList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>leasor</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
 </div>
@@ -22383,6 +22473,48 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>vin</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:17</div>
+<div>Precision:</div>
+<h2>leasor</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>leasing_contract_date</h2>
+<div>Type:Date</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>leasing_contract_num</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>leasing_total</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+<h2>insurance_osago</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>insurance_kasko</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="VehicleDialog_Model" class="content_box">
@@ -22487,6 +22619,48 @@
 <div>Precision:</div>
 <h2>weight_t</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vin</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:17</div>
+<div>Precision:</div>
+<h2>leasor</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>leasing_contract_date</h2>
+<div>Type:Date</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>leasing_contract_num</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>leasing_total</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+<h2>insurance_osago</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>insurance_kasko</h2>
+<div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

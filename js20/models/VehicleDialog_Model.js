@@ -180,6 +180,71 @@ function VehicleDialog_Model(options){
 	
 	options.fields.weight_t = new FieldInt("weight_t",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'VIN';
+	filed_options.autoInc = false;	
+	
+	options.fields.vin = new FieldString("vin",filed_options);
+	options.fields.vin.getValidator().setMaxLength('17');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.leasor = new FieldText("leasor",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.leasing_contract_date = new FieldDate("leasing_contract_date",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.leasing_contract_num = new FieldText("leasing_contract_num",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.leasing_total = new FieldFloat("leasing_total",filed_options);
+	options.fields.leasing_total.getValidator().setMaxLength('15');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Insurance osago data';
+	filed_options.autoInc = false;	
+	
+	options.fields.insurance_osago = new FieldJSONB("insurance_osago",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Insurance kasko data';
+	filed_options.autoInc = false;	
+	
+	options.fields.insurance_kasko = new FieldJSONB("insurance_kasko",filed_options);
+	
 			
 		VehicleDialog_Model.superclass.constructor.call(this,id,options);
 }

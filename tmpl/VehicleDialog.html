@@ -6,35 +6,102 @@
 	</div>
 
 	<div class="row">
-		<h1 class="page-header">Карточка автомобиля</h1>
+		<h3 class="page-header">Карточка автомобиля</h3>
 	</div>
 	
-	<div id="{{id}}:plate"/>
-	<div id="{{id}}:ord_num"/>
-	
-	<div id="{{id}}:load_capacity"/>
-	
-	<div id="{{id}}:driver"/>
-	
-	<div id="{{id}}:make"/>
-	<div id="{{id}}:weight_t"/>
-	<div id="{{id}}:feature"/>
-	
-	<div class="panel">
-		<div class="panel-heading">
-			<h6 class="panel-title">Владельцы</h6>		
-		</div>
-	
-		<div id="{{id}}:owners"/>
-	</div>	
-	<br/>
+	<div class="tabbable">
+		<ul class="nav nav-tabs nav-tabs-highlight">
+			<li class="active">
+				<a href="#params" data-toggle="tab" aria-expanded="true">Параметры</a>
+			</li>
+			<li>
+				<a href="#owners" data-toggle="tab" aria-expanded="false">Владельцы</a>
+			</li>
+			<li>
+				<a href="#insurence" data-toggle="tab" aria-expanded="false">Страхование</a>
+			</li>
+			
+			<li>
+				<a href="#leasing" data-toggle="tab" aria-expanded="false">Лизинг</a>
+			</li>
+			<li>
+				<a href="#tracker" data-toggle="tab" aria-expanded="false">Трэкер</a>
+			</li>
+		</ul>
+	</div>
 
-	<div id="{{id}}:tracker_id"/>
-	
-	<div id="{{id}}:sim_id"/>
-	
-	<div id="{{id}}:sim_number"/>
-	
-	<div id="{{id}}:tracker_last_dt"/>
-	<div id="{{id}}:tracker_sat_num"/>
+	<!-- Tab panes -->
+	<div class="tab-content dialogForm">	
+		<div class="tab-pane fade in active" id="params">
+			<div class="panel panel-body userDialogTab">
+				<div class="panel-heading">
+					<h4 class="panel-title">Параметры</h4>
+				</div>
+
+				<div id="{{id}}:plate"/>
+				<div id="{{id}}:vin"/>
+				<div id="{{id}}:ord_num"/>
+				<div id="{{id}}:load_capacity"/>
+				<div id="{{id}}:make"/>
+				<div id="{{id}}:weight_t"/>
+				<div id="{{id}}:feature"/>
+				<div id="{{id}}:driver"/>
+			</div>
+		</div>
+
+		<div class="tab-pane fade" id="owners">
+			<div class="panel panel-body userDialogTab">
+				<div class="panel">
+					<div class="panel-heading">
+						<h4 class="panel-title">Владельцы</h4>
+					</div>
+					<div id="{{id}}:owners"/>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane fade" id="insurence">
+			<div class="panel panel-body userDialogTab">
+				<div class="panel">
+					<div class="panel-heading">
+						<h4 class="panel-title">Страхование</h4>
+					</div>
+					<fieldset>
+						<legend>ОСАГО</legend>
+						<div id="{{id}}:insurance_osago"/>
+					</fieldset>
+					<fieldset>
+						<legend>КАСКО</legend>
+						<div id="{{id}}:insurance_kasko"/>
+					</fieldset>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane fade" id="leasing">
+			<div class="panel panel-body userDialogTab">
+				<div class="panel">
+					<div class="panel-heading">
+						<h4 class="panel-title">Лизинг</h4>
+					</div>
+					<div id="{{id}}:leasor"/>
+					<div id="{{id}}:leasing_contract_date"/>
+					<div id="{{id}}:leasing_contract_num"/>
+					<div id="{{id}}:leasing_total"/>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane fade" id="tracker">
+			<div class="panel panel-body userDialogTab">
+				<div class="panel">
+					<div class="panel-heading">
+						<h4 class="panel-title">Трэкер</h4>
+					</div>
+					<div id="{{id}}:tracker_id"/>
+					<div id="{{id}}:sim_id"/>
+					<div id="{{id}}:sim_number"/>
+					<div id="{{id}}:tracker_last_dt"/>
+					<div id="{{id}}:tracker_sat_num"/>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>	

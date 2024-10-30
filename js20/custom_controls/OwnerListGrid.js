@@ -18,6 +18,15 @@ function OwnerListGrid(id,options){
 
 	var cells = [
 		new GridCellHead(id+":head:dt_from",{
+			"value":"Дата с",
+			"columns":[
+				new GridColumnDateTime({
+					"field":model.getField("dt_from")
+				})
+			]
+		})
+		,new GridCellHead(id+":head:dt_from",{
+			"value":"Владелец",
 			"columns":[
 				new GridColumnDateTime({
 					"field":model.getField("dt_from")
@@ -35,7 +44,6 @@ function OwnerListGrid(id,options){
 	];
 
 	options = {
-		"showHead":false,
 		"model":model,
 		"keyIds":["id"],
 		"controller":new OwnerList_Controller({"clientModel":model}),

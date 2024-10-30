@@ -1433,6 +1433,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/views/VehicleTotRepItemList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/VehicleTotRepItemList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/VehicleTotRepCommonItemList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/VehicleTotRepCommonItemList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/VehicleTotRepBalanceList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/VehicleTotRepBalanceList_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/views/VehicleListReport_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/VehicleListReport_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/TaskImportanceLevelList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/TaskImportanceLevelList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/ProgUpdateList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ProgUpdateList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/ProgUpdateDetailList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ProgUpdateDetailList_View.js')) ));
@@ -1581,6 +1582,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/VehicleScheduleMakeOrderGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/VehicleScheduleMakeOrderGrid.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/MaterialMakeOrderGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/MaterialMakeOrderGrid.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/OwnerListGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/OwnerListGrid.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/InsuranceListGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/InsuranceListGrid.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ClientLocalListGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ClientLocalListGrid.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/PumpVehiclePriceListGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/PumpVehiclePriceListGrid.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/CementSiloEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/CementSiloEdit.js')) ));
@@ -1617,6 +1619,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/Firm1cEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/Firm1cEdit.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ChatStatusEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ChatStatusEdit.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ShipmentDocRep_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ShipmentDocRep_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/InsuranceIssuerEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/InsuranceIssuerEdit.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/LeasorEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/LeasorEdit.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/rs_ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/rs_ru.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/rs_common_ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/rs_common_ru.js')) ));
 		
@@ -2102,6 +2106,10 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/models/CementSiloMaterialList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/CementSiloMaterialList_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controllers/CementSiloMaterial_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/CementSiloMaterial_Controller.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/ShipmentForDocList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ShipmentForDocList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/controllers/InsuranceList_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/InsuranceList_Controller.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/InsuranceList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/InsuranceList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/InsuranceIssuerList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/InsuranceIssuerList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/LeasorList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/LeasorList_Model.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];
