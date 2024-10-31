@@ -4,7 +4,7 @@
 <xsl:import href="Controller_php.xsl"/>
 
 <!-- -->
-<xsl:variable name="CONTROLLER_ID" select="'Client1c'"/>
+<xsl:variable name="CONTROLLER_ID" select="'BuhRBP1c'"/>
 <!-- -->
 
 <xsl:output method="text" indent="yes"
@@ -31,18 +31,9 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 
 <xsl:template name="extra_methods">
 	public function complete($pm){		
-		$resp = ExtProg::getClientList($this->getExtVal($pm, "search"));
+		$resp = ExtProg::getBuhRBPList($this->getExtVal($pm, "search"));
 		//file_put_contents('output/qres.txt', $resp);
 		//return as is
-		ob_clean();
-		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode($resp, JSON_UNESCAPED_UNICODE);
-		return true;
-	}
-
-	public function get_leasor_on_pp($pm){
-		$resp = ExtProg::getClientOnPP($this->getExtVal($pm, "pp_num"));
-		file_put_contents('output/qres.txt', $resp);
 		ob_clean();
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode($resp, JSON_UNESCAPED_UNICODE);

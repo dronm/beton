@@ -1096,5 +1096,7 @@ class Vehicle_Controller extends ControllerSQL{
 			'ModelVars'
 		);	
 	}
+
 }
+
 ?>

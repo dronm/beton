@@ -1366,7 +1366,7 @@ defined in Entity line 1.
 
 
 
-1.00351
+1.00351 2024-10-31
 1) Vehicle new fields:
 	- leasing fields
 	- insurance_kasko, insurance_osaga jsonb, issuer, total, period_from, period_to
@@ -1384,6 +1384,12 @@ VehicleListReport_View.js
 VehicleListReport.html.xsl
 
 
+1.00352
+1) ExtProg: new methods to retrieve rbp and leasor.
+	BuhRBP1cList_Model
+	BuhRBP1c_Controller
+	BuhRBP1cEdit
+	VehicleDialog_View
 
 
 

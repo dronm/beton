@@ -26,7 +26,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
 
 require_once(ABSOLUTE_PATH.'functions/ExtProg.php');
 
-class Client1c_Controller extends ControllerSQL{
+class BuhRBP1c_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
 		parent::__construct($dbLinkMaster,$dbLink);
 			
@@ -38,36 +38,15 @@ class Client1c_Controller extends ControllerSQL{
 		$pm->addParam(new FieldExtInt('mid'));
 		$pm->addParam(new FieldExtString('search'));		
 		$this->addPublicMethod($pm);					
-		$this->setCompleteModelId('Client1cList_Model');
-
-			
-		$pm = new PublicMethod('get_leasor_on_pp');
-		
-				
-	$opts=array();
-	
-		$opts['length']=20;				
-		$pm->addParam(new FieldExtString('pp_num',$opts));
-	
-			
-		$this->addPublicMethod($pm);
+		$this->setCompleteModelId('BuhRBP1cList_Model');
 
 		
 	}	
 	
 	public function complete($pm){		
-		$resp = ExtProg::getClientList($this->getExtVal($pm, "search"));
+		$resp = ExtProg::getBuhRBPList($this->getExtVal($pm, "search"));
 		//file_put_contents('output/qres.txt', $resp);
 		//return as is
-		ob_clean();
-		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode($resp, JSON_UNESCAPED_UNICODE);
-		return true;
-	}
-
-	public function get_leasor_on_pp($pm){
-		$resp = ExtProg::getClientOnPP($this->getExtVal($pm, "pp_num"));
-		file_put_contents('output/qres.txt', $resp);
 		ob_clean();
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode($resp, JSON_UNESCAPED_UNICODE);

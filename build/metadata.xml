@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-10-30 14:57:19</lastBuild></version>
+		<lastBuild>2024-11-01 04:27:02</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -255,6 +255,7 @@
 		<version dateOpen="2024-10-23 06:57:40" dateClose="2024-10-23 06:58:31">1.00349</version>
 		<version dateOpen="2024-10-24 05:01:10" dateClose="2024-10-24 05:02:13">1.00350</version>
 		<version dateOpen="2024-10-30 07:41:47" dateClose="2024-10-30 14:57:22">1.00351</version>
+		<version dateOpen="2024-10-31 16:13:26" dateClose="2024-11-01 04:27:06">1.00352</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -4886,6 +4887,13 @@
 			<field id="search" dataType="Text"/>
 			<field id="ref" dataType="JSON"/>
 		</model>
+		<model id="BuhRBP1cList" parent="ModelJSON" virtual="TRUE" alias="Модель RBP 1с">
+			<field id="name" dataType="Text" primaryKey="TRUE"/>
+			<field id="date_from" dataType="Text"/>
+			<field id="date_to" dataType="Text"/>
+			<field id="total" dataType="Text"/>
+			<field id="search" dataType="Text"/>
+		</model>
 		<model id="Firm1c" parent="ModelSQL" dataTable="firms_1c" virtual="FALSE">
 			<field id="id" primaryKey="TRUE" dataType="Int" autoInc="TRUE"/>
 			<field id="ref_1c" dataType="JSONB" alias="Ссылка на справочник 1с"/>
@@ -6863,6 +6871,12 @@
 		</controller>
 		<controller id="Client1c" parentId="ControllerSQL" noState="FALSE">
 			<publicMethod id="complete" patternFieldId="search" modelId="Client1cList"/>
+			<publicMethod id="get_leasor_on_pp">
+				<field id="pp_num" dataType="String" length="20"/>
+			</publicMethod>
+		</controller>
+		<controller id="BuhRBP1c" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="complete" patternFieldId="search" modelId="BuhRBP1cList"/>
 		</controller>
 		<controller id="Firm1c" parentId="ControllerSQL" noState="FALSE">
 			<publicMethod id="get_list" modelId="Firm1cList"/>
@@ -8156,6 +8170,7 @@
 		<jsScript file="js20/custom_controls/VehicleOwnerTotIncomeRep_View.js"/>
 		<jsScript file="js20/custom_controls/TaskImportanceLevelEdit.js"/>
 		<jsScript file="js20/custom_controls/Client1cEdit.js"/>
+		<jsScript file="js20/custom_controls/BuhRBP1cEdit.js"/>
 		<jsScript file="js20/custom_controls/Firm1cEdit.js"/>
 		<jsScript file="js20/custom_controls/ChatStatusEdit.js"/>
 		<jsScript file="js20/custom_controls/ShipmentDocRep_View.js"/>
@@ -8652,6 +8667,8 @@
 		<jsScript file="js20/models/InsuranceList_Model.js"/>
 		<jsScript file="js20/models/InsuranceIssuerList_Model.js"/>
 		<jsScript file="js20/models/LeasorList_Model.js"/>
+		<jsScript file="js20/controllers/BuhRBP1c_Controller.js"/>
+		<jsScript file="js20/models/BuhRBP1cList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

@@ -1666,6 +1666,10 @@ $permissions = array();
 				
 					$permissions['Client1c_Controller_complete']=TRUE;
 				
+					$permissions['Client1c_Controller_get_leasor_on_pp']=TRUE;
+				
+					$permissions['BuhRBP1c_Controller_complete']=TRUE;
+				
 					$permissions['Firm1c_Controller_get_list']=TRUE;
 				
 					$permissions['Firm1c_Controller_get_object']=TRUE;

@@ -113,6 +113,10 @@ class ExtProg{
 		return ExtProg::send_query('get_catalog_by_attr', array('catalog'=>'clients','search'=>$search), TRUE);
 	}
 	
+	public static function getClientOnPP($ppNum){
+		return ExtProg::send_query('get_client_on_pp', array('pp_num'=>$ppNum), TRUE);
+	}
+
 	public static function getClientOborot(){
 		return ExtProg::send_query('get_client_dog_oborot', array(), TRUE);
 	}
@@ -121,5 +125,8 @@ class ExtProg{
 		return ExtProg::send_query('get_client_debt_list', array(), TRUE);
 	}
 
+	public static function getBuhRBPList($search){
+		return ExtProg::send_query('get_catalog_by_attr', array('catalog'=>'rbp','search'=>$search), TRUE);
+	}
 }
 ?>

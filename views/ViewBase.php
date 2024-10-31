@@ -1616,6 +1616,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/VehicleOwnerTotIncomeRep_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/VehicleOwnerTotIncomeRep_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/TaskImportanceLevelEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/TaskImportanceLevelEdit.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/Client1cEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/Client1cEdit.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/BuhRBP1cEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/BuhRBP1cEdit.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/Firm1cEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/Firm1cEdit.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ChatStatusEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ChatStatusEdit.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ShipmentDocRep_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ShipmentDocRep_View.js')) ));
@@ -2110,6 +2111,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/models/InsuranceList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/InsuranceList_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/InsuranceIssuerList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/InsuranceIssuerList_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/LeasorList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/LeasorList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/controllers/BuhRBP1c_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/BuhRBP1c_Controller.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/BuhRBP1cList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/BuhRBP1cList_Model.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

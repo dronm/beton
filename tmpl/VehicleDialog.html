@@ -65,10 +65,21 @@
 					<div class="panel-heading">
 						<h4 class="panel-title">Страхование</h4>
 					</div>
+
+					<fieldset>
+						<legend>Заполнение из 1с</legend>
+						<div id="{{id}}:insurance_issuer"/>
+						<div id="{{id}}:insurance_rbp"/>
+						<div id="{{id}}:cmdAddOnRBPOSAGO"/>
+						<div id="{{id}}:cmdAddOnRBPKASKO"/>
+					</fieldset>
+
+					<br></br>
 					<fieldset>
 						<legend>ОСАГО</legend>
 						<div id="{{id}}:insurance_osago"/>
 					</fieldset>
+					<br></br>
 					<fieldset>
 						<legend>КАСКО</legend>
 						<div id="{{id}}:insurance_kasko"/>
@@ -82,7 +93,11 @@
 					<div class="panel-heading">
 						<h4 class="panel-title">Лизинг</h4>
 					</div>
+					<div id="{{id}}:leasor_pp"/>
+					<div id="{{id}}:cmdFillOnPP"/>
+
 					<div id="{{id}}:leasor"/>
+
 					<div id="{{id}}:leasing_contract_date"/>
 					<div id="{{id}}:leasing_contract_num"/>
 					<div id="{{id}}:leasing_total"/>

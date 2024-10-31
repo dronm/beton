@@ -9,6 +9,8 @@ function VehicleDialog_View(id,options){
 	
 	VehicleDialog_View.superclass.constructor.call(this,id,options);
 	
+	let self = this;
+
 	this.addElement(new EditString(id+":plate",{
 		"labelCaption":"Рег.номер:",
 		"maxLength":"6",
@@ -67,6 +69,37 @@ function VehicleDialog_View(id,options){
 		"maxLength":"100",
 		"labelCaption":"Номер договора:",
 	}));	
+
+	//insurance filling
+	this.addElement(new Client1cEdit(id+":insurance_issuer",{
+	}));	
+	this.addElement(new BuhRBP1cEdit(id+":insurance_rbp",{
+	}));	
+	this.addElement(new ButtonCmd(id+":cmdAddOnRBPKASKO",{
+		"caption":"Добавить КАСКО",
+		"onClick":function(){
+			self.cmdAddOnRBPKASKO();
+		}
+	}));	
+	this.addElement(new ButtonCmd(id+":cmdAddOnRBPOSAGO",{
+		"caption":"Добавить ОСАГО",
+		"onClick":function(){
+			self.cmdAddOnRBPOSAGO();
+		}
+	}));	
+
+	this.addElement(new EditString(id+":leasor_pp",{
+		"maxLength":"20",
+		"labelCaption":"Номер п/п:",
+		"placeholder":"Номер платежного поручения",
+		"title":"Номер платежного поручения лизингодателя для заполнения"
+	}));	
+	this.addElement(new ButtonCmd(id+":cmdFillOnPP",{
+		"caption":"Заполнить по п/п",
+		"onClick":function(){
+			self.cmdFillOnPP();
+		}
+	}));		
 
 	this.addElement(new EditInt(id+":ord_num",{
 		"labelCaption":"Порядковый номер:",
@@ -141,4 +174,95 @@ VehicleDialog_View.prototype.onGetData = function(resp,cmd){
 		this.getControlSave().setEnabled(true);
 		this.getControlCancel().setEnabled(true);
 	}
+}
+
+VehicleDialog_View.prototype.cmdFillOnPP = function(){
+	const ppNum = this.getElement("leasor_pp").getValue();
+	if(!ppNum || !ppNum.length){
+		throw new Error("Заполните номер п/п");
+	}
+	window.setGlobalWait(true);
+	const self = this;
+	const pm = (new Client1c_Controller()).getPublicMethod("get_leasor_on_pp");
+	pm.setFieldValue("pp_num", ppNum);
+	pm.run({
+		"ok": function(resp){
+			console.log(resp)
+			const model = resp.getModel("Client1c_Model");
+			if(!model || !model.getNextRow()){
+				window.showTempWarn("П/п не найдено", null, 5000);
+				return;
+			}
+			console.log(model)
+			self.getElement("leasor").setValue(
+				model.getFieldValue("client_name")
+			);
+			self.getElement("leasing_contract_num").setValue(
+				model.getFieldValue("contract_num")
+			);
+			self.getElement("leasing_contract_date").setValue(
+				date1c_to_date(model.getFieldValue("contract_date"))
+			);
+		},
+		"all": function(){
+			window.setGlobalWait(false);
+		}
+	});
+}
+
+function date1c_to_date(date1cStr){
+	let dParts = date1cStr.split(" ")[0].split(".");
+	if(dParts.length<3){
+		throw new Error("dParts.length should be 3");
+	}
+	const d = DateHelper.strtotime(dParts[2]+"-"+dParts[1]+"-"+dParts[0]);
+	return d;
+}
+
+VehicleDialog_View.prototype.getRBP = function(){
+	const rbpCtrl = this.getElement("insurance_rbp");
+	const rbp = rbpCtrl.getValue();
+	if(!rbp || rbp.isNull()){
+		throw new Error("Не задана статья");
+	}
+
+	const issuer = this.getElement("insurance_issuer").getValue();
+	if(!issuer || issuer.isNull()){
+		throw new Error("Не задан страхователь");
+	}
+	
+	return {
+		"rbp": rbp.getKey("name"),
+		"issuer": issuer.getDescr(),
+		"date_from": date1c_to_date(rbpCtrl.getAttr("date_from")),
+		"date_to": date1c_to_date(rbpCtrl.getAttr("date_to")),
+		"total": rbpCtrl.getAttr("total")
+	};
+}
+
+VehicleDialog_View.prototype.addInsurance = function(rbpData, gridElemId){
+	const grid = this.getElement(gridElemId);
+	const pm = grid.getInsertPublicMethod();
+	pm.setFieldValue("issuer", rbpData.issuer);
+	pm.setFieldValue("total", rbpData.total);
+	pm.setFieldValue("dt_from", rbpData.date_from);
+	pm.setFieldValue("dt_to", rbpData.date_to);
+	pm.run({
+		"ok": (function(grid){
+			return function(resp){
+				grid.onRefresh();
+			}
+		})(grid)
+	});
+}
+
+VehicleDialog_View.prototype.cmdAddOnRBPKASKO = function(){
+	const rbpData = this.getRBP();
+	console.log(rbpData);
+	this.addInsurance(rbpData, "insurance_kasko");
+}
+VehicleDialog_View.prototype.cmdAddOnRBPOSAGO = function(){
+	const rbpData = this.getRBP();
+	console.log(rbpData);
+	this.addInsurance(rbpData, "insurance_osago");
 }

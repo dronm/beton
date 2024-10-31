@@ -16,6 +16,7 @@
 <li><a href="#AstCall_Controller">AstCall_Controller</a></li>
 <li><a href="#Attachment_Controller">Attachment_Controller</a></li>
 <li><a href="#Bank_Controller">Bank_Controller</a></li>
+<li><a href="#BuhRBP1c_Controller">BuhRBP1c_Controller</a></li>
 <li><a href="#Caller_Controller">Caller_Controller</a></li>
 <li><a href="#Captcha_Controller">Captcha_Controller</a></li>
 <li><a href="#CementSilo_Controller">CementSilo_Controller</a></li>
@@ -478,6 +479,7 @@
 <li><a href="#QualityPassport_Model">QualityPassport_Model</a></li>
 <li><a href="#QualityPassportList_Model">QualityPassportList_Model</a></li>
 <li><a href="#Client1cList_Model">Client1cList_Model</a></li>
+<li><a href="#BuhRBP1cList_Model">BuhRBP1cList_Model</a></li>
 <li><a href="#Firm1c_Model">Firm1c_Model</a></li>
 <li><a href="#Firm1cList_Model">Firm1cList_Model</a></li>
 <li><a href="#ClientDebt_Model">ClientDebt_Model</a></li>
@@ -793,6 +795,15 @@
 <a href="#BankList_Model">Model: BankList_Model</a>
 </div>
 </div>
+<div id="BuhRBP1c_Controller" class="content_box">
+<h1>BuhRBP1c_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>complete</h2>
+<a href="#BuhRBP1cList_Model">Model: BuhRBP1cList_Model</a>
+</div>
+</div>
 <div id="Caller_Controller" class="content_box">
 <h1>Caller_Controller</h1>
 <div class="content_item">
@@ -1001,7 +1012,18 @@
 <p class="big"></p>
 <p>Методы:</p>
 <h2>complete</h2>
-<a href="#Client1cList_Model">Model: Client1cList_Model</a>
+<a href="#Client1cList_Model">Model: Client1cList_Model</a><h2>get_leasor_on_pp</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>pp_num</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Нет</p>
+<p>Length:20</p>
+</div>
+</div>
 </div>
 </div>
 <div id="ClientComeFrom_Controller" class="content_box">
@@ -5922,6 +5944,42 @@
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:31</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="BuhRBP1cList_Model" class="content_box">
+<h1>BuhRBP1cList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>name</h2>
+<div>Type:Text</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_from</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_to</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>total</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>search</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
 <div>Precision:</div>
 </div>
 </div>
