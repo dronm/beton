@@ -16,20 +16,17 @@
  * @param {Object} options
  */
 
-function Driver_Model(options){
-	var id = 'Driver_Model';
+function VehicleMileage_Model(options){
+	var id = 'VehicleMileage_Model';
 	options = options || {};
 	
 	options.fields = {};
 	
-			
-				
-			
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = true;	
-	filed_options.alias = 'Код';
+	
 	filed_options.autoInc = true;	
 	
 	options.fields.id = new FieldInt("id",filed_options);
@@ -38,43 +35,41 @@ function Driver_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Наименование';
+	filed_options.alias = 'ТС';
 	filed_options.autoInc = false;	
 	
-	options.fields.name = new FieldString("name",filed_options);
-	options.fields.name.getValidator().setRequired(true);
-	options.fields.name.getValidator().setMaxLength('50');
+	options.fields.vehicle_id = new FieldInt("vehicle_id",filed_options);
+	options.fields.vehicle_id.getValidator().setRequired(true);
 	
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Водительское удостоверение';
+	filed_options.alias = 'Дата';
 	filed_options.autoInc = false;	
 	
-	options.fields.driver_licence = new FieldText("driver_licence",filed_options);
+	options.fields.for_date = new FieldDateTimeTZ("for_date",filed_options);
 	
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Класс водительского удостоверения';
+	filed_options.alias = 'Пробег';
 	filed_options.autoInc = false;	
 	
-	options.fields.driver_licence_class = new FieldString("driver_licence_class",filed_options);
-	options.fields.driver_licence_class.getValidator().setMaxLength('10');
+	options.fields.mileage = new FieldInt("mileage",filed_options);
 	
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Официально устроен';
+	filed_options.alias = 'Who set value';
 	filed_options.autoInc = false;	
 	
-	options.fields.employed = new FieldBool("employed",filed_options);
+	options.fields.user_id = new FieldInt("user_id",filed_options);
 	
 			
-		Driver_Model.superclass.constructor.call(this,id,options);
+		VehicleMileage_Model.superclass.constructor.call(this,id,options);
 }
-extend(Driver_Model,ModelXML);
+extend(VehicleMileage_Model,ModelXML);
 

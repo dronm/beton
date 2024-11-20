@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
  
 class Driver_Model extends ModelSQLBeton{
@@ -64,6 +65,16 @@ class Driver_Model extends ModelSQLBeton{
 						
 		$f_driver_licence_class=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"driver_licence_class",$f_opts);
 		$this->addField($f_driver_licence_class);
+		//********************
+		
+		//*** Field employed ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Официально устроен';
+		$f_opts['id']="employed";
+						
+		$f_employed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"employed",$f_opts);
+		$this->addField($f_employed);
 		//********************
 	
 		$order = new ModelOrderSQL();		

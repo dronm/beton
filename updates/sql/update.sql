@@ -31157,3 +31157,2050 @@ ALTER FUNCTION public.vehicle_list_report(in_date_from date, in_date_to date, in
 			descr='Отчет по спику ТС (страховки, лизинг)',
 			limited=FALSE
 		WHERE id='50024';
+	
+
+-- ******************* update 02/11/2024 11:55:09 ******************
+﻿-- Function: passport_print(in_shipment_id int, in_all bool)
+
+-- DROP FUNCTION passport_print(in_shipment_id int, in_all bool);
+
+CREATE OR REPLACE FUNCTION passport_print(in_shipment_id int, in_all bool)
+  RETURNS table(
+  	nomer text,
+  	client text,
+  	smes text,
+  	uklad text,
+  	smes_num text,
+  	obiem text,
+  	vremia_otpravki text,
+	klass_prochnosti text,
+	drugie_pokazateli_kach text,
+	sohran_udobouklad text,
+	kf_prochnosti text,
+	prochnost text,
+	naim_dobavki text,
+	aeff text,
+	krupnost text,
+	vidan text,
+	reg_nomer_dekl text
+  ) AS
+$BODY$
+BEGIN
+	IF in_all THEN
+		-- all shipments
+		RETURN QUERY
+		WITH
+		sh_orders AS (SELECT t.order_id AS id FROM shipments AS t WHERE t.id = in_shipment_id)
+		
+		SELECT
+			--o.number order_num(o.*)
+			'Документ о качестве бетонной смеси заданного качества партии № '||
+				(SELECT 
+				CASE WHEN EXTRACT(DAY FROM o.date_time)<10 THEN
+					'0' || EXTRACT(DAY FROM o.date_time)::varchar || '-' || trim(to_char(o.number,'000'))
+				ELSE
+					EXTRACT(DAY FROM o.date_time)::varchar || '-' || trim(to_char(o.number,'000'))
+				END)
+			AS nomer,
+			coalesce(cl.name_full, cl.name) AS client,
+			
+			CASE
+				WHEN upper(substring(ct.name, 1,2)) = 'ПБ' THEN
+					FORMAT('БСМ %s %s',
+						CASE
+							WHEN position('(' in official_name)>0 THEN
+								substring(ct.official_name, 1, position('(' in ct.official_name)-1)
+							ELSE ct.official_name
+						END,
+						pas.vid_smesi_gost::text					
+					)					
+				ELSE
+					FORMAT('БСТ %s F%sW%s %s',
+						--ct.official_name::text,
+						CASE
+							WHEN position('(' in official_name)>0 THEN
+								substring(ct.official_name, 1, position('(' in ct.official_name)-1)
+							ELSE ct.official_name
+						END,
+						pas.f_val::text, pas.w_val::text, pas.vid_smesi_gost::text					
+					)
+			END AS smes,
+			
+			pas.uklad AS uklad,
+			
+			--ID подбора/порядковый номер материала в подбре
+			pas.smes_num AS smes_num,
+			
+			REPLACE(sum(sh.quant)::text, '.', ',') || ' м3' AS obiem,
+			to_char(o.date_time, 'dd/mm/yy') || (
+				SELECT
+					to_char(min(t.ship_date_time), 'HH24:MI')|| ' - ' ||to_char(max(t.ship_date_time), 'HH24:MI')
+				FROM shipments AS t
+				WHERE t.order_id = (SELECT id FROM sh_orders)
+			) AS vremia_otpravki,
+			ct.official_name::text AS klass_prochnosti,
+			FORMAT('F%sW%s', pas.f_val::text, pas.w_val::text) AS drugie_pokazateli_kach,
+			pas.sohran_udobouklad AS sohran_udobouklad,
+			pas.kf_prochnosti AS kf_prochnosti,
+			pas.prochnost::text AS prochnost,
+			pas.naim_dobavki AS naim_dobavki,
+			pas.aeff AS aeff,
+			pas.krupnost::text AS krupnost,
+			to_char(o.date_time, 'dd/mm/yyyy') AS vidan,
+			pas.reg_nomer_dekl::text AS reg_nomer_dekl
+			
+		FROM shipments AS sh
+		LEFT JOIN orders AS o ON o.id = sh.order_id
+		LEFT JOIN clients AS cl ON cl.id = o.client_id
+		LEFT JOIN concrete_types AS ct ON ct.id = o.concrete_type_id
+		LEFT JOIN quality_passports AS pas ON pas.shipment_id = in_shipment_id
+		WHERE sh.order_id = (SELECT id FROM sh_orders)
+		GROUP BY
+			cl.name_full, cl.name,
+			o.date_time,
+			o.number,
+			ct.official_name,
+			pas.uklad,
+			pas.f_val,pas.w_val,
+			pas.vid_smesi_gost,
+			pas.sohran_udobouklad,
+			pas.kf_prochnosti,
+			pas.prochnost,
+			pas.naim_dobavki,
+			pas.aeff,
+			pas.krupnost,
+			pas.reg_nomer_dekl,
+			pas.id,
+			ct.name		
+		;
+	ELSE
+		-- one shipment
+		RETURN QUERY
+		WITH
+		ship_num AS (
+			SELECT
+				ROW_NUMBER() OVER() AS num,
+				sh.id
+			FROM shipments AS sh
+			WHERE sh.order_id = (SELECT sh_t.order_id FROM shipments AS sh_t WHERE sh_t.id = in_shipment_id)
+			ORDER BY sh.ship_date_time		
+		)
+		SELECT
+			--o.number/shipment порядковый номер отрузки
+			'Документ о качестве бетонной смеси заданного качества партии № '||
+				(SELECT 
+				CASE WHEN EXTRACT(DAY FROM o.date_time)<10 THEN
+					'0' || EXTRACT(DAY FROM o.date_time)::varchar || '-' || trim(to_char(o.number,'000'))
+				ELSE
+					EXTRACT(DAY FROM o.date_time)::varchar || '-' || trim(to_char(o.number,'000'))
+				END) ||'/'|| (SELECT ship_num.num::text FROM ship_num WHERE ship_num.id = in_shipment_id)			
+			AS nomer,
+			
+			coalesce(cl.name_full, cl.name) AS client,
+			
+			CASE
+				WHEN upper(substring(ct.name, 1,2)) = 'ПБ' THEN
+					FORMAT('БСМ %s %s',
+						CASE
+							WHEN position('(' in official_name)>0 THEN
+								substring(ct.official_name, 1, position('(' in ct.official_name)-1)
+							ELSE ct.official_name
+						END,
+						pas.vid_smesi_gost::text					
+					)
+				ELSE
+					-- убрать то, что в скобках
+					FORMAT('БСТ %s F%sW%s %s',
+						--ct.official_name::text,
+						CASE
+							WHEN position('(' in official_name)>0 THEN
+								substring(ct.official_name, 1, position('(' in ct.official_name)-1)
+							ELSE ct.official_name
+						END,
+						pas.f_val::text, pas.w_val::text, pas.vid_smesi_gost::text					
+					)
+			END AS smes,
+			
+			pas.uklad AS uklad,
+			
+			--ID подбора/порядковый номер материала в подбре
+			pas.smes_num AS smes_num,
+			
+			REPLACE(sh.quant::text, '.', ',') || ' м3' AS obiem,
+			to_char(sh.ship_date_time, 'dd/mm/yy HH24:MI') vremia_otpravki,
+			ct.official_name::text AS klass_prochnosti,
+			FORMAT('F%sW%s', pas.f_val::text, pas.w_val::text) AS drugie_pokazateli_kach,
+			pas.sohran_udobouklad AS sohran_udobouklad,
+			pas.kf_prochnosti AS kf_prochnosti,
+			pas.prochnost::text AS prochnost,
+			pas.naim_dobavki AS naim_dobavki,
+			pas.aeff AS aeff,
+			pas.krupnost::text AS krupnost,
+			to_char(sh.date_time, 'dd/mm/yyyy') AS vidan,
+			pas.reg_nomer_dekl::text AS reg_nomer_dekl
+			
+		FROM shipments AS sh
+		LEFT JOIN orders AS o ON o.id = sh.order_id
+		LEFT JOIN clients AS cl ON cl.id = o.client_id
+		LEFT JOIN concrete_types AS ct ON ct.id = o.concrete_type_id
+		LEFT JOIN quality_passports AS pas ON pas.shipment_id = sh.id
+		WHERE sh.id = in_shipment_id;
+	END IF;		
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION passport_print(in_shipment_id int, in_all bool) OWNER TO concrete1;
+
+
+-- ******************* update 02/11/2024 12:04:24 ******************
+﻿-- Function: quality_passports_smes_num(in_concrete_type_id int, in_shipment_id int)
+
+-- DROP FUNCTION quality_passports_smes_num(in_concrete_type_id int, in_shipment_id int);
+
+CREATE OR REPLACE FUNCTION quality_passports_smes_num(in_concrete_type_id int, in_shipment_id int)
+  RETURNS text AS
+$$
+	WITH
+	sh_data AS (
+		SELECT
+			sh.production_site_id,
+			sh.date_time
+		FROM shipments AS sh
+		WHERE sh.id = in_shipment_id
+	),
+	podbor AS (
+		SELECT
+			rt_h.id,
+			rt_h.code
+		FROM raw_material_cons_rate_dates AS rt_h
+		WHERE
+			--CONCRETE!!!
+			--rt_h.production_site_id = (SELECT production_site_id FROM sh_data)
+			--AND 
+			rt_h.dt + const_first_shift_start_time_val() < (SELECT date_time FROM sh_data)
+		ORDER BY rt_h.dt DESC
+		LIMIT 1
+	)
+	SELECT podbor.code::text FROM podbor;	
+$$
+  LANGUAGE sql STABLE
+  COST 100;
+ALTER FUNCTION quality_passports_smes_num(in_concrete_type_id int, in_shipment_id int) OWNER TO concrete1;
+
+
+-- ******************* update 19/11/2024 06:19:22 ******************
+
+		ALTER TABLE public.drivers ADD COLUMN employed bool;
+
+
+
+-- ******************* update 19/11/2024 06:20:47 ******************
+-- View: drivers_list
+
+-- DROP VIEW drivers_list;
+
+CREATE OR REPLACE VIEW drivers_list AS 
+	SELECT
+	 	dr.id,
+	 	dr.name,
+	 	dr.driver_licence,
+	 	dr.driver_licence_class,
+		(SELECT
+			json_agg(
+				json_build_object(
+					'name', ct.name,
+					'tel', ct.tel,
+					'tel_ext', ct.tel_ext,
+					'email', ct.email,
+					'post', p.name
+				)
+			)
+		FROM entity_contacts AS en
+		LEFT JOIN contacts AS ct ON ct.id = en.contact_id
+		LEFT JOIN posts AS p ON p.id = ct.post_id
+		WHERE en.entity_type = 'drivers' AND en.entity_id = dr.id
+		) AS contact_list,
+		
+		(SELECT
+			array_agg(en.contact_id)
+		FROM entity_contacts AS en
+		WHERE en.entity_type = 'drivers' AND en.entity_id = dr.id
+		) AS contact_ids,
+		
+		dr.employed
+		
+	 	
+ 	FROM drivers AS dr
+	ORDER BY dr.name;
+
+ALTER TABLE drivers_list OWNER TO beton;
+
+
+
+-- ******************* update 19/11/2024 06:50:29 ******************
+
+	-- ********** Adding new table from model **********
+	CREATE TABLE public.vehicle_mileages
+	(vehicle_id int NOT NULL REFERENCES vehicles(id),for_date timestampTZ,mileage int,CONSTRAINT vehicle_mileages_pkey PRIMARY KEY (vehicle_id)
+	);
+	ALTER TABLE public.vehicle_mileages OWNER TO beton;
+
+
+
+-- ******************* update 19/11/2024 07:19:59 ******************
+
+		ALTER TABLE public.vehicle_mileages ADD COLUMN user_id int NOT NULL REFERENCES users(id);
+
+
+
+-- ******************* update 19/11/2024 07:51:01 ******************
+-- View: vehicle_mileages_list
+
+-- DROP VIEW vehicle_mileages_list;
+
+CREATE OR REPLACE VIEW vehicle_mileages_list AS 
+	SELECT
+	 	ml.vehicle_id,
+	 	ml.for_date,
+	 	ml.mileage,
+	 	users_ref(users) as users_ref
+ 	FROM vehicle_mileages AS ml
+ 	left join users on users.id = ml.user_id
+	ORDER BY
+		ml.vehicle_id,
+		ml.for_date desc;
+
+ALTER TABLE vehicle_mileages_list OWNER TO beton;
+
+
+
+-- ******************* update 19/11/2024 08:07:33 ******************
+drop table vehicle_mileages cascade;
+
+	-- ********** Adding new table from model **********
+	CREATE TABLE public.vehicle_mileages
+	(id serial NOT NULL,vehicle_id int NOT NULL REFERENCES vehicles(id),for_date timestampTZ,mileage int,user_id int NOT NULL REFERENCES users(id),CONSTRAINT vehicle_mileages_pkey PRIMARY KEY (id)
+	);
+	
+	CREATE UNIQUE INDEX vehicle_mileages_idx
+	ON vehicle_mileages(vehicle_id,for_date);
+	ALTER TABLE public.vehicle_mileages OWNER TO beton;
+
+
+
+-- ******************* update 19/11/2024 08:07:48 ******************
+-- View: vehicle_mileages_list
+
+-- DROP VIEW vehicle_mileages_list;
+
+CREATE OR REPLACE VIEW vehicle_mileages_list AS 
+	SELECT
+		ml.id,
+	 	ml.vehicle_id,
+	 	ml.for_date,
+	 	ml.mileage,
+	 	users_ref(users) as users_ref
+ 	FROM vehicle_mileages AS ml
+ 	left join users on users.id = ml.user_id
+	ORDER BY
+		ml.vehicle_id,
+		ml.for_date desc;
+
+ALTER TABLE vehicle_mileages_list OWNER TO beton;
+
+
+
+-- ******************* update 20/11/2024 07:57:54 ******************
+-- Function: public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ);
+
+-- DROP FUNCTION public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ);
+
+CREATE OR REPLACE FUNCTION public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ)
+  RETURNS TABLE(
+  	car_id varchar(15),
+  	mileage_km numeric
+  ) AS
+$BODY$
+	WITH sorted_data AS (
+	    SELECT
+		car_id,
+		period,
+		ST_SetSRID(ST_MakePoint(lon, lat), 4326) AS geom,
+		LEAD( ST_SetSRID(ST_MakePoint(lon, lat), 4326) ) OVER (
+		    PARTITION BY car_id ORDER BY period
+		) AS next_geom
+	    FROM
+		public.car_tracking
+	    WHERE
+	    	(COALESCE(in_car_id, '') = '' OR in_car_id = car_id)
+	    	AND gps_valid = 1
+	    	AND speed > 0
+	    	AND period BETWEEN (in_date_from at time zone 'UTC') AND in_date_to at time zone 'UTC'
+	),
+	distances AS (
+	    SELECT
+		car_id,
+		period,
+		ST_Distance(geom::geography, next_geom::geography) AS mileage
+	    FROM
+		sorted_data
+	    WHERE
+		next_geom IS NOT NULL
+	)
+	SELECT
+	    car_id,
+	    SUM(mileage) / 1000 AS mileage_km -- Convert meters to kilometers
+	FROM
+	    distances
+	GROUP BY
+	    car_id
+	ORDER BY
+	    car_id;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ)
+  OWNER TO beton;
+
+
+
+-- ******************* update 20/11/2024 07:58:06 ******************
+-- Function: public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ);
+
+-- DROP FUNCTION public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ);
+
+CREATE OR REPLACE FUNCTION public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ)
+  RETURNS TABLE(
+  	car_id varchar(15),
+  	mileage_km numeric
+  ) AS
+$BODY$
+	WITH sorted_data AS (
+	    SELECT
+		car_id,
+		period,
+		ST_SetSRID(ST_MakePoint(lon, lat), 4326) AS geom,
+		LEAD( ST_SetSRID(ST_MakePoint(lon, lat), 4326) ) OVER (
+		    PARTITION BY car_id ORDER BY period
+		) AS next_geom
+	    FROM
+		public.car_tracking
+	    WHERE
+	    	(COALESCE(in_car_id, '') = '' OR in_car_id = car_id)
+	    	AND gps_valid = 1
+	    	AND speed > 0
+	    	AND period BETWEEN (in_date_from at time zone 'UTC') AND (in_date_to at time zone 'UTC')
+	),
+	distances AS (
+	    SELECT
+		car_id,
+		period,
+		ST_Distance(geom::geography, next_geom::geography) AS mileage
+	    FROM
+		sorted_data
+	    WHERE
+		next_geom IS NOT NULL
+	)
+	SELECT
+	    car_id,
+	    SUM(mileage) / 1000 AS mileage_km -- Convert meters to kilometers
+	FROM
+	    distances
+	GROUP BY
+	    car_id
+	ORDER BY
+	    car_id;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ)
+  OWNER TO beton;
+
+
+
+-- ******************* update 20/11/2024 07:58:06 ******************
+-- Function: public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ);
+
+-- DROP FUNCTION public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ);
+
+CREATE OR REPLACE FUNCTION public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ)
+  RETURNS TABLE(
+  	car_id varchar(15),
+  	mileage_km numeric
+  ) AS
+$BODY$
+	WITH sorted_data AS (
+	    SELECT
+		car_id,
+		period,
+		ST_SetSRID(ST_MakePoint(lon, lat), 4326) AS geom,
+		LEAD( ST_SetSRID(ST_MakePoint(lon, lat), 4326) ) OVER (
+		    PARTITION BY car_id ORDER BY period
+		) AS next_geom
+	    FROM
+		public.car_tracking
+	    WHERE
+	    	(COALESCE(in_car_id, '') = '' OR in_car_id = car_id)
+	    	AND gps_valid = 1
+	    	AND speed > 0
+	    	AND period BETWEEN (in_date_from at time zone 'UTC') AND (in_date_to at time zone 'UTC')
+	),
+	distances AS (
+	    SELECT
+		car_id,
+		period,
+		ST_Distance(geom::geography, next_geom::geography) AS mileage
+	    FROM
+		sorted_data
+	    WHERE
+		next_geom IS NOT NULL
+	)
+	SELECT
+	    car_id,
+	    SUM(mileage) / 1000 AS mileage_km -- Convert meters to kilometers
+	FROM
+	    distances
+	GROUP BY
+	    car_id
+	ORDER BY
+	    car_id;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ)
+  OWNER TO beton;
+
+
+
+-- ******************* update 20/11/2024 09:20:02 ******************
+
+-- DROP FUNCTION update_vehicle_mileage()
+/*
+CREATE OR REPLACE FUNCTION update_vehicle_mileage()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD;
+    current_time TIMESTAMPTZ := now(); -- Current timestamp
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Loop through each vehicle's last mileage entry
+    FOR vehicle IN
+        SELECT
+        	ml.vehicle_id,
+        	ml.for_date,
+        	ml.mileage,
+        	veh.tracker_id
+        FROM vehicle_mileage AS ml
+        LEFT JOIN vehicles AS veh ON veh.id = ml.vehicle_id
+        WHERE (ml.vehicle_id, ml.for_date) IN (
+            SELECT
+            	ml.vehicle_id,
+            	MAX(ml.for_date)
+            FROM vehicle_mileage
+            GROUP BY ml.vehicle_id
+        )
+    LOOP
+        start_time := vehicle.for_date; -- Start from the last recorded mileage
+        WHILE start_time + INTERVAL '1 day' <= current_time DO
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Call the mileage calculation function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.tracker_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update mileage for the next iteration
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time; -- Move to the next day
+        END WHILE;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+*/
+
+CREATE OR REPLACE FUNCTION update_vehicle_mileage()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD;
+    current_time TIMESTAMPTZ := now(); -- Current timestamp
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Loop through each vehicle's last mileage entry
+    FOR vehicle IN
+        SELECT vehicle_id, for_date, mileage
+        FROM vehicle_mileage
+        WHERE (vehicle_id, for_date) IN (
+            SELECT vehicle_id, MAX(for_date)
+            FROM vehicle_mileage
+            GROUP BY vehicle_id
+        )
+    LOOP
+        start_time := vehicle.for_date; -- Start from the last recorded mileage
+        WHILE start_time + INTERVAL '1 day' <= current_time LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Call the mileage calculation function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.vehicle_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update mileage for the next iteration
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time; -- Move to the next day
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:20:33 ******************
+
+-- DROP FUNCTION update_vehicle_mileage()
+/*
+CREATE OR REPLACE FUNCTION update_vehicle_mileage()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD;
+    current_time TIMESTAMPTZ := now(); -- Current timestamp
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Loop through each vehicle's last mileage entry
+    FOR vehicle IN
+        SELECT
+        	ml.vehicle_id,
+        	ml.for_date,
+        	ml.mileage,
+        	veh.tracker_id
+        FROM vehicle_mileage AS ml
+        LEFT JOIN vehicles AS veh ON veh.id = ml.vehicle_id
+        WHERE (ml.vehicle_id, ml.for_date) IN (
+            SELECT
+            	ml.vehicle_id,
+            	MAX(ml.for_date)
+            FROM vehicle_mileage
+            GROUP BY ml.vehicle_id
+        )
+    LOOP
+        start_time := vehicle.for_date; -- Start from the last recorded mileage
+        WHILE start_time + INTERVAL '1 day' <= current_time DO
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Call the mileage calculation function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.tracker_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update mileage for the next iteration
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time; -- Move to the next day
+        END WHILE;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+*/
+
+CREATE OR REPLACE FUNCTION update_vehicle_mileage()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD;
+    current_time TIMESTAMPTZ := now(); -- Current timestamp
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Loop through each vehicle's last mileage entry
+    FOR vehicle IN
+        SELECT
+        	ml.vehicle_id,
+        	ml.for_date,
+        	ml.mileage,
+        	veh.tracker_id
+        FROM vehicle_mileage AS ml
+        LEFT JOIN vehicles AS veh ON veh.id = ml.vehicle_id
+        WHERE (ml.vehicle_id, ml.for_date) IN (
+            SELECT
+            	ml.vehicle_id,
+            	MAX(ml.for_date)
+            FROM vehicle_mileage
+            GROUP BY ml.vehicle_id
+        )
+    LOOP
+        start_time := vehicle.for_date; -- Start from the last recorded mileage
+        WHILE start_time + INTERVAL '1 day' <= current_time LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Call the mileage calculation function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.tracker_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update mileage for the next iteration
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time; -- Move to the next day
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:22:16 ******************
+
+-- DROP FUNCTION update_vehicle_mileage()
+/*
+CREATE OR REPLACE FUNCTION update_vehicle_mileage()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD;
+    current_time TIMESTAMPTZ := now(); -- Current timestamp
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Loop through each vehicle's last mileage entry
+    FOR vehicle IN
+        SELECT
+        	ml.vehicle_id,
+        	ml.for_date,
+        	ml.mileage,
+        	veh.tracker_id
+        FROM vehicle_mileage AS ml
+        LEFT JOIN vehicles AS veh ON veh.id = ml.vehicle_id
+        WHERE (ml.vehicle_id, ml.for_date) IN (
+            SELECT
+            	ml.vehicle_id,
+            	MAX(ml.for_date)
+            FROM vehicle_mileage
+            GROUP BY ml.vehicle_id
+        )
+    LOOP
+        start_time := vehicle.for_date; -- Start from the last recorded mileage
+        WHILE start_time + INTERVAL '1 day' <= current_time DO
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Call the mileage calculation function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.tracker_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update mileage for the next iteration
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time; -- Move to the next day
+        END WHILE;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+*/
+
+CREATE OR REPLACE FUNCTION update_vehicle_mileage()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD;
+    current_time TIMESTAMPTZ := now(); -- Current timestamp
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Loop through each vehicle's last mileage entry
+    FOR vehicle IN
+        SELECT
+        	ml.vehicle_id,
+        	ml.for_date,
+        	ml.mileage,
+        	veh.tracker_id
+        FROM vehicle_mileage AS ml
+        LEFT JOIN vehicles AS veh ON veh.id = ml.vehicle_id
+        WHERE (ml.vehicle_id, ml.for_date) IN (
+            SELECT
+            	ml.vehicle_id,
+            	MAX(ml.for_date)
+            FROM vehicle_mileage
+            GROUP BY ml.vehicle_id
+        )
+    LOOP
+        start_time := vehicle.for_date; -- Start from the last recorded mileage
+        WHILE start_time + INTERVAL '1 day' <= current_time LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Call the mileage calculation function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.tracker_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update mileage for the next iteration
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time; -- Move to the next day
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:26:01 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD;
+    current_time TIMESTAMPTZ := now(); -- Current timestamp
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Loop through each vehicle's last mileage entry
+    FOR vehicle IN
+        SELECT
+        	ml.vehicle_id,
+        	ml.for_date,
+        	ml.mileage,
+        	veh.tracker_id
+        FROM vehicle_mileage AS ml
+        LEFT JOIN vehicles AS veh ON veh.id = ml.vehicle_id
+        WHERE (ml.vehicle_id, ml.for_date) IN (
+            SELECT
+            	ml.vehicle_id,
+            	MAX(ml.for_date)
+            FROM vehicle_mileage
+            GROUP BY ml.vehicle_id
+        )
+    LOOP
+        start_time := vehicle.for_date; -- Start from the last recorded mileage
+        WHILE start_time + INTERVAL '1 day' <= current_time LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Call the mileage calculation function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.tracker_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update mileage for the next iteration
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time; -- Move to the next day
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:26:36 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD;
+    current_time TIMESTAMPTZ := now(); -- Current timestamp
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Loop through each vehicle's last mileage entry
+    FOR vehicle IN
+        SELECT
+        	ml.vehicle_id,
+        	ml.for_date,
+        	ml.mileage,
+        	veh.tracker_id
+        FROM vehicle_mileages AS ml
+        LEFT JOIN vehicles AS veh ON veh.id = ml.vehicle_id
+        WHERE (ml.vehicle_id, ml.for_date) IN (
+            SELECT
+            	ml.vehicle_id,
+            	MAX(ml.for_date)
+            FROM vehicle_mileages
+            GROUP BY ml.vehicle_id
+        )
+    LOOP
+        start_time := vehicle.for_date; -- Start from the last recorded mileage
+        WHILE start_time + INTERVAL '1 day' <= current_time LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Call the mileage calculation function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.tracker_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update mileage for the next iteration
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time; -- Move to the next day
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:27:26 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD;
+    current_time TIMESTAMPTZ := now(); -- Current timestamp
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Loop through each vehicle's last mileage entry
+    FOR vehicle IN
+        SELECT
+        	ml.vehicle_id,
+        	ml.for_date,
+        	ml.mileage
+        	--veh.tracker_id
+        FROM vehicle_mileages AS ml
+        --LEFT JOIN vehicles AS veh ON veh.id = ml.vehicle_id
+        WHERE (ml.vehicle_id, ml.for_date) IN (
+            SELECT
+            	ml.vehicle_id,
+            	MAX(ml.for_date)
+            FROM vehicle_mileages
+            GROUP BY ml.vehicle_id
+        )
+    LOOP
+        start_time := vehicle.for_date; -- Start from the last recorded mileage
+        WHILE start_time + INTERVAL '1 day' <= current_time LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Call the mileage calculation function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.vehicle_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update mileage for the next iteration
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time; -- Move to the next day
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:34:59 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+
+CREATE OR REPLACE FUNCTION update_vehicle_mileage()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    current_time TIMESTAMPTZ := now(); -- Current timestamp
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileage
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            vm.mileage
+        FROM vehicle_mileage vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+
+        -- Process mileage for each day until the current time
+        WHILE start_time + INTERVAL '1 day' <= current_time LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.vehicle_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:35:19 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+DROP FUNCTION update_vehicle_mileage();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    current_time TIMESTAMPTZ := now(); -- Current timestamp
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileage
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            vm.mileage
+        FROM vehicle_mileage vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+
+        -- Process mileage for each day until the current time
+        WHILE start_time + INTERVAL '1 day' <= current_time LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.vehicle_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:35:51 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+DROP FUNCTION vehicle_mileages_update();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    current_time TIMESTAMPTZ := now(); -- Current timestamp
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileages
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            vm.mileage
+        FROM vehicle_mileages vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+
+        -- Process mileage for each day until the current time
+        WHILE start_time + INTERVAL '1 day' <= current_time LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.vehicle_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:36:42 ******************
+-- Function: public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ);
+
+-- DROP FUNCTION public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ);
+
+CREATE OR REPLACE FUNCTION public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ)
+  RETURNS TABLE(
+  	car_id varchar(15),
+  	mileage_km numeric
+  ) AS
+$BODY$
+	WITH sorted_data AS (
+	    SELECT
+		car_id,
+		period,
+		ST_SetSRID(ST_MakePoint(lon, lat), 4326) AS geom,
+		LEAD( ST_SetSRID(ST_MakePoint(lon, lat), 4326) ) OVER (
+		    PARTITION BY car_id ORDER BY period
+		) AS next_geom
+	    FROM
+		public.car_tracking
+	    WHERE
+	    	(COALESCE(in_car_id, '') = '' OR in_car_id = car_id)
+	    	AND gps_valid = 1
+	    	AND speed > 0
+	    	AND period BETWEEN (in_date_from at time zone 'UTC') AND (in_date_to at time zone 'UTC')
+	),
+	distances AS (
+	    SELECT
+		car_id,
+		period,
+		ST_Distance(geom::geography, next_geom::geography) AS mileage
+	    FROM
+		sorted_data
+	    WHERE
+		next_geom IS NOT NULL
+	)
+	SELECT
+	    car_id,
+	    SUM(mileage) / 1000 AS mileage_km -- Convert meters to kilometers
+	FROM
+	    distances
+	GROUP BY
+	    car_id
+	ORDER BY
+	    car_id;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ)
+  OWNER TO beton;
+
+
+
+-- ******************* update 20/11/2024 09:36:44 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+--DROP FUNCTION vehicle_mileages_update();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    current_time TIMESTAMPTZ := now(); -- Current timestamp
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileages
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            vm.mileage
+        FROM vehicle_mileages vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+
+        -- Process mileage for each day until the current time
+        WHILE start_time + INTERVAL '1 day' <= current_time LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.vehicle_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:37:45 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+--DROP FUNCTION vehicle_mileages_update();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    current_time TIMESTAMPTZ := now(); -- Current timestamp
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileages
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            vm.mileage
+        FROM vehicle_mileages vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+
+        -- Process mileage for each day until the current time
+        WHILE (start_time + INTERVAL '1 day') <= current_time LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.vehicle_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:40:29 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+--DROP FUNCTION vehicle_mileages_update();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    current_time TIMESTAMPTZ := now(); -- Current timestamp
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileages
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            vm.mileage
+        FROM vehicle_mileages vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+raise notice 'start_time=%, vehicle.vehicle_id=%', start_time, vehicle.vehicle_id;
+
+        -- Process mileage for each day until the current time
+        WHILE (start_time + INTERVAL '1 day') <= current_time LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.vehicle_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:40:58 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+--DROP FUNCTION vehicle_mileages_update();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    current_time TIMESTAMPTZ := now(); -- Current timestamp
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileages
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            vm.mileage
+        FROM vehicle_mileages vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+raise notice 'start_time=%, vehicle.vehicle_id=%, current_time=%', start_time, vehicle.vehicle_id, current_time;
+
+        -- Process mileage for each day until the current time
+        WHILE (start_time + INTERVAL '1 day') <= current_time LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.vehicle_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:41:40 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+--DROP FUNCTION vehicle_mileages_update();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileages
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            vm.mileage
+        FROM vehicle_mileages vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+raise notice 'start_time=%, vehicle.vehicle_id=%, current_time=%', start_time, vehicle.vehicle_id, current_time;
+
+        -- Process mileage for each day until the current time
+        WHILE (start_time + INTERVAL '1 day') <= now() LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.vehicle_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:42:43 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+--DROP FUNCTION vehicle_mileages_update();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileages
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            vm.mileage,
+            veh.tracker_id
+        FROM vehicle_mileages vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+        LEFT JOIN vehicles AS veh ON veh.id = vm.vehicle_id
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+
+        -- Process mileage for each day until the current time
+        WHILE (start_time + INTERVAL '1 day') <= now() LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := vehicle_tracking_mileage(
+                vehicle.tracker_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:43:32 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+--DROP FUNCTION vehicle_mileages_update();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileages
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            vm.mileage,
+            veh.tracker_id
+        FROM vehicle_mileages vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+        LEFT JOIN vehicles AS veh ON veh.id = vm.vehicle_id
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+
+        -- Process mileage for each day until the current time
+        WHILE (start_time + INTERVAL '1 day') <= now() LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := car_tracking_mileage(
+                vehicle.tracker_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            );
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:48:18 ******************
+-- Function: public.vehicle_mileage(in_vehicle_tracker varchar(15), in_date_from timestampTZ, in_date_to timestampTZ);
+
+-- DROP FUNCTION public.vehicle_mileage(in_vehicle_tracker varchar(15), in_date_from timestampTZ, in_date_to timestampTZ);
+
+CREATE OR REPLACE FUNCTION public.vehicle_mileage(in_vehicle_tracker varchar(15), in_date_from timestampTZ, in_date_to timestampTZ)
+  RETURNS numeric AS
+$BODY$
+	WITH sorted_data AS (
+	    SELECT
+		car_id,
+		period,
+		ST_SetSRID(ST_MakePoint(lon, lat), 4326) AS geom,
+		LEAD( ST_SetSRID(ST_MakePoint(lon, lat), 4326) ) OVER (
+		    PARTITION BY car_id ORDER BY period
+		) AS next_geom
+	    FROM
+		public.car_tracking
+	    WHERE
+	    	car_id = in_vehicle_tracker
+	    	AND gps_valid = 1
+	    	AND speed > 0
+	    	AND period BETWEEN (in_date_from at time zone 'UTC') AND (in_date_to at time zone 'UTC')
+	),
+	distances AS (
+	    SELECT
+		car_id,
+		period,
+		ST_Distance(geom::geography, next_geom::geography) AS mileage
+	    FROM
+		sorted_data
+	    WHERE
+		next_geom IS NOT NULL
+	)
+	SELECT
+	    SUM(mileage) / 1000 AS mileage_km -- Convert meters to kilometers
+	FROM distances;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION public.vehicle_mileage(in_vehicle_tracker varchar(15), in_date_from timestampTZ, in_date_to timestampTZ)
+  OWNER TO beton;
+
+
+
+-- ******************* update 20/11/2024 09:48:38 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+--DROP FUNCTION vehicle_mileages_update();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileages
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            vm.mileage,
+            veh.tracker_id
+        FROM vehicle_mileages vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+        LEFT JOIN vehicles AS veh ON veh.id = vm.vehicle_id
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+
+        -- Process mileage for each day until the current time
+        WHILE (start_time + INTERVAL '1 day') <= now() LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := round(vehicle_mileage(
+                vehicle.tracker_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            ));
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileage (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:48:56 ******************
+-- Function: public.vehicle_mileage(in_vehicle_tracker varchar(15), in_date_from timestampTZ, in_date_to timestampTZ);
+
+-- DROP FUNCTION public.vehicle_mileage(in_vehicle_tracker varchar(15), in_date_from timestampTZ, in_date_to timestampTZ);
+
+CREATE OR REPLACE FUNCTION public.vehicle_mileage(in_vehicle_tracker varchar(15), in_date_from timestampTZ, in_date_to timestampTZ)
+  RETURNS numeric AS
+$BODY$
+	WITH sorted_data AS (
+	    SELECT
+		car_id,
+		period,
+		ST_SetSRID(ST_MakePoint(lon, lat), 4326) AS geom,
+		LEAD( ST_SetSRID(ST_MakePoint(lon, lat), 4326) ) OVER (
+		    PARTITION BY car_id ORDER BY period
+		) AS next_geom
+	    FROM
+		public.car_tracking
+	    WHERE
+	    	car_id = in_vehicle_tracker
+	    	AND gps_valid = 1
+	    	AND speed > 0
+	    	AND period BETWEEN (in_date_from at time zone 'UTC') AND (in_date_to at time zone 'UTC')
+	),
+	distances AS (
+	    SELECT
+		car_id,
+		period,
+		ST_Distance(geom::geography, next_geom::geography) AS mileage
+	    FROM
+		sorted_data
+	    WHERE
+		next_geom IS NOT NULL
+	)
+	SELECT
+	    SUM(mileage) / 1000 AS mileage_km -- Convert meters to kilometers
+	FROM distances;
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION public.vehicle_mileage(in_vehicle_tracker varchar(15), in_date_from timestampTZ, in_date_to timestampTZ)
+  OWNER TO beton;
+
+
+
+-- ******************* update 20/11/2024 09:50:00 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+--DROP FUNCTION vehicle_mileages_update();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+BEGIN
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileages
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            vm.mileage,
+            veh.tracker_id
+        FROM vehicle_mileages vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+        LEFT JOIN vehicles AS veh ON veh.id = vm.vehicle_id
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+
+        -- Process mileage for each day until the current time
+        WHILE (start_time + INTERVAL '1 day') <= now() LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := round(vehicle_mileage(
+                vehicle.tracker_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            ));
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileages (vehicle_id, for_date, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 20/11/2024 09:52:10 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+--DROP FUNCTION vehicle_mileages_update();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+    new_user_id INT;
+BEGIN
+	new_user_id := ((SELECT const_reglament_user_val()->'keys'->>'id'))::int;
+	
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileages
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            vm.mileage,
+            veh.tracker_id
+        FROM vehicle_mileages vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+        LEFT JOIN vehicles AS veh ON veh.id = vm.vehicle_id
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+
+        -- Process mileage for each day until the current time
+        WHILE (start_time + INTERVAL '1 day') <= now() LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := round(vehicle_mileage(
+                vehicle.tracker_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            ));
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileages (vehicle_id, for_date, user_id, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                new_user_id,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;

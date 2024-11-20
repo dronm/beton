@@ -28,7 +28,9 @@ CREATE OR REPLACE VIEW drivers_list AS
 			array_agg(en.contact_id)
 		FROM entity_contacts AS en
 		WHERE en.entity_type = 'drivers' AND en.entity_id = dr.id
-		) AS contact_ids
+		) AS contact_ids,
+		
+		dr.employed
 		
 	 	
  	FROM drivers AS dr

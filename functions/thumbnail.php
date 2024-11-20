@@ -25,7 +25,7 @@ function get_image_dimensions($file, &$retVal){
 // Generates thumbnails of any file
 // office formats are converted to pdf first
 // pdf converted with pdftoppm
-// graphical extensiond are converted with convert
+// graphical extensions are converted with convert
 function gen_thumbnail($file, $ext, &$retVal) {
 	static $office_ext = array("doc", "docx", "xls", "xlsx", "odt", "ods", "txt");
 	static $pict_ext = array("jpg", "jpeg", "png", "gif");

@@ -24,11 +24,13 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
 
 
 
-require_once('common/geo/yandex.php');
 require_once(FRAME_WORK_PATH.'basic_classes/CondParamsSQL.php');
 
 require_once('common/OSRMV5.php');
-require_once('common/geo/yandex.php');
+
+//require_once('common/geo/yandex.php');
+require_once('common/geo/dadata.php');
+
 require_once('common/geo/YndxReverseCode.php');
 require_once('common/decodePolylineToArray.php');
 
@@ -548,7 +550,7 @@ class Destination_Controller extends ControllerSQL{
 		if(!isset($_SESSION['get_coords_on_name_cash']) || !isset($_SESSION['get_coords_on_name_cash'][$addr_h])){
 		
 			//yandex
-			get_inf_on_address($addr,$inf);
+			get_inf_on_address(DADATA_KEY, DADATA_SECRET, $addr, $inf);
 			
 			$this->make_route_to_zone($inf);
 			

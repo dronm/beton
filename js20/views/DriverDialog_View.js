@@ -26,6 +26,10 @@ function DriverDialog_View(id,options){
 			"maxLength":10
 		}));	
 		
+		this.addElement(new EditCheckBox(id+":employed",{
+			"labelCaption":"Сотрудник:"
+		}));	
+
 		this.addElement(new EntityContactList_View(id+":contacts_list",{
 			"detail":true
 		}));		
@@ -40,6 +44,7 @@ function DriverDialog_View(id,options){
 		new DataBinding({"control":this.getElement("name")})
 		,new DataBinding({"control":this.getElement("driver_licence")})
 		,new DataBinding({"control":this.getElement("driver_licence_class")})
+		,new DataBinding({"control":this.getElement("employed")})
 	];
 	this.setDataBindings(r_bd);
 	
@@ -48,6 +53,7 @@ function DriverDialog_View(id,options){
 		new CommandBinding({"control":this.getElement("name")})
 		,new CommandBinding({"control":this.getElement("driver_licence")})
 		,new CommandBinding({"control":this.getElement("driver_licence_class")})
+		,new CommandBinding({"control":this.getElement("employed")})
 	]);
 	var self = this;
 	this.addDetailDataSet({

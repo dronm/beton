@@ -15,5 +15,5 @@ CREATE OR REPLACE VIEW vehicle_mileages_list AS
 		ml.vehicle_id,
 		ml.for_date desc;
 
-ALTER TABLE vehicle_mileages_list OWNER TO beton;
+ALTER TABLE vehicle_mileages_list OWNER TO ;
 

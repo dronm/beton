@@ -1384,12 +1384,23 @@ VehicleListReport_View.js
 VehicleListReport.html.xsl
 
 
-1.00352
+1.00352 2024-11-01
 1) ExtProg: new methods to retrieve rbp and leasor.
 	BuhRBP1cList_Model
 	BuhRBP1c_Controller
 	BuhRBP1cEdit
 	VehicleDialog_View
+
+1.00353
+1) Destination_Controller.php dadata.php instead of common/geo/yandex.php function get_inf_on_address()
+2) Driver new field employed: bool.
+	Driver_Controller, DriverDialog_View.js, DriverDialog.html
+	DriverList_View.js: filter on employed field.
+3) Vehicle
+	vehicle_mileages new table, model, controller
+	VehicleDialog_View.js, VehicleDialog.html
+4) vehicle_malige function to return mileage for a period and vehicle.
+5) cron reglament job to update mileage on every day bases.
 
 
 

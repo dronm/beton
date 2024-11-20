@@ -1445,6 +1445,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/views/ChatStatusList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ChatStatusList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/VehicleOwnerTotIncomeAllRep_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/VehicleOwnerTotIncomeAllRep_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/CementSiloMaterialList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/CementSiloMaterialList_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/views/VehicleMileageList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/VehicleMileageList_View.js')) ));
 		
 		$this->addJsModel(new ModelJavaScript('js20/forms/ViewList_Form.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/forms/ViewList_Form.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/forms/MainMenuConstructor_Form.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/forms/MainMenuConstructor_Form.js')) ));
@@ -2113,6 +2114,9 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/models/LeasorList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/LeasorList_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controllers/BuhRBP1c_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/BuhRBP1c_Controller.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/BuhRBP1cList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/BuhRBP1cList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/VehicleMileage_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/VehicleMileage_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/controllers/VehicleMileage_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/VehicleMileage_Controller.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/VehicleMileageList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/VehicleMileageList_Model.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

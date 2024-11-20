@@ -11,6 +11,19 @@ function DriverList_View(id,options){
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
 	
+	let filters = {
+		"deleted":{
+			"binding":new CommandBinding({
+				"control":new EditSwitcher(id+":filter-ctrl-employed",{
+					"labelCaption":"Сотрудник:",
+					"contClassName":"form-group-filter",
+					"checked":false
+				}),
+				"field":new FieldBool("employed")}),
+			"sign":"e",
+			"falseValueNoFilter":true
+		}
+	};
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
@@ -19,6 +32,8 @@ function DriverList_View(id,options){
 		"editInline":false,
 		"editWinClass":DriverDialog_Form,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
+			"filters":filters,
+			"variantStorage":options.variantStorage,
 			"addCustomCommandsAfter":function(commands){
 				commands.push(new SendNotificationCmd(id+":grid:cmd:sendNotif",{
 					"showCmdControl":true,

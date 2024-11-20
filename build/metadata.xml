@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-11-01 04:27:02</lastBuild></version>
+		<lastBuild>2024-11-21 00:47:08</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -256,6 +256,7 @@
 		<version dateOpen="2024-10-24 05:01:10" dateClose="2024-10-24 05:02:13">1.00350</version>
 		<version dateOpen="2024-10-30 07:41:47" dateClose="2024-10-30 14:57:22">1.00351</version>
 		<version dateOpen="2024-10-31 16:13:26" dateClose="2024-11-01 04:27:06">1.00352</version>
+		<version dateOpen="2024-11-17 09:50:34" dateClose="2024-11-21 00:47:26">1.00353</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1065,6 +1066,24 @@
 			<field id="insurance_kasko" dataType="JSONB" alias="Insurance kasko data"/>
 			<globalFilter id="vehicle_owner_list" fieldId="vehicle_owners_ar"/>
 		</model>
+		<model id="VehicleMileage" parent="ModelSQLBeton" dataTable="vehicle_mileages" virtual="FALSE">
+			<field id="id" dataType="Int" dbRequired="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id" required="TRUE" alias="ТС"/>
+			<field id="for_date" dataType="DateTimeTZ" alias="Дата"/>
+			<field id="mileage" dataType="Int" alias="Пробег"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id" dbRequired="TRUE" alias="Who set value"/>
+			<index id="vehicle_mileages_idx" unique="TRUE">
+				<field id="vehicle_id"/>
+				<field id="for_date"/>
+			</index>
+		</model>
+		<model id="VehicleMileageList" parent="ModelSQLBeton" dataTable="vehicle_mileages_list" virtual="TRUE">
+			<field id="id" dataType="Int" dbRequired="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="vehicle_id" dataType="Int" alias="ТС"/>
+			<field id="for_date" dataType="DateTimeTZ" alias="Дата"/>
+			<field id="mileage" dataType="Int" alias="Пробег"/>
+			<field id="users_ref" dataType="JSON" alias="Who set value"/>
+		</model>
 		<model id="Driver" parent="ModelSQLBeton" dataTable="drivers" virtual="FALSE">
 			<defaultOrder>
 				<field id="name"/>
@@ -1073,6 +1092,7 @@
 			<field id="name" dataType="String" required="TRUE" length="50" alias="Наименование"/>
 			<field id="driver_licence" dataType="Text" alias="Водительское удостоверение"/>
 			<field id="driver_licence_class" dataType="String" length="10" alias="Класс водительского удостоверения"/>
+			<field id="employed" dataType="Bool" alias="Официально устроен"/>
 			<index id="driver_name_index">
 				<expression>lower(name)</expression>
 			</index>
@@ -1087,6 +1107,7 @@
 			<field id="driver_licence_class" dataType="String" length="10" alias="Класс водительского удостоверения"/>
 			<field id="contact_list" dataType="JSON" alias="Контакты"/>
 			<field id="contact_ids" dataType="Text" alias="Контакты"/>
+			<field id="employed" dataType="Bool" alias="Официально устроен"/>
 		</model>
 		<model id="RawMaterial" parent="ModelSQLBeton" dataTable="raw_materials" virtual="FALSE">
 			<defaultOrder>
@@ -5220,6 +5241,13 @@
 				<field id="templ" dataType="String"/>
 			</publicMethod>
 		</controller>
+		<controller id="VehicleMileage" parentId="ControllerSQL" state="TRUE" noState="FALSE">
+			<publicMethod id="insert" modelId="VehicleMileage"/>
+			<publicMethod id="update" modelId="VehicleMileage"/>
+			<publicMethod id="delete" modelId="VehicleMileage"/>
+			<publicMethod id="get_list" modelId="VehicleMileageList"/>
+			<publicMethod id="get_object" modelId="VehicleMileageList"/>
+		</controller>
 		<controller id="OrderGarbage" parentId="ControllerSQL" state="TRUE" noState="FALSE">
 			<publicMethod id="delete" modelId="OrderGarbage"/>
 			<publicMethod id="get_list" modelId="OrderGarbageList"/>
@@ -7348,6 +7376,7 @@
 		<serverTemplate id="ChatStatusList" class="list"/>
 		<serverTemplate id="CementSiloMaterialList" class="list"/>
 		<serverTemplate id="VehicleOwnerTotIncomeAllRep"/>
+		<serverTemplate id="VehicleMileageList" class="list"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="js20/tmpl/FatalException.html"/>
@@ -7994,6 +8023,7 @@
 		<jsScript file="js20/views/ChatStatusList_View.js"/>
 		<jsScript file="js20/views/VehicleOwnerTotIncomeAllRep_View.js"/>
 		<jsScript file="js20/views/CementSiloMaterialList_View.js"/>
+		<jsScript file="js20/views/VehicleMileageList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="js20/forms/ViewList_Form.js"/>
 		<jsScript file="js20/forms/MainMenuConstructor_Form.js"/>
@@ -8669,6 +8699,9 @@
 		<jsScript file="js20/models/LeasorList_Model.js"/>
 		<jsScript file="js20/controllers/BuhRBP1c_Controller.js"/>
 		<jsScript file="js20/models/BuhRBP1cList_Model.js"/>
+		<jsScript file="js20/models/VehicleMileage_Model.js"/>
+		<jsScript file="js20/controllers/VehicleMileage_Controller.js"/>
+		<jsScript file="js20/models/VehicleMileageList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

@@ -149,6 +149,7 @@
 <li><a href="#VariantStorage_Controller">VariantStorage_Controller</a></li>
 <li><a href="#Vehicle_Controller">Vehicle_Controller</a></li>
 <li><a href="#VehicleDriverForSchedGen_Controller">VehicleDriverForSchedGen_Controller</a></li>
+<li><a href="#VehicleMileage_Controller">VehicleMileage_Controller</a></li>
 <li><a href="#VehicleOwner_Controller">VehicleOwner_Controller</a></li>
 <li><a href="#VehicleOwnerClient_Controller">VehicleOwnerClient_Controller</a></li>
 <li><a href="#VehicleOwnerConcretePrice_Controller">VehicleOwnerConcretePrice_Controller</a></li>
@@ -201,6 +202,8 @@
 <li><a href="#ConcreteTypeForSiteList_Model">ConcreteTypeForSiteList_Model</a></li>
 <li><a href="#Vehicle_Model">Vehicle_Model</a></li>
 <li><a href="#VehicleDialog_Model">VehicleDialog_Model</a></li>
+<li><a href="#VehicleMileage_Model">VehicleMileage_Model</a></li>
+<li><a href="#VehicleMileageList_Model">VehicleMileageList_Model</a></li>
 <li><a href="#Driver_Model">Driver_Model</a></li>
 <li><a href="#DriverList_Model">DriverList_Model</a></li>
 <li><a href="#RawMaterial_Model">RawMaterial_Model</a></li>
@@ -4711,6 +4714,19 @@
 <a href="#VehicleDriverForSchedGen_Model">Model: VehicleDriverForSchedGen_Model</a>
 </div>
 </div>
+<div id="VehicleMileage_Controller" class="content_box">
+<h1>VehicleMileage_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#VehicleMileage_Model">Model: VehicleMileage_Model</a><h2>update</h2>
+<a href="#VehicleMileage_Model">Model: VehicleMileage_Model</a><h2>delete</h2>
+<a href="#VehicleMileage_Model">Model: VehicleMileage_Model</a><h2>get_list</h2>
+<a href="#VehicleMileageList_Model">Model: VehicleMileageList_Model</a><h2>get_object</h2>
+<a href="#VehicleMileageList_Model">Model: VehicleMileageList_Model</a>
+</div>
+</div>
 <div id="VehicleOwner_Controller" class="content_box">
 <h1>VehicleOwner_Controller</h1>
 <div class="content_item">
@@ -9150,6 +9166,12 @@
 <div>Required:</div>
 <div>Length:10</div>
 <div>Precision:</div>
+<h2>employed</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="DriverList_Model" class="content_box">
@@ -9188,6 +9210,12 @@
 <div>Precision:</div>
 <h2>contact_ids</h2>
 <div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>employed</h2>
+<div>Type:Bool</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -22767,6 +22795,78 @@
 <p>Поля:</p>
 <h2>make</h2>
 <div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="VehicleMileage_Model" class="content_box">
+<h1>VehicleMileage_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>for_date</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mileage</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="VehicleMileageList_Model" class="content_box">
+<h1>VehicleMileageList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>for_date</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mileage</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>users_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

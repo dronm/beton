@@ -120,6 +120,16 @@ $permissions = array();
 				
 					$permissions['Vehicle_Controller_vehicle_list_report']=TRUE;
 				
+					$permissions['VehicleMileage_Controller_insert']=TRUE;
+				
+					$permissions['VehicleMileage_Controller_update']=TRUE;
+				
+					$permissions['VehicleMileage_Controller_delete']=TRUE;
+				
+					$permissions['VehicleMileage_Controller_get_list']=TRUE;
+				
+					$permissions['VehicleMileage_Controller_get_object']=TRUE;
+				
 					$permissions['OrderGarbage_Controller_delete']=TRUE;
 				
 					$permissions['OrderGarbage_Controller_get_list']=TRUE;

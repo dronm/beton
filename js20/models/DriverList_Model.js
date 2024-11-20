@@ -82,6 +82,15 @@ function DriverList_Model(options){
 	
 	options.fields.contact_ids = new FieldText("contact_ids",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Официально устроен';
+	filed_options.autoInc = false;	
+	
+	options.fields.employed = new FieldBool("employed",filed_options);
+	
 		DriverList_Model.superclass.constructor.call(this,id,options);
 }
 extend(DriverList_Model,ModelXML);

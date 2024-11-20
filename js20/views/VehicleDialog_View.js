@@ -113,6 +113,10 @@ function VehicleDialog_View(id,options){
 		"labelCaption":"VIN:",
 		"maxLength": 17
 	}));	
+
+	this.addElement(new VehicleMileageList_View(id+":mileage_list",{
+		"detail":true
+	}));		
 	//****************************************************	
 	
 	//read
@@ -162,6 +166,13 @@ function VehicleDialog_View(id,options){
 		//,new CommandBinding({"control":this.getElement("sim_number")})
 	]);
 	
+	this.addDetailDataSet({
+		"control":this.getElement("mileage_list").getElement("grid"),
+		"controlFieldId": ["vehicle_id"],
+		"value": [function(){
+			return self.m_model.getFieldValue("id");
+		}]
+	});		
 }
 extend(VehicleDialog_View,ViewObjectAjx);
 
