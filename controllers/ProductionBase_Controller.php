@@ -45,6 +45,13 @@ class ProductionBase_Controller extends ControllerSQL{
 				,$f_params);
 		$pm->addParam($param);
 		
+			$f_params = array();
+			
+				$f_params['alias']='Адрес';
+			$param = new FieldExtText('address'
+				,$f_params);
+		$pm->addParam($param);
+		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		//default event
@@ -80,6 +87,13 @@ class ProductionBase_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Геозона';
 			$param = new FieldExtInt('destination_id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Адрес';
+			$param = new FieldExtText('address'
 				,$f_params);
 			$pm->addParam($param);
 		

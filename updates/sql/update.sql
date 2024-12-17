@@ -33204,3 +33204,5188 @@ BEGIN
     END LOOP;
 END;
 $$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 21/11/2024 07:11:55 ******************
+--one document for a shift
+
+-- Function: putevoi_list_f(in_vehicle_id int, in_date date)
+
+--DROP FUNCTION putevoi_list_f(in_vehicle_id int, in_date date);
+
+CREATE OR REPLACE FUNCTION putevoi_list_f(in_vehicle_id int, in_date date)
+  RETURNS table(
+	nomer text,
+	data_den text,
+	data_mes text,
+	data_god text,
+
+	avto_nomer text,
+	avto_marka text,
+
+	voditel_fio text,
+	voditel_udost text,
+	voditel_udost_class text,
+	
+	date_day_n text,
+	date_mon_n text,
+	date_hour_n text,
+	date_min_n text,	
+	spidom text,
+	vrem_fakt text,
+	
+	vz_date_day_n text,
+	vz_date_mon_n text,
+	vz_date_hour_n text,
+	vz_date_min_n text,
+	vz_spidom text,
+	vz_vrem_fakt text,
+	
+	zad1_client text,
+	zad1_vrem text,
+	zad1_object text,
+	zad1_kol text,
+	zad1_km text,
+	zad1_massa text,	
+	zad1_nomen_naim text,
+	zad1_ezd text,
+	
+	zad2_client text,
+	zad2_vrem text,
+	zad2_object text,
+	zad2_kol text,
+	zad2_km text,
+	zad2_massa text,	
+	zad2_nomen_naim text,
+	zad2_ezd text,
+
+	zad3_client text,
+	zad3_vrem text,
+	zad3_object text,
+	zad3_kol text,
+	zad3_km text,
+	zad3_massa text,	
+	zad3_nomen_naim text,
+	zad3_ezd text,
+	
+	zad4_client text,
+	zad4_vrem text,
+	zad4_object text,
+	zad4_kol text,
+	zad4_km text,
+	zad4_massa text,	
+	zad4_nomen_naim text,
+	zad4_ezd text,
+	
+	zad5_client text,
+	zad5_vrem text,
+	zad5_object text,
+	zad5_kol text,
+	zad5_km text,
+	zad5_massa text,	
+	zad5_nomen_naim text,
+	zad5_ezd text,
+	
+	vrem_rab text 
+  ) AS
+$BODY$
+	WITH
+	shift AS (
+		SELECT d1, d2 FROM get_shift_bounds(in_date) AS (d1 timestamp, d2 timestamp)
+	),
+	tasks AS (
+		SELECT
+			sub.client_name,
+			sub.dest_name,
+			sub.ct_name,
+			sub.quant,
+			sub.runs,
+			sub.mileage,
+			sub.first_ship_arrive		
+		FROM (
+			SELECT
+				cl.name AS client_name,
+				dest.name AS dest_name,
+				ct.official_name AS ct_name,
+				sum(sh.quant) AS quant,
+				count(sh.*) AS runs,
+				SUM(coalesce(
+					round(vehicle_mileage(
+						vh.tracker_id,
+						sh.ship_date_time,
+						(SELECT
+							st.date_time
+						FROM vehicle_schedule_states AS st
+						WHERE st.shipment_id = sh.id AND st.date_time>sh.ship_date_time
+						ORDER BY st.date_time DESC
+						LIMIT 1
+						))
+					), 0)
+				) AS mileage,
+				MIN((SELECT
+					st.date_time
+				FROM vehicle_schedule_states AS st
+				WHERE st.shipment_id = sh.id AND st.date_time>sh.ship_date_time AND st.state='at_dest'
+				ORDER BY st.date_time ASC
+				LIMIT 1				
+				)) AS first_ship_arrive
+			FROM shipments AS sh
+			LEFT JOIN orders AS o ON o.id = sh.order_id
+			LEFT JOIN concrete_types AS ct ON ct.id = o.concrete_type_id
+			LEFT JOIN clients AS cl ON cl.id = o.client_id
+			LEFT JOIN destinations AS dest ON dest.id = o.destination_id
+			LEFT JOIN vehicle_schedules AS sched ON sched.id = sh.vehicle_schedule_id
+			LEFT JOIN vehicles AS vh ON vh.id = sched.vehicle_id
+			WHERE sched.vehicle_id = in_vehicle_id AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+			GROUP BY
+				cl.name,
+				dest.name,
+				ct.official_name
+		) AS sub
+		ORDER BY sub.first_ship_arrive
+	),
+	schedule AS (
+		SELECT
+			sch.id,
+			sch.schedule_date,
+			sch.vehicle_id,
+			sch.driver_id
+		FROM vehicle_schedules AS sch
+		WHERE
+			sch.vehicle_id = in_vehicle_id
+			AND sch.schedule_date = in_date		
+	),
+	--firtst shipment
+	depart AS (
+		SELECT
+			sh.ship_date_time
+		FROM shipments AS sh
+		WHERE
+			sh.vehicle_schedule_id = (SELECT id FROM schedule)
+			AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+		ORDER BY sh.date_time ASC
+		LIMIT 1
+	),
+	--last shipment, at base state
+	ret_to_base AS (
+		SELECT
+			st.date_time
+		FROM vehicle_schedule_states AS st
+		WHERE st.shipment_id = (
+			--last shipment
+			SELECT
+				sh.id
+			FROM shipments AS sh
+			WHERE
+				sh.vehicle_schedule_id = (SELECT id FROM schedule)
+				AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+			ORDER BY sh.date_time DESC
+			LIMIT 1
+		)
+		ORDER BY st.date_time DESC
+		LIMIT 1
+	)
+	
+	SELECT
+		sch.id AS nomer,
+		to_char(sch.schedule_date::date,'DD') AS data_den,
+		to_char(sch.schedule_date::date,'TMMonth') AS data_mes,
+		to_char(sch.schedule_date::date,'YYYY') AS data_god,
+		
+		coalesce(vh.plate,'') AS avto_nomer,
+		coalesce(vh.make,'') AS avto_marka,
+
+		CASE
+			WHEN dr.employed THEN person_init(dr.name)
+			ELSE person_init(dr_vh.name)
+		END AS voditel_fio,
+		CASE
+			WHEN dr.employed THEN coalesce(dr.driver_licence,'')
+			ELSE coalesce(dr_vh.driver_licence,'')
+		END AS voditel_udost,
+		CASE
+			WHEN dr.employed THEN coalesce(dr.driver_licence_class,'')
+			ELSE coalesce(dr_vh.driver_licence_class,'')
+		END AS voditel_udost_class,
+		
+		-- departure: first ship
+		to_char((SELECT ship_date_time FROM depart),'DD') AS date_day_n,
+		to_char((SELECT ship_date_time FROM depart),'MM') AS date_mon_n,
+		to_char((SELECT ship_date_time FROM depart),'HH24') AS date_hour_n,
+		to_char((SELECT ship_date_time FROM depart),'MI') AS date_min_n,
+		coalesce((SELECT
+			ml.mileage::text
+		FROM vehicle_mileages AS ml
+		WHERE ml.vehicle_id = in_vehicle_id AND ml.for_date <= (SELECT d1 FROM shift)
+		ORDER BY ml.for_date DESC
+		LIMIT 1
+		),'') AS spidom,
+		to_char((SELECT ship_date_time FROM depart),'DD/MM HH24:MI') AS vrem_fakt,
+
+		-- return: last ship
+		to_char((SELECT date_time FROM ret_to_base),'DD') AS vz_date_day_n,
+		to_char((SELECT date_time FROM ret_to_base),'MM') AS vz_date_mon_n,
+		to_char((SELECT date_time FROM ret_to_base),'HH24') AS vz_date_hour_n,
+		to_char((SELECT date_time FROM ret_to_base),'MI') AS vz_date_min_n,
+		(coalesce((SELECT
+			ml.mileage
+		FROM vehicle_mileages AS ml
+		WHERE ml.vehicle_id = in_vehicle_id AND ml.for_date <= (SELECT d1 FROM shift)
+		ORDER BY ml.for_date DESC
+		LIMIT 1
+		),0) + coalesce(vehicle_mileage(vh.tracker_id, (SELECT d1 FROM shift), (SELECT d2 FROM shift)), 0)
+		)::text
+		AS vz_spidom,
+		to_char((SELECT date_time FROM ret_to_base),'DD/MM HH24:MI') AS vz_vrem_fakt,
+		
+		coalesce((SELECT client_name::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_km,
+		coalesce((SELECT quant::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_massa,	
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_ezd,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_km,
+		coalesce((SELECT quant::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_massa,	
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_ezd,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_km,
+		coalesce((SELECT quant::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_massa,	
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_ezd,
+		
+		coalesce((SELECT client_name::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_km,
+		coalesce((SELECT quant::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_massa,	
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_ezd,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_km,
+		coalesce((SELECT quant::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_massa,	
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_ezd,
+		
+		coalesce(((SELECT date_time FROM ret_to_base) - (SELECT ship_date_time FROM depart))::text, '') AS vrem_rab
+		
+	FROM schedule AS sch
+	LEFT JOIN vehicles AS vh ON vh.id = sch.vehicle_id
+	LEFT JOIN drivers AS dr ON dr.id = sch.driver_id
+	LEFT JOIN drivers AS dr_vh ON dr_vh.id = vh.driver_id
+	; 
+$BODY$
+LANGUAGE sql IMMUTABLE COST 100;
+ALTER FUNCTION putevoi_list_f(in_vehicle_id int, in_date date) OWNER TO beton;
+
+
+-- ******************* update 21/11/2024 07:14:59 ******************
+--one document for a shift
+
+-- Function: putevoi_list_f(in_vehicle_id int, in_date date)
+
+--DROP FUNCTION putevoi_list_f(in_vehicle_id int, in_date date);
+
+CREATE OR REPLACE FUNCTION putevoi_list_f(in_vehicle_id int, in_date date)
+  RETURNS table(
+	nomer text,
+	data_den text,
+	data_mes text,
+	data_god text,
+
+	avto_nomer text,
+	avto_marka text,
+
+	voditel_fio text,
+	voditel_udost text,
+	voditel_udost_class text,
+	
+	date_day_n text,
+	date_mon_n text,
+	date_hour_n text,
+	date_min_n text,	
+	spidom text,
+	vrem_fakt text,
+	
+	vz_date_day_n text,
+	vz_date_mon_n text,
+	vz_date_hour_n text,
+	vz_date_min_n text,
+	vz_spidom text,
+	vz_vrem_fakt text,
+	
+	zad1_client text,
+	zad1_vrem text,
+	zad1_object text,
+	zad1_kol text,
+	zad1_km text,
+	zad1_massa text,	
+	zad1_nomen_naim text,
+	zad1_ezd text,
+	
+	zad2_client text,
+	zad2_vrem text,
+	zad2_object text,
+	zad2_kol text,
+	zad2_km text,
+	zad2_massa text,	
+	zad2_nomen_naim text,
+	zad2_ezd text,
+
+	zad3_client text,
+	zad3_vrem text,
+	zad3_object text,
+	zad3_kol text,
+	zad3_km text,
+	zad3_massa text,	
+	zad3_nomen_naim text,
+	zad3_ezd text,
+	
+	zad4_client text,
+	zad4_vrem text,
+	zad4_object text,
+	zad4_kol text,
+	zad4_km text,
+	zad4_massa text,	
+	zad4_nomen_naim text,
+	zad4_ezd text,
+	
+	zad5_client text,
+	zad5_vrem text,
+	zad5_object text,
+	zad5_kol text,
+	zad5_km text,
+	zad5_massa text,	
+	zad5_nomen_naim text,
+	zad5_ezd text,
+	
+	vrem_rab text 
+  ) AS
+$BODY$
+	WITH
+	shift AS (
+		SELECT d1, d2 FROM get_shift_bounds(in_date) AS (d1 timestamp, d2 timestamp)
+	),
+	tasks AS (
+		SELECT
+			sub.client_name,
+			sub.dest_name,
+			sub.ct_name,
+			sub.quant,
+			sub.runs,
+			sub.mileage,
+			sub.first_ship_arrive		
+		FROM (
+			SELECT
+				cl.name AS client_name,
+				dest.name AS dest_name,
+				ct.official_name AS ct_name,
+				sum(sh.quant) AS quant,
+				count(sh.*) AS runs,
+				SUM(coalesce(
+					round(vehicle_mileage(
+						vh.tracker_id,
+						sh.ship_date_time,
+						(SELECT
+							st.date_time
+						FROM vehicle_schedule_states AS st
+						WHERE st.shipment_id = sh.id AND st.date_time>sh.ship_date_time
+						ORDER BY st.date_time DESC
+						LIMIT 1
+						))
+					), 0)
+				) AS mileage,
+				MIN((SELECT
+					st.date_time
+				FROM vehicle_schedule_states AS st
+				WHERE st.shipment_id = sh.id AND st.date_time>sh.ship_date_time AND st.state='at_dest'
+				ORDER BY st.date_time ASC
+				LIMIT 1				
+				)) AS first_ship_arrive
+			FROM shipments AS sh
+			LEFT JOIN orders AS o ON o.id = sh.order_id
+			LEFT JOIN concrete_types AS ct ON ct.id = o.concrete_type_id
+			LEFT JOIN clients AS cl ON cl.id = o.client_id
+			LEFT JOIN destinations AS dest ON dest.id = o.destination_id
+			LEFT JOIN vehicle_schedules AS sched ON sched.id = sh.vehicle_schedule_id
+			LEFT JOIN vehicles AS vh ON vh.id = sched.vehicle_id
+			WHERE sched.vehicle_id = in_vehicle_id AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+			GROUP BY
+				cl.name,
+				dest.name,
+				ct.official_name
+		) AS sub
+		ORDER BY sub.first_ship_arrive
+	),
+	schedule AS (
+		SELECT
+			sch.id,
+			sch.schedule_date,
+			sch.vehicle_id,
+			sch.driver_id
+		FROM vehicle_schedules AS sch
+		WHERE
+			sch.vehicle_id = in_vehicle_id
+			AND sch.schedule_date = in_date		
+	),
+	--firtst shipment
+	depart AS (
+		SELECT
+			sh.ship_date_time
+		FROM shipments AS sh
+		WHERE
+			sh.vehicle_schedule_id = (SELECT id FROM schedule)
+			AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+		ORDER BY sh.date_time ASC
+		LIMIT 1
+	),
+	--last shipment, at base state
+	ret_to_base AS (
+		SELECT
+			st.date_time
+		FROM vehicle_schedule_states AS st
+		WHERE st.shipment_id = (
+			--last shipment
+			SELECT
+				sh.id
+			FROM shipments AS sh
+			WHERE
+				sh.vehicle_schedule_id = (SELECT id FROM schedule)
+				AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+			ORDER BY sh.date_time DESC
+			LIMIT 1
+		)
+		ORDER BY st.date_time DESC
+		LIMIT 1
+	)
+	
+	SELECT
+		sch.id AS nomer,
+		to_char(sch.schedule_date::date,'DD') AS data_den,
+		to_char(sch.schedule_date::date,'TMMonth') AS data_mes,
+		to_char(sch.schedule_date::date,'YYYY') AS data_god,
+		
+		coalesce(vh.plate,'') AS avto_nomer,
+		coalesce(vh.make,'') AS avto_marka,
+
+		CASE
+			WHEN dr.employed THEN person_init(dr.name)
+			ELSE person_init(dr_vh.name)
+		END AS voditel_fio,
+		CASE
+			WHEN dr.employed THEN coalesce(dr.driver_licence,'')
+			ELSE coalesce(dr_vh.driver_licence,'')
+		END AS voditel_udost,
+		CASE
+			WHEN dr.employed THEN coalesce(dr.driver_licence_class,'')
+			ELSE coalesce(dr_vh.driver_licence_class,'')
+		END AS voditel_udost_class,
+		
+		-- departure: first ship
+		to_char((SELECT ship_date_time FROM depart),'DD') AS date_day_n,
+		to_char((SELECT ship_date_time FROM depart),'MM') AS date_mon_n,
+		to_char((SELECT ship_date_time FROM depart),'HH24') AS date_hour_n,
+		to_char((SELECT ship_date_time FROM depart),'MI') AS date_min_n,
+		coalesce((SELECT
+			ml.mileage::text
+		FROM vehicle_mileages AS ml
+		WHERE ml.vehicle_id = in_vehicle_id AND ml.for_date <= (SELECT d1 FROM shift)
+		ORDER BY ml.for_date DESC
+		LIMIT 1
+		),'') AS spidom,
+		to_char((SELECT ship_date_time FROM depart),'DD/MM HH24:MI') AS vrem_fakt,
+
+		-- return: last ship
+		to_char((SELECT date_time FROM ret_to_base),'DD') AS vz_date_day_n,
+		to_char((SELECT date_time FROM ret_to_base),'MM') AS vz_date_mon_n,
+		to_char((SELECT date_time FROM ret_to_base),'HH24') AS vz_date_hour_n,
+		to_char((SELECT date_time FROM ret_to_base),'MI') AS vz_date_min_n,
+		(coalesce((SELECT
+			ml.mileage
+		FROM vehicle_mileages AS ml
+		WHERE ml.vehicle_id = in_vehicle_id AND ml.for_date <= (SELECT d1 FROM shift)
+		ORDER BY ml.for_date DESC
+		LIMIT 1
+		),0) + coalesce(vehicle_mileage(vh.tracker_id, (SELECT d1 FROM shift), (SELECT d2 FROM shift)), 0)
+		)::text
+		AS vz_spidom,
+		to_char((SELECT date_time FROM ret_to_base),'DD/MM HH24:MI') AS vz_vrem_fakt,
+		
+		coalesce((SELECT client_name::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_km,
+		coalesce((SELECT quant::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_massa,	
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_ezd,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_km,
+		coalesce((SELECT quant::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_massa,	
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_ezd,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_km,
+		coalesce((SELECT quant::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_massa,	
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_ezd,
+		
+		coalesce((SELECT client_name::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_km,
+		coalesce((SELECT quant::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_massa,	
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_ezd,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_km,
+		coalesce((SELECT quant::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_massa,	
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_ezd,
+		
+		coalesce(
+			(
+				to_char((SELECT date_time FROM ret_to_base) - (SELECT ship_date_time FROM depart), 'HH24:MI')
+			)::text
+		, '') AS vrem_rab
+		
+	FROM schedule AS sch
+	LEFT JOIN vehicles AS vh ON vh.id = sch.vehicle_id
+	LEFT JOIN drivers AS dr ON dr.id = sch.driver_id
+	LEFT JOIN drivers AS dr_vh ON dr_vh.id = vh.driver_id
+	; 
+$BODY$
+LANGUAGE sql IMMUTABLE COST 100;
+ALTER FUNCTION putevoi_list_f(in_vehicle_id int, in_date date) OWNER TO beton;
+
+
+-- ******************* update 21/11/2024 07:15:17 ******************
+--one document for a shift
+
+-- Function: putevoi_list_f(in_vehicle_id int, in_date date)
+
+--DROP FUNCTION putevoi_list_f(in_vehicle_id int, in_date date);
+
+CREATE OR REPLACE FUNCTION putevoi_list_f(in_vehicle_id int, in_date date)
+  RETURNS table(
+	nomer text,
+	data_den text,
+	data_mes text,
+	data_god text,
+
+	avto_nomer text,
+	avto_marka text,
+
+	voditel_fio text,
+	voditel_udost text,
+	voditel_udost_class text,
+	
+	date_day_n text,
+	date_mon_n text,
+	date_hour_n text,
+	date_min_n text,	
+	spidom text,
+	vrem_fakt text,
+	
+	vz_date_day_n text,
+	vz_date_mon_n text,
+	vz_date_hour_n text,
+	vz_date_min_n text,
+	vz_spidom text,
+	vz_vrem_fakt text,
+	
+	zad1_client text,
+	zad1_vrem text,
+	zad1_object text,
+	zad1_kol text,
+	zad1_km text,
+	zad1_massa text,	
+	zad1_nomen_naim text,
+	zad1_ezd text,
+	
+	zad2_client text,
+	zad2_vrem text,
+	zad2_object text,
+	zad2_kol text,
+	zad2_km text,
+	zad2_massa text,	
+	zad2_nomen_naim text,
+	zad2_ezd text,
+
+	zad3_client text,
+	zad3_vrem text,
+	zad3_object text,
+	zad3_kol text,
+	zad3_km text,
+	zad3_massa text,	
+	zad3_nomen_naim text,
+	zad3_ezd text,
+	
+	zad4_client text,
+	zad4_vrem text,
+	zad4_object text,
+	zad4_kol text,
+	zad4_km text,
+	zad4_massa text,	
+	zad4_nomen_naim text,
+	zad4_ezd text,
+	
+	zad5_client text,
+	zad5_vrem text,
+	zad5_object text,
+	zad5_kol text,
+	zad5_km text,
+	zad5_massa text,	
+	zad5_nomen_naim text,
+	zad5_ezd text,
+	
+	vrem_rab text 
+  ) AS
+$BODY$
+	WITH
+	shift AS (
+		SELECT d1, d2 FROM get_shift_bounds(in_date) AS (d1 timestamp, d2 timestamp)
+	),
+	tasks AS (
+		SELECT
+			sub.client_name,
+			sub.dest_name,
+			sub.ct_name,
+			sub.quant,
+			sub.runs,
+			sub.mileage,
+			sub.first_ship_arrive		
+		FROM (
+			SELECT
+				cl.name AS client_name,
+				dest.name AS dest_name,
+				ct.official_name AS ct_name,
+				sum(sh.quant) AS quant,
+				count(sh.*) AS runs,
+				SUM(coalesce(
+					round(vehicle_mileage(
+						vh.tracker_id,
+						sh.ship_date_time,
+						(SELECT
+							st.date_time
+						FROM vehicle_schedule_states AS st
+						WHERE st.shipment_id = sh.id AND st.date_time>sh.ship_date_time
+						ORDER BY st.date_time DESC
+						LIMIT 1
+						))
+					), 0)
+				) AS mileage,
+				MIN((SELECT
+					st.date_time
+				FROM vehicle_schedule_states AS st
+				WHERE st.shipment_id = sh.id AND st.date_time>sh.ship_date_time AND st.state='at_dest'
+				ORDER BY st.date_time ASC
+				LIMIT 1				
+				)) AS first_ship_arrive
+			FROM shipments AS sh
+			LEFT JOIN orders AS o ON o.id = sh.order_id
+			LEFT JOIN concrete_types AS ct ON ct.id = o.concrete_type_id
+			LEFT JOIN clients AS cl ON cl.id = o.client_id
+			LEFT JOIN destinations AS dest ON dest.id = o.destination_id
+			LEFT JOIN vehicle_schedules AS sched ON sched.id = sh.vehicle_schedule_id
+			LEFT JOIN vehicles AS vh ON vh.id = sched.vehicle_id
+			WHERE sched.vehicle_id = in_vehicle_id AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+			GROUP BY
+				cl.name,
+				dest.name,
+				ct.official_name
+		) AS sub
+		ORDER BY sub.first_ship_arrive
+	),
+	schedule AS (
+		SELECT
+			sch.id,
+			sch.schedule_date,
+			sch.vehicle_id,
+			sch.driver_id
+		FROM vehicle_schedules AS sch
+		WHERE
+			sch.vehicle_id = in_vehicle_id
+			AND sch.schedule_date = in_date		
+	),
+	--firtst shipment
+	depart AS (
+		SELECT
+			sh.ship_date_time
+		FROM shipments AS sh
+		WHERE
+			sh.vehicle_schedule_id = (SELECT id FROM schedule)
+			AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+		ORDER BY sh.date_time ASC
+		LIMIT 1
+	),
+	--last shipment, at base state
+	ret_to_base AS (
+		SELECT
+			st.date_time
+		FROM vehicle_schedule_states AS st
+		WHERE st.shipment_id = (
+			--last shipment
+			SELECT
+				sh.id
+			FROM shipments AS sh
+			WHERE
+				sh.vehicle_schedule_id = (SELECT id FROM schedule)
+				AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+			ORDER BY sh.date_time DESC
+			LIMIT 1
+		)
+		ORDER BY st.date_time DESC
+		LIMIT 1
+	)
+	
+	SELECT
+		sch.id AS nomer,
+		to_char(sch.schedule_date::date,'DD') AS data_den,
+		to_char(sch.schedule_date::date,'TMMonth') AS data_mes,
+		to_char(sch.schedule_date::date,'YYYY') AS data_god,
+		
+		coalesce(vh.plate,'') AS avto_nomer,
+		coalesce(vh.make,'') AS avto_marka,
+
+		CASE
+			WHEN dr.employed THEN person_init(dr.name)
+			ELSE person_init(dr_vh.name)
+		END AS voditel_fio,
+		CASE
+			WHEN dr.employed THEN coalesce(dr.driver_licence,'')
+			ELSE coalesce(dr_vh.driver_licence,'')
+		END AS voditel_udost,
+		CASE
+			WHEN dr.employed THEN coalesce(dr.driver_licence_class,'')
+			ELSE coalesce(dr_vh.driver_licence_class,'')
+		END AS voditel_udost_class,
+		
+		-- departure: first ship
+		to_char((SELECT ship_date_time FROM depart),'DD') AS date_day_n,
+		to_char((SELECT ship_date_time FROM depart),'MM') AS date_mon_n,
+		to_char((SELECT ship_date_time FROM depart),'HH24') AS date_hour_n,
+		to_char((SELECT ship_date_time FROM depart),'MI') AS date_min_n,
+		coalesce((SELECT
+			ml.mileage::text
+		FROM vehicle_mileages AS ml
+		WHERE ml.vehicle_id = in_vehicle_id AND ml.for_date <= (SELECT d1 FROM shift)
+		ORDER BY ml.for_date DESC
+		LIMIT 1
+		),'') AS spidom,
+		to_char((SELECT ship_date_time FROM depart),'DD/MM HH24:MI') AS vrem_fakt,
+
+		-- return: last ship
+		to_char((SELECT date_time FROM ret_to_base),'DD') AS vz_date_day_n,
+		to_char((SELECT date_time FROM ret_to_base),'MM') AS vz_date_mon_n,
+		to_char((SELECT date_time FROM ret_to_base),'HH24') AS vz_date_hour_n,
+		to_char((SELECT date_time FROM ret_to_base),'MI') AS vz_date_min_n,
+		(coalesce((SELECT
+			ml.mileage
+		FROM vehicle_mileages AS ml
+		WHERE ml.vehicle_id = in_vehicle_id AND ml.for_date <= (SELECT d1 FROM shift)
+		ORDER BY ml.for_date DESC
+		LIMIT 1
+		),0) + coalesce(vehicle_mileage(vh.tracker_id, (SELECT d1 FROM shift), (SELECT d2 FROM shift)), 0)
+		)::text
+		AS vz_spidom,
+		to_char((SELECT date_time FROM ret_to_base),'DD/MM HH24:MI') AS vz_vrem_fakt,
+		
+		coalesce((SELECT client_name::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_km,
+		coalesce((SELECT quant::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_massa,	
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_ezd,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_km,
+		coalesce((SELECT quant::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_massa,	
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_ezd,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_km,
+		coalesce((SELECT quant::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_massa,	
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_ezd,
+		
+		coalesce((SELECT client_name::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_km,
+		coalesce((SELECT quant::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_massa,	
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_ezd,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_km,
+		coalesce((SELECT quant::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_massa,	
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_ezd,
+		
+		coalesce(
+			to_char((SELECT date_time FROM ret_to_base) - (SELECT ship_date_time FROM depart), 'HH24:MI')
+		, '') AS vrem_rab
+		
+	FROM schedule AS sch
+	LEFT JOIN vehicles AS vh ON vh.id = sch.vehicle_id
+	LEFT JOIN drivers AS dr ON dr.id = sch.driver_id
+	LEFT JOIN drivers AS dr_vh ON dr_vh.id = vh.driver_id
+	; 
+$BODY$
+LANGUAGE sql IMMUTABLE COST 100;
+ALTER FUNCTION putevoi_list_f(in_vehicle_id int, in_date date) OWNER TO beton;
+
+
+-- ******************* update 21/11/2024 07:49:12 ******************
+--one document for a shift
+
+-- Function: putevoi_list_f(in_vehicle_id int, in_date date)
+
+DROP FUNCTION putevoi_list_f(in_vehicle_id int, in_date date);
+
+CREATE OR REPLACE FUNCTION putevoi_list_f(in_vehicle_id int, in_date date)
+  RETURNS table(
+	nomer text,
+	data_den text,
+	data_mes text,
+	data_god text,
+
+	avto_nomer text,
+	avto_marka text,
+
+	voditel_fio text,
+	voditel_udost text,
+	voditel_udost_class text,
+	
+	date_day_n text,
+	date_mon_n text,
+	date_hour_n text,
+	date_min_n text,	
+	spidom text,
+	vrem_fakt text,
+	
+	vz_date_day_n text,
+	vz_date_mon_n text,
+	vz_date_hour_n text,
+	vz_date_min_n text,
+	vz_spidom text,
+	vz_vrem_fakt text,
+	
+	zad1_client text,
+	zad1_vrem text,
+	zad1_object text,
+	zad1_kol text,
+	zad1_km text,
+	zad1_nomen_naim text,
+	zad1_ezd text,
+	
+	zad2_client text,
+	zad2_vrem text,
+	zad2_object text,
+	zad2_kol text,
+	zad2_km text,
+	zad2_nomen_naim text,
+	zad2_ezd text,
+
+	zad3_client text,
+	zad3_vrem text,
+	zad3_object text,
+	zad3_kol text,
+	zad3_km text,
+	zad3_nomen_naim text,
+	zad3_ezd text,
+	
+	zad4_client text,
+	zad4_vrem text,
+	zad4_object text,
+	zad4_kol text,
+	zad4_km text,
+	zad4_nomen_naim text,
+	zad4_ezd text,
+	
+	zad5_client text,
+	zad5_vrem text,
+	zad5_object text,
+	zad5_kol text,
+	zad5_km text,
+	zad5_nomen_naim text,
+	zad5_ezd text,
+	
+	vrem_rab text 
+  ) AS
+$BODY$
+	WITH
+	shift AS (
+		SELECT d1, d2 FROM get_shift_bounds(in_date) AS (d1 timestamp, d2 timestamp)
+	),
+	tasks AS (
+		SELECT
+			sub.client_name,
+			sub.dest_name,
+			sub.ct_name,
+			sub.quant,
+			sub.runs,
+			sub.mileage,
+			sub.first_ship_arrive		
+		FROM (
+			SELECT
+				cl.name AS client_name,
+				dest.name AS dest_name,
+				ct.official_name AS ct_name,
+				sum(sh.quant) AS quant,
+				count(sh.*) AS runs,
+				SUM(coalesce(
+					round(vehicle_mileage(
+						vh.tracker_id,
+						sh.ship_date_time,
+						(SELECT
+							st.date_time
+						FROM vehicle_schedule_states AS st
+						WHERE st.shipment_id = sh.id AND st.date_time>sh.ship_date_time
+						ORDER BY st.date_time DESC
+						LIMIT 1
+						))
+					), 0)
+				) AS mileage,
+				MIN((SELECT
+					st.date_time
+				FROM vehicle_schedule_states AS st
+				WHERE st.shipment_id = sh.id AND st.date_time>sh.ship_date_time AND st.state='at_dest'
+				ORDER BY st.date_time ASC
+				LIMIT 1				
+				)) AS first_ship_arrive
+			FROM shipments AS sh
+			LEFT JOIN orders AS o ON o.id = sh.order_id
+			LEFT JOIN concrete_types AS ct ON ct.id = o.concrete_type_id
+			LEFT JOIN clients AS cl ON cl.id = o.client_id
+			LEFT JOIN destinations AS dest ON dest.id = o.destination_id
+			LEFT JOIN vehicle_schedules AS sched ON sched.id = sh.vehicle_schedule_id
+			LEFT JOIN vehicles AS vh ON vh.id = sched.vehicle_id
+			WHERE sched.vehicle_id = in_vehicle_id AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+			GROUP BY
+				cl.name,
+				dest.name,
+				ct.official_name
+		) AS sub
+		ORDER BY sub.first_ship_arrive
+	),
+	schedule AS (
+		SELECT
+			sch.id,
+			sch.schedule_date,
+			sch.vehicle_id,
+			sch.driver_id
+		FROM vehicle_schedules AS sch
+		WHERE
+			sch.vehicle_id = in_vehicle_id
+			AND sch.schedule_date = in_date		
+	),
+	--firtst shipment
+	depart AS (
+		SELECT
+			sh.ship_date_time
+		FROM shipments AS sh
+		WHERE
+			sh.vehicle_schedule_id = (SELECT id FROM schedule)
+			AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+		ORDER BY sh.date_time ASC
+		LIMIT 1
+	),
+	--last shipment, at base state
+	ret_to_base AS (
+		SELECT
+			st.date_time
+		FROM vehicle_schedule_states AS st
+		WHERE st.shipment_id = (
+			--last shipment
+			SELECT
+				sh.id
+			FROM shipments AS sh
+			WHERE
+				sh.vehicle_schedule_id = (SELECT id FROM schedule)
+				AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+			ORDER BY sh.date_time DESC
+			LIMIT 1
+		)
+		ORDER BY st.date_time DESC
+		LIMIT 1
+	)
+	
+	SELECT
+		sch.id AS nomer,
+		to_char(sch.schedule_date::date,'DD') AS data_den,
+		to_char(sch.schedule_date::date,'TMMonth') AS data_mes,
+		to_char(sch.schedule_date::date,'YYYY') AS data_god,
+		
+		coalesce(vh.plate,'') AS avto_nomer,
+		coalesce(vh.make,'') AS avto_marka,
+
+		CASE
+			WHEN dr.employed THEN person_init(dr.name)
+			ELSE person_init(dr_vh.name)
+		END AS voditel_fio,
+		CASE
+			WHEN dr.employed THEN coalesce(dr.driver_licence,'')
+			ELSE coalesce(dr_vh.driver_licence,'')
+		END AS voditel_udost,
+		CASE
+			WHEN dr.employed THEN coalesce(dr.driver_licence_class,'')
+			ELSE coalesce(dr_vh.driver_licence_class,'')
+		END AS voditel_udost_class,
+		
+		-- departure: first ship
+		to_char((SELECT ship_date_time FROM depart),'DD') AS date_day_n,
+		to_char((SELECT ship_date_time FROM depart),'MM') AS date_mon_n,
+		to_char((SELECT ship_date_time FROM depart),'HH24') AS date_hour_n,
+		to_char((SELECT ship_date_time FROM depart),'MI') AS date_min_n,
+		coalesce((SELECT
+			ml.mileage::text
+		FROM vehicle_mileages AS ml
+		WHERE ml.vehicle_id = in_vehicle_id AND ml.for_date <= (SELECT d1 FROM shift)
+		ORDER BY ml.for_date DESC
+		LIMIT 1
+		),'') AS spidom,
+		to_char((SELECT ship_date_time FROM depart),'DD/MM HH24:MI') AS vrem_fakt,
+
+		-- return: last ship
+		to_char((SELECT date_time FROM ret_to_base),'DD') AS vz_date_day_n,
+		to_char((SELECT date_time FROM ret_to_base),'MM') AS vz_date_mon_n,
+		to_char((SELECT date_time FROM ret_to_base),'HH24') AS vz_date_hour_n,
+		to_char((SELECT date_time FROM ret_to_base),'MI') AS vz_date_min_n,
+		(coalesce((SELECT
+			ml.mileage
+		FROM vehicle_mileages AS ml
+		WHERE ml.vehicle_id = in_vehicle_id AND ml.for_date <= (SELECT d1 FROM shift)
+		ORDER BY ml.for_date DESC
+		LIMIT 1
+		),0) + coalesce(vehicle_mileage(vh.tracker_id, (SELECT d1 FROM shift), (SELECT d2 FROM shift)), 0)
+		)::text
+		AS vz_spidom,
+		to_char((SELECT date_time FROM ret_to_base),'DD/MM HH24:MI') AS vz_vrem_fakt,
+		
+		coalesce((SELECT client_name::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_km,
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_ezd,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_km,
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_ezd,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_km,
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_ezd,
+		
+		coalesce((SELECT client_name::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_km,
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_ezd,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_km,
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_ezd,
+		
+		coalesce(
+			to_char((SELECT date_time FROM ret_to_base) - (SELECT ship_date_time FROM depart), 'HH24:MI')
+		, '') AS vrem_rab
+		
+	FROM schedule AS sch
+	LEFT JOIN vehicles AS vh ON vh.id = sch.vehicle_id
+	LEFT JOIN drivers AS dr ON dr.id = sch.driver_id
+	LEFT JOIN drivers AS dr_vh ON dr_vh.id = vh.driver_id
+	; 
+$BODY$
+LANGUAGE sql IMMUTABLE COST 100;
+ALTER FUNCTION putevoi_list_f(in_vehicle_id int, in_date date) OWNER TO beton;
+
+
+-- ******************* update 21/11/2024 08:24:04 ******************
+
+		ALTER TABLE public.production_bases ADD COLUMN address text;
+
+
+
+-- ******************* update 21/11/2024 08:24:45 ******************
+-- VIEW: production_bases_list
+
+--DROP VIEW production_bases_list;
+
+CREATE OR REPLACE VIEW production_bases_list AS
+	SELECT
+		b.id ,
+		b.name,
+		destinations_ref(d) AS destinations_ref,
+		b.address
+	FROM production_bases AS b
+	LEFT JOIN destinations AS d ON d.id = b.destination_id
+	ORDER BY b.name
+	;
+	
+ALTER VIEW production_bases_list OWNER TO beton;
+
+
+-- ******************* update 21/11/2024 08:30:35 ******************
+--one document for a shift
+
+-- Function: putevoi_list_f(in_vehicle_id int, in_date date)
+
+DROP FUNCTION putevoi_list_f(in_vehicle_id int, in_date date);
+
+CREATE OR REPLACE FUNCTION putevoi_list_f(in_vehicle_id int, in_date date)
+  RETURNS table(
+	nomer text,
+	data_den text,
+	data_mes text,
+	data_god text,
+
+	avto_nomer text,
+	avto_marka text,
+
+	voditel_fio text,
+	voditel_udost text,
+	voditel_udost_class text,
+	
+	date_day_n text,
+	date_mon_n text,
+	date_hour_n text,
+	date_min_n text,	
+	spidom text,
+	vrem_fakt text,
+	
+	vz_date_day_n text,
+	vz_date_mon_n text,
+	vz_date_hour_n text,
+	vz_date_min_n text,
+	vz_spidom text,
+	vz_vrem_fakt text,
+	
+	zad1_client text,
+	zad1_vrem text,
+	zad1_object text,
+	zad1_kol text,
+	zad1_km text,
+	zad1_nomen_naim text,
+	zad1_ezd text,
+	zad1_baza text,
+	
+	zad2_client text,
+	zad2_vrem text,
+	zad2_object text,
+	zad2_kol text,
+	zad2_km text,
+	zad2_nomen_naim text,
+	zad2_ezd text,
+	zad2_baza text,
+
+	zad3_client text,
+	zad3_vrem text,
+	zad3_object text,
+	zad3_kol text,
+	zad3_km text,
+	zad3_nomen_naim text,
+	zad3_ezd text,
+	zad3_baza text,
+	
+	zad4_client text,
+	zad4_vrem text,
+	zad4_object text,
+	zad4_kol text,
+	zad4_km text,
+	zad4_nomen_naim text,
+	zad4_ezd text,
+	zad4_baza text,
+	
+	zad5_client text,
+	zad5_vrem text,
+	zad5_object text,
+	zad5_kol text,
+	zad5_km text,
+	zad5_nomen_naim text,
+	zad5_ezd text,
+	zad5_baza text,
+	
+	vrem_rab text 
+  ) AS
+$BODY$
+	WITH
+	shift AS (
+		SELECT d1, d2 FROM get_shift_bounds(in_date) AS (d1 timestamp, d2 timestamp)
+	),
+	tasks AS (
+		SELECT
+			sub.client_name,
+			sub.dest_name,
+			sub.ct_name,
+			sub.base_address,
+			sub.quant,
+			sub.runs,
+			sub.mileage,
+			sub.first_ship_arrive		
+		FROM (
+			SELECT
+				cl.name AS client_name,
+				dest.name AS dest_name,
+				ct.official_name AS ct_name,
+				pb.address AS base_address,
+				sum(sh.quant) AS quant,
+				count(sh.*) AS runs,
+				SUM(coalesce(
+					round(vehicle_mileage(
+						vh.tracker_id,
+						sh.ship_date_time,
+						(SELECT
+							st.date_time
+						FROM vehicle_schedule_states AS st
+						WHERE st.shipment_id = sh.id AND st.date_time>sh.ship_date_time
+						ORDER BY st.date_time DESC
+						LIMIT 1
+						))
+					), 0)
+				) AS mileage,
+				MIN((SELECT
+					st.date_time
+				FROM vehicle_schedule_states AS st
+				WHERE st.shipment_id = sh.id AND st.date_time>sh.ship_date_time AND st.state='at_dest'
+				ORDER BY st.date_time ASC
+				LIMIT 1				
+				)) AS first_ship_arrive
+			FROM shipments AS sh
+			LEFT JOIN orders AS o ON o.id = sh.order_id
+			LEFT JOIN concrete_types AS ct ON ct.id = o.concrete_type_id
+			LEFT JOIN clients AS cl ON cl.id = o.client_id
+			LEFT JOIN destinations AS dest ON dest.id = o.destination_id
+			LEFT JOIN vehicle_schedules AS sched ON sched.id = sh.vehicle_schedule_id
+			LEFT JOIN vehicles AS vh ON vh.id = sched.vehicle_id
+			LEFT JOIN production_bases AS pb ON pb.id = sched.production_base_id
+			WHERE sched.vehicle_id = in_vehicle_id AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+			GROUP BY
+				cl.name,
+				pb.address,
+				dest.name,
+				ct.official_name
+		) AS sub
+		ORDER BY sub.first_ship_arrive
+	),
+	schedule AS (
+		SELECT
+			sch.id,
+			sch.schedule_date,
+			sch.vehicle_id,
+			sch.driver_id
+		FROM vehicle_schedules AS sch
+		WHERE
+			sch.vehicle_id = in_vehicle_id
+			AND sch.schedule_date = in_date		
+	),
+	--firtst shipment
+	depart AS (
+		SELECT
+			sh.ship_date_time
+		FROM shipments AS sh
+		WHERE
+			sh.vehicle_schedule_id = (SELECT id FROM schedule)
+			AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+		ORDER BY sh.date_time ASC
+		LIMIT 1
+	),
+	--last shipment, at base state
+	ret_to_base AS (
+		SELECT
+			st.date_time
+		FROM vehicle_schedule_states AS st
+		WHERE st.shipment_id = (
+			--last shipment
+			SELECT
+				sh.id
+			FROM shipments AS sh
+			WHERE
+				sh.vehicle_schedule_id = (SELECT id FROM schedule)
+				AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+			ORDER BY sh.date_time DESC
+			LIMIT 1
+		)
+		ORDER BY st.date_time DESC
+		LIMIT 1
+	)
+	
+	SELECT
+		sch.id AS nomer,
+		to_char(sch.schedule_date::date,'DD') AS data_den,
+		to_char(sch.schedule_date::date,'TMMonth') AS data_mes,
+		to_char(sch.schedule_date::date,'YYYY') AS data_god,
+		
+		coalesce(vh.plate,'') AS avto_nomer,
+		coalesce(vh.make,'') AS avto_marka,
+
+		CASE
+			WHEN dr.employed THEN person_init(dr.name)
+			ELSE person_init(dr_vh.name)
+		END AS voditel_fio,
+		CASE
+			WHEN dr.employed THEN coalesce(dr.driver_licence,'')
+			ELSE coalesce(dr_vh.driver_licence,'')
+		END AS voditel_udost,
+		CASE
+			WHEN dr.employed THEN coalesce(dr.driver_licence_class,'')
+			ELSE coalesce(dr_vh.driver_licence_class,'')
+		END AS voditel_udost_class,
+		
+		-- departure: first ship
+		to_char((SELECT ship_date_time FROM depart),'DD') AS date_day_n,
+		to_char((SELECT ship_date_time FROM depart),'MM') AS date_mon_n,
+		to_char((SELECT ship_date_time FROM depart),'HH24') AS date_hour_n,
+		to_char((SELECT ship_date_time FROM depart),'MI') AS date_min_n,
+		coalesce((SELECT
+			ml.mileage::text
+		FROM vehicle_mileages AS ml
+		WHERE ml.vehicle_id = in_vehicle_id AND ml.for_date <= (SELECT d1 FROM shift)
+		ORDER BY ml.for_date DESC
+		LIMIT 1
+		),'') AS spidom,
+		to_char((SELECT ship_date_time FROM depart),'DD/MM HH24:MI') AS vrem_fakt,
+
+		-- return: last ship
+		to_char((SELECT date_time FROM ret_to_base),'DD') AS vz_date_day_n,
+		to_char((SELECT date_time FROM ret_to_base),'MM') AS vz_date_mon_n,
+		to_char((SELECT date_time FROM ret_to_base),'HH24') AS vz_date_hour_n,
+		to_char((SELECT date_time FROM ret_to_base),'MI') AS vz_date_min_n,
+		(coalesce((SELECT
+			ml.mileage
+		FROM vehicle_mileages AS ml
+		WHERE ml.vehicle_id = in_vehicle_id AND ml.for_date <= (SELECT d1 FROM shift)
+		ORDER BY ml.for_date DESC
+		LIMIT 1
+		),0) + coalesce(vehicle_mileage(vh.tracker_id, (SELECT d1 FROM shift), (SELECT d2 FROM shift)), 0)
+		)::text
+		AS vz_spidom,
+		to_char((SELECT date_time FROM ret_to_base),'DD/MM HH24:MI') AS vz_vrem_fakt,
+		
+		coalesce((SELECT client_name::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_km,
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_ezd,
+		coalesce((SELECT base_address::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_baza,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_km,
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_ezd,
+		coalesce((SELECT base_address::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_baza,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_km,
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_ezd,
+		coalesce((SELECT base_address::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_baza,
+		
+		coalesce((SELECT client_name::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_km,
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_ezd,
+		coalesce((SELECT base_address::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_baza,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_km,
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_ezd,
+		coalesce((SELECT base_address::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_baza,
+		
+		coalesce(
+			to_char((SELECT date_time FROM ret_to_base) - (SELECT ship_date_time FROM depart), 'HH24:MI')
+		, '') AS vrem_rab
+		
+	FROM schedule AS sch
+	LEFT JOIN vehicles AS vh ON vh.id = sch.vehicle_id
+	LEFT JOIN drivers AS dr ON dr.id = sch.driver_id
+	LEFT JOIN drivers AS dr_vh ON dr_vh.id = vh.driver_id
+	; 
+$BODY$
+LANGUAGE sql IMMUTABLE COST 100;
+ALTER FUNCTION putevoi_list_f(in_vehicle_id int, in_date date) OWNER TO beton;
+
+
+-- ******************* update 21/11/2024 08:33:53 ******************
+--one document for a shift
+
+-- Function: putevoi_list_f(in_vehicle_id int, in_date date)
+
+DROP FUNCTION putevoi_list_f(in_vehicle_id int, in_date date);
+
+CREATE OR REPLACE FUNCTION putevoi_list_f(in_vehicle_id int, in_date date)
+  RETURNS table(
+	nomer text,
+	data_den text,
+	data_mes text,
+	data_god text,
+
+	avto_nomer text,
+	avto_marka text,
+
+	voditel_fio text,
+	voditel_udost text,
+	voditel_udost_class text,
+	
+	date_day_n text,
+	date_mon_n text,
+	date_hour_n text,
+	date_min_n text,	
+	spidom text,
+	vrem_fakt text,
+	
+	vz_date_day_n text,
+	vz_date_mon_n text,
+	vz_date_hour_n text,
+	vz_date_min_n text,
+	vz_spidom text,
+	vz_vrem_fakt text,
+	
+	zad1_client text,
+	zad1_vrem text,
+	zad1_object text,
+	zad1_kol text,
+	zad1_km text,
+	zad1_nomen_naim text,
+	zad1_ezd text,
+	zad1_baza text,
+	
+	zad2_client text,
+	zad2_vrem text,
+	zad2_object text,
+	zad2_kol text,
+	zad2_km text,
+	zad2_nomen_naim text,
+	zad2_ezd text,
+	zad2_baza text,
+
+	zad3_client text,
+	zad3_vrem text,
+	zad3_object text,
+	zad3_kol text,
+	zad3_km text,
+	zad3_nomen_naim text,
+	zad3_ezd text,
+	zad3_baza text,
+	
+	zad4_client text,
+	zad4_vrem text,
+	zad4_object text,
+	zad4_kol text,
+	zad4_km text,
+	zad4_nomen_naim text,
+	zad4_ezd text,
+	zad4_baza text,
+	
+	zad5_client text,
+	zad5_vrem text,
+	zad5_object text,
+	zad5_kol text,
+	zad5_km text,
+	zad5_nomen_naim text,
+	zad5_ezd text,
+	zad5_baza text,
+	
+	vrem_rab text 
+  ) AS
+$BODY$
+	WITH
+	shift AS (
+		SELECT d1, d2 FROM get_shift_bounds(in_date) AS (d1 timestamp, d2 timestamp)
+	),
+	tasks AS (
+		SELECT
+			sub.client_name,
+			sub.dest_name,
+			sub.ct_name,
+			sub.base_address,
+			sub.quant,
+			sub.runs,
+			sub.mileage,
+			sub.first_ship_arrive		
+		FROM (
+			SELECT
+				cl.name AS client_name,
+				dest.name AS dest_name,
+				ct.official_name AS ct_name,
+				pb.address AS base_address,
+				sum(sh.quant) AS quant,
+				count(sh.*) AS runs,
+				SUM(coalesce(
+					round(vehicle_mileage(
+						vh.tracker_id,
+						sh.ship_date_time,
+						(SELECT
+							st.date_time
+						FROM vehicle_schedule_states AS st
+						WHERE st.shipment_id = sh.id AND st.date_time>sh.ship_date_time
+						ORDER BY st.date_time DESC
+						LIMIT 1
+						))
+					), 0)
+				) AS mileage,
+				MIN((SELECT
+					st.date_time
+				FROM vehicle_schedule_states AS st
+				WHERE st.shipment_id = sh.id AND st.date_time>sh.ship_date_time AND st.state='at_dest'
+				ORDER BY st.date_time ASC
+				LIMIT 1				
+				)) AS first_ship_arrive
+			FROM shipments AS sh
+			LEFT JOIN orders AS o ON o.id = sh.order_id
+			LEFT JOIN concrete_types AS ct ON ct.id = o.concrete_type_id
+			LEFT JOIN clients AS cl ON cl.id = o.client_id
+			LEFT JOIN destinations AS dest ON dest.id = o.destination_id
+			LEFT JOIN vehicle_schedules AS sched ON sched.id = sh.vehicle_schedule_id
+			LEFT JOIN vehicles AS vh ON vh.id = sched.vehicle_id
+			LEFT JOIN production_bases AS pb ON pb.id = sched.production_base_id
+			WHERE sched.vehicle_id = in_vehicle_id AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+			GROUP BY
+				cl.name,
+				pb.address,
+				dest.name,
+				ct.official_name
+		) AS sub
+		ORDER BY sub.first_ship_arrive
+	),
+	schedule AS (
+		SELECT
+			sch.id,
+			sch.schedule_date,
+			sch.vehicle_id,
+			sch.driver_id
+		FROM vehicle_schedules AS sch
+		WHERE
+			sch.vehicle_id = in_vehicle_id
+			AND sch.schedule_date = in_date		
+	),
+	--firtst shipment
+	depart AS (
+		SELECT
+			sh.ship_date_time
+		FROM shipments AS sh
+		WHERE
+			sh.vehicle_schedule_id = (SELECT id FROM schedule)
+			AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+		ORDER BY sh.date_time ASC
+		LIMIT 1
+	),
+	--last shipment, at base state
+	ret_to_base AS (
+		SELECT
+			st.date_time
+		FROM vehicle_schedule_states AS st
+		WHERE st.shipment_id = (
+			--last shipment
+			SELECT
+				sh.id
+			FROM shipments AS sh
+			WHERE
+				sh.vehicle_schedule_id = (SELECT id FROM schedule)
+				AND sh.date_time::date >= (SELECT d1 FROM shift) AND sh.date_time::date <= (SELECT d2 FROM shift)
+			ORDER BY sh.date_time DESC
+			LIMIT 1
+		)
+		ORDER BY st.date_time DESC
+		LIMIT 1
+	)
+	
+	SELECT
+		sch.id AS nomer,
+		to_char(sch.schedule_date::date,'DD') AS data_den,
+		to_char(sch.schedule_date::date,'TMMonth') AS data_mes,
+		to_char(sch.schedule_date::date,'YYYY') AS data_god,
+		
+		coalesce(vh.plate,'') AS avto_nomer,
+		coalesce(vh.make,'') AS avto_marka,
+
+		CASE
+			WHEN dr.employed THEN person_init(dr.name)
+			ELSE person_init(dr_vh.name)
+		END AS voditel_fio,
+		CASE
+			WHEN dr.employed THEN coalesce(dr.driver_licence,'')
+			ELSE coalesce(dr_vh.driver_licence,'')
+		END AS voditel_udost,
+		CASE
+			WHEN dr.employed THEN coalesce(dr.driver_licence_class,'')
+			ELSE coalesce(dr_vh.driver_licence_class,'')
+		END AS voditel_udost_class,
+		
+		-- departure: first ship
+		to_char((SELECT ship_date_time FROM depart),'DD') AS date_day_n,
+		to_char((SELECT ship_date_time FROM depart),'MM') AS date_mon_n,
+		to_char((SELECT ship_date_time FROM depart),'HH24') AS date_hour_n,
+		to_char((SELECT ship_date_time FROM depart),'MI') AS date_min_n,
+		coalesce((SELECT
+			ml.mileage::text
+		FROM vehicle_mileages AS ml
+		WHERE ml.vehicle_id = in_vehicle_id AND ml.for_date <= (SELECT d1 FROM shift)
+		ORDER BY ml.for_date DESC
+		LIMIT 1
+		),'') AS spidom,
+		to_char((SELECT ship_date_time FROM depart),'DD/MM HH24:MI') AS vrem_fakt,
+
+		-- return: last ship
+		to_char((SELECT date_time FROM ret_to_base),'DD') AS vz_date_day_n,
+		to_char((SELECT date_time FROM ret_to_base),'MM') AS vz_date_mon_n,
+		to_char((SELECT date_time FROM ret_to_base),'HH24') AS vz_date_hour_n,
+		to_char((SELECT date_time FROM ret_to_base),'MI') AS vz_date_min_n,
+		(coalesce((SELECT
+			ml.mileage
+		FROM vehicle_mileages AS ml
+		WHERE ml.vehicle_id = in_vehicle_id AND ml.for_date <= (SELECT d1 FROM shift)
+		ORDER BY ml.for_date DESC
+		LIMIT 1
+		),0) + coalesce(round(vehicle_mileage(vh.tracker_id, (SELECT d1 FROM shift), (SELECT d2 FROM shift))), 0)
+		)::text
+		AS vz_spidom,
+		to_char((SELECT date_time FROM ret_to_base),'DD/MM HH24:MI') AS vz_vrem_fakt,
+		
+		coalesce((SELECT client_name::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 0 LIMIT 1), '') AS zad1_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_km,
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_ezd,
+		coalesce((SELECT base_address::text FROM tasks OFFSET 0 LIMIT 1), '') zad1_baza,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 1 LIMIT 1), '') AS zad2_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_km,
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_ezd,
+		coalesce((SELECT base_address::text FROM tasks OFFSET 1 LIMIT 1), '') zad2_baza,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 2 LIMIT 1), '') AS zad3_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_km,
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_ezd,
+		coalesce((SELECT base_address::text FROM tasks OFFSET 2 LIMIT 1), '') zad3_baza,
+		
+		coalesce((SELECT client_name::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 3 LIMIT 1), '') AS zad4_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_km,
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_ezd,
+		coalesce((SELECT base_address::text FROM tasks OFFSET 3 LIMIT 1), '') zad4_baza,
+
+		coalesce((SELECT client_name::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_client,
+		coalesce((SELECT to_char(first_ship_arrive,'HH24:MI') FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_vrem,
+		coalesce((SELECT dest_name::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_object,
+		coalesce((SELECT quant::text FROM tasks OFFSET 4 LIMIT 1), '') AS zad5_kol,
+		coalesce((SELECT mileage::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_km,
+		coalesce((SELECT ct_name::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_nomen_naim,
+		coalesce((SELECT runs::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_ezd,
+		coalesce((SELECT base_address::text FROM tasks OFFSET 4 LIMIT 1), '') zad5_baza,
+		
+		coalesce(
+			to_char((SELECT date_time FROM ret_to_base) - (SELECT ship_date_time FROM depart), 'HH24:MI')
+		, '') AS vrem_rab
+		
+	FROM schedule AS sch
+	LEFT JOIN vehicles AS vh ON vh.id = sch.vehicle_id
+	LEFT JOIN drivers AS dr ON dr.id = sch.driver_id
+	LEFT JOIN drivers AS dr_vh ON dr_vh.id = vh.driver_id
+	; 
+$BODY$
+LANGUAGE sql IMMUTABLE COST 100;
+ALTER FUNCTION putevoi_list_f(in_vehicle_id int, in_date date) OWNER TO beton;
+
+
+-- ******************* update 25/11/2024 16:35:58 ******************
+-- VIEW: production_material_list
+
+--DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+	
+	SELECT
+		prod.production_dt_start AS date_time,
+		t.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		t.production_id,
+		t.raw_material_id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		--Подбор
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=t.production_site_id
+					AND cor_rolled.production_id=t.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END
+		-
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					-
+					-- - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=t.production_site_id
+								AND cor_rolled.production_id=t.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+		,mat.max_fact_quant_tolerance_percent
+		,row_to_json(pr_com.*) AS production_comment
+		,mat.ord AS material_ord
+		
+		--required quant
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		/*,CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=t.production_site_id
+					AND cor_rolled.production_id=t.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END - sum(t.material_quant_req) */
+		,(sum(t.material_quant) + coalesce(t_cor.quant,0)) - sum(t.material_quant_req) AS quant_req_dif
+		
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					sum(t.material_quant_req)
+					-
+					--(sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=t.production_site_id
+								AND cor_rolled.production_id=t.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS req_dif_violation
+		
+	FROM material_fact_consumptions t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	--LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
+	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
+	LEFT JOIN shipments AS sh ON sh.id = prod.shipment_id
+	INNER JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id AND (t_cor.cement_silo_id IS NULL OR t_cor.cement_silo_id=t.cement_silo_id)
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	LEFT JOIN production_comments AS pr_com
+		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
+
+	GROUP BY
+		prod.production_dt_start,
+		t.production_site_id,t.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
+		,pr_com.*
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 25/11/2024 16:36:53 ******************
+-- VIEW: production_material_list
+
+--DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+	
+	SELECT
+		prod.production_dt_start AS date_time,
+		t.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		t.production_id,
+		t.raw_material_id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		--Подбор
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=t.production_site_id
+					AND cor_rolled.production_id=t.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END
+		-
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					-
+					-- - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=t.production_site_id
+								AND cor_rolled.production_id=t.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+		,mat.max_fact_quant_tolerance_percent
+		,row_to_json(pr_com.*) AS production_comment
+		,mat.ord AS material_ord
+		
+		--required quant
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		/*,CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=t.production_site_id
+					AND cor_rolled.production_id=t.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END - sum(t.material_quant_req) */
+		,(sum(t.material_quant) + coalesce(t_cor.quant,0)) - sum(t.material_quant_req) AS quant_req_dif
+		
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					sum(t.material_quant_req)
+					-
+					--(sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=t.production_site_id
+								AND cor_rolled.production_id=t.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS req_dif_violation
+		
+	FROM material_fact_consumptions t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	--LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
+	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
+	LEFT JOIN shipments AS sh ON sh.id = prod.shipment_id
+	INNER JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id AND (t_cor.cement_silo_id IS NULL OR t_cor.cement_silo_id=t.cement_silo_id)
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	LEFT JOIN production_comments AS pr_com
+		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
+
+	GROUP BY
+		prod.production_dt_start,
+		t.production_site_id,t.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
+		,pr_com.*
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 25/11/2024 16:40:46 ******************
+-- VIEW: production_material_list
+
+--DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+	
+	SELECT
+		prod.production_dt_start AS date_time,
+		t.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		t.production_id,
+		t.raw_material_id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		--Подбор
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=t.production_site_id
+					AND cor_rolled.production_id=t.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END
+		-
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					-
+					-- - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=t.production_site_id
+								AND cor_rolled.production_id=t.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+		,mat.max_fact_quant_tolerance_percent
+		,row_to_json(pr_com.*) AS production_comment
+		,mat.ord AS material_ord
+		
+		--required quant
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		/*,CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=t.production_site_id
+					AND cor_rolled.production_id=t.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END - sum(t.material_quant_req) */
+		,(sum(t.material_quant) + coalesce(t_cor.quant,0)) - sum(t.material_quant_req) AS quant_req_dif
+		
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					sum(t.material_quant_req)
+					-
+					--(sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=t.production_site_id
+								AND cor_rolled.production_id=t.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS req_dif_violation
+		
+	FROM material_fact_consumptions t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	--LEFT JOIN vehicle_schedule_states AS vsch ON vsch.id=t.vehicle_schedule_state_id
+	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
+	LEFT JOIN shipments AS sh ON sh.id = prod.shipment_id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id AND (t_cor.cement_silo_id IS NULL OR t_cor.cement_silo_id=t.cement_silo_id)
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	LEFT JOIN production_comments AS pr_com
+		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
+
+	GROUP BY
+		prod.production_dt_start,
+		t.production_site_id,t.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
+		,pr_com.*
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 25/11/2024 17:20:16 ******************
+-- VIEW: production_material_list
+
+--DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+	
+	SELECT
+		prod.production_dt_start AS date_time,
+		t.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		t.production_id,
+		t.raw_material_id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		--Подбор
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=t.production_site_id
+					AND cor_rolled.production_id=t.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END
+		-
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					-
+					-- - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=t.production_site_id
+								AND cor_rolled.production_id=t.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+		,mat.max_fact_quant_tolerance_percent
+		,row_to_json(pr_com.*) AS production_comment
+		,mat.ord AS material_ord
+		
+		--required quant
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		/*,CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=t.production_site_id
+					AND cor_rolled.production_id=t.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END - sum(t.material_quant_req) */
+		,(sum(t.material_quant) + coalesce(t_cor.quant,0)) - sum(t.material_quant_req) AS quant_req_dif
+		
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					sum(t.material_quant_req)
+					-
+					--(sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=t.production_site_id
+								AND cor_rolled.production_id=t.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS req_dif_violation
+		
+	FROM material_fact_consumptions t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
+	LEFT JOIN shipments AS sh ON sh.id = prod.shipment_id
+	
+	FULL OUTER JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id AND (t_cor.cement_silo_id IS NULL OR t_cor.cement_silo_id=t.cement_silo_id)
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	LEFT JOIN production_comments AS pr_com
+		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
+
+	GROUP BY
+		prod.production_dt_start,
+		t.production_site_id,t.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
+		,pr_com.*
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 25/11/2024 17:21:38 ******************
+-- VIEW: production_material_list
+
+--DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+	
+	SELECT
+		prod.production_dt_start AS date_time,
+		t.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		t.production_id,
+		t.raw_material_id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		--Подбор
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=t.production_site_id
+					AND cor_rolled.production_id=t.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END
+		-
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					-
+					-- - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=t.production_site_id
+								AND cor_rolled.production_id=t.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+		,mat.max_fact_quant_tolerance_percent
+		,row_to_json(pr_com.*) AS production_comment
+		,mat.ord AS material_ord
+		
+		--required quant
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		/*,CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=t.production_site_id
+					AND cor_rolled.production_id=t.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END - sum(t.material_quant_req) */
+		,(sum(t.material_quant) + coalesce(t_cor.quant,0)) - sum(t.material_quant_req) AS quant_req_dif
+		
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					sum(t.material_quant_req)
+					-
+					--(sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=t.production_site_id
+								AND cor_rolled.production_id=t.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS req_dif_violation
+		
+	FROM material_fact_consumptions t
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=t.raw_material_id
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN productions AS prod ON prod.production_site_id=t.production_site_id AND prod.production_id=t.production_id
+	LEFT JOIN shipments AS sh ON sh.id = prod.shipment_id
+	
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id AND ra_mat.material_id=t.raw_material_id
+	
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id AND (t_cor.cement_silo_id IS NULL OR t_cor.cement_silo_id=t.cement_silo_id)
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	LEFT JOIN production_comments AS pr_com
+		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
+
+	GROUP BY
+		prod.production_dt_start,
+		t.production_site_id,t.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
+		,pr_com.*
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 25/11/2024 17:29:43 ******************
+-- VIEW: production_material_list
+
+--DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list2 AS
+	SELECT
+		prod.production_dt_start AS date_time,
+		t.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		t.production_id,
+		mat.id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		--Подбор
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=t.production_site_id
+					AND cor_rolled.production_id=t.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END
+		-
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					-
+					-- - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=t.production_site_id
+								AND cor_rolled.production_id=t.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+		,mat.max_fact_quant_tolerance_percent
+		,row_to_json(pr_com.*) AS production_comment
+		,mat.ord AS material_ord
+		
+		--required quant
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		/*,CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=t.production_site_id
+					AND t_rolled.production_id=t.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=t.production_site_id
+					AND cor_rolled.production_id=t.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END - sum(t.material_quant_req) */
+		,(sum(t.material_quant) + coalesce(t_cor.quant,0)) - sum(t.material_quant_req) AS quant_req_dif
+		
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					sum(t.material_quant_req)
+					-
+					--(sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=t.production_site_id
+								AND t_rolled.production_id=t.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=t.production_site_id
+								AND cor_rolled.production_id=t.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS req_dif_violation
+
+
+	FROM shipments AS sh
+	LEFT JOIN productions AS prod ON prod.shipment_id=sh.id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id
+	FULL OUTER JOIN material_fact_consumptions AS t ON
+		prod.production_site_id = t.production_site_id
+		AND prod.production_id=t.production_id
+		AND t.raw_material_id=ra_mat.material_id
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=coalesce(ra_mat.material_id, t.raw_material_id)
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id AND (t_cor.cement_silo_id IS NULL OR t_cor.cement_silo_id=t.cement_silo_id)
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	LEFT JOIN production_comments AS pr_com
+		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
+	GROUP BY
+		prod.production_dt_start,
+		t.production_site_id,t.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
+		,pr_com.*
+	ORDER BY t.production_site_id,
+		t.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list2 OWNER TO beton;
+
+
+
+-- ******************* update 25/11/2024 17:38:21 ******************
+-- VIEW: production_material_list
+
+--DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list2 AS
+	SELECT
+		prod.production_dt_start AS date_time,
+		prod.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		prod.production_id,
+		mat.id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		--Подбор
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END
+		-
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					-
+					-- - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+		,mat.max_fact_quant_tolerance_percent
+		,row_to_json(pr_com.*) AS production_comment
+		,mat.ord AS material_ord
+		
+		--required quant
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		/*,CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END - sum(t.material_quant_req) */
+		,(sum(t.material_quant) + coalesce(t_cor.quant,0)) - sum(t.material_quant_req) AS quant_req_dif
+		
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					sum(t.material_quant_req)
+					-
+					--(sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS req_dif_violation
+
+
+	FROM shipments AS sh
+	LEFT JOIN productions AS prod ON prod.shipment_id=sh.id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id
+	FULL OUTER JOIN material_fact_consumptions AS t ON
+		prod.production_site_id = t.production_site_id
+		AND prod.production_id=t.production_id
+		AND t.raw_material_id=ra_mat.material_id
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=coalesce(ra_mat.material_id, t.raw_material_id)
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id AND (t_cor.cement_silo_id IS NULL OR t_cor.cement_silo_id=t.cement_silo_id)
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	LEFT JOIN production_comments AS pr_com
+		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
+	GROUP BY
+		prod.production_dt_start,
+		prod.production_site_id,prod.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
+		,pr_com.*
+	ORDER BY prod.production_site_id,
+		prod.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list2 OWNER TO beton;
+
+
+
+-- ******************* update 25/11/2024 17:39:56 ******************
+-- VIEW: production_material_list
+
+--DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+	SELECT
+		prod.production_dt_start AS date_time,
+		prod.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		prod.production_id,
+		mat.id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		--Подбор
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END
+		-
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					-
+					-- - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+		,mat.max_fact_quant_tolerance_percent
+		,row_to_json(pr_com.*) AS production_comment
+		,mat.ord AS material_ord
+		
+		--required quant
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		/*,CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END - sum(t.material_quant_req) */
+		,(sum(t.material_quant) + coalesce(t_cor.quant,0)) - sum(t.material_quant_req) AS quant_req_dif
+		
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					sum(t.material_quant_req)
+					-
+					--(sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS req_dif_violation
+
+
+	FROM shipments AS sh
+	LEFT JOIN productions AS prod ON prod.shipment_id=sh.id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id
+	FULL OUTER JOIN material_fact_consumptions AS t ON
+		prod.production_site_id = t.production_site_id
+		AND prod.production_id=t.production_id
+		AND t.raw_material_id=ra_mat.material_id
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=coalesce(ra_mat.material_id, t.raw_material_id)
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id AND (t_cor.cement_silo_id IS NULL OR t_cor.cement_silo_id=t.cement_silo_id)
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	LEFT JOIN production_comments AS pr_com
+		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
+	GROUP BY
+		prod.production_dt_start,
+		prod.production_site_id,prod.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant
+		,pr_com.*
+	ORDER BY prod.production_site_id,
+		prod.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 25/11/2024 17:44:30 ******************
+-- VIEW: production_material_list
+
+--DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+	SELECT
+		prod.production_dt_start AS date_time,
+		prod.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		prod.production_id,
+		mat.id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		--Подбор
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(coalesce(t.concrete_quant,0), o.quant)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END
+		-
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					-
+					-- - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+		,mat.max_fact_quant_tolerance_percent
+		,row_to_json(pr_com.*) AS production_comment
+		,mat.ord AS material_ord
+		
+		--required quant
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		/*,CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END - sum(t.material_quant_req) */
+		,(sum(t.material_quant) + coalesce(t_cor.quant,0)) - sum(t.material_quant_req) AS quant_req_dif
+		
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					sum(t.material_quant_req)
+					-
+					--(sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS req_dif_violation
+
+
+	FROM shipments AS sh
+	LEFT JOIN productions AS prod ON prod.shipment_id=sh.id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id
+	FULL OUTER JOIN material_fact_consumptions AS t ON
+		prod.production_site_id = t.production_site_id
+		AND prod.production_id=t.production_id
+		AND t.raw_material_id=ra_mat.material_id
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=coalesce(ra_mat.material_id, t.raw_material_id)
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id AND (t_cor.cement_silo_id IS NULL OR t_cor.cement_silo_id=t.cement_silo_id)
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	LEFT JOIN production_comments AS pr_com
+		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
+	LEFT JOIN orders AS o ON o.id = sh.order_id
+	
+	GROUP BY
+		prod.production_dt_start,
+		prod.production_site_id,prod.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant, o.quant
+		,pr_com.*
+	ORDER BY prod.production_site_id,
+		prod.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 25/11/2024 17:46:23 ******************
+-- VIEW: production_material_list
+
+--DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+	SELECT
+		prod.production_dt_start AS date_time,
+		prod.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		prod.production_id,
+		mat.id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		--Подбор
+		CASE WHEN coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END
+		-
+		CASE WHEN coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					-
+					-- - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+		,mat.max_fact_quant_tolerance_percent
+		,row_to_json(pr_com.*) AS production_comment
+		,mat.ord AS material_ord
+		
+		--required quant
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		/*,CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END - sum(t.material_quant_req) */
+		,(sum(t.material_quant) + coalesce(t_cor.quant,0)) - sum(t.material_quant_req) AS quant_req_dif
+		
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR coalesce(t.concrete_quant,0)=0 THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					sum(t.material_quant_req)
+					-
+					--(sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS req_dif_violation
+
+
+	FROM shipments AS sh
+	LEFT JOIN productions AS prod ON prod.shipment_id=sh.id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id
+	FULL OUTER JOIN material_fact_consumptions AS t ON
+		prod.production_site_id = t.production_site_id
+		AND prod.production_id=t.production_id
+		AND t.raw_material_id=ra_mat.material_id
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=coalesce(ra_mat.material_id, t.raw_material_id)
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id AND (t_cor.cement_silo_id IS NULL OR t_cor.cement_silo_id=t.cement_silo_id)
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	LEFT JOIN production_comments AS pr_com
+		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
+	LEFT JOIN orders AS o ON o.id = sh.order_id
+	
+	GROUP BY
+		prod.production_dt_start,
+		prod.production_site_id,prod.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant, o.quant
+		,pr_com.*
+	ORDER BY prod.production_site_id,
+		prod.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 25/11/2024 17:48:05 ******************
+-- VIEW: production_material_list
+
+--DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+	SELECT
+		prod.production_dt_start AS date_time,
+		prod.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		prod.production_id,
+		mat.id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(t.material_quant) AS material_quant,
+		sum(t.material_quant) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(t.material_quant_req) AS quant_fact_req,
+		
+		--Подбор
+		CASE WHEN coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END
+		-
+		CASE WHEN coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					-
+					-- - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+		,mat.max_fact_quant_tolerance_percent
+		,row_to_json(pr_com.*) AS production_comment
+		,mat.ord AS material_ord
+		
+		--required quant
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		/*,CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END - sum(t.material_quant_req) */
+		,(sum(t.material_quant) + coalesce(t_cor.quant,0)) - sum(t.material_quant_req) AS quant_req_dif
+		
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					sum(t.material_quant_req)
+					-
+					--(sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS req_dif_violation
+
+
+	FROM shipments AS sh
+	LEFT JOIN productions AS prod ON prod.shipment_id=sh.id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id
+	FULL OUTER JOIN material_fact_consumptions AS t ON
+		prod.production_site_id = t.production_site_id
+		AND prod.production_id=t.production_id
+		AND t.raw_material_id=ra_mat.material_id
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=coalesce(ra_mat.material_id, t.raw_material_id)
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id AND (t_cor.cement_silo_id IS NULL OR t_cor.cement_silo_id=t.cement_silo_id)
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	LEFT JOIN production_comments AS pr_com
+		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
+	LEFT JOIN orders AS o ON o.id = sh.order_id
+	
+	GROUP BY
+		prod.production_dt_start,
+		prod.production_site_id,prod.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant, o.quant
+		,pr_com.*
+	ORDER BY prod.production_site_id,
+		prod.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 25/11/2024 17:50:06 ******************
+-- VIEW: production_material_list
+
+--DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+	SELECT
+		prod.production_dt_start AS date_time,
+		prod.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		prod.production_id,
+		mat.id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(coalesce(t.material_quant, 0)) AS material_quant,
+		sum(coalesce(t.material_quant,0)) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(coalesce(t.material_quant_req,0)) AS quant_fact_req,
+		
+		--Подбор
+		CASE WHEN coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END
+		-
+		CASE WHEN coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					-
+					-- - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+		,mat.max_fact_quant_tolerance_percent
+		,row_to_json(pr_com.*) AS production_comment
+		,mat.ord AS material_ord
+		
+		--required quant
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		/*,CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END - sum(t.material_quant_req) */
+		,(sum(t.material_quant) + coalesce(t_cor.quant,0)) - sum(t.material_quant_req) AS quant_req_dif
+		
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					sum(t.material_quant_req)
+					-
+					--(sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS req_dif_violation
+
+
+	FROM shipments AS sh
+	LEFT JOIN productions AS prod ON prod.shipment_id=sh.id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id
+	FULL OUTER JOIN material_fact_consumptions AS t ON
+		prod.production_site_id = t.production_site_id
+		AND prod.production_id=t.production_id
+		AND t.raw_material_id=ra_mat.material_id
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=coalesce(ra_mat.material_id, t.raw_material_id)
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id AND (t_cor.cement_silo_id IS NULL OR t_cor.cement_silo_id=t.cement_silo_id)
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	LEFT JOIN production_comments AS pr_com
+		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
+	LEFT JOIN orders AS o ON o.id = sh.order_id
+	
+	GROUP BY
+		prod.production_dt_start,
+		prod.production_site_id,prod.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant, o.quant
+		,pr_com.*
+	ORDER BY prod.production_site_id,
+		prod.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 25/11/2024 17:55:34 ******************
+-- VIEW: production_material_list
+
+--DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+	SELECT
+		prod.production_dt_start AS date_time,
+		prod.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		prod.production_id,
+		mat.id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(coalesce(t.material_quant, 0)) AS material_quant,
+		sum(coalesce(t.material_quant,0)) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(coalesce(t.material_quant_req,0)) AS quant_fact_req,
+		
+		--Подбор
+		CASE WHEN coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(coalesce(t.material_quant,0)) + coalesce(t_cor.quant,0))
+		END
+		-
+		CASE WHEN coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					-
+					-- - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+		,mat.max_fact_quant_tolerance_percent
+		,row_to_json(pr_com.*) AS production_comment
+		,mat.ord AS material_ord
+		
+		--required quant
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		/*,CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+		END - sum(t.material_quant_req) */
+		,(sum(t.material_quant) + coalesce(t_cor.quant,0)) - sum(t.material_quant_req) AS quant_req_dif
+		
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					sum(t.material_quant_req)
+					-
+					--(sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS req_dif_violation
+
+
+	FROM shipments AS sh
+	LEFT JOIN productions AS prod ON prod.shipment_id=sh.id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id
+	FULL OUTER JOIN material_fact_consumptions AS t ON
+		prod.production_site_id = t.production_site_id
+		AND prod.production_id=t.production_id
+		AND t.raw_material_id=ra_mat.material_id
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=coalesce(ra_mat.material_id, t.raw_material_id)
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id AND (t_cor.cement_silo_id IS NULL OR t_cor.cement_silo_id=t.cement_silo_id)
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	LEFT JOIN production_comments AS pr_com
+		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
+	LEFT JOIN orders AS o ON o.id = sh.order_id
+	
+	GROUP BY
+		prod.production_dt_start,
+		prod.production_site_id,prod.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant, o.quant
+		,pr_com.*
+	ORDER BY prod.production_site_id,
+		prod.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 25/11/2024 17:57:17 ******************
+-- VIEW: production_material_list
+
+--DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+	SELECT
+		prod.production_dt_start AS date_time,
+		prod.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		prod.production_id,
+		mat.id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(coalesce(t.material_quant, 0)) AS material_quant,
+		sum(coalesce(t.material_quant,0)) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(coalesce(t.material_quant_req,0)) AS quant_fact_req,
+		
+		--Подбор
+		CASE WHEN coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(coalesce(t.material_quant,0)) + coalesce(t_cor.quant,0))
+		END
+		-
+		CASE WHEN coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					-
+					-- - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+		,mat.max_fact_quant_tolerance_percent
+		,row_to_json(pr_com.*) AS production_comment
+		,mat.ord AS material_ord
+		
+		--required quant
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		/*,CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(coalesce(t.material_quant,0)) + coalesce(t_cor.quant,0))
+		END - sum(coalesce(t.material_quant_req,0)) */
+		,(sum(coalesce(t.material_quant,0)) + coalesce(t_cor.quant,0)) - sum(coalesce(t.material_quant_req,0)) AS quant_req_dif
+		
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					sum(t.material_quant_req)
+					-
+					--(sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS req_dif_violation
+
+
+	FROM shipments AS sh
+	LEFT JOIN productions AS prod ON prod.shipment_id=sh.id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id
+	FULL OUTER JOIN material_fact_consumptions AS t ON
+		prod.production_site_id = t.production_site_id
+		AND prod.production_id=t.production_id
+		AND t.raw_material_id=ra_mat.material_id
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=coalesce(ra_mat.material_id, t.raw_material_id)
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id AND (t_cor.cement_silo_id IS NULL OR t_cor.cement_silo_id=t.cement_silo_id)
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	LEFT JOIN production_comments AS pr_com
+		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
+	LEFT JOIN orders AS o ON o.id = sh.order_id
+	
+	GROUP BY
+		prod.production_dt_start,
+		prod.production_site_id,prod.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant, o.quant
+		,pr_com.*
+	ORDER BY prod.production_site_id,
+		prod.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 25/11/2024 18:00:55 ******************
+-- VIEW: production_material_list
+
+--DROP VIEW material_cons_tolerance_violation_list;
+--DROP VIEW production_material_list;
+
+CREATE OR REPLACE VIEW production_material_list AS
+	SELECT
+		prod.production_dt_start AS date_time,
+		prod.production_site_id,
+		production_sites_ref(ps) AS production_sites_ref,
+		prod.production_id,
+		mat.id AS material_id,
+		materials_ref(mat) AS materials_ref,
+		cement_silos_ref(cem) AS cement_silos_ref,
+		t.cement_silo_id,
+		sum(coalesce(t.material_quant, 0)) AS material_quant,
+		sum(coalesce(t.material_quant,0)) + coalesce(t_cor.quant,0) AS quant_fact,
+		sum(coalesce(t.material_quant_req,0)) AS quant_fact_req,
+		
+		--Подбор
+		CASE WHEN coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		END AS quant_consuption,
+		
+		coalesce(t_cor.quant,0) AS quant_corrected,
+
+		t_cor.elkon_id AS elkon_correction_id,
+		users_ref(cor_u) AS correction_users_ref,
+		t_cor.date_time_set correction_date_time_set,
+
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(coalesce(t.material_quant,0)) + coalesce(t_cor.quant,0))
+		END
+		-
+		CASE WHEN coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		END 
+		AS quant_dif
+	
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN t.raw_material_id IS NULL THEN TRUE --no fact
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					-
+					-- - (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,o.quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS dif_violation
+	
+		,mat.max_fact_quant_tolerance_percent
+		,row_to_json(pr_com.*) AS production_comment
+		,mat.ord AS material_ord
+		
+		--required quant
+		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
+		/*,CASE
+			WHEN (SELECT count(*)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+			)>=2 THEN
+				coalesce((SELECT sum(t_rolled.material_quant)
+				FROM material_fact_consumptions AS t_rolled
+				WHERE t_rolled.production_site_id=prod.production_site_id
+					AND t_rolled.production_id=prod.production_id
+					AND t_rolled.raw_material_id=t.raw_material_id
+				),0) + 
+				coalesce((SELECT sum(cor_rolled.quant)
+				FROM material_fact_consumption_corrections AS cor_rolled
+				WHERE cor_rolled.production_site_id=prod.production_site_id
+					AND cor_rolled.production_id=prod.production_id
+					AND cor_rolled.material_id=t.raw_material_id
+				),0)			
+				
+			ELSE (sum(coalesce(t.material_quant,0)) + coalesce(t_cor.quant,0))
+		END - sum(coalesce(t.material_quant_req,0)) */
+		,(sum(coalesce(t.material_quant,0)) + coalesce(t_cor.quant,0)) - sum(coalesce(t.material_quant_req,0)) AS quant_req_dif
+		
+		,CASE
+			WHEN mat.id IS NULL THEN FALSE
+			WHEN t.raw_material_id IS NULL THEN TRUE --no fact
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN TRUE
+			ELSE
+				coalesce(
+				( abs(
+					sum(t.material_quant_req)
+					-
+					--(sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					CASE
+						WHEN (SELECT count(*)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+						)>=2 THEN
+							coalesce((SELECT sum(t_rolled.material_quant)
+							FROM material_fact_consumptions AS t_rolled
+							WHERE t_rolled.production_site_id=prod.production_site_id
+								AND t_rolled.production_id=prod.production_id
+								AND t_rolled.raw_material_id=t.raw_material_id
+							),0) + 
+							coalesce((SELECT sum(cor_rolled.quant)
+							FROM material_fact_consumption_corrections AS cor_rolled
+							WHERE cor_rolled.production_site_id=prod.production_site_id
+								AND cor_rolled.production_id=prod.production_id
+								AND cor_rolled.material_id=t.raw_material_id
+							),0)			
+				
+						ELSE (sum(t.material_quant_req) + coalesce(t_cor.quant,0))
+					END
+					
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,0)
+					 	>= mat.max_fact_quant_tolerance_percent
+				)
+			,FALSE)
+		END AS req_dif_violation
+
+
+	FROM shipments AS sh
+	LEFT JOIN productions AS prod ON prod.shipment_id=sh.id
+	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id
+	FULL OUTER JOIN material_fact_consumptions AS t ON
+		prod.production_site_id = t.production_site_id
+		AND prod.production_id=t.production_id
+		AND t.raw_material_id=ra_mat.material_id
+	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
+	LEFT JOIN raw_materials AS mat ON mat.id=coalesce(ra_mat.material_id, t.raw_material_id)
+	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id
+	LEFT JOIN material_fact_consumption_corrections AS t_cor ON t_cor.production_site_id=t.production_site_id AND t_cor.production_id=t.production_id
+			AND t_cor.material_id=t.raw_material_id AND (t_cor.cement_silo_id IS NULL OR t_cor.cement_silo_id=t.cement_silo_id)
+	LEFT JOIN users AS cor_u ON cor_u.id=t_cor.user_id
+	LEFT JOIN production_comments AS pr_com
+		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
+	LEFT JOIN orders AS o ON o.id = sh.order_id
+	
+	GROUP BY
+		prod.production_dt_start,
+		prod.production_site_id,prod.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
+		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
+		ps.*,mat.*,cem.*,
+		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant, o.quant
+		,pr_com.*
+	ORDER BY prod.production_site_id,
+		prod.production_id,
+		mat.ord
+			
+	;
+	
+ALTER VIEW production_material_list OWNER TO beton;
+
+
+
+-- ******************* update 14/12/2024 02:41:41 ******************
+
+		ALTER TABLE public.clients ADD COLUMN shipment_quant_for_cost  numeric(19,3);
+
+
+
+-- ******************* update 14/12/2024 02:42:02 ******************
+-- View: public.clients_dialog
+
+-- DROP VIEW public.clients_dialog;
+
+CREATE OR REPLACE VIEW public.clients_dialog AS 
+	SELECT
+		cl.id,
+		cl.name,
+		cl.name_full,
+		cl.manager_comment,
+		client_types_ref(ct) AS client_types_ref,
+		client_come_from_ref(ccf) AS client_come_from_ref,
+		cl.phone_cel,
+		cl.email,
+		cl.client_kind,
+		users_ref(u) AS users_ref,
+		
+		cl.inn
+		,users_ref(acc) AS accounts_ref
+		,cl.account_from_date
+		
+		,cl.bank_account
+		,banks.banks_ref(bnk) AS banks_ref
+		,cl.kpp
+		,cl.address_legal
+		,cl.ref_1c
+		,cl.shipment_quant_for_cost
+		
+	FROM clients cl
+	LEFT JOIN client_types ct ON ct.id = cl.client_type_id
+	LEFT JOIN client_come_from ccf ON ccf.id = cl.client_come_from_id
+	LEFT JOIN users u ON u.id = cl.manager_id
+	LEFT JOIN users acc ON acc.id = cl.user_id
+	LEFT JOIN banks.banks bnk ON bnk.bik = cl.bank_bik
+	;
+
+ALTER TABLE public.clients_dialog
+  OWNER TO beton;
+
+
+
+-- ******************* update 14/12/2024 03:21:57 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+--DROP FUNCTION vehicle_mileages_update();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+    new_user_id INT;
+BEGIN
+	new_user_id := ((SELECT const_reglament_user_val()->'keys'->>'id'))::int;
+	
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileages
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            vm.mileage,
+            veh.tracker_id
+        FROM vehicle_mileages vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+        LEFT JOIN vehicles AS veh ON veh.id = vm.vehicle_id
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+
+        -- Process mileage for each day until the current time
+        WHILE (start_time + INTERVAL '1 day') <= now() LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := round(vehicle_mileage(
+                vehicle.tracker_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            ));
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileages (vehicle_id, for_date, user_id, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                new_user_id,
+                coalesce(vehicle.mileage,0) + coalesce(new_mileage, 0)
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 14/12/2024 03:26:36 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+--DROP FUNCTION vehicle_mileages_update();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+    new_user_id INT;
+BEGIN
+	new_user_id := ((SELECT const_reglament_user_val()->'keys'->>'id'))::int;
+	
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileages
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            coalesce(vm.mileage,0) AS mileage,
+            veh.tracker_id
+        FROM vehicle_mileages vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+        LEFT JOIN vehicles AS veh ON veh.id = vm.vehicle_id
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+
+        -- Process mileage for each day until the current time
+        WHILE (start_time + INTERVAL '1 day') <= now() LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := round(vehicle_mileage(
+                vehicle.tracker_id,
+                start_time,
+                end_time - INTERVAL '1 second'
+            ));
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileages (vehicle_id, for_date, user_id, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                new_user_id,
+                vehicle.mileage + coalesce(new_mileage, 0)
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 14/12/2024 03:27:30 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+--DROP FUNCTION vehicle_mileages_update();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+    new_user_id INT;
+BEGIN
+	new_user_id := ((SELECT const_reglament_user_val()->'keys'->>'id'))::int;
+	
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileages
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            coalesce(vm.mileage,0) AS mileage,
+            veh.tracker_id
+        FROM vehicle_mileages vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+        LEFT JOIN vehicles AS veh ON veh.id = vm.vehicle_id
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+
+        -- Process mileage for each day until the current time
+        WHILE (start_time + INTERVAL '1 day') <= now() LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := round(coalesce(vehicle_mileage(
+		        vehicle.tracker_id,
+		        start_time,
+		        end_time - INTERVAL '1 second'
+		    ), 0)
+            );
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileages (vehicle_id, for_date, user_id, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                new_user_id,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 14/12/2024 03:27:54 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+--DROP FUNCTION vehicle_mileages_update();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+    new_user_id INT;
+BEGIN
+	new_user_id := ((SELECT const_reglament_user_val()->'keys'->>'id'))::int;
+	
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileages
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            coalesce(vm.mileage,0) AS mileage,
+            veh.tracker_id
+        FROM vehicle_mileages vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+        LEFT JOIN vehicles AS veh ON veh.id = vm.vehicle_id
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+
+        -- Process mileage for each day until the current time
+        WHILE (start_time + INTERVAL '1 day') <= now() LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := round(coalesce(vehicle_mileage(
+		        vehicle.tracker_id,
+		        start_time,
+		        end_time - INTERVAL '1 second'
+		    ), 0)
+            );
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileages (vehicle_id, for_date, user_id, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                new_user_id,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+            return;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 14/12/2024 03:28:44 ******************
+
+--DROP FUNCTION vehicle_mileages_update()
+--DROP FUNCTION vehicle_mileages_update();
+
+CREATE OR REPLACE FUNCTION vehicle_mileages_update()
+RETURNS void AS $$
+DECLARE
+    vehicle RECORD; -- Holds the current vehicle record in the loop
+    start_time TIMESTAMPTZ; -- Time to start updating
+    end_time TIMESTAMPTZ; -- Time to calculate up to
+    new_mileage INT; -- Computed mileage
+    new_user_id INT;
+BEGIN
+	new_user_id := ((SELECT const_reglament_user_val()->'keys'->>'id'))::int;
+	
+    -- Main loop to iterate through vehicles
+    FOR vehicle IN
+	    -- Use a CTE to find the most recent mileage records for each vehicle
+	    WITH latest_mileage AS (
+		SELECT 
+		    vehicle_id, 
+		    MAX(for_date) AS last_date
+		FROM vehicle_mileages
+		GROUP BY vehicle_id
+	    )
+    
+        SELECT 
+            vm.vehicle_id, 
+            vm.for_date, 
+            coalesce(vm.mileage,0) AS mileage,
+            veh.tracker_id
+        FROM vehicle_mileages vm
+        INNER JOIN latest_mileage lm
+        ON vm.vehicle_id = lm.vehicle_id AND vm.for_date = lm.last_date
+        LEFT JOIN vehicles AS veh ON veh.id = vm.vehicle_id
+    LOOP
+        -- Initialize the start time from the last recorded mileage
+        start_time := vehicle.for_date;
+
+        -- Process mileage for each day until the current time
+        WHILE (start_time + INTERVAL '1 day') <= now() LOOP
+            -- Set the end of the current day at 06:00
+            end_time := start_time + INTERVAL '1 day';
+
+            -- Calculate mileage using the custom function
+            new_mileage := round(coalesce(vehicle_mileage(
+		        vehicle.tracker_id,
+		        start_time,
+		        end_time - INTERVAL '1 second'
+		    ), 0)
+            );
+
+            -- Insert the new mileage record into the table
+            INSERT INTO vehicle_mileages (vehicle_id, for_date, user_id, mileage)
+            VALUES (
+                vehicle.vehicle_id,
+                end_time,
+                new_user_id,
+                vehicle.mileage + new_mileage
+            );
+
+            -- Update the vehicle's mileage and increment the start time
+            vehicle.mileage := vehicle.mileage + new_mileage;
+            start_time := end_time;
+        END LOOP;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- ******************* update 17/12/2024 06:55:49 ******************
+
+		ALTER TABLE public.raw_materials ADD COLUMN deleted bool
+			DEFAULT FALSE;
+/*	DROP INDEX IF EXISTS raw_materials_name_index;
+	CREATE UNIQUE INDEX raw_materials_name_index
+	ON raw_materials(lower(name));
+*/

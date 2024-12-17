@@ -52,6 +52,15 @@ function ProductionBaseList_Model(options){
 	
 	options.fields.destinations_ref = new FieldJSON("destinations_ref",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Адрес';
+	filed_options.autoInc = false;	
+	
+	options.fields.address = new FieldText("address",filed_options);
+	
 		ProductionBaseList_Model.superclass.constructor.call(this,id,options);
 }
 extend(ProductionBaseList_Model,ModelXML);

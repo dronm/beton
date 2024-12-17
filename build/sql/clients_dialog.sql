@@ -24,6 +24,7 @@ CREATE OR REPLACE VIEW public.clients_dialog AS
 		,cl.kpp
 		,cl.address_legal
 		,cl.ref_1c
+		,cl.shipment_quant_for_cost
 		
 	FROM clients cl
 	LEFT JOIN client_types ct ON ct.id = cl.client_type_id

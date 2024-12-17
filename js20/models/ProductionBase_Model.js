@@ -54,6 +54,15 @@ function ProductionBase_Model(options){
 	options.fields.destination_id = new FieldInt("destination_id",filed_options);
 	options.fields.destination_id.getValidator().setRequired(true);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Адрес';
+	filed_options.autoInc = false;	
+	
+	options.fields.address = new FieldText("address",filed_options);
+	
 		ProductionBase_Model.superclass.constructor.call(this,id,options);
 }
 extend(ProductionBase_Model,ModelXML);

@@ -9,6 +9,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
  
 class ProductionBase_Model extends ModelSQLBeton{
@@ -48,6 +49,16 @@ class ProductionBase_Model extends ModelSQLBeton{
 						
 		$f_destination_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destination_id",$f_opts);
 		$this->addField($f_destination_id);
+		//********************
+		
+		//*** Field address ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Адрес';
+		$f_opts['id']="address";
+						
+		$f_address=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"address",$f_opts);
+		$this->addField($f_address);
 		//********************
 	
 		$order = new ModelOrderSQL();		

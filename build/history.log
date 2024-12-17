@@ -1403,6 +1403,40 @@ VehicleListReport.html.xsl
 5) cron reglament job to update mileage on every day bases.
 
 
+1.00354
+1) ProductionBase added field address for putevoi_list
+	ProductionBase_Model
+	ProductionBaseList_Model
+	ProductionBase_Controller.php
+	ProductionBaseList_View.js
+2) production_material_list changed completely based on shipments, production_material_list2.sql
+
+
+1.00355 2024-12-17
+1) RawMaterial new field deleted to remove unused elements.
+2) User_Controller added hidden filter on deleted column for all users.
+
+1) Function water_ship_cost_on_date() returns water cost no matter how much. Need to multiply by 
+		hipments_quant_for_cost(in_date, in_shipments.quant::numeric, in_destinations.distance::numeric)
+	- shipments_cost
+	- shipments_list
+
+2) Minimal quant for shimpent.
+	shipments_quant_for_cost(in_date date, in_quant numeric,in_distance numeric)
+	need also to consider a client. need a table to hold client specific values.
+	- shipments_for_client_list
+	- shipments_cost
+	- shipments_list
+	- shipments_for_veh_owner_list
+	Client new column shimpent_quant_for_cost
+
+3) TN added new record in templates.
+
+
+
+
+
+
 
 
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели

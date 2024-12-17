@@ -159,6 +159,12 @@ extend(Client_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldFloat("shipment_quant_for_cost",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -284,6 +290,12 @@ extend(Client_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Ссылка на справочник 1с";
 	var field = new FieldJSONB("ref_1c",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldFloat("shipment_quant_for_cost",options);
 	
 	pm.addField(field);
 	

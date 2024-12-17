@@ -27,7 +27,7 @@ BEGIN
         SELECT 
             vm.vehicle_id, 
             vm.for_date, 
-            vm.mileage,
+            coalesce(vm.mileage,0) AS mileage,
             veh.tracker_id
         FROM vehicle_mileages vm
         INNER JOIN latest_mileage lm
@@ -43,11 +43,12 @@ BEGIN
             end_time := start_time + INTERVAL '1 day';
 
             -- Calculate mileage using the custom function
-            new_mileage := round(vehicle_mileage(
-                vehicle.tracker_id,
-                start_time,
-                end_time - INTERVAL '1 second'
-            ));
+            new_mileage := round(coalesce(vehicle_mileage(
+		        vehicle.tracker_id,
+		        start_time,
+		        end_time - INTERVAL '1 second'
+		    ), 0)
+            );
 
             -- Insert the new mileage record into the table
             INSERT INTO vehicle_mileages (vehicle_id, for_date, user_id, mileage)

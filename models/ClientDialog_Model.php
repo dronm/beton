@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
@@ -42,31 +43,6 @@ class ClientDialog_Model extends ModelSQLBeton{
 		$this->addField($f_name);
 		//********************
 		
-		//*** Field inn ***
-		$f_opts = array();
-		$f_opts['id']="inn";
-						
-		$f_inn=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"inn",$f_opts);
-		$this->addField($f_inn);
-		//********************
-		
-		//*** Field kpp ***
-		$f_opts = array();
-		$f_opts['length']=10;
-		$f_opts['id']="kpp";
-						
-		$f_kpp=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"kpp",$f_opts);
-		$this->addField($f_kpp);
-		//********************
-		
-		//*** Field address_legal ***
-		$f_opts = array();
-		$f_opts['id']="address_legal";
-						
-		$f_address_legal=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"address_legal",$f_opts);
-		$this->addField($f_address_legal);
-		//********************
-		
 		//*** Field name_full ***
 		$f_opts = array();
 		
@@ -87,14 +63,6 @@ class ClientDialog_Model extends ModelSQLBeton{
 		$this->addField($f_manager_comment);
 		//********************
 		
-		//*** Field phone_cel ***
-		$f_opts = array();
-		$f_opts['id']="phone_cel";
-						
-		$f_phone_cel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"phone_cel",$f_opts);
-		$this->addField($f_phone_cel);
-		//********************
-		
 		//*** Field client_types_ref ***
 		$f_opts = array();
 		$f_opts['id']="client_types_ref";
@@ -111,6 +79,22 @@ class ClientDialog_Model extends ModelSQLBeton{
 		$this->addField($f_client_come_from_ref);
 		//********************
 		
+		//*** Field phone_cel ***
+		$f_opts = array();
+		$f_opts['id']="phone_cel";
+						
+		$f_phone_cel=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"phone_cel",$f_opts);
+		$this->addField($f_phone_cel);
+		//********************
+		
+		//*** Field email ***
+		$f_opts = array();
+		$f_opts['id']="email";
+						
+		$f_email=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"email",$f_opts);
+		$this->addField($f_email);
+		//********************
+		
 		//*** Field client_kind ***
 		$f_opts = array();
 		$f_opts['id']="client_kind";
@@ -125,6 +109,14 @@ class ClientDialog_Model extends ModelSQLBeton{
 						
 		$f_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"users_ref",$f_opts);
 		$this->addField($f_users_ref);
+		//********************
+		
+		//*** Field inn ***
+		$f_opts = array();
+		$f_opts['id']="inn";
+						
+		$f_inn=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"inn",$f_opts);
+		$this->addField($f_inn);
 		//********************
 		
 		//*** Field accounts_ref ***
@@ -145,16 +137,6 @@ class ClientDialog_Model extends ModelSQLBeton{
 		$this->addField($f_account_from_date);
 		//********************
 		
-		//*** Field banks_ref ***
-		$f_opts = array();
-		
-		$f_opts['alias']='БИК банка';
-		$f_opts['id']="banks_ref";
-						
-		$f_banks_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"banks_ref",$f_opts);
-		$this->addField($f_banks_ref);
-		//********************
-		
 		//*** Field bank_account ***
 		$f_opts = array();
 		
@@ -165,13 +147,31 @@ class ClientDialog_Model extends ModelSQLBeton{
 		$this->addField($f_bank_account);
 		//********************
 		
-		//*** Field bank_bik ***
+		//*** Field banks_ref ***
 		$f_opts = array();
-		$f_opts['length']=9;
-		$f_opts['id']="bank_bik";
+		
+		$f_opts['alias']='БИК банка';
+		$f_opts['id']="banks_ref";
 						
-		$f_bank_bik=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"bank_bik",$f_opts);
-		$this->addField($f_bank_bik);
+		$f_banks_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"banks_ref",$f_opts);
+		$this->addField($f_banks_ref);
+		//********************
+		
+		//*** Field kpp ***
+		$f_opts = array();
+		$f_opts['length']=10;
+		$f_opts['id']="kpp";
+						
+		$f_kpp=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"kpp",$f_opts);
+		$this->addField($f_kpp);
+		//********************
+		
+		//*** Field address_legal ***
+		$f_opts = array();
+		$f_opts['id']="address_legal";
+						
+		$f_address_legal=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"address_legal",$f_opts);
+		$this->addField($f_address_legal);
 		//********************
 		
 		//*** Field ref_1c ***
@@ -180,6 +180,15 @@ class ClientDialog_Model extends ModelSQLBeton{
 						
 		$f_ref_1c=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ref_1c",$f_opts);
 		$this->addField($f_ref_1c);
+		//********************
+		
+		//*** Field shipment_quant_for_cost ***
+		$f_opts = array();
+		$f_opts['length']=19;
+		$f_opts['id']="shipment_quant_for_cost";
+						
+		$f_shipment_quant_for_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipment_quant_for_cost",$f_opts);
+		$this->addField($f_shipment_quant_for_cost);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

@@ -310,7 +310,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		$flName = $ar["file_name"]; 
 	}
 
-	//downloads template as generic type: docx, xlsx.
+	//downloads template as docx, xlsx.
 	public static function downloadFilledTemplate($dbLink, $templateName, $paramArray, $erEmpty, $fileName){
 		$out_fl = '';
 		$fl_name = '';

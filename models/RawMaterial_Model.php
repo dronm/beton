@@ -150,6 +150,15 @@ class RawMaterial_Model extends ModelSQLBeton{
 		$f_dif_store=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"dif_store",$f_opts);
 		$this->addField($f_dif_store);
 		//********************
+		
+		//*** Field deleted ***
+		$f_opts = array();
+		$f_opts['defaultValue']='FALSE';
+		$f_opts['id']="deleted";
+						
+		$f_deleted=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"deleted",$f_opts);
+		$this->addField($f_deleted);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

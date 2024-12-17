@@ -121,6 +121,10 @@ function ClientDialog_View(id,options){
 			//}
 		}));		
 						
+		this.addElement(new EditFloat(id+":shipment_quant_for_cost",{
+			"precision":2,
+			"labelCaption":"Минмальное количество для доставки:"
+		}));		
 	}
 	
 	ClientDialog_View.superclass.constructor.call(this,id,options);
@@ -142,6 +146,7 @@ function ClientDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("bank_account")})
 		,new DataBinding({"control":this.getElement("banks_ref"),"fieldId":"banks_ref"})
 		,new DataBinding({"control":this.getElement("ref_1c"),"fieldId":"ref_1c"})
+		,new DataBinding({"control":this.getElement("shipment_quant_for_cost")})
 	]);
 	
 	//write
@@ -160,6 +165,7 @@ function ClientDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("bank_account")})
 		,new CommandBinding({"control":this.getElement("banks_ref"),"fieldId":"bank_bik"})
 		,new CommandBinding({"control":this.getElement("ref_1c"),"fieldId":"ref_1c"})
+		,new CommandBinding({"control":this.getElement("shipment_quant_for_cost")})
 		/*,new CommandBinding({"func":function(ctrl, pm){
 			if(self.m_ref1c){
 				pm.setFieldValue("ref_1c", self.m_ref1c);

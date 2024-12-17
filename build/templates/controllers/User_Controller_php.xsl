@@ -546,8 +546,26 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$f2->setValue($date_to);
 			$filter->addField($f2,'&lt;');				
 			GlobalFilter::set('AstCallList_Model', $filter, TRUE);
+
+
+			$filter = new ModelWhereSQL();
+			$f1 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+			$f1->setValue($date_from);
+			$filter->addField($f1,'&gt;=');		
+			$f2 = new FieldSQLDateTime(NULL, NULL, NULL, "date_time");
+			$f2->setValue($date_to);
+			$filter->addField($f2,'&lt;');				
+			GlobalFilter::set('MaterialFactConsumptionRolledList_Model', $filter, TRUE);
 		}	
 		
+		//raw material list
+		$model = new RawMaterial_Model($this->getDbLink());
+		$filter = new ModelWhereSQL();
+		$field = clone $model->getFieldById('deleted');
+		$field->setValue(FALSE);
+		$filter->addField($field,'=');
+		GlobalFilter::set('RawMaterial_Model', $filter, TRUE);
+
 		//app_id clobal filter
 		<xsl:for-each select="/metadata/models/model/globalFilter[@id='app_id']">
 		<xsl:variable name="model_id" select="concat(../@id,'_Model')"/>

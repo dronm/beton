@@ -1389,7 +1389,9 @@ UPDATE public.production_sites
 				//throw $e;
 				
 			}finally{
-				unlink($SYGNAL_FILE);
+				if(file_exists($SYGNAL_FILE)){
+					unlink($SYGNAL_FILE);
+				}
 			}			
 		}
 	}

@@ -46,34 +46,6 @@ function ClientDialog_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.inn = new FieldString("inn",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.kpp = new FieldString("kpp",filed_options);
-	options.fields.kpp.getValidator().setMaxLength('10');
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.address_legal = new FieldText("address_legal",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
 	filed_options.alias = 'Полное наименование';
 	filed_options.autoInc = false;	
 	
@@ -88,15 +60,6 @@ function ClientDialog_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.manager_comment = new FieldText("manager_comment",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.phone_cel = new FieldString("phone_cel",filed_options);
 	
 				
 	
@@ -123,6 +86,24 @@ function ClientDialog_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.phone_cel = new FieldString("phone_cel",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.email = new FieldString("email",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.client_kind = new FieldString("client_kind",filed_options);
 	
 				
@@ -133,6 +114,15 @@ function ClientDialog_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.users_ref = new FieldJSON("users_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.inn = new FieldString("inn",filed_options);
 	
 				
 	
@@ -156,15 +146,6 @@ function ClientDialog_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'БИК банка';
-	filed_options.autoInc = false;	
-	
-	options.fields.banks_ref = new FieldJSON("banks_ref",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
 	filed_options.alias = 'Банковский счет';
 	filed_options.autoInc = false;	
 	
@@ -174,11 +155,29 @@ function ClientDialog_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'БИК банка';
+	filed_options.autoInc = false;	
+	
+	options.fields.banks_ref = new FieldJSON("banks_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.bank_bik = new FieldString("bank_bik",filed_options);
-	options.fields.bank_bik.getValidator().setMaxLength('9');
+	options.fields.kpp = new FieldString("kpp",filed_options);
+	options.fields.kpp.getValidator().setMaxLength('10');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.address_legal = new FieldText("address_legal",filed_options);
 	
 				
 	
@@ -188,6 +187,16 @@ function ClientDialog_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.ref_1c = new FieldString("ref_1c",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.shipment_quant_for_cost = new FieldFloat("shipment_quant_for_cost",filed_options);
+	options.fields.shipment_quant_for_cost.getValidator().setMaxLength('19');
 	
 		ClientDialog_Model.superclass.constructor.call(this,id,options);
 }

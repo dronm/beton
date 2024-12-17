@@ -1,5 +1,5 @@
 /**
- * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017 - 2024
  
  * THIS FILE IS GENERATED FROM TEMPLATE build/templates/controllers/Controller_js20.xsl
  * ALL DIRECT MODIFICATIONS WILL BE LOST WITH THE NEXT BUILD PROCESS!!!
@@ -56,6 +56,12 @@ extend(ProductionBase_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Адрес";
+	var field = new FieldText("address",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -83,6 +89,12 @@ extend(ProductionBase_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Геозона";
 	var field = new FieldInt("destination_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Адрес";
+	var field = new FieldText("address",options);
 	
 	pm.addField(field);
 	
@@ -124,6 +136,9 @@ extend(ProductionBase_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Геозона";
 	pm.addField(new FieldJSON("destinations_ref",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Адрес";
+	pm.addField(new FieldText("address",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");
 	
 }

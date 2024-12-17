@@ -205,6 +205,16 @@ function Client_Model(options){
 	
 	options.fields.ref_1c = new FieldJSONB("ref_1c",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.shipment_quant_for_cost = new FieldFloat("shipment_quant_for_cost",filed_options);
+	options.fields.shipment_quant_for_cost.getValidator().setMaxLength('19');
+	
 			
 			
 			

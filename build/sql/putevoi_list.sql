@@ -2,6 +2,7 @@
 
 --DROP VIEW putevoi_list;
 
+
 CREATE OR REPLACE VIEW putevoi_list AS
 	SELECT
 		sh.id AS nomer,
@@ -16,7 +17,7 @@ CREATE OR REPLACE VIEW putevoi_list AS
 		coalesce(dr.driver_licence,'') AS voditel_udost,
 		coalesce(dr.driver_licence_class,'') AS voditel_udost_class,		
 		
-		'Бетон '||ct.name AS nomen_naim	,
+		'Бетон '||ct.name AS nomen_naim,
 		
 		to_char(sh.date_time,'DD') AS date_day_n,
 		to_char(sh.date_time,'MM') AS date_mon_n,

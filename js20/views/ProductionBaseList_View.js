@@ -79,6 +79,14 @@ function ProductionBaseList_View(id,options){
 								})
 							]
 						})						
+						,new GridCellHead(id+":grid:head:address",{
+							"value":"Адрес",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("address")
+								})
+							]
+						})						
 					]
 				})
 			]

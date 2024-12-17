@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-11-21 00:47:08</lastBuild></version>
+		<lastBuild>2024-12-17 07:15:38</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -257,6 +257,7 @@
 		<version dateOpen="2024-10-30 07:41:47" dateClose="2024-10-30 14:57:22">1.00351</version>
 		<version dateOpen="2024-10-31 16:13:26" dateClose="2024-11-01 04:27:06">1.00352</version>
 		<version dateOpen="2024-11-17 09:50:34" dateClose="2024-11-21 00:47:26">1.00353</version>
+		<version dateOpen="2024-11-21 08:23:02" dateClose="2024-12-17 07:15:41">1.00354</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -813,6 +814,7 @@
 			<field id="bank_bik" dataType="String" length="9" alias="БИК банка"/>
 			<field id="bank_account" dataType="String" length="20" alias="Банковский счет"/>
 			<field id="ref_1c" dataType="JSONB" alias="Ссылка на справочник 1с"/>
+			<field id="shipment_quant_for_cost" dataType="Float" length="19" precision="3"/>
 			<index id="clients_name_index">
 				<expression>lower(name)</expression>
 			</index>
@@ -866,6 +868,7 @@
 			<field id="kpp" dataType="String" length="10"/>
 			<field id="address_legal" dataType="Text"/>
 			<field id="ref_1c" dataType="String"/>
+			<field id="shipment_quant_for_cost" dataType="Float" length="19" precision="3"/>
 		</model>
 		<model id="Destination" parent="ModelSQLBeton" dataTable="destinations" virtual="FALSE">
 			<defaultOrder>
@@ -1126,7 +1129,8 @@
 			<field id="max_fact_quant_tolerance_percent" dataType="Float" length="19" precision="2"/>
 			<field id="is_cement" dataType="Bool" alias="Цемент,учет в силосе" defaultValue="FALSE"/>
 			<field id="dif_store" dataType="Bool" alias="Учет по местам хранения" defaultValue="FALSE"/>
-			<index id="raw_materials_name_index">
+			<field id="deleted" dataType="Bool" defaultValue="FALSE"/>
+			<index id="raw_materials_name_index" unique="TRUE">
 				<expression>lower(name)</expression>
 			</index>
 			<index id="raw_materials_concrete_part_index">
@@ -1702,14 +1706,16 @@
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="name" dataType="String" length="200"/>
 			<field id="destination_id" dataType="Int" refTable="destinations" refField="id" required="TRUE" alias="Геозона"/>
+			<field id="address" dataType="Text" alias="Адрес"/>
 		</model>
-		<model id="ProductionBaseList" parent="ModelSQLBeton" dataTable="production_bases_list" virtual="FALSE">
+		<model id="ProductionBaseList" parent="ModelSQLBeton" dataTable="production_bases_list" virtual="TRUE">
 			<defaultOrder>
 				<field id="name"/>
 			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
 			<field id="name" dataType="String"/>
 			<field id="destinations_ref" dataType="JSON" alias="Геозона"/>
+			<field id="address" dataType="Text" alias="Адрес"/>
 		</model>
 		<model id="ProductionSite" parent="ModelSQLBeton" dataTable="production_sites" virtual="FALSE">
 			<defaultOrder>

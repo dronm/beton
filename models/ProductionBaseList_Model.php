@@ -9,6 +9,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
@@ -47,6 +48,16 @@ class ProductionBaseList_Model extends ModelSQLBeton{
 						
 		$f_destinations_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destinations_ref",$f_opts);
 		$this->addField($f_destinations_ref);
+		//********************
+		
+		//*** Field address ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Адрес';
+		$f_opts['id']="address";
+						
+		$f_address=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"address",$f_opts);
+		$this->addField($f_address);
 		//********************
 	
 		$order = new ModelOrderSQL();		
