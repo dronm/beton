@@ -114,6 +114,7 @@
 ,"ru_destination_price_for_driver":"Цена для водителей"
 ,"ru_demurrage_cost_per_hour":"Стоимость простоя"
 ,"ru_water_ship_cost":"Стоимость доставки воды"
+,"ru_min_quant_for_ship_cost":"Минимальное количество куб для доставки"
 }
 
 		,"inform_types":{"ru_email":"Электронная почта"

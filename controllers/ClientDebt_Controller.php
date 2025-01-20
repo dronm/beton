@@ -85,22 +85,33 @@ class ClientDebt_Controller extends ControllerSQL{
 		$cur_time_s = date('Y-m-d H:i:s',time());
 		
 		$firm_ids = array();
+		$client_ids = array();
 		$q = '';
 		for($i = 0; $i < count($rows); $i++){	
 			$rec = $rows[$i];
 			$par->add('client_ref', DT_STRING, $rec['client_ref']);
+			$par->add('contract_ref', DT_STRING, $rec['contract_ref']);
 			
 			$debt_total = floatval($rec['debt_total']);
-			//client
-			$client_ar = $link->query_first(sprintf(
-				"SELECT t.id
-				FROM clients t WHERE t.ref_1c->'keys'->>'ref_1c' = %s",
-				$par->getDbVal('client_ref'))
-			);
 
-			if (!is_array($client_ar) || !count($client_ar)){
+			//client
+			if (!array_key_exists($rec['client_ref'], $client_ids)){
+				$client_ar = $link->query_first(sprintf(
+					"SELECT t.id
+					FROM clients t WHERE t.ref_1c->'keys'->>'ref_1c' = %s",
+					$par->getDbVal('client_ref'))
+				);
+				if (is_array($client_ar) && count($client_ar) && isset($client_ar['id'])){					
+					$client_ids[$rec['client_ref']] = $client_ar['id']; //add id for farther ref
+				}else{
+					$client_ids[$rec['client_ref']] = "";
+				}
+			}
+
+			if ($client_ids[$rec['client_ref']] == ""){
 				continue; //does not exist
 			}
+
 			//фирма
 			if (!array_key_exists($rec['firm_ref'], $firm_ids)){
 				$par->add('firm_ref', DT_STRING, $rec['firm_ref']);
@@ -125,23 +136,50 @@ class ClientDebt_Controller extends ControllerSQL{
 					$firm_ids[$rec['firm_ref']] = $firm_ar['id']; //add id for farther ref
 				}				
 			}
+
+			//contract
+			$contract_ar = $link->query_first(sprintf(
+					"SELECT t.id FROM client_contracts_1c AS t WHERE t.ref_1c->'keys'->>'ref_1c' = %s",
+					$par->getDbVal('contract_ref')					
+				)
+			);
+			$contract_id = NULL;
+			if (!is_array($contract_ar) || !count($contract_ar) || !isset($contract_ar['id'])){
+				//add new contract
+				$par->add('contract', DT_STRING, $rec['contract']);
+
+				$ar = $link->query_first(sprintf(
+					"INSERT INTO client_contracts_1c (ref_1c, client_id)
+					VALUES (jsonb_build_object('ref_1c', %s, 'descr', %s), %d)
+					RETURNING id"
+					,$par->getDbVal('contract_ref')
+					,$par->getDbVal('contract')
+					,$client_ids[$rec['client_ref']]
+				));
+				$contract_id = $ar["id"];
+			}else {
+				$contract_id = $contract_ar["id"];
+			}				
+
 			$q = sprintf(
-				"INSERT INTO client_debts (firm_id, client_id, debt_total, update_date)
-				VALUES(%d, %d, %s, now())
-				ON CONFLICT (firm_id, client_id) DO UPDATE
+				"INSERT INTO client_debts (firm_id, client_id, client_contract_id, debt_total, update_date)
+				VALUES(%d, %d, %d, %s, now())
+				ON CONFLICT (firm_id, client_id, client_contract_id) DO UPDATE
 				SET
 					debt_total = %s,
 					update_date = now()"
 				,$firm_ids[$rec['firm_ref']]
-				,$client_ar['id']
+				,$client_ids[$rec['client_ref']]
+				,$contract_id
 				,$debt_total
 				,$debt_total
 			);
 			$link->query($q);
 			//throw new Exception($q);
 		}
-		$link->query(sprintf("DELETE FROM client_debts WHERE update_date < '%s'", $cur_time_s));		
+		$link->query(sprintf("DELETE FROM client_debts WHERE update_date < '%s'", $cur_time_s));
 	}
+	
 
 }
 ?>

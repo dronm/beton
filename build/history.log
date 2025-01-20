@@ -1415,24 +1415,45 @@ VehicleListReport.html.xsl
 1.00355 2024-12-17
 1) RawMaterial new field deleted to remove unused elements.
 2) User_Controller added hidden filter on deleted column for all users.
+3) Added name to all materials with null name and added unique index on name column.
+
 
 1) Function water_ship_cost_on_date() returns water cost no matter how much. Need to multiply by 
-		hipments_quant_for_cost(in_date, in_shipments.quant::numeric, in_destinations.distance::numeric)
+		shipments_quant_for_cost(in_date, in_shipments.quant::numeric, in_destinations.distance::numeric)
 	- shipments_cost
 	- shipments_list
 
 2) Minimal quant for shimpent.
-	shipments_quant_for_cost(in_date date, in_quant numeric,in_distance numeric)
-	need also to consider a client. need a table to hold client specific values.
+	constant def_min_quant_for_cost with value 10;
+	periodic values: min_quant_for_ship_cost_period_value_list
+	shipments_quant_for_cost(in_date date, in_quant numeric,in_distance numeric) new function with in_client_min_quant parameter.
 	- shipments_for_client_list
 	- shipments_cost
 	- shipments_list
 	- shipments_for_veh_owner_list
 	Client new column shimpent_quant_for_cost
 
-3) TN added new record in templates.
+3) Water cost. min quant as for concrete.
+	function water_ship_cost_on_date(), called from:
+	- shipments_list
+	4000 for old shimpents before 2025
 
+4) TN added new record in templates.
+	Shipment_Controller->shipment_transp_nakl(nomer)
+	custom_controls/TranspNaklBtn.js
+	custom_controls/ShipmentGridCmdPrintTranspNakl.js
 
+5) New constant: water ref to water
+6) ClientContract new model
+	ClientSpecification client_contract_ref_1c
+	ClientDebt new field dogovor_ref_1c, client_contract_id
+	ClientDebtList
+	client_debts_list.sql
+	client_contracts_ref.sql
+	ClientContractList_View.js
+	ClientContractList_Form.js
+	ClientDebtList_View.js
+	ClientContractEdit.js
 
 
 

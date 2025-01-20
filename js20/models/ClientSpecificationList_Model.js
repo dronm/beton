@@ -50,6 +50,15 @@ function ClientSpecificationList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.client_ref_1c = new FieldString("client_ref_1c",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.specification_date = new FieldDate("specification_date",filed_options);
 	options.fields.specification_date.getValidator().setRequired(true);
 	
@@ -97,6 +106,24 @@ function ClientSpecificationList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.clients_ref = new FieldJSON("clients_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Contract';
+	filed_options.autoInc = false;	
+	
+	options.fields.client_contracts_1c_ref = new FieldJSON("client_contracts_1c_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.client_contract_1c_id = new FieldInt("client_contract_1c_id",filed_options);
 	
 				
 	

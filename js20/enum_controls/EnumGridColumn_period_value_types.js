@@ -26,6 +26,8 @@ function EnumGridColumn_period_value_types(options){
 
 	options.multyLangValues["ru"]["water_ship_cost"] = "Стоимость доставки воды";
 
+	options.multyLangValues["ru"]["min_quant_for_ship_cost"] = "Минимальное количество куб для доставки";
+
 	
 	options.ctrlClass = options.ctrlClass || Enum_period_value_types;
 	options.searchOptions = options.searchOptions || {};

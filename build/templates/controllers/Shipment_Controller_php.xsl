@@ -1209,6 +1209,16 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			,'Путевой лист'
 		);
 	}
+
+	public function shipment_transp_nakl($pm){
+		return ExcelTemplate_Controller::downloadFilledTemplate(
+			$this->getDbLink()
+			,'Транспортная накладная'
+			,array($this->getExtDbVal($pm, 'id'))
+			,'Отгрузка не найдена!'
+			,'Транспортная накладная'
+		);
+	}
 		
 	public function shipment_ttn($pm){
 		return ExcelTemplate_Controller::downloadFilledTemplate(

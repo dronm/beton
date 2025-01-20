@@ -1544,10 +1544,12 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/PrintPutevoiListBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/PrintPutevoiListBtn.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ShipmentGridCmdPrintInvoice.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ShipmentGridCmdPrintInvoice.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ShipmentGridCmdPrintPass.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ShipmentGridCmdPrintPass.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/PrintTranspNaklBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/PrintTranspNaklBtn.js')) ));
 		
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/PrintPassBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/PrintPassBtn.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ShipmentGridCmdPrintTTN.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ShipmentGridCmdPrintTTN.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ShipmentGridCmdPrintPutevoiList.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ShipmentGridCmdPrintPutevoiList.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ShipmentGridCmdPrintTranspNakl.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ShipmentGridCmdPrintTranspNakl.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ShipmentGridCmdChangeOrder.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ShipmentGridCmdChangeOrder.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ShipmentGridCmdDelete.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ShipmentGridCmdDelete.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/RawMaterialConsRateCalcBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/RawMaterialConsRateCalcBtn.js')) ));
@@ -1623,6 +1625,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ShipmentDocRep_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ShipmentDocRep_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/InsuranceIssuerEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/InsuranceIssuerEdit.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/LeasorEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/LeasorEdit.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ClientContract1cEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ClientContract1cEdit.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/rs_ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/rs_ru.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/rs_common_ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/rs_common_ru.js')) ));
 		
@@ -2117,6 +2120,10 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/models/VehicleMileage_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/VehicleMileage_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controllers/VehicleMileage_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/VehicleMileage_Controller.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/VehicleMileageList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/VehicleMileageList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/MinQuantForShipCostPeriodValueList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/MinQuantForShipCostPeriodValueList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/ClientContract1c_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ClientContract1c_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/controllers/ClientContract1c_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/ClientContract1c_Controller.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/ClientContract1cList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ClientContract1cList_Model.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

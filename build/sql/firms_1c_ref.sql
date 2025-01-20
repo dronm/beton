@@ -11,5 +11,4 @@ $$
 	);
 $$
   LANGUAGE sql VOLATILE COST 100;
-ALTER FUNCTION firms_1c_ref(firms_1c) OWNER TO ;	
 	

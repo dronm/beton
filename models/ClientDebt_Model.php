@@ -8,6 +8,7 @@
 
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
  
@@ -47,6 +48,14 @@ class ClientDebt_Model extends ModelSQL{
 		$this->addField($f_client_id);
 		//********************
 		
+		//*** Field client_contract_id ***
+		$f_opts = array();
+		$f_opts['id']="client_contract_id";
+						
+		$f_client_contract_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_contract_id",$f_opts);
+		$this->addField($f_client_contract_id);
+		//********************
+		
 		//*** Field debt_total ***
 		$f_opts = array();
 		$f_opts['length']=15;
@@ -63,6 +72,15 @@ class ClientDebt_Model extends ModelSQL{
 						
 		$f_update_date=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"update_date",$f_opts);
 		$this->addField($f_update_date);
+		//********************
+		
+		//*** Field dogovor_ref_1c ***
+		$f_opts = array();
+		$f_opts['length']=36;
+		$f_opts['id']="dogovor_ref_1c";
+						
+		$f_dogovor_ref_1c=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"dogovor_ref_1c",$f_opts);
+		$this->addField($f_dogovor_ref_1c);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

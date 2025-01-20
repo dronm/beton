@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2024-12-17 07:15:38</lastBuild></version>
+		<lastBuild>2025-01-20 06:25:36</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -258,6 +258,7 @@
 		<version dateOpen="2024-10-31 16:13:26" dateClose="2024-11-01 04:27:06">1.00352</version>
 		<version dateOpen="2024-11-17 09:50:34" dateClose="2024-11-21 00:47:26">1.00353</version>
 		<version dateOpen="2024-11-21 08:23:02" dateClose="2024-12-17 07:15:41">1.00354</version>
+		<version dateOpen="2024-12-24 16:31:32" dateClose="2025-01-20 06:25:58">1.00355</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -551,6 +552,9 @@
 			</value>
 			<value id="water_ship_cost">
 				<ru descr="Стоимость доставки воды"/>
+			</value>
+			<value id="min_quant_for_ship_cost">
+				<ru descr="Минимальное количество куб для доставки"/>
 			</value>
 		</enum>
 		<enum id="inform_types">
@@ -4408,6 +4412,11 @@
 			<field id="date_time" dataType="DateTimeTZ"/>
 			<field id="val" dataType="Float" length="15" precision="2"/>
 		</model>
+		<model id="MinQuantForShipCostPeriodValueList" parent="ModelSQL" dataTable="min_quant_for_ship_cost_period_value_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="date_time" dataType="DateTimeTZ"/>
+			<field id="val" dataType="Float" length="15" precision="2"/>
+		</model>
 		<model id="TmUserList" parent="ModelSQL" dataTable="ext_users_list" virtual="TRUE" dataSchema="notifications">
 			<defaultOrder>
 				<field id="date_time" sortDirect="DESC"/>
@@ -4567,11 +4576,13 @@
 		<model id="ClientSpecification" parent="ModelSQL" dataTable="client_specifications" virtual="FALSE" descr="Спецификации контрагентов">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="client_id" dataType="Int" alias="Контрагент" refTable="clients" refField="id"/>
+			<field id="client_contract_1c_ref" dataType="String" length="36"/>
 			<field id="specification_date" dataType="Date" required="TRUE"/>
 			<field id="contract" dataType="Text" alias="Договор"/>
 			<field id="specification" dataType="Text" alias="Спецификация"/>
 			<field id="concrete_type_id" dataType="Int" alias="Марка" refTable="concrete_types" refField="id"/>
 			<field id="destination_id" dataType="Int" alias="Объект" refTable="destinations" refField="id"/>
+			<field id="client_contract_ref_1c" dataType="String" length="36"/>
 			<field id="quant" dataType="Float" length="19" prcision="4" alias="Количество"/>
 			<field id="price" dataType="Float" length="15" precision="2" alias="Цена"/>
 			<field id="total" dataType="Float" length="15" precision="2" alias="Сумма"/>
@@ -4596,12 +4607,15 @@
 			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="client_id" dataType="Int" sysCol="TRUE"/>
+			<field id="client_ref_1c" dataType="String" sysCol="TRUE"/>
 			<field id="specification_date" dataType="Date" required="TRUE"/>
 			<field id="contract" dataType="Text" alias="Договор"/>
 			<field id="specification" dataType="Text" alias="Спецификация"/>
 			<field id="concrete_type_id" dataType="Int" sysCol="TRUE"/>
 			<field id="destination_id" dataType="Int" sysCol="TRUE"/>
 			<field id="clients_ref" dataType="JSON" alias="Контрагент"/>
+			<field id="client_contracts_1c_ref" dataType="JSON" alias="Contract"/>
+			<field id="client_contract_1c_id" dataType="Int"/>
 			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
 			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
 			<field id="quant" dataType="Float" length="19" prcision="4" alias="Количество"/>
@@ -4934,18 +4948,46 @@
 			<field id="descr" dataType="Text"/>
 			<field id="inn" dataType="String" length="12"/>
 		</model>
+		<model id="Firm1c" parent="ModelSQL" dataTable="firms_1c" virtual="FALSE">
+			<field id="id" primaryKey="TRUE" dataType="Int" autoInc="TRUE"/>
+			<field id="ref_1c" dataType="JSONB" alias="Ссылка на справочник 1с"/>
+			<field id="inn" dataType="String" length="12" alias="ИНН"/>
+			<index id="firms_1c_ref_idx" unique="TRUE">
+				<expression>(ref_1c-&gt;'keys'-&gt;&gt;'ref_1c')</expression>
+			</index>
+		</model>
+		<model id="ClientContract1c" parent="ModelSQL" dataTable="client_contracts_1c" virtual="FALSE">
+			<field id="id" primaryKey="TRUE" dataType="Int" autoInc="TRUE"/>
+			<field id="client_id" dataType="Int" refTable="clients" refField="id"/>
+			<field id="ref_1c" dataType="JSONB" alias="Ссылка на справочник 1с"/>
+			<index id="client_contracts_1c_ref_idx" unique="TRUE">
+				<expression>(ref_1c-&gt;'keys'-&gt;&gt;'ref_1c')</expression>
+			</index>
+			<index id="client_contracts_1c_client_idx">
+				<field id="client_id"/>
+			</index>
+		</model>
+		<model id="ClientContract1cList" parent="ModelJSON" virtual="TRUE">
+			<field id="name" dataType="Text"/>
+			<field id="ref_1c" dataType="String"/>
+			<field id="search" dataType="Text"/>
+		</model>
 		<model id="ClientDebt" parent="ModelSQL" dataTable="client_debts" virtual="FALSE">
 			<field id="id" primaryKey="TRUE" dataType="Int" autoInc="TRUE"/>
 			<field id="firm_id" dataType="Int" refTable="firms_1c" refField="id"/>
 			<field id="client_id" dataType="Int" refTable="clients" refField="id"/>
+			<field id="client_contract_id" dataType="Int" refTable="client_contracts_1c" refField="id"/>
 			<field id="debt_total" dataType="Float" length="15" precision="2" unsigned="FALSE"/>
 			<field id="update_date" dataType="DateTimeTZ" defaultValue="CURRENT_TIMESTAMP"/>
+			<field id="dogovor_ref_1c" dataType="String" length="36"/>
 			<index id="client_debts_firm_idx" unique="TRUE">
 				<field id="firm_id"/>
 				<field id="client_id"/>
+				<field id="client_contract_id"/>
 			</index>
 			<index id="client_debts_firm_client_idx">
 				<field id="client_id"/>
+				<field id="client_contract_id"/>
 			</index>
 		</model>
 		<model id="ClientDebtList" parent="ModelSQL" dataTable="client_debts_list" virtual="TRUE">
@@ -4953,7 +4995,9 @@
 			<field id="firm_id" dataType="Int" refTable="firms_1c" refField="id"/>
 			<field id="firms_ref" dataType="JSON"/>
 			<field id="client_id" dataType="Int" refTable="clients" refField="id"/>
+			<field id="client_contract_id" dataType="Int" refTable="client_contracts_1c" refField="id"/>
 			<field id="clients_ref" dataType="JSON"/>
+			<field id="client_contracts_ref" dataType="JSON"/>
 			<field id="debt_total" dataType="Float"/>
 			<field id="update_date" dataType="Date"/>
 		</model>
@@ -5100,6 +5144,7 @@
 		<constant id="chart_max_quant" name="Максимальное значение объема для графика" descr="Определяет максимальное значение в м3 для график" dataType="Int" defaultValue="100" autoload="TRUE"/>
 		<constant id="konkrid_client" name="Конкрид" descr="Конкрид" dataType="JSON" defaultValue="100" autoload="FALSE"/>
 		<constant id="reglament_user" name="Пользователь регламент" descr="Пользователь регламент" dataType="JSON" autoload="FALSE"/>
+		<constant id="water" name="Вода" descr="Water" dataType="JSON" autoload="FALSE"/>
 	</constants>
 	<controllers>
 		<controller id="Event" parentId="ControllerSQL">
@@ -5582,6 +5627,9 @@
 				<field id="id" dataType="Int" required="TRUE"/>
 			</publicMethod>
 			<publicMethod id="shipment_putevoi_list" modelId="ModelSQL">
+				<field id="id" dataType="Int" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="shipment_transp_nakl" modelId="ModelSQL">
 				<field id="id" dataType="Int" required="TRUE"/>
 			</publicMethod>
 			<publicMethod id="get_time_list" modelId="ShipmentTimeList" condFields="TRUE">
@@ -6921,6 +6969,16 @@
 			<publicMethod id="get_object" modelId="ClientDebtList"/>
 			<publicMethod id="update_from_1c"/>
 		</controller>
+		<controller id="ClientContract1c" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="get_list" modelId="ClientDebtList"/>
+			<publicMethod id="get_object" modelId="ClientDebtList"/>
+			<publicMethod id="complete_from_1c" patternFieldId="search" modelId="ClientContract1cList">
+				<field id="ic" dataType="Int"/>
+				<field id="mid" dataType="Int"/>
+				<field id="client_ref_1c" dataType="String" length="36"/>
+				<field id="search" dataType="String" length="100"/>
+			</publicMethod>
+		</controller>
 		<controller id="ShipmentMedia" parentId="ControllerSQL" noState="FALSE">
 			<publicMethod id="get_list" modelId="ShipmentMediaList"/>
 			<publicMethod id="get_object" modelId="ShipmentMediaList"/>
@@ -8128,6 +8186,7 @@
 		<jsScript file="js20/custom_controls/PrintPutevoiListBtn.js"/>
 		<jsScript file="js20/custom_controls/ShipmentGridCmdPrintInvoice.js"/>
 		<jsScript file="js20/custom_controls/ShipmentGridCmdPrintPass.js"/>
+		<jsScript file="js20/custom_controls/PrintTranspNaklBtn.js"/>
 		<!--
 		<jsScript file="js20/custom_controls/PrintPassShipBtn.js" />
 		<jsScript file="js20/custom_controls/PrintPassAllBtn.js" />
@@ -8137,6 +8196,7 @@
 		<jsScript file="js20/custom_controls/PrintPassBtn.js"/>
 		<jsScript file="js20/custom_controls/ShipmentGridCmdPrintTTN.js"/>
 		<jsScript file="js20/custom_controls/ShipmentGridCmdPrintPutevoiList.js"/>
+		<jsScript file="js20/custom_controls/ShipmentGridCmdPrintTranspNakl.js"/>
 		<jsScript file="js20/custom_controls/ShipmentGridCmdChangeOrder.js"/>
 		<jsScript file="js20/custom_controls/ShipmentGridCmdDelete.js"/>
 		<jsScript file="js20/custom_controls/RawMaterialConsRateCalcBtn.js"/>
@@ -8212,6 +8272,7 @@
 		<jsScript file="js20/custom_controls/ShipmentDocRep_View.js"/>
 		<jsScript file="js20/custom_controls/InsuranceIssuerEdit.js"/>
 		<jsScript file="js20/custom_controls/LeasorEdit.js"/>
+		<jsScript file="js20/custom_controls/ClientContract1cEdit.js"/>
 		<jsScript file="js20/views/rs_ru.js"/>
 		<jsScript file="js20/views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -8708,6 +8769,10 @@
 		<jsScript file="js20/models/VehicleMileage_Model.js"/>
 		<jsScript file="js20/controllers/VehicleMileage_Controller.js"/>
 		<jsScript file="js20/models/VehicleMileageList_Model.js"/>
+		<jsScript file="js20/models/MinQuantForShipCostPeriodValueList_Model.js"/>
+		<jsScript file="js20/models/ClientContract1c_Model.js"/>
+		<jsScript file="js20/controllers/ClientContract1c_Controller.js"/>
+		<jsScript file="js20/models/ClientContract1cList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

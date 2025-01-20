@@ -378,6 +378,8 @@ $permissions = array();
 				
 					$permissions['Shipment_Controller_shipment_putevoi_list']=TRUE;
 				
+					$permissions['Shipment_Controller_shipment_transp_nakl']=TRUE;
+				
 					$permissions['Shipment_Controller_get_time_list']=TRUE;
 				
 					$permissions['Shipment_Controller_set_blanks_exist']=TRUE;
@@ -1689,6 +1691,12 @@ $permissions = array();
 					$permissions['ClientDebt_Controller_get_object']=TRUE;
 				
 					$permissions['ClientDebt_Controller_update_from_1c']=TRUE;
+				
+					$permissions['ClientContract1c_Controller_get_list']=TRUE;
+				
+					$permissions['ClientContract1c_Controller_get_object']=TRUE;
+				
+					$permissions['ClientContract1c_Controller_complete_from_1c']=TRUE;
 				
 					$permissions['ShipmentMedia_Controller_get_list']=TRUE;
 				

@@ -17,6 +17,9 @@
 
 <xsl:template match="controller"><![CDATA[<?php]]>
 <xsl:call-template name="add_requirements"/>
+
+require_once(ABSOLUTE_PATH.'functions/ExtProg.php');
+
 class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@parentId"/>{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
 		parent::__construct($dbLinkMaster,$dbLink);<xsl:apply-templates/>
@@ -27,6 +30,49 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 </xsl:template>
 
 <xsl:template name="extra_methods">
+
+	public function check_contract($pm){
+		if($pm->getParamValue("client_contract_1c_ref")){
+			$ar = $this->getDbLink()->query_first(sprintf(
+				"SELECT id FROM client_contracts_1c WHERE ref_1c->>'ref_1c'=%s"
+				,$this->getExtDbVal($pm, 'client_contract_1c_ref')
+			));
+			if(!is_array($ar) || !count($ar) || !isset($ar["id"])){
+				$client_id = NULL;
+				if($pm->getParamValue("client_id")){
+					$client_id = $this->getExtDbVal($pm, 'client_id');
+				}else{
+					$ar = $this->getDbLink()->query_first(sprintf(
+						"SELECT client_id FROM client_specifications WHERE id=%d"
+						,$this->getExtDbVal($pm, 'old_id')
+					));
+					$client_id = $ar["client_id"];
+				}
+
+				$resp = ExtProg::getClientContract($this->getExtVal($pm, "client_contract_1c_ref"));
+				/* $name = $resp["models"]["Contract1cList_Model"]["rows"][0]["name"]; */
+				$name = $resp["models"]["Contract1cList_Model"]["rows"][0]["name"];
+				$this->getDbLinkMaster()->query(sprintf(
+					"INSERT INTO client_contracts_1c (ref_1c, client_id)
+					VALUES (jsonb_build_object('ref_1c', %s, 'descr', '%s'), %d)
+					RETURNING id"
+					,$this->getExtDbVal($pm, 'client_contract_1c_ref')
+					,$name
+					,$client_id
+				));
+			}
+		}
+	}
+
+	public function update($pm){
+		$this->check_contract($pm);
+		parent::update($pm);
+	}
+
+	public function insert($pm){
+		$this->check_contract($pm);
+		parent::insert($pm);
+	}
 
 	public function complete_for_client($pm){
 		$client_id = $this->getExtDbVal($pm, 'client_id');

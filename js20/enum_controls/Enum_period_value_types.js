@@ -27,6 +27,9 @@ checked:(options.defaultValue&&options.defaultValue=="demurrage_cost_per_hour")}
 ,{"value":"water_ship_cost",
 "descr":this.multyLangValues[window.getApp().getLocale()+"_"+"water_ship_cost"],
 checked:(options.defaultValue&&options.defaultValue=="water_ship_cost")}
+,{"value":"min_quant_for_ship_cost",
+"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"min_quant_for_ship_cost"],
+checked:(options.defaultValue&&options.defaultValue=="min_quant_for_ship_cost")}
 ];
 	
 	Enum_period_value_types.superclass.constructor.call(this,id,options);
@@ -38,6 +41,7 @@ Enum_period_value_types.prototype.multyLangValues = {"ru_destination_price":"Ц�
 ,"ru_destination_price_for_driver":"Цена для водителей"
 ,"ru_demurrage_cost_per_hour":"Стоимость простоя"
 ,"ru_water_ship_cost":"Стоимость доставки воды"
+,"ru_min_quant_for_ship_cost":"Минимальное количество куб для доставки"
 };
 
 

@@ -128,5 +128,13 @@ class ExtProg{
 	public static function getBuhRBPList($search){
 		return ExtProg::send_query('get_catalog_by_attr', array('catalog'=>'rbp','search'=>$search), TRUE);
 	}
+
+	public static function completeClientContract($clientRef1c, $search){
+		return ExtProg::send_query('complete_client_dog', array('client_ref_1c'=>$clientRef1c,'search'=>$search), TRUE);
+	}
+
+	public static function getClientContract($contractRef1c){
+		return ExtProg::send_query('get_client_dog', array('ref_1c'=>$contractRef1c), TRUE);
+	}
 }
 ?>

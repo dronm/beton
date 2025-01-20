@@ -38389,3 +38389,2557 @@ $$ LANGUAGE plpgsql;
 	CREATE UNIQUE INDEX raw_materials_name_index
 	ON raw_materials(lower(name));
 */
+
+
+-- ******************* update 17/12/2024 07:20:02 ******************
+
+		
+
+-- ******************* update 24/12/2024 16:17:33 ******************
+-- VIEW: transp_nakl
+
+--DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id AS nomer,
+		sh.id AS nomer2,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		
+		coalesce(cl.name||' ', '')||
+		coalesce(', '||cl.address_legal, '')		
+		AS gruzopoluchatel,
+		
+		'Бетон '||ct.name AS gruz_naim,
+		1 AS gruz_mest,
+		sh.quant*2.4 AS gruz_massa,
+		
+		coalesce(vh.make,'') || ' '||coalesce(vh.plate,'') AS avto,
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4 AS gruz_massa_pogruzka,
+		sh.quant*2.4 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 24/12/2024 17:24:33 ******************
+-- VIEW: transp_nakl
+
+--DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id AS nomer,
+		sh.id AS nomer2,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		
+		coalesce(cl.name||' ', '')||
+		coalesce(', '||cl.address_legal, '')		
+		AS gruzopoluchatel,
+		
+		'Бетон '||ct.name AS gruz_naim,
+		1 AS gruz_mest,
+		sh.quant*2.4*1000 AS gruz_massa,
+		
+		coalesce(vh.make,'') || ' '||coalesce(vh.plate,'') AS avto,
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 25/12/2024 08:41:44 ******************
+﻿-- Function: shipments_quant_for_cost(in_date date, in_quant numeric,in_distance numeric)
+
+-- DROP FUNCTION shipments_quant_for_cost(in_date date, in_quant numeric,in_distance numeric);
+
+-- from december 2024 client specific values, not a fixed 10
+
+CREATE OR REPLACE FUNCTION shipments_quant_for_cost(in_date date, in_quant numeric,in_distance numeric, in_client_min_quant numeric)
+  RETURNS numeric AS
+$$
+	SELECT
+		CASE 
+			WHEN in_date >= '2025-01-01' THEN
+				CASE
+					WHEN in_quant>=10 THEN in_quant
+					WHEN in_distance<=60 THEN greatest(10, in_quant)
+					ELSE
+						case when coalesce(in_client_min_quant, 0) = 0 then 10 else in_client_min_quant end
+				END
+		
+			WHEN in_date >= '2023-07-10' THEN
+				CASE
+					WHEN in_quant>=10 THEN in_quant
+					WHEN in_distance<=60 THEN greatest(10, in_quant)
+					ELSE 10
+				END
+				
+			WHEN in_date >= '2021-07-01' THEN
+				CASE
+					WHEN in_quant>=10 THEN in_quant
+					WHEN in_distance<=60 THEN greatest(7, in_quant)
+					ELSE 10
+				END
+				
+			ELSE
+				CASE
+					WHEN in_quant>=7 THEN in_quant
+					WHEN in_distance<=60 THEN greatest(5, in_quant)
+					ELSE 7
+				END
+		END
+	;
+$$
+  LANGUAGE sql IMMUTABLE
+  COST 100;
+ALTER FUNCTION shipments_quant_for_cost(in_date date, in_quant numeric,in_distance numeric) OWNER TO beton;
+
+
+-- ******************* update 25/12/2024 08:46:21 ******************
+﻿-- Function: shipments_quant_for_cost(in_date date, in_quant numeric,in_distance numeric)
+
+-- DROP FUNCTION shipments_quant_for_cost(in_date date, in_quant numeric,in_distance numeric);
+
+-- from december 2024 client specific values, not a fixed 10
+
+CREATE OR REPLACE FUNCTION shipments_quant_for_cost(in_date date, in_quant numeric,in_distance numeric, in_client_min_quant numeric)
+  RETURNS numeric AS
+$$
+	SELECT
+		CASE 
+			WHEN in_date >= '2025-01-01' THEN
+				CASE
+					WHEN in_quant >= least(in_client_min_quant, 10) THEN in_quant
+					WHEN in_distance<=60 THEN greatest(least(in_client_min_quant, 10), in_quant)
+					ELSE least(in_client_min_quant, 10)
+				END
+		
+			WHEN in_date >= '2023-07-10' THEN
+				CASE
+					WHEN in_quant>=10 THEN in_quant
+					WHEN in_distance<=60 THEN greatest(10, in_quant)
+					ELSE 10
+				END
+				
+			WHEN in_date >= '2021-07-01' THEN
+				CASE
+					WHEN in_quant>=10 THEN in_quant
+					WHEN in_distance<=60 THEN greatest(7, in_quant)
+					ELSE 10
+				END
+				
+			ELSE
+				CASE
+					WHEN in_quant>=7 THEN in_quant
+					WHEN in_distance<=60 THEN greatest(5, in_quant)
+					ELSE 7
+				END
+		END
+	;
+$$
+  LANGUAGE sql IMMUTABLE
+  COST 100;
+ALTER FUNCTION shipments_quant_for_cost(in_date date, in_quant numeric,in_distance numeric) OWNER TO beton;
+
+
+-- ******************* update 25/12/2024 08:47:25 ******************
+-- VIEW: shipments_for_client_list
+
+--DROP VIEW shipments_for_client_list;
+
+CREATE OR REPLACE VIEW shipments_for_client_list AS
+
+	SELECT
+		sh.order_id
+		,o.client_id
+		,get_shift_start(sh.ship_date_time)::date AS ship_date
+		,o.destination_id
+		,destinations_ref(dest)::text AS destinations_ref
+		,o.concrete_type_id
+		,concrete_types_ref(ct)::text AS concrete_types_ref
+		,(o.pump_vehicle_id IS NOT NULL) AS pump_exists
+		,sum(sh.quant) AS quant
+		
+		,sum(
+			coalesce(
+				(SELECT pr.price FROM owner_price_list(o.client_id,o.date_time) AS pr WHERE pr.concrete_type_id=o.concrete_type_id)
+				,(SELECT pr.price FROM client_price_list(o.client_id,o.date_time) AS pr WHERE pr.concrete_type_id=o.concrete_type_id)
+			)
+			*sh.quant
+		) AS concrete_cost
+		
+		,sum((CASE
+			WHEN coalesce(sh.ship_cost_edit,FALSE) THEN sh.ship_cost
+			WHEN dest.id=const_self_ship_dest_id_val() THEN 0
+			WHEN o.concrete_type_id=12 THEN const_water_ship_cost_val()
+			ELSE
+				CASE
+					WHEN coalesce(dest.special_price,FALSE) THEN
+						--coalesce(dest.price,0)
+						coalesce(period_value('destination_price'::period_value_types, dest.id, sh.date_time)::numeric(15,2),0)
+					ELSE
+					coalesce(
+						(SELECT sh_p.price
+						FROM shipment_for_owner_costs sh_p
+						WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+						ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+						LIMIT 1
+						),			
+						--coalesce(dest.price,0)
+						coalesce(period_value('destination_price'::period_value_types, dest.id, sh.date_time)::numeric(15,2),0)
+					)			
+				END
+				*
+				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
+		END)::numeric(15,2)
+		) AS deliv_cost
+		
+		,(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0				
+				WHEN (SELECT bool_or(coalesce(t.pump_for_client_cost_edit,FALSE)) FROM shipments t WHERE t.order_id=o.id)
+					THEN (SELECT sum(coalesce(t.pump_for_client_cost,0)::numeric(15,2)) FROM shipments t WHERE t.order_id=o.id)
+				--last ship only!!!
+				ELSE
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(SELECT
+								CASE
+									WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+									ELSE coalesce(pr_vals.price_m,0)*o.quant
+								END
+							FROM pump_prices_values AS pr_vals
+							WHERE pr_vals.pump_price_id = (pump_vehicle_price_on_date(pvh.pump_prices,o.date_time)->'keys'->>'id')::int
+								--pvh.pump_price_id
+								AND o.quant<=pr_vals.quant_to
+							ORDER BY pr_vals.quant_to ASC
+							LIMIT 1
+							)::numeric(15,2)
+					END
+			END
+		) AS pump_cost
+		
+		--concrete
+		,sum( (SELECT pr.price FROM client_price_list(o.client_id,o.date_time) AS pr WHERE pr.concrete_type_id=o.concrete_type_id)*sh.quant )+
+		--deliv
+		sum((CASE
+			WHEN coalesce(sh.ship_cost_edit,FALSE) THEN sh.ship_cost
+			WHEN dest.id=const_self_ship_dest_id_val() THEN 0
+			WHEN o.concrete_type_id=12 THEN const_water_ship_cost_val()
+			ELSE
+				CASE
+					WHEN coalesce(dest.special_price,FALSE) THEN
+						--coalesce(dest.price,0)
+						coalesce(period_value('destination_price'::period_value_types, dest.id, sh.date_time)::numeric(15,2),0)
+					ELSE
+					coalesce(
+						(SELECT sh_p.price
+						FROM shipment_for_owner_costs sh_p
+						WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+						ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+						LIMIT 1
+						),			
+						--coalesce(dest.price,0)
+						coalesce(period_value('destination_price'::period_value_types, dest.id, sh.date_time)::numeric(15,2),0)
+					)			
+				END
+				*
+				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))			
+		END)::numeric(15,2))+
+		--pump
+		(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0				
+				WHEN (SELECT bool_or(coalesce(t.pump_for_client_cost_edit,FALSE)) FROM shipments t WHERE t.order_id=o.id)
+					THEN (SELECT sum(coalesce(t.pump_for_client_cost,0)::numeric(15,2)) FROM shipments t WHERE t.order_id=o.id)
+				--last ship only!!!
+				ELSE
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(SELECT
+								CASE
+									WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+									ELSE coalesce(pr_vals.price_m,0)*o.quant
+								END
+							FROM pump_prices_values AS pr_vals
+							WHERE pr_vals.pump_price_id = (pump_vehicle_price_on_date(pvh.pump_prices,o.date_time)->'keys'->>'id')::int
+								--pvh.pump_price_id
+								AND o.quant<=pr_vals.quant_to
+							ORDER BY pr_vals.quant_to ASC
+							LIMIT 1
+							)::numeric(15,2)
+					END
+			END
+		)
+		AS total_cost
+		
+		,clients_ref(cl) AS clients_ref
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id=sh.order_id
+	LEFT JOIN destinations dest ON dest.id=o.destination_id
+	LEFT JOIN concrete_types ct ON ct.id=o.concrete_type_id
+	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	WHERE cl.account_from_date IS NULL OR get_shift_start(sh.ship_date_time)>=cl.account_from_date
+	GROUP BY 
+		sh.order_id
+		,o.id
+		,o.date_time
+		,o.client_id
+		,get_shift_start(sh.ship_date_time)::date
+		,o.destination_id
+		,destinations_ref
+		,o.concrete_type_id
+		,concrete_types_ref
+		,o.pump_vehicle_id
+		,pvh.pump_prices
+		,cl.*
+	ORDER BY get_shift_start(sh.ship_date_time)::date DESC
+	;
+	
+ALTER VIEW shipments_for_client_list OWNER TO beton;
+
+
+-- ******************* update 25/12/2024 11:36:07 ******************
+
+	CREATE OR REPLACE VIEW constants_list_view AS
+	SELECT *
+	FROM const_doc_per_page_count_view
+	UNION ALL
+	SELECT *
+	FROM const_grid_refresh_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_order_grid_refresh_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_backup_vehicles_feature_view
+	UNION ALL
+	SELECT *
+	FROM const_base_geo_zone_id_view
+	UNION ALL
+	SELECT *
+	FROM const_base_geo_zone_view
+	UNION ALL
+	SELECT *
+	FROM const_chart_step_min_view
+	UNION ALL
+	SELECT *
+	FROM const_day_shift_length_view
+	UNION ALL
+	SELECT *
+	FROM const_days_allowed_with_broken_tracker_view
+	UNION ALL
+	SELECT *
+	FROM const_def_order_unload_speed_view
+	UNION ALL
+	SELECT *
+	FROM const_demurrage_coast_per_hour_view
+	UNION ALL
+	SELECT *
+	FROM const_first_shift_start_time_view
+	UNION ALL
+	SELECT *
+	FROM const_geo_zone_check_points_count_view
+	UNION ALL
+	SELECT *
+	FROM const_map_default_lat_view
+	UNION ALL
+	SELECT *
+	FROM const_map_default_lon_view
+	UNION ALL
+	SELECT *
+	FROM const_max_hour_load_view
+	UNION ALL
+	SELECT *
+	FROM const_max_vehicle_at_work_view
+	UNION ALL
+	SELECT *
+	FROM const_min_demurrage_time_view
+	UNION ALL
+	SELECT *
+	FROM const_min_quant_for_ship_cost_view
+	UNION ALL
+	SELECT *
+	FROM const_no_tracker_signal_warn_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_ord_mark_if_no_ship_time_view
+	UNION ALL
+	SELECT *
+	FROM const_order_auto_place_tolerance_view
+	UNION ALL
+	SELECT *
+	FROM const_order_step_min_view
+	UNION ALL
+	SELECT *
+	FROM const_own_vehicles_feature_view
+	UNION ALL
+	SELECT *
+	FROM const_raw_mater_plcons_rep_def_days_view
+	UNION ALL
+	SELECT *
+	FROM const_self_ship_dest_id_view
+	UNION ALL
+	SELECT *
+	FROM const_self_ship_dest_view
+	UNION ALL
+	SELECT *
+	FROM const_shift_for_orders_length_time_view
+	UNION ALL
+	SELECT *
+	FROM const_shift_length_time_view
+	UNION ALL
+	SELECT *
+	FROM const_ship_coast_for_self_ship_destination_view
+	UNION ALL
+	SELECT *
+	FROM const_speed_change_for_order_autolocate_view
+	UNION ALL
+	SELECT *
+	FROM const_vehicle_unload_time_view
+	UNION ALL
+	SELECT *
+	FROM const_avg_mat_cons_dev_day_count_view
+	UNION ALL
+	SELECT *
+	FROM const_days_for_plan_procur_view
+	UNION ALL
+	SELECT *
+	FROM const_lab_min_sample_count_view
+	UNION ALL
+	SELECT *
+	FROM const_lab_days_for_avg_view
+	UNION ALL
+	SELECT *
+	FROM const_city_ext_view
+	UNION ALL
+	SELECT *
+	FROM const_def_lang_view
+	UNION ALL
+	SELECT *
+	FROM const_efficiency_warn_k_view
+	UNION ALL
+	SELECT *
+	FROM const_zone_violation_alarm_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_weather_update_interval_sec_view
+	UNION ALL
+	SELECT *
+	FROM const_call_history_count_view
+	UNION ALL
+	SELECT *
+	FROM const_water_ship_cost_view
+	UNION ALL
+	SELECT *
+	FROM const_vehicle_owner_accord_from_day_view
+	UNION ALL
+	SELECT *
+	FROM const_vehicle_owner_accord_to_day_view
+	UNION ALL
+	SELECT *
+	FROM const_show_time_for_shipped_vehicles_view
+	UNION ALL
+	SELECT *
+	FROM const_tracker_malfunction_tel_list_view
+	UNION ALL
+	SELECT *
+	FROM const_low_efficiency_tel_list_view
+	UNION ALL
+	SELECT *
+	FROM const_material_closed_balance_date_view
+	UNION ALL
+	SELECT *
+	FROM const_cement_material_view
+	UNION ALL
+	SELECT *
+	FROM const_deviation_for_reroute_view
+	UNION ALL
+	SELECT *
+	FROM const_arnavi_telemat_server_view
+	UNION ALL
+	SELECT *
+	FROM const_chart_step_quant_view
+	UNION ALL
+	SELECT *
+	FROM const_chart_max_quant_view
+	UNION ALL
+	SELECT *
+	FROM const_konkrid_client_view
+	UNION ALL
+	SELECT *
+	FROM const_reglament_user_view
+	ORDER BY name;
+	ALTER VIEW constants_list_view OWNER TO beton;
+	
+
+
+-- ******************* update 25/12/2024 11:37:07 ******************
+-- VIEW: 
+
+insert into period_values(period_value_type, key, date_time, val) values('min_quant_for_ship_cost', 0, '2021-07-01T00:00:00','10');
+
+
+-- ******************* update 25/12/2024 11:53:06 ******************
+﻿-- Function: shipments_quant_for_cost(in_date date, in_quant numeric,in_distance numeric)
+
+-- DROP FUNCTION shipments_quant_for_cost(in_date date, in_quant numeric,in_distance numeric);
+
+-- from december 2024 client specific values, not a fixed 10
+
+CREATE OR REPLACE FUNCTION shipments_quant_for_cost(in_date date, in_quant numeric,in_distance numeric, in_client_min_quant numeric)
+  RETURNS numeric AS
+$$
+	with
+	client_quant AS (
+		select
+			case
+				when coalesce(in_client_min_quant, 0)=0 then 
+					period_value('min_quant_for_ship_cost', 0, in_date)::numeric
+				else in_client_min_quant
+			end AS v
+		)
+	SELECT
+		CASE 
+			WHEN in_date >= '2025-01-01' THEN
+				CASE
+					WHEN in_quant >= (select v from client_quant) THEN in_quant
+					WHEN in_distance<=60 THEN greatest((select v from client_quant), in_quant)
+					ELSE (select v from client_quant)
+				END
+		
+			WHEN in_date >= '2023-07-10' THEN
+				CASE
+					WHEN in_quant>=10 THEN in_quant
+					WHEN in_distance<=60 THEN greatest(10, in_quant)
+					ELSE 10
+				END
+				
+			WHEN in_date >= '2021-07-01' THEN
+				CASE
+					WHEN in_quant>=10 THEN in_quant
+					WHEN in_distance<=60 THEN greatest(7, in_quant)
+					ELSE 10
+				END
+				
+			ELSE
+				CASE
+					WHEN in_quant>=7 THEN in_quant
+					WHEN in_distance<=60 THEN greatest(5, in_quant)
+					ELSE 7
+				END
+		END
+	;
+$$
+  LANGUAGE sql IMMUTABLE
+  COST 100;
+ALTER FUNCTION shipments_quant_for_cost(in_date date, in_quant numeric,in_distance numeric) OWNER TO beton;
+
+
+-- ******************* update 25/12/2024 11:53:44 ******************
+-- View: public.shipments_list
+
+--DROP VIEW shipments_for_veh_owner_list;
+--DROP VIEW shipment_dates_list;
+--DROP VIEW public.shipments_list;
+
+CREATE OR REPLACE VIEW public.shipments_list AS 
+	SELECT
+		sh.id,
+		sh.ship_date_time,
+		sh.quant,
+		
+		--shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE) AS cost,
+		(CASE
+			-- Вручную из документа
+			WHEN coalesce(sh.ship_cost_edit, FALSE) THEN sh.ship_cost
+			
+			-- Самовывоз
+			WHEN dest.id=const_self_ship_dest_id_val() THEN 0
+			
+			-- Вода
+			WHEN o.concrete_type_id=12 THEN
+				--const_water_ship_cost_val()
+				water_ship_cost_on_date(sh.date_time)
+				
+			-- Все остальное
+			ELSE
+				CASE
+					-- цена по производственным зонам
+					WHEN destination_prod_base_price_val(ps.production_base_id, dest.id, sh.ship_date_time::timestamp) IS NOT NULL THEN
+						destination_prod_base_price_val(ps.production_base_id, dest.id, sh.ship_date_time::timestamp)
+				
+					-- специальная цена
+					WHEN coalesce(dest.special_price, FALSE) THEN
+						coalesce(period_value('destination_price'::period_value_types, dest.id, sh.date_time)::numeric(15,2),0)
+						
+					-- по схеме от расстояния
+					ELSE
+						coalesce(
+							(SELECT sh_p.price
+							FROM shipment_for_owner_costs sh_p
+							WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+							ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+							LIMIT 1
+							)			
+							,coalesce(dest.price, 0)
+						)
+				END
+				*
+				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
+		END)::numeric(15,2)
+		AS cost,
+		
+		sh.shipped,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_type_id,		
+		v.owner,
+		
+		vehicles_ref(v) AS vehicles_ref,
+		vs.vehicle_id,
+		
+		drivers_ref(d) AS drivers_ref,
+		vs.driver_id,
+		
+		destinations_ref(dest) As destinations_ref,
+		o.destination_id,
+		
+		clients_ref(cl) As clients_ref,
+		o.client_id,
+		
+		shipments_demurrage_cost(sh.demurrage::interval, sh.date_time) AS demurrage_cost,
+		sh.demurrage,
+		
+		sh.client_mark,
+		sh.blanks_exist,
+		
+		users_ref(u) As users_ref,
+		o.user_id,
+		
+		production_sites_ref(ps) AS production_sites_ref,
+		sh.production_site_id,
+		
+		--vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		vehicle_owner_on_date(v.vehicle_owners,sh.date_time) AS vehicle_owners_ref,
+		
+		sh.acc_comment,
+		sh.acc_comment_shipment,
+		--v_own.id AS vehicle_owner_id,
+		((vehicle_owner_on_date(v.vehicle_owners,sh.date_time))->'keys'->>'id')::int AS vehicle_owner_id,
+		
+		--shipments_pump_cost(sh,o,dest,pvh,TRUE) AS pump_cost,
+		(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0
+				WHEN coalesce(sh.pump_cost_edit,FALSE) THEN sh.pump_cost::numeric(15,2)
+				--last ship only!!!
+				WHEN sh.id = (SELECT this_ship.id FROM shipments AS this_ship WHERE this_ship.order_id=o.id ORDER BY this_ship.ship_date_time DESC LIMIT 1)
+				THEN
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(WITH
+							pump_price_id AS (
+								SELECT (pump_vehicle_price_on_date(pvh.pump_prices, sh.date_time)->'keys'->>'id')::int AS id
+							),
+							garant_pr AS (
+								SELECT
+									price_fixed,
+									greatest(o.quant - quant_to, 0) AS quant_over
+								FROM pump_prices_values
+								WHERE pump_price_id = (SELECT id FROM pump_price_id)
+									AND coalesce(price_garanteed, FALSE)
+									AND coalesce(quant_from, 0) <= o.quant
+									AND coalesce(price_fixed, 0) > 0
+								ORDER BY quant_from DESC
+								LIMIT 1
+							)
+							SELECT
+								coalesce((SELECT price_fixed FROM garant_pr), 0) +
+								(SELECT
+									CASE
+										WHEN coalesce(pr_vals.price_fixed, 0)>0 THEN pr_vals.price_fixed
+										ELSE coalesce(pr_vals.price_m, 0) * coalesce((SELECT quant_over FROM garant_pr), o.quant)
+									END
+								FROM pump_prices_values AS pr_vals
+								WHERE pr_vals.pump_price_id = (SELECT id FROM pump_price_id)
+									AND o.quant <= coalesce(pr_vals.quant_to, 999999)
+									AND coalesce(pr_vals.price_garanteed, FALSE) = FALSE
+								ORDER BY pr_vals.quant_to ASC
+								LIMIT 1)
+							)::numeric(15,2)
+					END
+				ELSE 0	
+			END
+		) AS pump_cost,
+		
+		pump_vehicles_ref(pvh,pvh_v,pvh_own) AS pump_vehicles_ref,
+		pvh.vehicle_id AS pump_vehicle_id,
+		pvh_v.vehicle_owner_id AS pump_vehicle_owner_id,
+		sh.owner_agreed,
+		sh.owner_agreed_date_time,
+		sh.owner_pump_agreed,
+		sh.owner_pump_agreed_date_time,
+		
+		vehicle_owners_ref(pvh_own) AS pump_vehicle_owners_ref,
+		
+		CASE
+			-- цена по производственным зонам
+			WHEN destination_prod_base_price_val(ps.production_base_id, dest.id, sh.ship_date_time::timestamp) IS NOT NULL THEN
+				destination_prod_base_price_val(ps.production_base_id, dest.id, sh.ship_date_time::timestamp)
+		
+			WHEN coalesce(dest.special_price,FALSE) THEN
+				coalesce(
+					period_value('destination_price'::period_value_types, dest.id, sh.date_time)::numeric(15,2),
+					0
+				)
+			ELSE
+				coalesce(
+					(SELECT sh_p.price
+					FROM shipment_for_owner_costs sh_p
+					WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+					ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+					LIMIT 1
+					),			
+					coalesce(dest.price,0)
+				)			
+		END AS ship_price,
+		
+		coalesce(sh.ship_cost_edit,FALSE) AS ship_cost_edit,
+		coalesce(sh.pump_cost_edit,FALSE) AS pump_cost_edit,
+		
+		sh.pump_for_client_cost_edit,
+		(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0
+				WHEN coalesce(sh.pump_for_client_cost_edit,FALSE) THEN sh.pump_for_client_cost::numeric(15,2)
+				--last ship only!!!
+				WHEN sh.id = (SELECT this_ship.id FROM shipments AS this_ship WHERE this_ship.order_id=o.id ORDER BY this_ship.ship_date_time DESC LIMIT 1)
+				THEN
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(WITH
+							pump_price_id AS (
+								SELECT (pump_vehicle_price_on_date(pvh.pump_prices, sh.date_time)->'keys'->>'id')::int AS id
+							),
+							garant_pr AS (
+								SELECT
+									price_fixed,
+									greatest(o.quant - quant_to, 0) AS quant_over
+								FROM pump_prices_values
+								WHERE pump_price_id = (SELECT id FROM pump_price_id)
+									AND coalesce(price_garanteed, FALSE)
+									AND coalesce(quant_from, 0) <= o.quant
+									AND coalesce(price_fixed, 0) > 0
+								ORDER BY quant_from DESC
+								LIMIT 1
+							)
+							SELECT
+								coalesce((SELECT price_fixed FROM garant_pr), 0) +
+								(SELECT 
+									CASE
+										WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+										ELSE coalesce(pr_vals.price_m, 0) * coalesce((SELECT quant_over FROM garant_pr), o.quant)
+									END
+								FROM pump_prices_values AS pr_vals
+								WHERE pr_vals.pump_price_id = (SELECT id FROM pump_price_id)
+									AND o.quant <= coalesce(pr_vals.quant_to, 999999)
+									AND coalesce(pr_vals.price_garanteed, FALSE) = FALSE								
+								ORDER BY pr_vals.quant_to ASC
+								LIMIT 1)
+							)::numeric(15,2)
+					END
+				ELSE 0	
+			END
+		) AS pump_for_client_cost
+		
+		/*,prod.production_id
+		,concrete_types_ref(prod_concr) AS production_concrete_types_ref
+		,prod.concrete_quant AS production_concrete_quant
+		*/
+		
+	FROM shipments sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN vehicle_schedules vs ON vs.id = sh.vehicle_schedule_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN drivers d ON d.id = vs.driver_id
+	LEFT JOIN vehicles v ON v.id = vs.vehicle_id
+	LEFT JOIN users u ON u.id = sh.user_id
+	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
+	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+	LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
+	LEFT JOIN vehicle_owners pvh_own ON pvh_own.id = pvh_v.vehicle_owner_id
+	
+	/*LEFT JOIN (
+		SELECT
+			t.shipment_id,
+			t.production_id,
+			t.concrete_type_id,
+			sum(concrete_quant)::numeric(19,4) AS concrete_quant
+		FROM productions AS t
+		GROUP BY t.shipment_id,t.production_id,t.concrete_type_id
+	) AS prod ON prod.shipment_id = sh.id
+	LEFT JOIN concrete_types AS prod_concr ON prod_concr.id = prod.concrete_type_id
+	*/
+	ORDER BY sh.date_time DESC
+	--LIMIT 60
+	;
+
+ALTER TABLE public.shipments_list OWNER TO beton;
+
+
+
+-- ******************* update 25/12/2024 11:53:58 ******************
+-- VIEW: shipments_for_client_list
+
+--DROP VIEW shipments_for_client_list;
+
+CREATE OR REPLACE VIEW shipments_for_client_list AS
+
+	SELECT
+		sh.order_id
+		,o.client_id
+		,get_shift_start(sh.ship_date_time)::date AS ship_date
+		,o.destination_id
+		,destinations_ref(dest)::text AS destinations_ref
+		,o.concrete_type_id
+		,concrete_types_ref(ct)::text AS concrete_types_ref
+		,(o.pump_vehicle_id IS NOT NULL) AS pump_exists
+		,sum(sh.quant) AS quant
+		
+		,sum(
+			coalesce(
+				(SELECT pr.price FROM owner_price_list(o.client_id,o.date_time) AS pr WHERE pr.concrete_type_id=o.concrete_type_id)
+				,(SELECT pr.price FROM client_price_list(o.client_id,o.date_time) AS pr WHERE pr.concrete_type_id=o.concrete_type_id)
+			)
+			*sh.quant
+		) AS concrete_cost
+		
+		,sum((CASE
+			WHEN coalesce(sh.ship_cost_edit,FALSE) THEN sh.ship_cost
+			WHEN dest.id=const_self_ship_dest_id_val() THEN 0
+			WHEN o.concrete_type_id=12 THEN const_water_ship_cost_val()
+			ELSE
+				CASE
+					WHEN coalesce(dest.special_price,FALSE) THEN
+						--coalesce(dest.price,0)
+						coalesce(period_value('destination_price'::period_value_types, dest.id, sh.date_time)::numeric(15,2),0)
+					ELSE
+					coalesce(
+						(SELECT sh_p.price
+						FROM shipment_for_owner_costs sh_p
+						WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+						ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+						LIMIT 1
+						),			
+						--coalesce(dest.price,0)
+						coalesce(period_value('destination_price'::period_value_types, dest.id, sh.date_time)::numeric(15,2),0)
+					)			
+				END
+				*
+				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
+		END)::numeric(15,2)
+		) AS deliv_cost
+		
+		,(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0				
+				WHEN (SELECT bool_or(coalesce(t.pump_for_client_cost_edit,FALSE)) FROM shipments t WHERE t.order_id=o.id)
+					THEN (SELECT sum(coalesce(t.pump_for_client_cost,0)::numeric(15,2)) FROM shipments t WHERE t.order_id=o.id)
+				--last ship only!!!
+				ELSE
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(SELECT
+								CASE
+									WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+									ELSE coalesce(pr_vals.price_m,0)*o.quant
+								END
+							FROM pump_prices_values AS pr_vals
+							WHERE pr_vals.pump_price_id = (pump_vehicle_price_on_date(pvh.pump_prices,o.date_time)->'keys'->>'id')::int
+								--pvh.pump_price_id
+								AND o.quant<=pr_vals.quant_to
+							ORDER BY pr_vals.quant_to ASC
+							LIMIT 1
+							)::numeric(15,2)
+					END
+			END
+		) AS pump_cost
+		
+		--concrete
+		,sum( (SELECT pr.price FROM client_price_list(o.client_id,o.date_time) AS pr WHERE pr.concrete_type_id=o.concrete_type_id)*sh.quant )+
+		--deliv
+		sum((CASE
+			WHEN coalesce(sh.ship_cost_edit,FALSE) THEN sh.ship_cost
+			WHEN dest.id=const_self_ship_dest_id_val() THEN 0
+			WHEN o.concrete_type_id=12 THEN const_water_ship_cost_val()
+			ELSE
+				CASE
+					WHEN coalesce(dest.special_price,FALSE) THEN
+						--coalesce(dest.price,0)
+						coalesce(period_value('destination_price'::period_value_types, dest.id, sh.date_time)::numeric(15,2),0)
+					ELSE
+					coalesce(
+						(SELECT sh_p.price
+						FROM shipment_for_owner_costs sh_p
+						WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+						ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+						LIMIT 1
+						),			
+						--coalesce(dest.price,0)
+						coalesce(period_value('destination_price'::period_value_types, dest.id, sh.date_time)::numeric(15,2),0)
+					)			
+				END
+				*
+				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))			
+		END)::numeric(15,2))+
+		--pump
+		(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0				
+				WHEN (SELECT bool_or(coalesce(t.pump_for_client_cost_edit,FALSE)) FROM shipments t WHERE t.order_id=o.id)
+					THEN (SELECT sum(coalesce(t.pump_for_client_cost,0)::numeric(15,2)) FROM shipments t WHERE t.order_id=o.id)
+				--last ship only!!!
+				ELSE
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(SELECT
+								CASE
+									WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+									ELSE coalesce(pr_vals.price_m,0)*o.quant
+								END
+							FROM pump_prices_values AS pr_vals
+							WHERE pr_vals.pump_price_id = (pump_vehicle_price_on_date(pvh.pump_prices,o.date_time)->'keys'->>'id')::int
+								--pvh.pump_price_id
+								AND o.quant<=pr_vals.quant_to
+							ORDER BY pr_vals.quant_to ASC
+							LIMIT 1
+							)::numeric(15,2)
+					END
+			END
+		)
+		AS total_cost
+		
+		,clients_ref(cl) AS clients_ref
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id=sh.order_id
+	LEFT JOIN destinations dest ON dest.id=o.destination_id
+	LEFT JOIN concrete_types ct ON ct.id=o.concrete_type_id
+	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	WHERE cl.account_from_date IS NULL OR get_shift_start(sh.ship_date_time)>=cl.account_from_date
+	GROUP BY 
+		sh.order_id
+		,o.id
+		,o.date_time
+		,o.client_id
+		,get_shift_start(sh.ship_date_time)::date
+		,o.destination_id
+		,destinations_ref
+		,o.concrete_type_id
+		,concrete_types_ref
+		,o.pump_vehicle_id
+		,pvh.pump_prices
+		,cl.*
+	ORDER BY get_shift_start(sh.ship_date_time)::date DESC
+	;
+	
+ALTER VIEW shipments_for_client_list OWNER TO beton;
+
+
+-- ******************* update 25/12/2024 11:57:25 ******************
+-- VIEW: shipments_for_veh_owner_list
+
+--DROP VIEW shipments_for_veh_owner_list;
+
+CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
+	SELECT
+		sh.id,
+		sh.ship_date_time,
+		sh.destination_id,
+		sh.destinations_ref,
+		sh.concrete_type_id,
+		sh.concrete_types_ref,
+		sh.quant,
+		sh.vehicle_id,
+		sh.vehicles_ref,
+		sh.driver_id,
+		sh.drivers_ref,
+		sh.vehicle_owner_id,
+		sh.vehicle_owners_ref,
+		sh.cost,
+		sh.ship_cost_edit,
+		sh.pump_cost_edit,
+		sh.demurrage,
+		sh.demurrage_cost,
+		sh.acc_comment,
+		sh.acc_comment_shipment,
+		sh.owner_agreed,
+		sh.owner_agreed_date_time,
+		
+		-- ЦЕНА ДЛЯ ВОДИТЕЛЯ
+		CASE
+		-- самовывоз
+		WHEN sh.destination_id = const_self_ship_dest_id_val() THEN 0
+		
+		-- Цена для производственной зоны
+		WHEN destination_prod_base_driver_price_val(pr_bs.id, dest.id, sh.ship_date_time::timestamp) IS NOT NULL THEN
+			destination_prod_base_driver_price_val(pr_bs.id, dest.id, sh.ship_date_time::timestamp) *
+				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
+		
+		-- периодическая цена для всех зон
+		WHEN coalesce(per_vals.price_for_driver, 0)>0 THEN
+			per_vals.price_for_driver *
+				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
+			
+		-- все остальные случаи
+		ELSE
+			(WITH
+			act_price AS (
+				SELECT h.date AS d
+				FROM shipment_for_driver_costs_h h
+				WHERE h.date<=sh.ship_date_time::date
+				ORDER BY h.date DESC
+				LIMIT 1
+			)
+			SELECT shdr_cost.price
+			FROM shipment_for_driver_costs AS shdr_cost
+			WHERE
+				shdr_cost.date=(SELECT d FROM act_price)
+				AND shdr_cost.distance_to>=dest.distance
+				/*OR shdr_cost.id=(
+					SELECT t.id
+					FROM shipment_for_driver_costs t
+					WHERE t.date=(SELECT d FROM act_price)
+					ORDER BY t.distance_to LIMIT 1
+				)
+				*/
+			ORDER BY shdr_cost.distance_to ASC
+			LIMIT 1
+			) * shipments_quant_for_cost(sh.ship_date_time::date,sh.quant::numeric,dest.distance::numeric)
+		END AS cost_for_driver,
+		
+		sh.production_sites_ref,
+		production_bases_ref(pr_bs) AS production_bases_ref,
+		pr_bs.id AS production_base_id
+		
+	FROM shipments_list sh
+	LEFT JOIN destinations AS dest ON dest.id=destination_id
+	
+	LEFT JOIN (
+		SELECT
+			max(p.date_time) AS date_time,
+			p.key AS destination_id
+		FROM period_values AS p		
+		WHERE p.period_value_type='destination_price_for_driver'::period_value_types		
+		GROUP BY p.key
+	) AS per_hist ON per_hist.destination_id = dest.id 
+	LEFT JOIN (
+		SELECT
+			p.date_time AS date_time,
+			p.key AS destination_id,
+			p.val::numeric(15,2) AS price_for_driver
+		FROM period_values AS p		
+		WHERE p.period_value_type='destination_price_for_driver'::period_value_types		
+	) AS per_vals ON per_vals.destination_id = dest.id AND per_vals.date_time = per_hist.date_time
+		
+	LEFT JOIN production_sites AS pr_st ON pr_st.id = sh.production_site_id
+	LEFT JOIN production_bases AS pr_bs ON pr_bs.id = pr_st.production_base_id
+	
+	LEFT JOIN clients AS cl ON cl.id = sh.client_id
+	
+	ORDER BY ship_date_time DESC
+	;
+	
+ALTER VIEW shipments_for_veh_owner_list OWNER TO beton;
+
+
+-- ******************* update 25/12/2024 11:57:55 ******************
+-- VIEW: shipments_for_veh_owner_list
+
+--DROP VIEW shipments_for_veh_owner_list;
+
+CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
+	SELECT
+		sh.id,
+		sh.ship_date_time,
+		sh.destination_id,
+		sh.destinations_ref,
+		sh.concrete_type_id,
+		sh.concrete_types_ref,
+		sh.quant,
+		sh.vehicle_id,
+		sh.vehicles_ref,
+		sh.driver_id,
+		sh.drivers_ref,
+		sh.vehicle_owner_id,
+		sh.vehicle_owners_ref,
+		sh.cost,
+		sh.ship_cost_edit,
+		sh.pump_cost_edit,
+		sh.demurrage,
+		sh.demurrage_cost,
+		sh.acc_comment,
+		sh.acc_comment_shipment,
+		sh.owner_agreed,
+		sh.owner_agreed_date_time,
+		
+		-- ЦЕНА ДЛЯ ВОДИТЕЛЯ
+		CASE
+		-- самовывоз
+		WHEN sh.destination_id = const_self_ship_dest_id_val() THEN 0
+		
+		-- Цена для производственной зоны
+		WHEN destination_prod_base_driver_price_val(pr_bs.id, dest.id, sh.ship_date_time::timestamp) IS NOT NULL THEN
+			destination_prod_base_driver_price_val(pr_bs.id, dest.id, sh.ship_date_time::timestamp) *
+				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
+		
+		-- периодическая цена для всех зон
+		WHEN coalesce(per_vals.price_for_driver, 0)>0 THEN
+			per_vals.price_for_driver *
+				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
+			
+		-- все остальные случаи
+		ELSE
+			(WITH
+			act_price AS (
+				SELECT h.date AS d
+				FROM shipment_for_driver_costs_h h
+				WHERE h.date<=sh.ship_date_time::date
+				ORDER BY h.date DESC
+				LIMIT 1
+			)
+			SELECT shdr_cost.price
+			FROM shipment_for_driver_costs AS shdr_cost
+			WHERE
+				shdr_cost.date=(SELECT d FROM act_price)
+				AND shdr_cost.distance_to>=dest.distance
+				/*OR shdr_cost.id=(
+					SELECT t.id
+					FROM shipment_for_driver_costs t
+					WHERE t.date=(SELECT d FROM act_price)
+					ORDER BY t.distance_to LIMIT 1
+				)
+				*/
+			ORDER BY shdr_cost.distance_to ASC
+			LIMIT 1
+			) * shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
+		END AS cost_for_driver,
+		
+		sh.production_sites_ref,
+		production_bases_ref(pr_bs) AS production_bases_ref,
+		pr_bs.id AS production_base_id
+		
+	FROM shipments_list sh
+	LEFT JOIN destinations AS dest ON dest.id=destination_id
+	
+	LEFT JOIN (
+		SELECT
+			max(p.date_time) AS date_time,
+			p.key AS destination_id
+		FROM period_values AS p		
+		WHERE p.period_value_type='destination_price_for_driver'::period_value_types		
+		GROUP BY p.key
+	) AS per_hist ON per_hist.destination_id = dest.id 
+	LEFT JOIN (
+		SELECT
+			p.date_time AS date_time,
+			p.key AS destination_id,
+			p.val::numeric(15,2) AS price_for_driver
+		FROM period_values AS p		
+		WHERE p.period_value_type='destination_price_for_driver'::period_value_types		
+	) AS per_vals ON per_vals.destination_id = dest.id AND per_vals.date_time = per_hist.date_time
+		
+	LEFT JOIN production_sites AS pr_st ON pr_st.id = sh.production_site_id
+	LEFT JOIN production_bases AS pr_bs ON pr_bs.id = pr_st.production_base_id
+	
+	LEFT JOIN clients AS cl ON cl.id = sh.client_id
+	
+	ORDER BY ship_date_time DESC
+	;
+	
+ALTER VIEW shipments_for_veh_owner_list OWNER TO beton;
+
+
+-- ******************* update 25/12/2024 12:05:57 ******************
+-- View: public.shipments_list
+
+--DROP VIEW shipments_for_veh_owner_list;
+--DROP VIEW shipment_dates_list;
+--DROP VIEW public.shipments_list;
+
+CREATE OR REPLACE VIEW public.shipments_list AS 
+	SELECT
+		sh.id,
+		sh.ship_date_time,
+		sh.quant,
+		
+		--shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE) AS cost,
+		(CASE
+			-- Вручную из документа
+			WHEN coalesce(sh.ship_cost_edit, FALSE) THEN sh.ship_cost
+			
+			-- Самовывоз
+			WHEN dest.id=const_self_ship_dest_id_val() THEN 0
+			
+			-- Вода
+			WHEN o.concrete_type_id=12 THEN
+				case
+					when sh.date_time::date>='2025-01-01' then
+						water_ship_cost_on_date(sh.date_time) * shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
+					else
+						water_ship_cost_on_date(sh.date_time)
+				end
+				
+			-- Все остальное
+			ELSE
+				CASE
+					-- цена по производственным зонам
+					WHEN destination_prod_base_price_val(ps.production_base_id, dest.id, sh.ship_date_time::timestamp) IS NOT NULL THEN
+						destination_prod_base_price_val(ps.production_base_id, dest.id, sh.ship_date_time::timestamp)
+				
+					-- специальная цена
+					WHEN coalesce(dest.special_price, FALSE) THEN
+						coalesce(period_value('destination_price'::period_value_types, dest.id, sh.date_time)::numeric(15,2),0)
+						
+					-- по схеме от расстояния
+					ELSE
+						coalesce(
+							(SELECT sh_p.price
+							FROM shipment_for_owner_costs sh_p
+							WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+							ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+							LIMIT 1
+							)			
+							,coalesce(dest.price, 0)
+						)
+				END
+				*
+				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
+		END)::numeric(15,2)
+		AS cost,
+		
+		sh.shipped,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_type_id,		
+		v.owner,
+		
+		vehicles_ref(v) AS vehicles_ref,
+		vs.vehicle_id,
+		
+		drivers_ref(d) AS drivers_ref,
+		vs.driver_id,
+		
+		destinations_ref(dest) As destinations_ref,
+		o.destination_id,
+		
+		clients_ref(cl) As clients_ref,
+		o.client_id,
+		
+		shipments_demurrage_cost(sh.demurrage::interval, sh.date_time) AS demurrage_cost,
+		sh.demurrage,
+		
+		sh.client_mark,
+		sh.blanks_exist,
+		
+		users_ref(u) As users_ref,
+		o.user_id,
+		
+		production_sites_ref(ps) AS production_sites_ref,
+		sh.production_site_id,
+		
+		--vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		vehicle_owner_on_date(v.vehicle_owners,sh.date_time) AS vehicle_owners_ref,
+		
+		sh.acc_comment,
+		sh.acc_comment_shipment,
+		--v_own.id AS vehicle_owner_id,
+		((vehicle_owner_on_date(v.vehicle_owners,sh.date_time))->'keys'->>'id')::int AS vehicle_owner_id,
+		
+		--shipments_pump_cost(sh,o,dest,pvh,TRUE) AS pump_cost,
+		(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0
+				WHEN coalesce(sh.pump_cost_edit,FALSE) THEN sh.pump_cost::numeric(15,2)
+				--last ship only!!!
+				WHEN sh.id = (SELECT this_ship.id FROM shipments AS this_ship WHERE this_ship.order_id=o.id ORDER BY this_ship.ship_date_time DESC LIMIT 1)
+				THEN
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(WITH
+							pump_price_id AS (
+								SELECT (pump_vehicle_price_on_date(pvh.pump_prices, sh.date_time)->'keys'->>'id')::int AS id
+							),
+							garant_pr AS (
+								SELECT
+									price_fixed,
+									greatest(o.quant - quant_to, 0) AS quant_over
+								FROM pump_prices_values
+								WHERE pump_price_id = (SELECT id FROM pump_price_id)
+									AND coalesce(price_garanteed, FALSE)
+									AND coalesce(quant_from, 0) <= o.quant
+									AND coalesce(price_fixed, 0) > 0
+								ORDER BY quant_from DESC
+								LIMIT 1
+							)
+							SELECT
+								coalesce((SELECT price_fixed FROM garant_pr), 0) +
+								(SELECT
+									CASE
+										WHEN coalesce(pr_vals.price_fixed, 0)>0 THEN pr_vals.price_fixed
+										ELSE coalesce(pr_vals.price_m, 0) * coalesce((SELECT quant_over FROM garant_pr), o.quant)
+									END
+								FROM pump_prices_values AS pr_vals
+								WHERE pr_vals.pump_price_id = (SELECT id FROM pump_price_id)
+									AND o.quant <= coalesce(pr_vals.quant_to, 999999)
+									AND coalesce(pr_vals.price_garanteed, FALSE) = FALSE
+								ORDER BY pr_vals.quant_to ASC
+								LIMIT 1)
+							)::numeric(15,2)
+					END
+				ELSE 0	
+			END
+		) AS pump_cost,
+		
+		pump_vehicles_ref(pvh,pvh_v,pvh_own) AS pump_vehicles_ref,
+		pvh.vehicle_id AS pump_vehicle_id,
+		pvh_v.vehicle_owner_id AS pump_vehicle_owner_id,
+		sh.owner_agreed,
+		sh.owner_agreed_date_time,
+		sh.owner_pump_agreed,
+		sh.owner_pump_agreed_date_time,
+		
+		vehicle_owners_ref(pvh_own) AS pump_vehicle_owners_ref,
+		
+		CASE
+			-- цена по производственным зонам
+			WHEN destination_prod_base_price_val(ps.production_base_id, dest.id, sh.ship_date_time::timestamp) IS NOT NULL THEN
+				destination_prod_base_price_val(ps.production_base_id, dest.id, sh.ship_date_time::timestamp)
+		
+			WHEN coalesce(dest.special_price,FALSE) THEN
+				coalesce(
+					period_value('destination_price'::period_value_types, dest.id, sh.date_time)::numeric(15,2),
+					0
+				)
+			ELSE
+				coalesce(
+					(SELECT sh_p.price
+					FROM shipment_for_owner_costs sh_p
+					WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+					ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+					LIMIT 1
+					),			
+					coalesce(dest.price,0)
+				)			
+		END AS ship_price,
+		
+		coalesce(sh.ship_cost_edit,FALSE) AS ship_cost_edit,
+		coalesce(sh.pump_cost_edit,FALSE) AS pump_cost_edit,
+		
+		sh.pump_for_client_cost_edit,
+		(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0
+				WHEN coalesce(sh.pump_for_client_cost_edit,FALSE) THEN sh.pump_for_client_cost::numeric(15,2)
+				--last ship only!!!
+				WHEN sh.id = (SELECT this_ship.id FROM shipments AS this_ship WHERE this_ship.order_id=o.id ORDER BY this_ship.ship_date_time DESC LIMIT 1)
+				THEN
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(WITH
+							pump_price_id AS (
+								SELECT (pump_vehicle_price_on_date(pvh.pump_prices, sh.date_time)->'keys'->>'id')::int AS id
+							),
+							garant_pr AS (
+								SELECT
+									price_fixed,
+									greatest(o.quant - quant_to, 0) AS quant_over
+								FROM pump_prices_values
+								WHERE pump_price_id = (SELECT id FROM pump_price_id)
+									AND coalesce(price_garanteed, FALSE)
+									AND coalesce(quant_from, 0) <= o.quant
+									AND coalesce(price_fixed, 0) > 0
+								ORDER BY quant_from DESC
+								LIMIT 1
+							)
+							SELECT
+								coalesce((SELECT price_fixed FROM garant_pr), 0) +
+								(SELECT 
+									CASE
+										WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+										ELSE coalesce(pr_vals.price_m, 0) * coalesce((SELECT quant_over FROM garant_pr), o.quant)
+									END
+								FROM pump_prices_values AS pr_vals
+								WHERE pr_vals.pump_price_id = (SELECT id FROM pump_price_id)
+									AND o.quant <= coalesce(pr_vals.quant_to, 999999)
+									AND coalesce(pr_vals.price_garanteed, FALSE) = FALSE								
+								ORDER BY pr_vals.quant_to ASC
+								LIMIT 1)
+							)::numeric(15,2)
+					END
+				ELSE 0	
+			END
+		) AS pump_for_client_cost
+		
+		/*,prod.production_id
+		,concrete_types_ref(prod_concr) AS production_concrete_types_ref
+		,prod.concrete_quant AS production_concrete_quant
+		*/
+		
+	FROM shipments sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN vehicle_schedules vs ON vs.id = sh.vehicle_schedule_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN drivers d ON d.id = vs.driver_id
+	LEFT JOIN vehicles v ON v.id = vs.vehicle_id
+	LEFT JOIN users u ON u.id = sh.user_id
+	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
+	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+	LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
+	LEFT JOIN vehicle_owners pvh_own ON pvh_own.id = pvh_v.vehicle_owner_id
+	
+	/*LEFT JOIN (
+		SELECT
+			t.shipment_id,
+			t.production_id,
+			t.concrete_type_id,
+			sum(concrete_quant)::numeric(19,4) AS concrete_quant
+		FROM productions AS t
+		GROUP BY t.shipment_id,t.production_id,t.concrete_type_id
+	) AS prod ON prod.shipment_id = sh.id
+	LEFT JOIN concrete_types AS prod_concr ON prod_concr.id = prod.concrete_type_id
+	*/
+	ORDER BY sh.date_time DESC
+	--LIMIT 60
+	;
+
+ALTER TABLE public.shipments_list OWNER TO beton;
+
+
+
+-- ******************* update 10/01/2025 10:51:23 ******************
+	CREATE OR REPLACE VIEW constants_list_view AS
+	SELECT *
+	FROM const_doc_per_page_count_view
+	UNION ALL
+	SELECT *
+	FROM const_grid_refresh_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_order_grid_refresh_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_backup_vehicles_feature_view
+	UNION ALL
+	SELECT *
+	FROM const_base_geo_zone_id_view
+	UNION ALL
+	SELECT *
+	FROM const_base_geo_zone_view
+	UNION ALL
+	SELECT *
+	FROM const_chart_step_min_view
+	UNION ALL
+	SELECT *
+	FROM const_day_shift_length_view
+	UNION ALL
+	SELECT *
+	FROM const_days_allowed_with_broken_tracker_view
+	UNION ALL
+	SELECT *
+	FROM const_def_order_unload_speed_view
+	UNION ALL
+	SELECT *
+	FROM const_demurrage_coast_per_hour_view
+	UNION ALL
+	SELECT *
+	FROM const_first_shift_start_time_view
+	UNION ALL
+	SELECT *
+	FROM const_geo_zone_check_points_count_view
+	UNION ALL
+	SELECT *
+	FROM const_map_default_lat_view
+	UNION ALL
+	SELECT *
+	FROM const_map_default_lon_view
+	UNION ALL
+	SELECT *
+	FROM const_max_hour_load_view
+	UNION ALL
+	SELECT *
+	FROM const_max_vehicle_at_work_view
+	UNION ALL
+	SELECT *
+	FROM const_min_demurrage_time_view
+	UNION ALL
+	SELECT *
+	FROM const_min_quant_for_ship_cost_view
+	UNION ALL
+	SELECT *
+	FROM const_no_tracker_signal_warn_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_ord_mark_if_no_ship_time_view
+	UNION ALL
+	SELECT *
+	FROM const_order_auto_place_tolerance_view
+	UNION ALL
+	SELECT *
+	FROM const_order_step_min_view
+	UNION ALL
+	SELECT *
+	FROM const_own_vehicles_feature_view
+	UNION ALL
+	SELECT *
+	FROM const_raw_mater_plcons_rep_def_days_view
+	UNION ALL
+	SELECT *
+	FROM const_self_ship_dest_id_view
+	UNION ALL
+	SELECT *
+	FROM const_self_ship_dest_view
+	UNION ALL
+	SELECT *
+	FROM const_shift_for_orders_length_time_view
+	UNION ALL
+	SELECT *
+	FROM const_shift_length_time_view
+	UNION ALL
+	SELECT *
+	FROM const_ship_coast_for_self_ship_destination_view
+	UNION ALL
+	SELECT *
+	FROM const_speed_change_for_order_autolocate_view
+	UNION ALL
+	SELECT *
+	FROM const_vehicle_unload_time_view
+	UNION ALL
+	SELECT *
+	FROM const_avg_mat_cons_dev_day_count_view
+	UNION ALL
+	SELECT *
+	FROM const_days_for_plan_procur_view
+	UNION ALL
+	SELECT *
+	FROM const_lab_min_sample_count_view
+	UNION ALL
+	SELECT *
+	FROM const_lab_days_for_avg_view
+	UNION ALL
+	SELECT *
+	FROM const_city_ext_view
+	UNION ALL
+	SELECT *
+	FROM const_def_lang_view
+	UNION ALL
+	SELECT *
+	FROM const_efficiency_warn_k_view
+	UNION ALL
+	SELECT *
+	FROM const_zone_violation_alarm_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_weather_update_interval_sec_view
+	UNION ALL
+	SELECT *
+	FROM const_call_history_count_view
+	UNION ALL
+	SELECT *
+	FROM const_water_ship_cost_view
+	UNION ALL
+	SELECT *
+	FROM const_vehicle_owner_accord_from_day_view
+	UNION ALL
+	SELECT *
+	FROM const_vehicle_owner_accord_to_day_view
+	UNION ALL
+	SELECT *
+	FROM const_show_time_for_shipped_vehicles_view
+	UNION ALL
+	SELECT *
+	FROM const_tracker_malfunction_tel_list_view
+	UNION ALL
+	SELECT *
+	FROM const_low_efficiency_tel_list_view
+	UNION ALL
+	SELECT *
+	FROM const_material_closed_balance_date_view
+	UNION ALL
+	SELECT *
+	FROM const_cement_material_view
+	UNION ALL
+	SELECT *
+	FROM const_deviation_for_reroute_view
+	UNION ALL
+	SELECT *
+	FROM const_arnavi_telemat_server_view
+	UNION ALL
+	SELECT *
+	FROM const_chart_step_quant_view
+	UNION ALL
+	SELECT *
+	FROM const_chart_max_quant_view
+	UNION ALL
+	SELECT *
+	FROM const_konkrid_client_view
+	UNION ALL
+	SELECT *
+	FROM const_reglament_user_view
+	ORDER BY name;
+
+
+-- ******************* update 10/01/2025 10:57:20 ******************
+	CREATE OR REPLACE VIEW constants_list_view AS
+	SELECT *
+	FROM const_doc_per_page_count_view
+	UNION ALL
+	SELECT *
+	FROM const_grid_refresh_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_order_grid_refresh_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_backup_vehicles_feature_view
+	UNION ALL
+	SELECT *
+	FROM const_base_geo_zone_id_view
+	UNION ALL
+	SELECT *
+	FROM const_base_geo_zone_view
+	UNION ALL
+	SELECT *
+	FROM const_chart_step_min_view
+	UNION ALL
+	SELECT *
+	FROM const_day_shift_length_view
+	UNION ALL
+	SELECT *
+	FROM const_days_allowed_with_broken_tracker_view
+	UNION ALL
+	SELECT *
+	FROM const_def_order_unload_speed_view
+	UNION ALL
+	SELECT *
+	FROM const_demurrage_coast_per_hour_view
+	UNION ALL
+	SELECT *
+	FROM const_first_shift_start_time_view
+	UNION ALL
+	SELECT *
+	FROM const_geo_zone_check_points_count_view
+	UNION ALL
+	SELECT *
+	FROM const_map_default_lat_view
+	UNION ALL
+	SELECT *
+	FROM const_map_default_lon_view
+	UNION ALL
+	SELECT *
+	FROM const_max_hour_load_view
+	UNION ALL
+	SELECT *
+	FROM const_max_vehicle_at_work_view
+	UNION ALL
+	SELECT *
+	FROM const_min_demurrage_time_view
+	UNION ALL
+	SELECT *
+	FROM const_min_quant_for_ship_cost_view
+	UNION ALL
+	SELECT *
+	FROM const_no_tracker_signal_warn_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_ord_mark_if_no_ship_time_view
+	UNION ALL
+	SELECT *
+	FROM const_order_auto_place_tolerance_view
+	UNION ALL
+	SELECT *
+	FROM const_order_step_min_view
+	UNION ALL
+	SELECT *
+	FROM const_own_vehicles_feature_view
+	UNION ALL
+	SELECT *
+	FROM const_raw_mater_plcons_rep_def_days_view
+	UNION ALL
+	SELECT *
+	FROM const_self_ship_dest_id_view
+	UNION ALL
+	SELECT *
+	FROM const_self_ship_dest_view
+	UNION ALL
+	SELECT *
+	FROM const_shift_for_orders_length_time_view
+	UNION ALL
+	SELECT *
+	FROM const_shift_length_time_view
+	UNION ALL
+	SELECT *
+	FROM const_ship_coast_for_self_ship_destination_view
+	UNION ALL
+	SELECT *
+	FROM const_speed_change_for_order_autolocate_view
+	UNION ALL
+	SELECT *
+	FROM const_vehicle_unload_time_view
+	UNION ALL
+	SELECT *
+	FROM const_avg_mat_cons_dev_day_count_view
+	UNION ALL
+	SELECT *
+	FROM const_days_for_plan_procur_view
+	UNION ALL
+	SELECT *
+	FROM const_lab_min_sample_count_view
+	UNION ALL
+	SELECT *
+	FROM const_lab_days_for_avg_view
+	UNION ALL
+	SELECT *
+	FROM const_city_ext_view
+	UNION ALL
+	SELECT *
+	FROM const_def_lang_view
+	UNION ALL
+	SELECT *
+	FROM const_efficiency_warn_k_view
+	UNION ALL
+	SELECT *
+	FROM const_zone_violation_alarm_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_weather_update_interval_sec_view
+	UNION ALL
+	SELECT *
+	FROM const_call_history_count_view
+	UNION ALL
+	SELECT *
+	FROM const_water_ship_cost_view
+	UNION ALL
+	SELECT *
+	FROM const_vehicle_owner_accord_from_day_view
+	UNION ALL
+	SELECT *
+	FROM const_vehicle_owner_accord_to_day_view
+	UNION ALL
+	SELECT *
+	FROM const_show_time_for_shipped_vehicles_view
+	UNION ALL
+	SELECT *
+	FROM const_tracker_malfunction_tel_list_view
+	UNION ALL
+	SELECT *
+	FROM const_low_efficiency_tel_list_view
+	UNION ALL
+	SELECT *
+	FROM const_material_closed_balance_date_view
+	UNION ALL
+	SELECT *
+	FROM const_cement_material_view
+	UNION ALL
+	SELECT *
+	FROM const_deviation_for_reroute_view
+	UNION ALL
+	SELECT *
+	FROM const_arnavi_telemat_server_view
+	UNION ALL
+	SELECT *
+	FROM const_chart_step_quant_view
+	UNION ALL
+	SELECT *
+	FROM const_chart_max_quant_view
+	UNION ALL
+	SELECT *
+	FROM const_konkrid_client_view
+	UNION ALL
+	SELECT *
+	FROM const_reglament_user_view
+	ORDER BY name;
+
+
+-- ******************* update 10/01/2025 11:00:21 ******************
+	CREATE OR REPLACE VIEW constants_list_view AS
+	SELECT *
+	FROM const_doc_per_page_count_view
+	UNION ALL
+	SELECT *
+	FROM const_grid_refresh_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_order_grid_refresh_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_backup_vehicles_feature_view
+	UNION ALL
+	SELECT *
+	FROM const_base_geo_zone_id_view
+	UNION ALL
+	SELECT *
+	FROM const_base_geo_zone_view
+	UNION ALL
+	SELECT *
+	FROM const_chart_step_min_view
+	UNION ALL
+	SELECT *
+	FROM const_day_shift_length_view
+	UNION ALL
+	SELECT *
+	FROM const_days_allowed_with_broken_tracker_view
+	UNION ALL
+	SELECT *
+	FROM const_def_order_unload_speed_view
+	UNION ALL
+	SELECT *
+	FROM const_demurrage_coast_per_hour_view
+	UNION ALL
+	SELECT *
+	FROM const_first_shift_start_time_view
+	UNION ALL
+	SELECT *
+	FROM const_geo_zone_check_points_count_view
+	UNION ALL
+	SELECT *
+	FROM const_map_default_lat_view
+	UNION ALL
+	SELECT *
+	FROM const_map_default_lon_view
+	UNION ALL
+	SELECT *
+	FROM const_max_hour_load_view
+	UNION ALL
+	SELECT *
+	FROM const_max_vehicle_at_work_view
+	UNION ALL
+	SELECT *
+	FROM const_min_demurrage_time_view
+	UNION ALL
+	SELECT *
+	FROM const_min_quant_for_ship_cost_view
+	UNION ALL
+	SELECT *
+	FROM const_no_tracker_signal_warn_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_ord_mark_if_no_ship_time_view
+	UNION ALL
+	SELECT *
+	FROM const_order_auto_place_tolerance_view
+	UNION ALL
+	SELECT *
+	FROM const_order_step_min_view
+	UNION ALL
+	SELECT *
+	FROM const_own_vehicles_feature_view
+	UNION ALL
+	SELECT *
+	FROM const_raw_mater_plcons_rep_def_days_view
+	UNION ALL
+	SELECT *
+	FROM const_self_ship_dest_id_view
+	UNION ALL
+	SELECT *
+	FROM const_self_ship_dest_view
+	UNION ALL
+	SELECT *
+	FROM const_shift_for_orders_length_time_view
+	UNION ALL
+	SELECT *
+	FROM const_shift_length_time_view
+	UNION ALL
+	SELECT *
+	FROM const_ship_coast_for_self_ship_destination_view
+	UNION ALL
+	SELECT *
+	FROM const_speed_change_for_order_autolocate_view
+	UNION ALL
+	SELECT *
+	FROM const_vehicle_unload_time_view
+	UNION ALL
+	SELECT *
+	FROM const_avg_mat_cons_dev_day_count_view
+	UNION ALL
+	SELECT *
+	FROM const_days_for_plan_procur_view
+	UNION ALL
+	SELECT *
+	FROM const_lab_min_sample_count_view
+	UNION ALL
+	SELECT *
+	FROM const_lab_days_for_avg_view
+	UNION ALL
+	SELECT *
+	FROM const_city_ext_view
+	UNION ALL
+	SELECT *
+	FROM const_def_lang_view
+	UNION ALL
+	SELECT *
+	FROM const_efficiency_warn_k_view
+	UNION ALL
+	SELECT *
+	FROM const_zone_violation_alarm_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_weather_update_interval_sec_view
+	UNION ALL
+	SELECT *
+	FROM const_call_history_count_view
+	UNION ALL
+	SELECT *
+	FROM const_water_ship_cost_view
+	UNION ALL
+	SELECT *
+	FROM const_vehicle_owner_accord_from_day_view
+	UNION ALL
+	SELECT *
+	FROM const_vehicle_owner_accord_to_day_view
+	UNION ALL
+	SELECT *
+	FROM const_show_time_for_shipped_vehicles_view
+	UNION ALL
+	SELECT *
+	FROM const_tracker_malfunction_tel_list_view
+	UNION ALL
+	SELECT *
+	FROM const_low_efficiency_tel_list_view
+	UNION ALL
+	SELECT *
+	FROM const_material_closed_balance_date_view
+	UNION ALL
+	SELECT *
+	FROM const_cement_material_view
+	UNION ALL
+	SELECT *
+	FROM const_deviation_for_reroute_view
+	UNION ALL
+	SELECT *
+	FROM const_arnavi_telemat_server_view
+	UNION ALL
+	SELECT *
+	FROM const_chart_step_quant_view
+	UNION ALL
+	SELECT *
+	FROM const_chart_max_quant_view
+	UNION ALL
+	SELECT *
+	FROM const_konkrid_client_view
+	UNION ALL
+	SELECT *
+	FROM const_reglament_user_view
+	ORDER BY name;
+
+
+-- ******************* update 10/01/2025 11:02:49 ******************
+	CREATE OR REPLACE VIEW constants_list_view AS
+	SELECT *
+	FROM const_doc_per_page_count_view
+	UNION ALL
+	SELECT *
+	FROM const_grid_refresh_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_order_grid_refresh_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_backup_vehicles_feature_view
+	UNION ALL
+	SELECT *
+	FROM const_base_geo_zone_id_view
+	UNION ALL
+	SELECT *
+	FROM const_base_geo_zone_view
+	UNION ALL
+	SELECT *
+	FROM const_chart_step_min_view
+	UNION ALL
+	SELECT *
+	FROM const_day_shift_length_view
+	UNION ALL
+	SELECT *
+	FROM const_days_allowed_with_broken_tracker_view
+	UNION ALL
+	SELECT *
+	FROM const_def_order_unload_speed_view
+	UNION ALL
+	SELECT *
+	FROM const_demurrage_coast_per_hour_view
+	UNION ALL
+	SELECT *
+	FROM const_first_shift_start_time_view
+	UNION ALL
+	SELECT *
+	FROM const_geo_zone_check_points_count_view
+	UNION ALL
+	SELECT *
+	FROM const_map_default_lat_view
+	UNION ALL
+	SELECT *
+	FROM const_map_default_lon_view
+	UNION ALL
+	SELECT *
+	FROM const_max_hour_load_view
+	UNION ALL
+	SELECT *
+	FROM const_max_vehicle_at_work_view
+	UNION ALL
+	SELECT *
+	FROM const_min_demurrage_time_view
+	UNION ALL
+	SELECT *
+	FROM const_min_quant_for_ship_cost_view
+	UNION ALL
+	SELECT *
+	FROM const_no_tracker_signal_warn_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_ord_mark_if_no_ship_time_view
+	UNION ALL
+	SELECT *
+	FROM const_order_auto_place_tolerance_view
+	UNION ALL
+	SELECT *
+	FROM const_order_step_min_view
+	UNION ALL
+	SELECT *
+	FROM const_own_vehicles_feature_view
+	UNION ALL
+	SELECT *
+	FROM const_raw_mater_plcons_rep_def_days_view
+	UNION ALL
+	SELECT *
+	FROM const_self_ship_dest_id_view
+	UNION ALL
+	SELECT *
+	FROM const_self_ship_dest_view
+	UNION ALL
+	SELECT *
+	FROM const_shift_for_orders_length_time_view
+	UNION ALL
+	SELECT *
+	FROM const_shift_length_time_view
+	UNION ALL
+	SELECT *
+	FROM const_ship_coast_for_self_ship_destination_view
+	UNION ALL
+	SELECT *
+	FROM const_speed_change_for_order_autolocate_view
+	UNION ALL
+	SELECT *
+	FROM const_vehicle_unload_time_view
+	UNION ALL
+	SELECT *
+	FROM const_avg_mat_cons_dev_day_count_view
+	UNION ALL
+	SELECT *
+	FROM const_days_for_plan_procur_view
+	UNION ALL
+	SELECT *
+	FROM const_lab_min_sample_count_view
+	UNION ALL
+	SELECT *
+	FROM const_lab_days_for_avg_view
+	UNION ALL
+	SELECT *
+	FROM const_city_ext_view
+	UNION ALL
+	SELECT *
+	FROM const_def_lang_view
+	UNION ALL
+	SELECT *
+	FROM const_efficiency_warn_k_view
+	UNION ALL
+	SELECT *
+	FROM const_zone_violation_alarm_interval_view
+	UNION ALL
+	SELECT *
+	FROM const_weather_update_interval_sec_view
+	UNION ALL
+	SELECT *
+	FROM const_call_history_count_view
+	UNION ALL
+	SELECT *
+	FROM const_water_ship_cost_view
+	UNION ALL
+	SELECT *
+	FROM const_vehicle_owner_accord_from_day_view
+	UNION ALL
+	SELECT *
+	FROM const_vehicle_owner_accord_to_day_view
+	UNION ALL
+	SELECT *
+	FROM const_show_time_for_shipped_vehicles_view
+	UNION ALL
+	SELECT *
+	FROM const_tracker_malfunction_tel_list_view
+	UNION ALL
+	SELECT *
+	FROM const_low_efficiency_tel_list_view
+	UNION ALL
+	SELECT *
+	FROM const_material_closed_balance_date_view
+	UNION ALL
+	SELECT *
+	FROM const_cement_material_view
+	UNION ALL
+	SELECT *
+	FROM const_deviation_for_reroute_view
+	UNION ALL
+	SELECT *
+	FROM const_arnavi_telemat_server_view
+	UNION ALL
+	SELECT *
+	FROM const_chart_step_quant_view
+	UNION ALL
+	SELECT *
+	FROM const_chart_max_quant_view
+	UNION ALL
+	SELECT *
+	FROM const_konkrid_client_view
+	UNION ALL
+	SELECT *
+	FROM const_reglament_user_view
+	ORDER BY name;
+
+
+-- ******************* update 10/01/2025 11:15:41 ******************
+-- View: public.shipments_list
+
+--DROP VIEW shipments_for_veh_owner_list;
+--DROP VIEW shipment_dates_list;
+--DROP VIEW public.shipments_list;
+
+CREATE OR REPLACE VIEW public.shipments_list AS 
+	SELECT
+		sh.id,
+		sh.ship_date_time,
+		sh.quant,
+		
+		--shipments_cost(dest,o.concrete_type_id,o.date_time::date,sh,TRUE) AS cost,
+		(CASE
+			-- Вручную из документа
+			WHEN coalesce(sh.ship_cost_edit, FALSE) THEN sh.ship_cost
+			
+			-- Самовывоз
+			WHEN dest.id=const_self_ship_dest_id_val() THEN 0
+			
+			-- Вода
+			WHEN o.concrete_type_id = (select (const_water_val()->'keys'->>'id')::int) THEN
+				case
+					when sh.date_time::date>='2025-01-01' then
+						water_ship_cost_on_date(sh.date_time) * shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
+					else
+						water_ship_cost_on_date(sh.date_time)
+				end
+				
+			-- Все остальное
+			ELSE
+				CASE
+					-- цена по производственным зонам
+					WHEN destination_prod_base_price_val(ps.production_base_id, dest.id, sh.ship_date_time::timestamp) IS NOT NULL THEN
+						destination_prod_base_price_val(ps.production_base_id, dest.id, sh.ship_date_time::timestamp)
+				
+					-- специальная цена
+					WHEN coalesce(dest.special_price, FALSE) THEN
+						coalesce(period_value('destination_price'::period_value_types, dest.id, sh.date_time)::numeric(15,2),0)
+						
+					-- по схеме от расстояния
+					ELSE
+						coalesce(
+							(SELECT sh_p.price
+							FROM shipment_for_owner_costs sh_p
+							WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+							ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+							LIMIT 1
+							)			
+							,coalesce(dest.price, 0)
+						)
+				END
+				*
+				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
+		END)::numeric(15,2)
+		AS cost,
+		
+		sh.shipped,
+		concrete_types_ref(concr) AS concrete_types_ref,
+		o.concrete_type_id,		
+		v.owner,
+		
+		vehicles_ref(v) AS vehicles_ref,
+		vs.vehicle_id,
+		
+		drivers_ref(d) AS drivers_ref,
+		vs.driver_id,
+		
+		destinations_ref(dest) As destinations_ref,
+		o.destination_id,
+		
+		clients_ref(cl) As clients_ref,
+		o.client_id,
+		
+		shipments_demurrage_cost(sh.demurrage::interval, sh.date_time) AS demurrage_cost,
+		sh.demurrage,
+		
+		sh.client_mark,
+		sh.blanks_exist,
+		
+		users_ref(u) As users_ref,
+		o.user_id,
+		
+		production_sites_ref(ps) AS production_sites_ref,
+		sh.production_site_id,
+		
+		--vehicle_owners_ref(v_own) AS vehicle_owners_ref,
+		vehicle_owner_on_date(v.vehicle_owners,sh.date_time) AS vehicle_owners_ref,
+		
+		sh.acc_comment,
+		sh.acc_comment_shipment,
+		--v_own.id AS vehicle_owner_id,
+		((vehicle_owner_on_date(v.vehicle_owners,sh.date_time))->'keys'->>'id')::int AS vehicle_owner_id,
+		
+		--shipments_pump_cost(sh,o,dest,pvh,TRUE) AS pump_cost,
+		(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0
+				WHEN coalesce(sh.pump_cost_edit,FALSE) THEN sh.pump_cost::numeric(15,2)
+				--last ship only!!!
+				WHEN sh.id = (SELECT this_ship.id FROM shipments AS this_ship WHERE this_ship.order_id=o.id ORDER BY this_ship.ship_date_time DESC LIMIT 1)
+				THEN
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(WITH
+							pump_price_id AS (
+								SELECT (pump_vehicle_price_on_date(pvh.pump_prices, sh.date_time)->'keys'->>'id')::int AS id
+							),
+							garant_pr AS (
+								SELECT
+									price_fixed,
+									greatest(o.quant - quant_to, 0) AS quant_over
+								FROM pump_prices_values
+								WHERE pump_price_id = (SELECT id FROM pump_price_id)
+									AND coalesce(price_garanteed, FALSE)
+									AND coalesce(quant_from, 0) <= o.quant
+									AND coalesce(price_fixed, 0) > 0
+								ORDER BY quant_from DESC
+								LIMIT 1
+							)
+							SELECT
+								coalesce((SELECT price_fixed FROM garant_pr), 0) +
+								(SELECT
+									CASE
+										WHEN coalesce(pr_vals.price_fixed, 0)>0 THEN pr_vals.price_fixed
+										ELSE coalesce(pr_vals.price_m, 0) * coalesce((SELECT quant_over FROM garant_pr), o.quant)
+									END
+								FROM pump_prices_values AS pr_vals
+								WHERE pr_vals.pump_price_id = (SELECT id FROM pump_price_id)
+									AND o.quant <= coalesce(pr_vals.quant_to, 999999)
+									AND coalesce(pr_vals.price_garanteed, FALSE) = FALSE
+								ORDER BY pr_vals.quant_to ASC
+								LIMIT 1)
+							)::numeric(15,2)
+					END
+				ELSE 0	
+			END
+		) AS pump_cost,
+		
+		pump_vehicles_ref(pvh,pvh_v,pvh_own) AS pump_vehicles_ref,
+		pvh.vehicle_id AS pump_vehicle_id,
+		pvh_v.vehicle_owner_id AS pump_vehicle_owner_id,
+		sh.owner_agreed,
+		sh.owner_agreed_date_time,
+		sh.owner_pump_agreed,
+		sh.owner_pump_agreed_date_time,
+		
+		vehicle_owners_ref(pvh_own) AS pump_vehicle_owners_ref,
+		
+		CASE
+			-- цена по производственным зонам
+			WHEN destination_prod_base_price_val(ps.production_base_id, dest.id, sh.ship_date_time::timestamp) IS NOT NULL THEN
+				destination_prod_base_price_val(ps.production_base_id, dest.id, sh.ship_date_time::timestamp)
+		
+			WHEN coalesce(dest.special_price,FALSE) THEN
+				coalesce(
+					period_value('destination_price'::period_value_types, dest.id, sh.date_time)::numeric(15,2),
+					0
+				)
+			ELSE
+				coalesce(
+					(SELECT sh_p.price
+					FROM shipment_for_owner_costs sh_p
+					WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
+					ORDER BY sh_p.date DESC,sh_p.distance_to ASC
+					LIMIT 1
+					),			
+					coalesce(dest.price,0)
+				)			
+		END AS ship_price,
+		
+		coalesce(sh.ship_cost_edit,FALSE) AS ship_cost_edit,
+		coalesce(sh.pump_cost_edit,FALSE) AS pump_cost_edit,
+		
+		sh.pump_for_client_cost_edit,
+		(SELECT
+			CASE
+				WHEN o.pump_vehicle_id IS NULL THEN 0
+				WHEN coalesce(sh.pump_for_client_cost_edit,FALSE) THEN sh.pump_for_client_cost::numeric(15,2)
+				--last ship only!!!
+				WHEN sh.id = (SELECT this_ship.id FROM shipments AS this_ship WHERE this_ship.order_id=o.id ORDER BY this_ship.ship_date_time DESC LIMIT 1)
+				THEN
+					CASE
+						WHEN coalesce(o.total_edit,FALSE) AND coalesce(o.unload_price,0)>0 THEN o.unload_price::numeric(15,2)
+						ELSE
+							(WITH
+							pump_price_id AS (
+								SELECT (pump_vehicle_price_on_date(pvh.pump_prices, sh.date_time)->'keys'->>'id')::int AS id
+							),
+							garant_pr AS (
+								SELECT
+									price_fixed,
+									greatest(o.quant - quant_to, 0) AS quant_over
+								FROM pump_prices_values
+								WHERE pump_price_id = (SELECT id FROM pump_price_id)
+									AND coalesce(price_garanteed, FALSE)
+									AND coalesce(quant_from, 0) <= o.quant
+									AND coalesce(price_fixed, 0) > 0
+								ORDER BY quant_from DESC
+								LIMIT 1
+							)
+							SELECT
+								coalesce((SELECT price_fixed FROM garant_pr), 0) +
+								(SELECT 
+									CASE
+										WHEN coalesce(pr_vals.price_fixed,0)>0 THEN pr_vals.price_fixed
+										ELSE coalesce(pr_vals.price_m, 0) * coalesce((SELECT quant_over FROM garant_pr), o.quant)
+									END
+								FROM pump_prices_values AS pr_vals
+								WHERE pr_vals.pump_price_id = (SELECT id FROM pump_price_id)
+									AND o.quant <= coalesce(pr_vals.quant_to, 999999)
+									AND coalesce(pr_vals.price_garanteed, FALSE) = FALSE								
+								ORDER BY pr_vals.quant_to ASC
+								LIMIT 1)
+							)::numeric(15,2)
+					END
+				ELSE 0	
+			END
+		) AS pump_for_client_cost
+		
+		/*,prod.production_id
+		,concrete_types_ref(prod_concr) AS production_concrete_types_ref
+		,prod.concrete_quant AS production_concrete_quant
+		*/
+		
+	FROM shipments sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN vehicle_schedules vs ON vs.id = sh.vehicle_schedule_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN drivers d ON d.id = vs.driver_id
+	LEFT JOIN vehicles v ON v.id = vs.vehicle_id
+	LEFT JOIN users u ON u.id = sh.user_id
+	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
+	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
+	LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
+	LEFT JOIN vehicle_owners pvh_own ON pvh_own.id = pvh_v.vehicle_owner_id
+	
+	/*LEFT JOIN (
+		SELECT
+			t.shipment_id,
+			t.production_id,
+			t.concrete_type_id,
+			sum(concrete_quant)::numeric(19,4) AS concrete_quant
+		FROM productions AS t
+		GROUP BY t.shipment_id,t.production_id,t.concrete_type_id
+	) AS prod ON prod.shipment_id = sh.id
+	LEFT JOIN concrete_types AS prod_concr ON prod_concr.id = prod.concrete_type_id
+	*/
+	ORDER BY sh.date_time DESC
+	--LIMIT 60
+	;
+
+ALTER TABLE public.shipments_list OWNER TO beton;
+
+
+
+-- ******************* update 17/01/2025 08:02:30 ******************
+-- Function: public.client_contracts_ref(client_contracts)
+-- DROP FUNCTION public.client_contracts_ref(client_contracts);
+
+CREATE OR REPLACE FUNCTION public.client_contracts_ref(client_contracts)
+  RETURNS json AS
+$$
+	SELECT json_build_object(
+		'keys',json_build_object(
+			'id',$1.id    
+			),	
+		'descr',$1.name,
+		'dataType','client_contracts'
+	);
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;

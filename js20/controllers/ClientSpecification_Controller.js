@@ -1,5 +1,5 @@
 /**
- * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017 - 2024
  
  * THIS FILE IS GENERATED FROM TEMPLATE build/templates/controllers/Controller_js20.xsl
  * ALL DIRECT MODIFICATIONS WILL BE LOST WITH THE NEXT BUILD PROCESS!!!
@@ -52,6 +52,12 @@ extend(ClientSpecification_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
+	
+	var field = new FieldString("client_contract_1c_ref",options);
+	
+	pm.addField(field);
+	
+	var options = {};
 	options.required = true;
 	var field = new FieldDate("specification_date",options);
 	
@@ -78,6 +84,12 @@ extend(ClientSpecification_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Объект";
 	var field = new FieldInt("destination_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldString("client_contract_ref_1c",options);
 	
 	pm.addField(field);
 	
@@ -125,6 +137,12 @@ extend(ClientSpecification_Controller,ControllerObjServer);
 	
 	var options = {};
 	
+	var field = new FieldString("client_contract_1c_ref",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
 	var field = new FieldDate("specification_date",options);
 	
 	pm.addField(field);
@@ -150,6 +168,12 @@ extend(ClientSpecification_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Объект";
 	var field = new FieldInt("destination_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldString("client_contract_ref_1c",options);
 	
 	pm.addField(field);
 	
@@ -208,6 +232,9 @@ extend(ClientSpecification_Controller,ControllerObjServer);
 	pm.addField(new FieldInt("client_id",f_opts));
 	var f_opts = {};
 	
+	pm.addField(new FieldString("client_ref_1c",f_opts));
+	var f_opts = {};
+	
 	pm.addField(new FieldDate("specification_date",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Договор";
@@ -224,6 +251,12 @@ extend(ClientSpecification_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Контрагент";
 	pm.addField(new FieldJSON("clients_ref",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Contract";
+	pm.addField(new FieldJSON("client_contracts_1c_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("client_contract_1c_id",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Марка";
 	pm.addField(new FieldJSON("concrete_types_ref",f_opts));

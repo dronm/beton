@@ -34,11 +34,13 @@ CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
 		
 		-- Цена для производственной зоны
 		WHEN destination_prod_base_driver_price_val(pr_bs.id, dest.id, sh.ship_date_time::timestamp) IS NOT NULL THEN
-			destination_prod_base_driver_price_val(pr_bs.id, dest.id, sh.ship_date_time::timestamp) * shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric)
+			destination_prod_base_driver_price_val(pr_bs.id, dest.id, sh.ship_date_time::timestamp) *
+				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
 		
 		-- периодическая цена для всех зон
 		WHEN coalesce(per_vals.price_for_driver, 0)>0 THEN
-			per_vals.price_for_driver * shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric)
+			per_vals.price_for_driver *
+				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
 			
 		-- все остальные случаи
 		ELSE
@@ -64,7 +66,7 @@ CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
 				*/
 			ORDER BY shdr_cost.distance_to ASC
 			LIMIT 1
-			) * shipments_quant_for_cost(sh.ship_date_time::date,sh.quant::numeric,dest.distance::numeric)
+			) * shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
 		END AS cost_for_driver,
 		
 		sh.production_sites_ref,
@@ -93,6 +95,9 @@ CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
 		
 	LEFT JOIN production_sites AS pr_st ON pr_st.id = sh.production_site_id
 	LEFT JOIN production_bases AS pr_bs ON pr_bs.id = pr_st.production_base_id
+	
+	LEFT JOIN clients AS cl ON cl.id = sh.client_id
+	
 	ORDER BY ship_date_time DESC
 	;
 	

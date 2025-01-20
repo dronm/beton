@@ -65,7 +65,20 @@ function ClientDebtList_View(id,options){
 							],
 							"sortable":true
 						})
-						
+						,new GridCellHead(id+":grid:head:client_contracts_ref",{
+							"value":"Contract",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("client_contracts_ref"),
+									"ctrlBindFieldId":"client_contract_id",
+									"ctrlOptions":{
+										"labelCaption":""
+									}
+								})
+							],
+							"sortable":true,
+							"sort":"asc"							
+						})
 						,new GridCellHead(id+":grid:head:debt_total",{
 							"value":"Сумма",
 							"columns":[

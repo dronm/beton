@@ -56,6 +56,15 @@ function ClientDebt_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.client_contract_id = new FieldInt("client_contract_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.debt_total = new FieldFloat("debt_total",filed_options);
 	options.fields.debt_total.getValidator().setMaxLength('15');
 	
@@ -68,6 +77,16 @@ function ClientDebt_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.update_date = new FieldDateTimeTZ("update_date",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.dogovor_ref_1c = new FieldString("dogovor_ref_1c",filed_options);
+	options.fields.dogovor_ref_1c.getValidator().setMaxLength('36');
 	
 			
 			

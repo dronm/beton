@@ -24,6 +24,7 @@ function ClientSpecificationList_View(id,options){
 		"filters":(options.detailFilters&&options.detailFilters.ClientSpecificationList_Model)? options.detailFilters.ClientSpecificationList_Model:null,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd"),		
 		"popUpMenu":popup_menu,
+		"editViewClass": ClientSpecificationListEdit_View,
 		"head":new GridHead(id+"-grid:head",{
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
@@ -45,6 +46,19 @@ function ClientSpecificationList_View(id,options){
 							"sortable":true
 						})
 					
+						,new GridCellHead(id+":grid:head:client_contracts_1c_ref",{
+							"value":"Contract",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("client_contracts_1c_ref"),
+									"ctrlBindFieldId":"client_contract_1c_ref",
+									"ctrlClass":ClientContract1cEdit,
+									"ctrlOptions":{
+										"labelCaption":""
+									}
+								})
+							]
+						})
 						,new GridCellHead(id+":grid:head:specification_date",{
 							"value":"Дата",
 							"columns":[
@@ -223,4 +237,21 @@ ClientSpecificationList_View.prototype.calcTotal = function(){
 		return;
 	}
 	v.getElement("total").setValue(v.getElement("price").getValue() * v.getElement("quant").getValue());
+}
+
+//***********************
+function ClientSpecificationListEdit_View(id,options){	
+	ClientSpecificationListEdit_View.superclass.constructor.call(this,id,options);
+}
+extend(ClientSpecificationListEdit_View, ViewGridEditInlineAjx);
+
+ClientSpecificationListEdit_View.prototype.onGetData = function(resp, cmd){
+	ClientSpecificationListEdit_View.superclass.onGetData.call(this, resp, cmd);
+
+	if(resp){
+		const model = resp.getModel("ClientSpecificationList_Model");
+		model.getRow(0);
+		const clientRef1c = model.getFieldValue("client_ref_1c");
+		this.getElement("client_contracts_1c_ref").setClientRef1c(clientRef1c);
+	}
 }

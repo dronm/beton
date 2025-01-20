@@ -19,9 +19,14 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 			WHEN dest.id=const_self_ship_dest_id_val() THEN 0
 			
 			-- Вода
-			WHEN o.concrete_type_id=12 THEN
-				--const_water_ship_cost_val()
-				water_ship_cost_on_date(sh.date_time)
+			WHEN o.concrete_type_id = (select (const_water_val()->'keys'->>'id')::int) THEN
+				case
+					when sh.date_time::date>='2025-01-01' then
+						water_ship_cost_on_date(sh.date_time) * shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
+					else
+						--water_ship_cost_on_date(sh.date_time)
+						4000::numeric(15, 2)
+				end
 				
 			-- Все остальное
 			ELSE
@@ -47,7 +52,7 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 						)
 				END
 				*
-				shipments_quant_for_cost(sh.ship_date_time::date,sh.quant::numeric,dest.distance::numeric)
+				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
 		END)::numeric(15,2)
 		AS cost,
 		

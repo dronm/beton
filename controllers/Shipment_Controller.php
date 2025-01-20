@@ -643,6 +643,18 @@ class Shipment_Controller extends ControllerSQL{
 		$this->addPublicMethod($pm);
 
 			
+		$pm = new PublicMethod('shipment_transp_nakl');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
 		$pm = new PublicMethod('get_time_list');
 		
 		$pm->addParam(new FieldExtInt('count'));
@@ -1978,6 +1990,16 @@ class Shipment_Controller extends ControllerSQL{
 			,array($this->getExtDbVal($pm, 'id'))
 			,'Отгрузка не найдена!'
 			,'Путевой лист'
+		);
+	}
+
+	public function shipment_transp_nakl($pm){
+		return ExcelTemplate_Controller::downloadFilledTemplate(
+			$this->getDbLink()
+			,'Транспортная накладная'
+			,array($this->getExtDbVal($pm, 'id'))
+			,'Отгрузка не найдена!'
+			,'Транспортная накладная'
 		);
 	}
 		

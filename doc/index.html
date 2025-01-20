@@ -27,6 +27,7 @@
 <li><a href="#Client_Controller">Client_Controller</a></li>
 <li><a href="#Client1c_Controller">Client1c_Controller</a></li>
 <li><a href="#ClientComeFrom_Controller">ClientComeFrom_Controller</a></li>
+<li><a href="#ClientContract1c_Controller">ClientContract1c_Controller</a></li>
 <li><a href="#ClientDebt_Controller">ClientDebt_Controller</a></li>
 <li><a href="#ClientLocalList_Controller">ClientLocalList_Controller</a></li>
 <li><a href="#ClientSpecification_Controller">ClientSpecification_Controller</a></li>
@@ -445,6 +446,7 @@
 <li><a href="#DestinationPriceForDriverPeriodValueList_Model">DestinationPriceForDriverPeriodValueList_Model</a></li>
 <li><a href="#DemurrageCostPerHourPeriodValueList_Model">DemurrageCostPerHourPeriodValueList_Model</a></li>
 <li><a href="#WaterShipCostPeriodValueList_Model">WaterShipCostPeriodValueList_Model</a></li>
+<li><a href="#MinQuantForShipCostPeriodValueList_Model">MinQuantForShipCostPeriodValueList_Model</a></li>
 <li><a href="#TmUserList_Model">TmUserList_Model</a></li>
 <li><a href="#TmUserDialog_Model">TmUserDialog_Model</a></li>
 <li><a href="#TmUser_Model">TmUser_Model</a></li>
@@ -485,6 +487,9 @@
 <li><a href="#BuhRBP1cList_Model">BuhRBP1cList_Model</a></li>
 <li><a href="#Firm1c_Model">Firm1c_Model</a></li>
 <li><a href="#Firm1cList_Model">Firm1cList_Model</a></li>
+<li><a href="#Firm1c_Model">Firm1c_Model</a></li>
+<li><a href="#ClientContract1c_Model">ClientContract1c_Model</a></li>
+<li><a href="#ClientContract1cList_Model">ClientContract1cList_Model</a></li>
 <li><a href="#ClientDebt_Model">ClientDebt_Model</a></li>
 <li><a href="#ClientDebtList_Model">ClientDebtList_Model</a></li>
 <li><a href="#ShipmentMedia_Model">ShipmentMedia_Model</a></li>
@@ -1040,6 +1045,17 @@
 <a href="#ClientComeFrom_Model">Model: ClientComeFrom_Model</a><h2>get_list</h2>
 <a href="#ClientComeFrom_Model">Model: ClientComeFrom_Model</a><h2>get_object</h2>
 <a href="#ClientComeFrom_Model">Model: ClientComeFrom_Model</a>
+</div>
+</div>
+<div id="ClientContract1c_Controller" class="content_box">
+<h1>ClientContract1c_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>get_list</h2>
+<a href="#ClientDebtList_Model">Model: ClientDebtList_Model</a><h2>get_object</h2>
+<a href="#ClientDebtList_Model">Model: ClientDebtList_Model</a><h2>complete_from_1c</h2>
+<a href="#ClientContract1cList_Model">Model: ClientContract1cList_Model</a>
 </div>
 </div>
 <div id="ClientDebt_Controller" class="content_box">
@@ -3576,6 +3592,7 @@
 <a href="#ShipmentRep_Model">Model: ShipmentRep_Model</a><h2>shipment_invoice</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_ttn</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_putevoi_list</h2>
+<a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_transp_nakl</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>get_time_list</h2>
 <a href="#ShipmentTimeList_Model">Model: ShipmentTimeList_Model</a><h2>set_blanks_exist</h2>
 <p>Arguments:</p>
@@ -6564,6 +6581,54 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="ClientContract1c_Model" class="content_box">
+<h1>ClientContract1c_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ClientContract1cList_Model" class="content_box">
+<h1>ClientContract1cList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>name</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>search</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="ClientDebt_Model" class="content_box">
 <h1>ClientDebt_Model</h1>
 <div class="content_item">
@@ -6586,6 +6651,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>client_contract_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>debt_total</h2>
 <div>Type:Float</div>
 <div>Primary key:</div>
@@ -6597,6 +6668,12 @@
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
+<div>Precision:</div>
+<h2>dogovor_ref_1c</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:36</div>
 <div>Precision:</div>
 </div>
 </div>
@@ -6628,7 +6705,19 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>client_contract_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>clients_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_contracts_ref</h2>
 <div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -6952,6 +7041,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>client_contract_1c_ref</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:36</div>
+<div>Precision:</div>
 <h2>specification_date</h2>
 <div>Type:Date</div>
 <div>Primary key:</div>
@@ -6981,6 +7076,12 @@
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
+<div>Precision:</div>
+<h2>client_contract_ref_1c</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:36</div>
 <div>Precision:</div>
 <h2>quant</h2>
 <div>Type:Float</div>
@@ -7078,6 +7179,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>client_ref_1c</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>specification_date</h2>
 <div>Type:Date</div>
 <div>Primary key:</div>
@@ -7110,6 +7217,18 @@
 <div>Precision:</div>
 <h2>clients_ref</h2>
 <div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_contracts_1c_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_contract_1c_id</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -9798,6 +9917,30 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="Firm1c_Model" class="content_box">
+<h1>Firm1c_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>inn</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:12</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="Firm1cList_Model" class="content_box">
 <h1>Firm1cList_Model</h1>
 <div class="content_item">
@@ -12209,6 +12352,30 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+</div>
+</div>
+<div id="MinQuantForShipCostPeriodValueList_Model" class="content_box">
+<h1>MinQuantForShipCostPeriodValueList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>val</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
 </div>
 </div>
 <div id="Offer_Model" class="content_box">
@@ -24133,6 +24300,8 @@
 <h2>demurrage_cost_per_hour</h2>
 <div>Description:</div>
 <h2>water_ship_cost</h2>
+<div>Description:</div>
+<h2>min_quant_for_ship_cost</h2>
 <div>Description:</div>
 </div>
 </div>

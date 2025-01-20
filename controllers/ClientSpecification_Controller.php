@@ -23,6 +23,9 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
  */
 
 
+
+require_once(ABSOLUTE_PATH.'functions/ExtProg.php');
+
 class ClientSpecification_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
 		parent::__construct($dbLinkMaster,$dbLink);
@@ -35,6 +38,11 @@ class ClientSpecification_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Контрагент';
 			$param = new FieldExtInt('client_id'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtString('client_contract_1c_ref'
 				,$f_params);
 		$pm->addParam($param);
 		
@@ -70,6 +78,11 @@ class ClientSpecification_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Объект';
 			$param = new FieldExtInt('destination_id'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtString('client_contract_ref_1c'
 				,$f_params);
 		$pm->addParam($param);
 		
@@ -128,6 +141,11 @@ class ClientSpecification_Controller extends ControllerSQL{
 			$pm->addParam($param);
 		
 			$f_params=array();
+			$param = new FieldExtString('client_contract_1c_ref'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
 			$param = new FieldExtDate('specification_date'
 				,$f_params);
 			$pm->addParam($param);
@@ -157,6 +175,11 @@ class ClientSpecification_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Объект';
 			$param = new FieldExtInt('destination_id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtString('client_contract_ref_1c'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -294,6 +317,49 @@ class ClientSpecification_Controller extends ControllerSQL{
 		
 	}	
 	
+
+	public function check_contract($pm){
+		if($pm->getParamValue("client_contract_1c_ref")){
+			$ar = $this->getDbLink()->query_first(sprintf(
+				"SELECT id FROM client_contracts_1c WHERE ref_1c->>'ref_1c'=%s"
+				,$this->getExtDbVal($pm, 'client_contract_1c_ref')
+			));
+			if(!is_array($ar) || !count($ar) || !isset($ar["id"])){
+				$client_id = NULL;
+				if($pm->getParamValue("client_id")){
+					$client_id = $this->getExtDbVal($pm, 'client_id');
+				}else{
+					$ar = $this->getDbLink()->query_first(sprintf(
+						"SELECT client_id FROM client_specifications WHERE id=%d"
+						,$this->getExtDbVal($pm, 'old_id')
+					));
+					$client_id = $ar["client_id"];
+				}
+
+				$resp = ExtProg::getClientContract($this->getExtVal($pm, "client_contract_1c_ref"));
+				/* $name = $resp["models"]["Contract1cList_Model"]["rows"][0]["name"]; */
+				$name = $resp["models"]["Contract1cList_Model"]["rows"][0]["name"];
+				$this->getDbLinkMaster()->query(sprintf(
+					"INSERT INTO client_contracts_1c (ref_1c, client_id)
+					VALUES (jsonb_build_object('ref_1c', %s, 'descr', '%s'), %d)
+					RETURNING id"
+					,$this->getExtDbVal($pm, 'client_contract_1c_ref')
+					,$name
+					,$client_id
+				));
+			}
+		}
+	}
+
+	public function update($pm){
+		$this->check_contract($pm);
+		parent::update($pm);
+	}
+
+	public function insert($pm){
+		$this->check_contract($pm);
+		parent::insert($pm);
+	}
 
 	public function complete_for_client($pm){
 		$client_id = $this->getExtDbVal($pm, 'client_id');

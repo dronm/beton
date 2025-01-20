@@ -45,7 +45,7 @@ CREATE OR REPLACE VIEW shipments_for_client_list AS
 					)			
 				END
 				*
-				shipments_quant_for_cost(sh.ship_date_time::date,sh.quant::numeric,dest.distance::numeric)			
+				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
 		END)::numeric(15,2)
 		) AS deliv_cost
 		
@@ -100,7 +100,7 @@ CREATE OR REPLACE VIEW shipments_for_client_list AS
 					)			
 				END
 				*
-				shipments_quant_for_cost(sh.ship_date_time::date,sh.quant::numeric,dest.distance::numeric)			
+				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))			
 		END)::numeric(15,2))+
 		--pump
 		(SELECT

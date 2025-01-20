@@ -8,6 +8,7 @@
 
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
@@ -41,6 +42,15 @@ class ClientSpecificationList_Model extends ModelSQL{
 						
 		$f_client_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_id",$f_opts);
 		$this->addField($f_client_id);
+		//********************
+		
+		//*** Field client_ref_1c ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="client_ref_1c";
+						
+		$f_client_ref_1c=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_ref_1c",$f_opts);
+		$this->addField($f_client_ref_1c);
 		//********************
 		
 		//*** Field specification_date ***
@@ -97,6 +107,24 @@ class ClientSpecificationList_Model extends ModelSQL{
 						
 		$f_clients_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"clients_ref",$f_opts);
 		$this->addField($f_clients_ref);
+		//********************
+		
+		//*** Field client_contracts_1c_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Contract';
+		$f_opts['id']="client_contracts_1c_ref";
+						
+		$f_client_contracts_1c_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_contracts_1c_ref",$f_opts);
+		$this->addField($f_client_contracts_1c_ref);
+		//********************
+		
+		//*** Field client_contract_1c_id ***
+		$f_opts = array();
+		$f_opts['id']="client_contract_1c_id";
+						
+		$f_client_contract_1c_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_contract_1c_id",$f_opts);
+		$this->addField($f_client_contract_1c_id);
 		//********************
 		
 		//*** Field concrete_types_ref ***

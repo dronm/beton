@@ -47,6 +47,16 @@ function ClientSpecification_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.client_contract_1c_ref = new FieldString("client_contract_1c_ref",filed_options);
+	options.fields.client_contract_1c_ref.getValidator().setMaxLength('36');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.specification_date = new FieldDate("specification_date",filed_options);
 	options.fields.specification_date.getValidator().setRequired(true);
 	
@@ -85,6 +95,16 @@ function ClientSpecification_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.destination_id = new FieldInt("destination_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.client_contract_ref_1c = new FieldString("client_contract_ref_1c",filed_options);
+	options.fields.client_contract_ref_1c.getValidator().setMaxLength('36');
 	
 				
 	
