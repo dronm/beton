@@ -48,6 +48,13 @@ class ClientSpecification_Controller extends ControllerSQL{
 		
 			$f_params = array();
 			
+				$f_params['alias']='Объект';
+			$param = new FieldExtInt('client_contract_id'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
 				$f_params['required']=TRUE;
 			$param = new FieldExtDate('specification_date'
 				,$f_params);
@@ -78,11 +85,6 @@ class ClientSpecification_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Объект';
 			$param = new FieldExtInt('destination_id'
-				,$f_params);
-		$pm->addParam($param);
-		
-			$f_params = array();
-			$param = new FieldExtString('client_contract_ref_1c'
 				,$f_params);
 		$pm->addParam($param);
 		
@@ -146,6 +148,13 @@ class ClientSpecification_Controller extends ControllerSQL{
 			$pm->addParam($param);
 		
 			$f_params=array();
+			
+				$f_params['alias']='Объект';
+			$param = new FieldExtInt('client_contract_id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
 			$param = new FieldExtDate('specification_date'
 				,$f_params);
 			$pm->addParam($param);
@@ -175,11 +184,6 @@ class ClientSpecification_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Объект';
 			$param = new FieldExtInt('destination_id'
-				,$f_params);
-			$pm->addParam($param);
-		
-			$f_params=array();
-			$param = new FieldExtString('client_contract_ref_1c'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -339,7 +343,7 @@ class ClientSpecification_Controller extends ControllerSQL{
 				$resp = ExtProg::getClientContract($this->getExtVal($pm, "client_contract_1c_ref"));
 				/* $name = $resp["models"]["Contract1cList_Model"]["rows"][0]["name"]; */
 				$name = $resp["models"]["Contract1cList_Model"]["rows"][0]["name"];
-				$this->getDbLinkMaster()->query(sprintf(
+				$ar = $this->getDbLinkMaster()->query(sprintf(
 					"INSERT INTO client_contracts_1c (ref_1c, client_id)
 					VALUES (jsonb_build_object('ref_1c', %s, 'descr', '%s'), %d)
 					RETURNING id"
@@ -347,7 +351,13 @@ class ClientSpecification_Controller extends ControllerSQL{
 					,$name
 					,$client_id
 				));
+				$client_contract_id = $ar["id"];
+
+			}else {
+				$client_contract_id = $ar["id"];
 			}
+
+			$pm->setParamValue("client_contract_id", $client_contract_id);
 		}
 	}
 

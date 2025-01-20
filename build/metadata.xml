@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-01-20 06:25:36</lastBuild></version>
+		<lastBuild>2025-01-20 07:14:32</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -259,6 +259,7 @@
 		<version dateOpen="2024-11-17 09:50:34" dateClose="2024-11-21 00:47:26">1.00353</version>
 		<version dateOpen="2024-11-21 08:23:02" dateClose="2024-12-17 07:15:41">1.00354</version>
 		<version dateOpen="2024-12-24 16:31:32" dateClose="2025-01-20 06:25:58">1.00355</version>
+		<version dateOpen="2025-01-20 07:02:31" dateClose="2025-01-20 07:14:50">1.00356</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -4577,12 +4578,12 @@
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="client_id" dataType="Int" alias="Контрагент" refTable="clients" refField="id"/>
 			<field id="client_contract_1c_ref" dataType="String" length="36"/>
+			<field id="client_contract_id" dataType="Int" alias="Объект" refTable="client_contracts_1c" refField="id"/>
 			<field id="specification_date" dataType="Date" required="TRUE"/>
 			<field id="contract" dataType="Text" alias="Договор"/>
 			<field id="specification" dataType="Text" alias="Спецификация"/>
 			<field id="concrete_type_id" dataType="Int" alias="Марка" refTable="concrete_types" refField="id"/>
 			<field id="destination_id" dataType="Int" alias="Объект" refTable="destinations" refField="id"/>
-			<field id="client_contract_ref_1c" dataType="String" length="36"/>
 			<field id="quant" dataType="Float" length="19" prcision="4" alias="Количество"/>
 			<field id="price" dataType="Float" length="15" precision="2" alias="Цена"/>
 			<field id="total" dataType="Float" length="15" precision="2" alias="Сумма"/>

@@ -54,6 +54,15 @@ function ClientSpecification_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Объект';
+	filed_options.autoInc = false;	
+	
+	options.fields.client_contract_id = new FieldInt("client_contract_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	
 	filed_options.autoInc = false;	
 	
@@ -95,16 +104,6 @@ function ClientSpecification_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.destination_id = new FieldInt("destination_id",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.client_contract_ref_1c = new FieldString("client_contract_ref_1c",filed_options);
-	options.fields.client_contract_ref_1c.getValidator().setMaxLength('36');
 	
 				
 	

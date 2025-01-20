@@ -52,6 +52,16 @@ class ClientSpecification_Model extends ModelSQL{
 		$this->addField($f_client_contract_1c_ref);
 		//********************
 		
+		//*** Field client_contract_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Объект';
+		$f_opts['id']="client_contract_id";
+						
+		$f_client_contract_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_contract_id",$f_opts);
+		$this->addField($f_client_contract_id);
+		//********************
+		
 		//*** Field specification_date ***
 		$f_opts = array();
 		$f_opts['id']="specification_date";
@@ -98,15 +108,6 @@ class ClientSpecification_Model extends ModelSQL{
 						
 		$f_destination_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"destination_id",$f_opts);
 		$this->addField($f_destination_id);
-		//********************
-		
-		//*** Field client_contract_ref_1c ***
-		$f_opts = array();
-		$f_opts['length']=36;
-		$f_opts['id']="client_contract_ref_1c";
-						
-		$f_client_contract_ref_1c=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_contract_ref_1c",$f_opts);
-		$this->addField($f_client_contract_ref_1c);
 		//********************
 		
 		//*** Field quant ***

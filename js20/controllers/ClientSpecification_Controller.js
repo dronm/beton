@@ -58,6 +58,12 @@ extend(ClientSpecification_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
+	options.alias = "Объект";
+	var field = new FieldInt("client_contract_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
 	options.required = true;
 	var field = new FieldDate("specification_date",options);
 	
@@ -84,12 +90,6 @@ extend(ClientSpecification_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Объект";
 	var field = new FieldInt("destination_id",options);
-	
-	pm.addField(field);
-	
-	var options = {};
-	
-	var field = new FieldString("client_contract_ref_1c",options);
 	
 	pm.addField(field);
 	
@@ -142,6 +142,12 @@ extend(ClientSpecification_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
+	options.alias = "Объект";
+	var field = new FieldInt("client_contract_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
 	
 	var field = new FieldDate("specification_date",options);
 	
@@ -168,12 +174,6 @@ extend(ClientSpecification_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Объект";
 	var field = new FieldInt("destination_id",options);
-	
-	pm.addField(field);
-	
-	var options = {};
-	
-	var field = new FieldString("client_contract_ref_1c",options);
 	
 	pm.addField(field);
 	

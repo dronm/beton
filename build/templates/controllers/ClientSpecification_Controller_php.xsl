@@ -52,7 +52,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 				$resp = ExtProg::getClientContract($this->getExtVal($pm, "client_contract_1c_ref"));
 				/* $name = $resp["models"]["Contract1cList_Model"]["rows"][0]["name"]; */
 				$name = $resp["models"]["Contract1cList_Model"]["rows"][0]["name"];
-				$this->getDbLinkMaster()->query(sprintf(
+				$ar = $this->getDbLinkMaster()->query(sprintf(
 					"INSERT INTO client_contracts_1c (ref_1c, client_id)
 					VALUES (jsonb_build_object('ref_1c', %s, 'descr', '%s'), %d)
 					RETURNING id"
@@ -60,7 +60,13 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 					,$name
 					,$client_id
 				));
+				$client_contract_id = $ar["id"];
+
+			}else {
+				$client_contract_id = $ar["id"];
 			}
+
+			$pm->setParamValue("client_contract_id", $client_contract_id);
 		}
 	}
 
