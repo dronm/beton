@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-01-20 07:14:32</lastBuild></version>
+		<lastBuild>2025-01-25 10:39:09</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -260,6 +260,7 @@
 		<version dateOpen="2024-11-21 08:23:02" dateClose="2024-12-17 07:15:41">1.00354</version>
 		<version dateOpen="2024-12-24 16:31:32" dateClose="2025-01-20 06:25:58">1.00355</version>
 		<version dateOpen="2025-01-20 07:02:31" dateClose="2025-01-20 07:14:50">1.00356</version>
+		<version dateOpen="2025-01-20 07:15:59" dateClose="2025-01-25 10:39:16">1.00357</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -5146,6 +5147,7 @@
 		<constant id="konkrid_client" name="Конкрид" descr="Конкрид" dataType="JSON" defaultValue="100" autoload="FALSE"/>
 		<constant id="reglament_user" name="Пользователь регламент" descr="Пользователь регламент" dataType="JSON" autoload="FALSE"/>
 		<constant id="water" name="Вода" descr="Water" dataType="JSON" autoload="FALSE"/>
+		<constant id="ping1c" name="1C ping" descr="1C ping" dataType="JSON" autoload="FALSE"/>
 	</constants>
 	<controllers>
 		<controller id="Event" parentId="ControllerSQL">
@@ -6286,6 +6288,9 @@
 		</controller>
 		<controller id="Weather" parentId="ControllerSQL" state="TRUE">
 			<publicMethod id="get_current" modelId="Weather"/>
+		</controller>
+		<controller id="Connect1cCheck" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="connected"/>
 		</controller>
 		<controller id="VehicleDriverForSchedGen" parentIdJS="ControllerObjClient" server="FALSE">
 			<publicMethod id="insert" modelId="VehicleDriverForSchedGen"/>
@@ -8219,6 +8224,7 @@
 		<jsScript file="js20/custom_controls/EditColorPalette.js"/>
 		<jsScript file="js20/custom_controls/AssignedVehicleGrid.js"/>
 		<jsScript file="js20/custom_controls/Weather.js"/>
+		<jsScript file="js20/custom_controls/Connect1cCheck.js"/>
 		<jsScript file="js20/custom_controls/VehicleDriverForSchedGenGrid.js"/>
 		<jsScript file="js20/custom_controls/EmployeeWorkTimeScheduleGrid.js"/>
 		<jsScript file="js20/custom_controls/QuarryEdit.js"/>
@@ -8774,6 +8780,7 @@
 		<jsScript file="js20/models/ClientContract1c_Model.js"/>
 		<jsScript file="js20/controllers/ClientContract1c_Controller.js"/>
 		<jsScript file="js20/models/ClientContract1cList_Model.js"/>
+		<jsScript file="js20/controllers/Connect1cCheck_Controller.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

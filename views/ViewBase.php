@@ -1571,6 +1571,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/EditColorPalette.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/EditColorPalette.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/AssignedVehicleGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/AssignedVehicleGrid.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/Weather.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/Weather.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/Connect1cCheck.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/Connect1cCheck.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/VehicleDriverForSchedGenGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/VehicleDriverForSchedGenGrid.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/EmployeeWorkTimeScheduleGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/EmployeeWorkTimeScheduleGrid.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/QuarryEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/QuarryEdit.js')) ));
@@ -2124,6 +2125,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/models/ClientContract1c_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ClientContract1c_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controllers/ClientContract1c_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/ClientContract1c_Controller.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/ClientContract1cList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ClientContract1cList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/controllers/Connect1cCheck_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/Connect1cCheck_Controller.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

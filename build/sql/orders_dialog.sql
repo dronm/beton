@@ -87,8 +87,28 @@ CREATE OR REPLACE VIEW public.orders_dialog AS
 		
 		o.f_val,
 		o.w_val,
-		
-		debts.debt_total AS client_debt
+
+		coalesce(
+			CASE
+				WHEN o.client_specification_id IS NOT NULL THEN
+					(SELECT 
+						d.debt_total
+					FROM client_contracts_1c AS cl_ct 
+					LEFT JOIN client_debts AS d ON d.client_id=spec.client_id
+						AND d.client_contract_id = cl_ct.id 
+					WHERE cl_ct.ref_1c->>'ref_1c'=spec.client_contract_1c_ref
+					LIMIT 1
+					)
+				ELSE
+					--no specificaton
+					(SELECT 
+						d.debt_total
+					FROM client_debts AS d 
+					WHERE d.client_id = o.client_id
+					LIMIT 1
+					)
+			END
+		, 0) AS client_debt
 		
 	FROM orders o
 	LEFT JOIN clients cl ON cl.id = o.client_id
@@ -116,5 +136,4 @@ CREATE OR REPLACE VIEW public.orders_dialog AS
 	
 	ORDER BY o.date_time;
 
-ALTER TABLE public.orders_dialog OWNER TO ;
 

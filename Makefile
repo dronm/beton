@@ -1,5 +1,5 @@
 migup: 
-	migrate -database "$(DB_CONN)" -path migrations up
+	migrate -database "$(DB_CONN)" -path migrations up 1
 migdown: 
 	migrate -database "$(DB_CONN)" -path migrations down 1
 migfix: 

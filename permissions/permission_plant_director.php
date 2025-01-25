@@ -988,6 +988,8 @@ $permissions = array();
 				
 					$permissions['Weather_Controller_get_current']=TRUE;
 				
+					$permissions['Connect1cCheck_Controller_connected']=TRUE;
+				
 					$permissions['VehicleDriverForSchedGen_Controller_insert']=TRUE;
 				
 					$permissions['VehicleDriverForSchedGen_Controller_update']=TRUE;

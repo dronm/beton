@@ -158,6 +158,11 @@
 	
 	<xsl:if test="not(/document/model[@id='ModelVars']/row/role_id='vehicle_owner') and not(/document/model[@id='ModelVars']/row/role_id='client')">
 	if(application.showTmChat()){
+		if (document.getElementById("connect1c")){
+			application.m_connect1c = new Connect1cCheck("connect1c",{"refreshInterval":60});
+			application.m_connect1c.toDOM();		
+		}
+
 		application.m_tmChat = new TmChat_View("Chat");
 		application.m_tmChat.toDOM(document.getElementById("windowData"));
 		
@@ -655,6 +660,12 @@ throw Error(CommonHelper.longString(function () {/*
 			<xsl:call-template name="initMenu"/>	
 			<ul class="nav navbar-nav navbar-right">			
 			
+				<li>
+					<span>1c:</span>
+					<img id="connect1c">
+					</img>
+				</li>			
+
 				<li class="dropdown">
 					<a id="weather">
 					</a>

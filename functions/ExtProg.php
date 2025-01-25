@@ -18,8 +18,13 @@ class ExtProg{
 	    return $head;
 	}
 	
-	/* $fileOpts = array('name',disposition,contentType,toFile boolean)*/
-	private static function send_query($cmd, $params, $parseContent, $fileOpts=NULL){
+	/* 
+	 * $fileOpts = array('name',disposition,contentType,toFile boolean)
+	 * If $parseContent is TRUE, the response string is parsed as json value and returned as array.
+	 * If $ileOpts is not null, then the returned value from 1c is treated as file.
+	 * Function returnes parsed/unparsed responce from 1c or file path.
+	 */
+	private static function send_query($cmd, $params, $parseContent, $fileOpts=NULL): string|array {
 		$CON_TIMEOUT = 120;//seconds
 		
 		$params['key'] = KEY_1C;
@@ -109,32 +114,52 @@ class ExtProg{
 		}
 	}
 
-	public static function getClientList($search){
-		return ExtProg::send_query('get_catalog_by_attr', array('catalog'=>'clients','search'=>$search), TRUE);
+	public static function getClientList(string $search): array {
+		return (array)ExtProg::send_query('get_catalog_by_attr', array('catalog'=>'clients','search'=>$search), TRUE);
 	}
 	
-	public static function getClientOnPP($ppNum){
-		return ExtProg::send_query('get_client_on_pp', array('pp_num'=>$ppNum), TRUE);
+	public static function getClientOnPP(string $ppNum): array {
+		return (array)ExtProg::send_query('get_client_on_pp', array('pp_num'=>$ppNum), TRUE);
 	}
 
-	public static function getClientOborot(){
-		return ExtProg::send_query('get_client_dog_oborot', array(), TRUE);
+	public static function getClientOborot(): array {
+		return (array)ExtProg::send_query('get_client_dog_oborot', array(), TRUE);
 	}
 
-	public static function getClientDebtList(){
-		return ExtProg::send_query('get_client_debt_list', array(), TRUE);
+	public static function getClientDebtList(): array {
+		return (array)ExtProg::send_query('get_client_debt_list', array(), TRUE);
 	}
 
-	public static function getBuhRBPList($search){
-		return ExtProg::send_query('get_catalog_by_attr', array('catalog'=>'rbp','search'=>$search), TRUE);
+	public static function getBuhRBPList(string $search): array {
+		return  (array)ExtProg::send_query('get_catalog_by_attr', array('catalog'=>'rbp','search'=>$search), TRUE);
 	}
 
-	public static function completeClientContract($clientRef1c, $search){
-		return ExtProg::send_query('complete_client_dog', array('client_ref_1c'=>$clientRef1c,'search'=>$search), TRUE);
+	public static function completeClientContract(string $clientRef1c, string $search): array {
+		return (array)ExtProg::send_query('complete_client_dog', array('client_ref_1c'=>$clientRef1c,'search'=>$search), TRUE);
 	}
 
-	public static function getClientContract($contractRef1c){
-		return ExtProg::send_query('get_client_dog', array('ref_1c'=>$contractRef1c), TRUE);
+	public static function getClientContract(string $contractRef1c): array {
+		return (array)ExtProg::send_query('get_client_dog', array('ref_1c'=>$contractRef1c), TRUE);
+	}
+
+	public static function ping(): bool {
+		try{
+			$respModel = ExtProg::send_query('ping', array(), TRUE);
+		}catch(Exception $e){
+			return FALSE;
+		}
+		if(!isset($respModel) 
+			|| !isset($respModel["models"])
+			|| !isset($respModel["models"]["Query1c_Model"])
+			|| !isset($respModel["models"]["Query1c_Model"]["rows"])
+			|| !is_array($respModel["models"]["Query1c_Model"]["rows"])
+			|| !count($respModel["models"]["Query1c_Model"]["rows"])
+			|| !isset($respModel["models"]["Query1c_Model"]["rows"][0]["result"])
+			|| $respModel["models"]["Query1c_Model"]["rows"][0]["result"] !== TRUE
+		){
+			return FALSE;
+		}
+		return TRUE;
 	}
 }
 ?>
