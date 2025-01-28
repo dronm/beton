@@ -57,25 +57,25 @@ Connect1cCheck.prototype.setRefreshInterval = function(newInterval) {
 /* public methods */
 Connect1cCheck.prototype.toDOM = function(p){
 
-	const evSrvExists = window.getApp().getAppSrv();
-	if(evSrvExists){
-		//events
-		const self = this;
-		this.m_srvEvents = {
-			events: [
-				{"id": "Connect1cCheck.update"}
-			],
-			onEvent: function(params){
-				self.onPing1cChange(params);
-			},
-			onClose: function(params){
-				self.srvEventsOnClose(params)
-			},
-			onSubscribed: function(){
-				self.setRefreshInterval(0);
-			}
-		};
-	}
+	// const evSrvExists = window.getApp().getAppSrv();
+	// if(evSrvExists){
+	// 	//events
+	// 	const self = this;
+	// 	this.m_srvEvents = {
+	// 		events: [
+	// 			{"id": "Connect1cCheck.update"}
+	// 		],
+	// 		onEvent: function(params){
+	// 			self.onPing1cChange(params);
+	// 		},
+	// 		onClose: function(params){
+	// 			self.srvEventsOnClose(params)
+	// 		},
+	// 		onSubscribed: function(){
+	// 			self.setRefreshInterval(0);
+	// 		}
+	// 	};
+	// }
 	this.setRefreshInterval(this.DEF_REFRESH * 1000);
 
 	Connect1cCheck.superclass.toDOM.call(this,p);
