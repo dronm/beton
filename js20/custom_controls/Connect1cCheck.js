@@ -14,9 +14,9 @@
 function Connect1cCheck(id,options){
 	options = options || {};	
 	
-	this.m_refreshInterval = (options.refreshInterval||this.DEF_REFRESH)*1000;
 	this.m_lastValue = false;
-	
+	this.m_refreshInterval = 0;
+
 	Connect1cCheck.superclass.constructor.call(this,id,"IMG",
 		{"attrs": {
 			"src": this.PIC_ERR,
@@ -39,21 +39,55 @@ Connect1cCheck.prototype.PIC_ERR = "./img/dot_red.png";
 
 /* protected*/
 
+Connect1cCheck.prototype.setRefreshInterval = function(newInterval) {
+	var self = this;
+
+	this.m_refreshInterval = newInterval;
+	if(newInterval > 0){
+		this.m_timer = setInterval(function(){
+			self.refresh();
+		}, this.m_refreshInterval);	
+
+	}else if(this.m_timer !== undefined){
+		clearInterval(this.m_timer);
+		this.m_timer = undefined;
+	}
+}
 
 /* public methods */
 Connect1cCheck.prototype.toDOM = function(p){
+
+	const evSrvExists = window.getApp().getAppSrv();
+	if(evSrvExists){
+		//events
+		const self = this;
+		this.m_srvEvents = {
+			events: [
+				{"id": "Connect1cCheck.update"}
+			],
+			onEvent: function(params){
+				self.onPing1cChange(params);
+			},
+			onClose: function(params){
+				self.srvEventsOnClose(params)
+			},
+			onSubscribed: function(){
+				self.setRefreshInterval(0);
+			}
+		};
+	}
+	this.setRefreshInterval(this.DEF_REFRESH * 1000);
+
 	Connect1cCheck.superclass.toDOM.call(this,p);
-	var self = this;
-	this.m_timer = setInterval(function(){
-		self.refresh();
-	}, this.m_refreshInterval);	
-	
+
 	this.refresh();
 }
 
 Connect1cCheck.prototype.delDOM = function(){
-	if(this.m_timer)
+	if(this.m_timer){
 		clearInterval(this.m_timer);
+		this.m_timer = undefined;
+	}
 	
 	Connect1cCheck.superclass.delDOM.call(this);
 }
@@ -76,10 +110,27 @@ Connect1cCheck.prototype.refresh = function(){
 				connected = model.getFieldValue("pong"); 
 			}
 			if(connected!==self.m_lastValue){ 
-				self.m_lastValue = connected;
-				self.setAttr("src", connected? self.PIC_OK:self.PIC_ERR);
+				self.onValueChange(connected);
 			}
 		}
 	});
 }
 
+Connect1cCheck.prototype.onValueChange = function(newVal){
+	this.m_lastValue = newVal;
+	this.setAttr("src", newVal? this.PIC_OK : this.PIC_ERR);
+}
+
+Connect1cCheck.prototype.onPing1cChange = function(json){
+	if(json.params && json.params.result !== undefined
+		&& this.m_lastValue !== json.params.result
+	){
+		this.onValueChange(json.params.result);
+	}
+}
+
+Connect1cCheck.prototype.srvEventsOnClose = function(message){
+	if(message && message.code>1000){
+		this.setRefreshInterval(this.DEF_REFRESH * 1000);
+	}
+}

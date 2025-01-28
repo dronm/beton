@@ -1461,14 +1461,16 @@ VehicleListReport.html.xsl
 1) ClientSpecification_Controller, added new field client_contract_id.
 
 
-1.00357
+1.00357 2025-27-01
 1) Show 1c connection status
 	Connect1cCheck_Controller
 	constant ping1c
-	regl_ping1c.php
+	functions/regl_ping1c.php
 	Connect1cCheck.js custom js module
 
 
+1.00358
+1) Async Check1c with events
 
 
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели
