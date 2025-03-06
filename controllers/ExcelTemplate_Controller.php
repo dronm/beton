@@ -386,7 +386,7 @@ class ExcelTemplate_Controller extends ControllerSQL{
 			if(count($fl_name_parts)==0){
 				throw new Exception('Не определено имя шаблона');
 			}
-			$ext = $fl_name_parts[count($fl_name_parts)-1];
+			$ext = strtolower($fl_name_parts[count($fl_name_parts)-1]);
 			if($ext == 'xlsx'){
 				$reader_tp = 'Xlsx';
 			}else if($ext == 'xls'){
@@ -474,7 +474,7 @@ class ExcelTemplate_Controller extends ControllerSQL{
 			throw new Exception($erEmpty);
 		}
 		
-		$ext = $ar['file_ext'];
+		$ext = strtolower($ar['file_ext']);
 		if($ext == 'xlsx'){
 			$reader_tp = 'Xlsx';
 		}else if($ext == 'xls'){
@@ -525,7 +525,7 @@ class ExcelTemplate_Controller extends ControllerSQL{
 		$flName = $ar["file_name"]; 
 	}
 
-	//downloads template as generic type: docx, xlsx.
+	//downloads template as docx, xlsx.
 	public static function downloadFilledTemplate($dbLink, $templateName, $paramArray, $erEmpty, $fileName){
 		$out_fl = '';
 		$fl_name = '';

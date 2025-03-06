@@ -240,6 +240,46 @@ function RawMaterialConsRateList_Model(options){
 	options.fields.mat10_rate = new FieldFloat("mat10_rate",filed_options);
 	options.fields.mat10_rate.getValidator().setMaxLength('19');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.mat11_rate = new FieldFloat("mat11_rate",filed_options);
+	options.fields.mat11_rate.getValidator().setMaxLength('19');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.mat12_rate = new FieldFloat("mat12_rate",filed_options);
+	options.fields.mat12_rate.getValidator().setMaxLength('19');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.mat13_rate = new FieldFloat("mat13_rate",filed_options);
+	options.fields.mat13_rate.getValidator().setMaxLength('19');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.mat14_rate = new FieldFloat("mat14_rate",filed_options);
+	options.fields.mat14_rate.getValidator().setMaxLength('19');
+	
 		RawMaterialConsRateList_Model.superclass.constructor.call(this,id,options);
 }
 extend(RawMaterialConsRateList_Model,ModelXML);

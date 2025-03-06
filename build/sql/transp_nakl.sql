@@ -7,7 +7,13 @@ CREATE OR REPLACE VIEW transp_nakl AS
 		sh.id AS nomer,
 		sh.id AS nomer2,
 		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
 		
+		coalesce(cl.name||' ', '')||
+		coalesce(', '||cl.address_legal, '')||
+		coalesce(', ИНН '||cl.inn, '')		
+		AS gruzopoluchatel1,
+
 		coalesce(cl.name||' ', '')||
 		coalesce(', '||cl.address_legal, '')		
 		AS gruzopoluchatel,
@@ -16,11 +22,16 @@ CREATE OR REPLACE VIEW transp_nakl AS
 		1 AS gruz_mest,
 		sh.quant*2.4*1000 AS gruz_massa,
 		
-		coalesce(vh.make,'') || ' '||coalesce(vh.plate,'') AS avto,
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		vh.plate AS avto_nomer,
+		
+		coalesce(dr.name,'') AS voditel,
+		
 		
 		dest.name AS adres,
 		
 		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
 		
 		(SELECT
 			to_char(st.date_time,'DD.MM.YY HH24:MI')

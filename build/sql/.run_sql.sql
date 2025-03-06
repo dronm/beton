@@ -1,104 +1,106 @@
--- VIEW: shipments_for_veh_owner_list
+-- VIEW: transp_nakl
 
---DROP VIEW shipments_for_veh_owner_list;
+--DROP VIEW transp_nakl;
 
-CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
+CREATE OR REPLACE VIEW transp_nakl AS
 	SELECT
-		sh.id,
-		sh.ship_date_time,
-		sh.destination_id,
-		sh.destinations_ref,
-		sh.concrete_type_id,
-		sh.concrete_types_ref,
-		sh.quant,
-		sh.vehicle_id,
-		sh.vehicles_ref,
-		sh.driver_id,
-		sh.drivers_ref,
-		sh.vehicle_owner_id,
-		sh.vehicle_owners_ref,
-		sh.cost,
-		sh.ship_cost_edit,
-		sh.pump_cost_edit,
-		sh.demurrage,
-		sh.demurrage_cost,
-		sh.acc_comment,
-		sh.acc_comment_shipment,
-		sh.owner_agreed,
-		sh.owner_agreed_date_time,
+		sh.id AS nomer,
+		sh.id AS nomer2,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
 		
-		-- ЦЕНА ДЛЯ ВОДИТЕЛЯ
-		CASE
-		-- самовывоз
-		WHEN sh.destination_id = const_self_ship_dest_id_val() THEN 0
+		coalesce(cl.name||' ', '')||
+		coalesce(', '||cl.address_legal, '')||
+		coalesce(', ИНН '||cl.inn, '')		
+		AS gruzopoluchatel1,
+
+		coalesce(cl.name||' ', '')||
+		coalesce(', '||cl.address_legal, '')		
+		AS gruzopoluchatel,
 		
-		-- Цена для производственной зоны
-		WHEN destination_prod_base_driver_price_val(pr_bs.id, dest.id, sh.ship_date_time::timestamp) IS NOT NULL THEN
-			destination_prod_base_driver_price_val(pr_bs.id, dest.id, sh.ship_date_time::timestamp) *
-				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
+		'Бетон '||ct.name AS gruz_naim,
+		1 AS gruz_mest,
+		sh.quant*2.4*1000 AS gruz_massa,
 		
-		-- периодическая цена для всех зон
-		WHEN coalesce(per_vals.price_for_driver, 0)>0 THEN
-			per_vals.price_for_driver *
-				shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
-			
-		-- все остальные случаи
-		ELSE
-			(WITH
-			act_price AS (
-				SELECT h.date AS d
-				FROM shipment_for_driver_costs_h h
-				WHERE h.date<=sh.ship_date_time::date
-				ORDER BY h.date DESC
-				LIMIT 1
-			)
-			SELECT shdr_cost.price
-			FROM shipment_for_driver_costs AS shdr_cost
-			WHERE
-				shdr_cost.date=(SELECT d FROM act_price)
-				AND shdr_cost.distance_to>=dest.distance
-				/*OR shdr_cost.id=(
-					SELECT t.id
-					FROM shipment_for_driver_costs t
-					WHERE t.date=(SELECT d FROM act_price)
-					ORDER BY t.distance_to LIMIT 1
-				)
-				*/
-			ORDER BY shdr_cost.distance_to ASC
-			LIMIT 1
-			) * shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
-		END AS cost_for_driver,
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		vh.plate AS avto_nomer,
 		
-		sh.production_sites_ref,
-		production_bases_ref(pr_bs) AS production_bases_ref,
-		pr_bs.id AS production_base_id
+		coalesce(dr.name,'') AS voditel,
 		
-	FROM shipments_list sh
-	LEFT JOIN destinations AS dest ON dest.id=destination_id
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
 	
-	LEFT JOIN (
-		SELECT
-			max(p.date_time) AS date_time,
-			p.key AS destination_id
-		FROM period_values AS p		
-		WHERE p.period_value_type='destination_price_for_driver'::period_value_types		
-		GROUP BY p.key
-	) AS per_hist ON per_hist.destination_id = dest.id 
-	LEFT JOIN (
-		SELECT
-			p.date_time AS date_time,
-			p.key AS destination_id,
-			p.val::numeric(15,2) AS price_for_driver
-		FROM period_values AS p		
-		WHERE p.period_value_type='destination_price_for_driver'::period_value_types		
-	) AS per_vals ON per_vals.destination_id = dest.id AND per_vals.date_time = per_hist.date_time
-		
-	LEFT JOIN production_sites AS pr_st ON pr_st.id = sh.production_site_id
-	LEFT JOIN production_bases AS pr_bs ON pr_bs.id = pr_st.production_base_id
-	
-	LEFT JOIN clients AS cl ON cl.id = sh.client_id
-	
-	ORDER BY ship_date_time DESC
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
 	;
 	
-ALTER VIEW shipments_for_veh_owner_list OWNER TO beton;
+ALTER VIEW transp_nakl OWNER TO beton;

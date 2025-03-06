@@ -4,13 +4,13 @@ require_once('db_con_f.php');
 
 function hasFileExpired(string $filePath, int $interval = 150): bool {
     if (!file_exists($filePath)) {
-        throw new Exception("File does not exist.");
+        return FALSE;
     }
     
     // Get file creation time
     $creationTime = filectime($filePath);
     if ($creationTime === false) {
-        throw new Exception("Unable to retrieve file creation time.");
+        return FALSE;
     }
     
     // Compare with the current time
@@ -18,13 +18,15 @@ function hasFileExpired(string $filePath, int $interval = 150): bool {
 }
 
 $sigFile = "ping1c.chk";
+$sigFileExists = file_exists($sigFile);
 
-if(hasFileExpired($sigFile)){
+if($sigFileExists && hasFileExpired($sigFile)){
 	unlink($sigFile);
-}else{
+}else if ($sigFileExists){
 	return;
 }
 
+//$sigFile does not exist
 file_put_contents($sigFile, date("Y-m-d H:i:s"));
 try{
 	$res = ExtProg::ping();

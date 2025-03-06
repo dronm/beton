@@ -160,7 +160,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		$concrete_type_id = $pm->getParamValue('old_concrete_type_id',0);
 		//dynamic params
 		foreach($_REQUEST as $par_name => $par_val){
-			if (preg_match("/mat[1-9]_rate/",$par_name)){
+			if (preg_match("/mat\d+_rate/",$par_name)){
 				$s = substr($par_name,0,strpos($par_name,'_'));
 				$mat_ind = intval(str_replace('mat','',$s));
 				if(!isset($_REQUEST['mat'.$mat_ind.'_id'])){
@@ -172,13 +172,13 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 					$par_val=0;
 				}
 				FieldSQLFloat::formatForDb($par_val,$rate);
-				if ($par_val){
+				<!-- if ($par_val!=0){ -->
 					$q=sprintf(
 					'SELECT raw_material_cons_rates_update(%d,%d,%d,%f)',
 					$rate_date_id,$concrete_type_id,$raw_material_id,$rate);				
 					//throw new Exception($q);
 					$link_master->query($q);
-				}
+				<!-- } -->
 			}
 		}
 		

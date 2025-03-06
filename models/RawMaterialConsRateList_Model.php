@@ -216,6 +216,42 @@ class RawMaterialConsRateList_Model extends ModelSQLBeton{
 		$f_mat10_rate=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"mat10_rate",$f_opts);
 		$this->addField($f_mat10_rate);
 		//********************
+		
+		//*** Field mat11_rate ***
+		$f_opts = array();
+		$f_opts['length']=19;
+		$f_opts['id']="mat11_rate";
+						
+		$f_mat11_rate=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"mat11_rate",$f_opts);
+		$this->addField($f_mat11_rate);
+		//********************
+		
+		//*** Field mat12_rate ***
+		$f_opts = array();
+		$f_opts['length']=19;
+		$f_opts['id']="mat12_rate";
+						
+		$f_mat12_rate=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"mat12_rate",$f_opts);
+		$this->addField($f_mat12_rate);
+		//********************
+		
+		//*** Field mat13_rate ***
+		$f_opts = array();
+		$f_opts['length']=19;
+		$f_opts['id']="mat13_rate";
+						
+		$f_mat13_rate=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"mat13_rate",$f_opts);
+		$this->addField($f_mat13_rate);
+		//********************
+		
+		//*** Field mat14_rate ***
+		$f_opts = array();
+		$f_opts['length']=19;
+		$f_opts['id']="mat14_rate";
+						
+		$f_mat14_rate=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"mat14_rate",$f_opts);
+		$this->addField($f_mat14_rate);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

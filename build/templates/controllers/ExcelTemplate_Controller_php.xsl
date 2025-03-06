@@ -171,7 +171,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 			if(count($fl_name_parts)==0){
 				throw new Exception('Не определено имя шаблона');
 			}
-			$ext = $fl_name_parts[count($fl_name_parts)-1];
+			$ext = strtolower($fl_name_parts[count($fl_name_parts)-1]);
 			if($ext == 'xlsx'){
 				$reader_tp = 'Xlsx';
 			}else if($ext == 'xls'){
@@ -259,7 +259,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 			throw new Exception($erEmpty);
 		}
 		
-		$ext = $ar['file_ext'];
+		$ext = strtolower($ar['file_ext']);
 		if($ext == 'xlsx'){
 			$reader_tp = 'Xlsx';
 		}else if($ext == 'xls'){

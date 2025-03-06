@@ -1476,6 +1476,14 @@ VehicleListReport.html.xsl
 1) Async Check1c with events
 
 
+1.00361
+1) ExcelTemplate_Controller->genFilledTemplate() error when template ext is upper case.
+
+-1) LoginTM when delete key is pressed need to remove previous digit, not only set to previous field.
+
+
+
+
 
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели
 XXX Удаленные элементы справочника: фильтр вверху, пометка спереди, по возможности у всех справочиников. Example: PumpVehicle

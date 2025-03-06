@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-01-25 10:39:09</lastBuild></version>
+		<lastBuild>2025-03-06 17:48:41</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -264,6 +264,7 @@
 		<version dateOpen="2025-01-28 06:27:16" dateClose="2025-01-28 06:27:40">1.00358</version>
 		<version dateOpen="2025-01-28 06:39:17" dateClose="2025-01-28 06:39:29">1.00359</version>
 		<version dateOpen="2025-01-28 06:46:00" dateClose="2025-01-28 06:46:05">1.00360</version>
+		<version dateOpen="2025-02-07 08:16:55" dateClose="2025-03-06 17:48:56">1.00361</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1272,6 +1273,10 @@
 			<field id="mat8_rate" dataType="Float" length="19" precision="4"/>
 			<field id="mat9_rate" dataType="Float" length="19" precision="4"/>
 			<field id="mat10_rate" dataType="Float" length="19" precision="4"/>
+			<field id="mat11_rate" dataType="Float" length="19" precision="4"/>
+			<field id="mat12_rate" dataType="Float" length="19" precision="4"/>
+			<field id="mat13_rate" dataType="Float" length="19" precision="4"/>
+			<field id="mat14_rate" dataType="Float" length="19" precision="4"/>
 		</model>
 		<model id="RawMaterialConsRateDateList" parent="ModelSQLBeton" dataTable="raw_material_cons_rates_dates_list" virtual="TRUE">
 			<defaultOrder>
