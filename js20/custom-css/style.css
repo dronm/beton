@@ -1259,3 +1259,7 @@ tr.deleted_row {
 	max-height: 300px;
 	overflow-y: auto;
 }
+
+.RepMaterialAction-tr {
+	background-color: #5bcf97 !important;
+}

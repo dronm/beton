@@ -619,7 +619,7 @@ class RawMaterial_Controller extends ControllerSQL{
 		$this->addNewModel(
 			"SELECT *
 			FROM raw_materials
-			WHERE concrete_part=TRUE
+			WHERE concrete_part=TRUE AND NOT deleted
 			ORDER BY ord",
 		"RawMaterial_Model");
 	}

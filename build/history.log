@@ -1476,8 +1476,15 @@ VehicleListReport.html.xsl
 1) Async Check1c with events
 
 
-1.00361
+1.00361 06/02/2025
 1) ExcelTemplate_Controller->genFilledTemplate() error when template ext is upper case.
+2) RawMaterialConsRateList was for 10 materials, corrected.
+
+
+
+1.00362
+1) RepMaterialAction template, background colors
+2) RawMaterialMapToProductinList_View.js, filters for period
 
 -1) LoginTM when delete key is pressed need to remove previous digit, not only set to previous field.
 

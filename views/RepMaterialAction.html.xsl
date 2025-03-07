@@ -158,7 +158,17 @@
 </xsl:template>
 
 <xsl:template match="model[@id='MaterialActionList1_Model']/row">
-	<tr>
+	<xsl:variable name="tr_class">
+		<xsl:choose>
+			<xsl:when test="contains(material_name, 'Шлак')">
+				<xsl:text>RepMaterialAction-tr</xsl:text>
+			</xsl:when>
+			<xsl:otherwise></xsl:otherwise>		
+		</xsl:choose>
+	</xsl:variable>
+  
+
+	<tr class="{$tr_class}">
 		<td><xsl:value-of select="material_name"/></td>		
 		<td align="right">
 			<xsl:call-template name="format_quant">
@@ -170,23 +180,23 @@
 				<xsl:with-param name="val" select="quant_deb"/>
 			</xsl:call-template>																									
 		</td>				
-		<td align="right">
+		<td align="right" class="RepMaterialAction-tr">
 			<xsl:call-template name="format_quant">
 				<xsl:with-param name="val" select="pr1_quant_kred"/>
 			</xsl:call-template>																									
 		</td>				
-		<td align="right">
+		<td align="right" class="RepMaterialAction-tr">
 			<xsl:call-template name="format_quant">
 				<xsl:with-param name="val" select="pr2_quant_kred"/>
 			</xsl:call-template>																									
 		</td>				
-		<td align="right">
+		<td align="right" class="RepMaterialAction-tr">
 			<xsl:call-template name="format_quant">
 				<xsl:with-param name="val" select="pr3_quant_kred"/>
 			</xsl:call-template>																									
 		</td>				
 		
-		<td align="right">
+		<td align="right" class="RepMaterialAction-tr">
 			<xsl:call-template name="format_quant">
 				<xsl:with-param name="val" select="quant_kred"/>
 			</xsl:call-template>																									
@@ -206,7 +216,17 @@
 </xsl:template>
 
 <xsl:template match="model[@id='MaterialActionList2_Model']/row">
-	<tr>
+	<xsl:variable name="tr_class">
+		<xsl:choose>
+			<xsl:when test="contains(material_name, 'Шлак')">
+				<xsl:text>RepMaterialAction-tr</xsl:text>
+			</xsl:when>
+			<xsl:otherwise></xsl:otherwise>		
+		</xsl:choose>
+	</xsl:variable>
+  
+
+	<tr class="{$tr_class}">
 		<td><xsl:value-of select="material_name"/></td>		
 		<td align="right">
 			<xsl:call-template name="format_quant">
@@ -218,12 +238,12 @@
 				<xsl:with-param name="val" select="quant_deb"/>
 			</xsl:call-template>																									
 		</td>				
-		<td align="right">
+		<td align="right" class="RepMaterialAction-tr">
 			<xsl:call-template name="format_quant">
 				<xsl:with-param name="val" select="pr1_quant_kred"/>
 			</xsl:call-template>																									
 		</td>				
-		<td align="right">
+		<td align="right" class="RepMaterialAction-tr">
 			<xsl:call-template name="format_quant">
 				<xsl:with-param name="val" select="quant_kred"/>
 			</xsl:call-template>																									
@@ -243,7 +263,17 @@
 </xsl:template>
 
 <xsl:template match="model[@id='MaterialActionList3_Model']/row">
-	<tr>
+	<xsl:variable name="tr_class">
+		<xsl:choose>
+			<xsl:when test="contains(material_name, 'Шлак')">
+				<xsl:text>RepMaterialAction-tr</xsl:text>
+			</xsl:when>
+			<xsl:otherwise></xsl:otherwise>		
+		</xsl:choose>
+	</xsl:variable>
+  
+
+	<tr class="{$tr_class}">
 		<td><xsl:value-of select="material_name"/></td>		
 		<td align="right">
 			<xsl:call-template name="format_quant">
@@ -255,12 +285,12 @@
 				<xsl:with-param name="val" select="quant_deb"/>
 			</xsl:call-template>																									
 		</td>				
-		<td align="right">
+		<td align="right" class="RepMaterialAction-tr">
 			<xsl:call-template name="format_quant">
 				<xsl:with-param name="val" select="pr1_quant_kred"/>
 			</xsl:call-template>																									
 		</td>				
-		<td align="right">
+		<td align="right" class="RepMaterialAction-tr">
 			<xsl:call-template name="format_quant">
 				<xsl:with-param name="val" select="quant_kred"/>
 			</xsl:call-template>																									

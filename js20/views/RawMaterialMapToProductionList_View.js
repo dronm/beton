@@ -15,6 +15,63 @@ function RawMaterialMapToProductionList_View(id,options){
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
 	
+	var period_ctrl = new EditPeriodDateShift(id+":filter-ctrl-period",{
+		"field":new FieldDateTime("date_time")
+	});
+
+	var filters = {
+		"period":{
+			"binding":new CommandBinding({
+				"control":period_ctrl,
+				"field":period_ctrl.getField()
+			}),
+			"bindings":[
+				{"binding":new CommandBinding({
+					"control":period_ctrl.getControlFrom(),
+					"field":period_ctrl.getField()
+					}),
+				"sign":"ge"
+				},
+				{"binding":new CommandBinding({
+					"control":period_ctrl.getControlTo(),
+					"field":period_ctrl.getField()
+					}),
+				"sign":"le"
+				}
+			]
+		}
+		,"production_sites_ref":{
+			"binding":new CommandBinding({
+				"control":new ProductionSiteEdit(id+":filter-ctrl-production_sites_ref",{
+					"contClassName":"form-group-filter",
+					"labelCaption":"Завод:"
+				}),
+				"field":new FieldInt("production_site_id")}),
+			"sign":"e"		
+		}
+		,"materials_ref":{
+			"binding":new CommandBinding({
+				"control":new MaterialSelect(id+":filter-ctrl-materials_ref",{
+					"contClassName":"form-group-filter",
+					"labelCaption":"Материал:"
+				}),
+				"field":new FieldInt("raw_material_id")}),
+			"sign":"e"		
+		}
+		,"production_descr":{
+			"binding":new CommandBinding({
+				"control":new Edit(id+":filter-ctrl-production_descr",{
+					"contClassName":"form-group-filter",
+					"labelCaption":"Материал в производстве:"
+				}),
+				"field":new FieldText("production_descr")}),
+			"sign":"lk",
+			"icase": true,
+			lwcards: true,
+			rwcards: true
+		}
+	};
+
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
@@ -23,6 +80,9 @@ function RawMaterialMapToProductionList_View(id,options){
 		"editInline":true,
 		"editWinClass":null,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
+			"cmdFilter":true,
+			"filters":filters,
+			"variantStorage":options.variantStorage
 		}),
 		"popUpMenu":popup_menu,
 		"head":new GridHead(id+"-grid:head",{
@@ -39,7 +99,6 @@ function RawMaterialMapToProductionList_View(id,options){
 										"labelCaption":""
 									},
 									"ctrlBindFieldId":"raw_material_id"
-									
 								})
 							]
 							//"sortable":true
