@@ -1482,13 +1482,15 @@ VehicleListReport.html.xsl
 
 
 
-1.00362
+1.00362 10/03/2025
 1) RepMaterialAction template, background colors
 2) RawMaterialMapToProductinList_View.js, filters for period
 
 -1) LoginTM when delete key is pressed need to remove previous digit, not only set to previous field.
 
 
+1.00363 12/03/2025
+1) MaterialActionReport, color
 
 
 
