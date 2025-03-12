@@ -79,6 +79,15 @@ function RawMaterialConsRateDateList_Model(options){
 	
 	options.fields.production_sites_ref = new FieldJSON("production_sites_ref",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Завод ID';
+	filed_options.autoInc = false;	
+	
+	options.fields.production_site_id = new FieldInt("production_site_id",filed_options);
+	
 		RawMaterialConsRateDateList_Model.superclass.constructor.call(this,id,options);
 }
 extend(RawMaterialConsRateDateList_Model,ModelXML);

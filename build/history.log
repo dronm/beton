@@ -1493,6 +1493,12 @@ VehicleListReport.html.xsl
 1) MaterialActionReport, color
 
 
+1.00364 
+1) RawMaterialConsRadeDateList added filter,
+	RawMaterialConsRadeDateList_Model added field production_site_id
+
+
+
 
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели
 XXX Удаленные элементы справочника: фильтр вверху, пометка спереди, по возможности у всех справочиников. Example: PumpVehicle

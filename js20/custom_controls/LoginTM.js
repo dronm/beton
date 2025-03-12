@@ -55,6 +55,7 @@ LoginTM.prototype.m_timeLeft;
 
 LoginTM.prototype.toDOM = function(p){
 	LoginTM.superclass.toDOM.call(this,parent);
+
 	var tm_tel = CommonHelper.getCookie("tm_tel");
 	if(tm_tel){
 		var tm_photo;
@@ -63,39 +64,113 @@ LoginTM.prototype.toDOM = function(p){
 		}
 		this.setUserDataCtrl(tm_tel, CommonHelper.getCookie("tm_first_name"), tm_photo);
 	}
-	var self = this;
-	EventHelper.add("tm_сode1", "keyup", function(e){
-		var v = document.getElementById("tm_сode1").value;
-		var key = e.keyCode || e.charCode;
-		if(key == 39 || key == 9 || (v && v.length) ){
-			//right,tab
-			document.getElementById("tm_сode2").focus();
-		}
-	});
-	EventHelper.add("tm_сode2", "keyup", function(e){
-		var v = document.getElementById("tm_сode2").value;
-		var key = e.keyCode || e.charCode;
-		if(key == 37 || key == 8 ||key == 46){
-			//left, del
-			document.getElementById("tm_сode1").focus();
-			
-		}else if(key == 39 || key == 9 || (v && v.length)){
-			//right,tab
-			document.getElementById("tm_сode3").focus();
-		}
-	});
-	EventHelper.add("tm_сode3", "keyup", function(e){
-		var v = document.getElementById("tm_сode3").value;
-		var key = e.keyCode || e.charCode;
-		if(key == 37 || key == 8 ||key == 46){
-			//left, del
-			document.getElementById("tm_сode2").focus();
-			
-		}else if(v && v.length){
+	const self = this;
+	// EventHelper.add("tm_сode1", "keyup", function(e){
+	// 		console.log("code1")
+	// 	e.preventDefault();
+	// 	e.stopPropagation();
+	// 	var v = document.getElementById("tm_сode1").value;
+	// 	var key = e.keyCode || e.charCode;
+	// 	if( key == 13 || key == 39 || key == 9 || (v && v.length) ){
+	// 		console.log("code1 next")
+	// 		//right,tab,any digit
+	// 		const n = document.getElementById("tm_сode2");
+	// 		n.focus();
+	// 		n.select();
+	// 	}
+	// });
+	// EventHelper.add("tm_сode2", "keydown", function(e){
+	// 		console.log("code2")
+	// 	var v = document.getElementById("tm_сode2").value;
+	// 	var key = e.keyCode || e.charCode;
+	// 	if(key == 37) {
+	// 		console.log("code2 37")
+	// 		//left
+	// 		const n = document.getElementById("tm_сode1");
+	// 		n.focus();
+	// 		n.select();
+	//
+	// 	}else if( (key == 8 ||key == 46) && (!v || !v.length)){
+	// 		//del
+	// 		console.log("code2 delete")
+	// 		const n = document.getElementById("tm_сode1");
+	// 		n.value = "";
+	// 		n.focus();
+	//
+	// 	}else if(key == 13 || key == 39 || key == 9 || (v && v.length)){
+	// 		console.log("code2 next")
+	// 		//right,tab
+	// 		const n = document.getElementById("tm_сode3");
+	// 		n.focus();
+	// 		n.select();
+	// 	}
+	// });
+	// EventHelper.add("tm_сode3", "keyup", function(e){
+	// 	var v = document.getElementById("tm_сode3").value;
+	// 	var key = e.keyCode || e.charCode;
+	// 	if(key == 37 || key == 8 ||key == 46){
+	// 		//left, del
+	// 		document.getElementById("tm_сode2").focus();
+	//
+	// 	}else if(v && v.length){
+	// 		self.submitCode();
+	// 	}
+	// });
+    // const inputs = document.querySelectorAll("input[id^='tm_code']");
+	const inputs = DOMHelper.getElementsByAttr("tmCode", document.body, "class", false);
+	// console.log("INPUTS:",inputs)
+	//
+   function checkAndSubmit() {
+        if ([...inputs].every(input => input.value.length === 1)) {
 			self.submitCode();
-		}
-	});
-	
+        }
+    }
+
+    inputs.forEach((input, index) => {
+		console.log("iterating inputs")
+        input.addEventListener("keydown", function (event) {
+            const key = event.key;
+            
+			event.preventDefault();
+            if (key >= "0" && key <= "9") {
+                // event.preventDefault();
+                input.value = key;
+                if (index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                    inputs[index + 1].select();
+                }
+				checkAndSubmit();
+
+            } else if (key === "Backspace" || key === "Delete") {
+                if (input.value === "") {
+                    if (index > 0) {
+                        inputs[index - 1].focus();
+                        inputs[index - 1].value = "";
+                        inputs[index - 1].select();
+                    }
+                } else {
+                    input.value = "";
+                }
+                // event.preventDefault();
+            } else if (key === "ArrowRight") {
+                if (index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                    inputs[index + 1].select();
+                }
+            } else if (key === "ArrowLeft") {
+                if (index > 0) {
+                    inputs[index - 1].focus();
+                    inputs[index - 1].select();
+                }
+            } else if (key === "Tab") {
+                // event.preventDefault();
+                if (index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                    inputs[index + 1].select();
+                }
+            }
+        });
+    });	
 	//check left time
 	var tm_l = CommonHelper.getCookie("tm_time_left");
 	if( tm_l || CommonHelper.getCookie("tm_code_time_left")){

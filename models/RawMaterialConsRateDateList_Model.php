@@ -81,6 +81,17 @@ class RawMaterialConsRateDateList_Model extends ModelSQLBeton{
 		$f_production_sites_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_sites_ref",$f_opts);
 		$this->addField($f_production_sites_ref);
 		//********************
+		
+		//*** Field production_site_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Завод ID';
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="production_site_id";
+						
+		$f_production_site_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_site_id",$f_opts);
+		$this->addField($f_production_site_id);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

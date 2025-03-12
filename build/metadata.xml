@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-03-06 17:48:41</lastBuild></version>
+		<lastBuild>2025-03-12 08:02:50</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -267,6 +267,7 @@
 		<version dateOpen="2025-02-07 08:16:55" dateClose="2025-03-06 17:48:56">1.00361</version>
 		<version dateOpen="2025-03-07 10:16:31" dateClose="2025-03-07 12:00:04">1.00362</version>
 		<version dateOpen="2025-03-11 18:02:11" dateClose="2025-03-11 18:02:35">1.00363</version>
+		<version dateOpen="2025-03-12 06:43:24" dateClose="2025-03-12 08:03:03">1.00364</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1290,6 +1291,7 @@
 			<field id="name" dataType="Text" alias="Комментарий"/>
 			<field id="code" dataType="Int" alias="№ подбора"/>
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
+			<field id="production_site_id" dataType="Int" alias="Завод ID" sysCol="TRUE"/>
 		</model>
 		<model id="PumpPrice" parent="ModelSQLBeton" dataTable="pump_prices" virtual="FALSE">
 			<field id="id" autoInc="TRUE" primaryKey="TRUE" dataType="Int"/>

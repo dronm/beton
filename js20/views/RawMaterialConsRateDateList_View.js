@@ -36,6 +36,15 @@ function RawMaterialConsRateDateList_View(id,options){
 				}
 			]
 		}
+		,"production_site":{
+			"binding":new CommandBinding({
+				"control":new ProductionSiteEdit(id+":filter-ctrl-production_site",{
+					"contClassName":"form-group-filter",
+					"labelCaption":"Завод:"
+				}),
+				"field":new FieldInt("production_site_id")}),
+			"sign":"e"		
+		}
 	};
 	
 	var popup_menu = new PopUpMenu();
@@ -50,7 +59,7 @@ function RawMaterialConsRateDateList_View(id,options){
 			"cmdDelete":true,
 			"cmdEdit":true,
 			"cmdCopy":false,
-			"cmdFilter":false,
+			"cmdFilter":true,
 			"filters":filters,
 			"variantStorage":options.variantStorage,
 			"cmdAllCommands":false,

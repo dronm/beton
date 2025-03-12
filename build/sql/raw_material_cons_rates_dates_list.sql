@@ -42,7 +42,8 @@ CREATE OR REPLACE VIEW raw_material_cons_rates_dates_list AS
 		
 		d_from.name,
 		d_from.code,
-		production_sites_ref(production_sites_ref_t) AS production_sites_ref
+		production_sites_ref(production_sites_ref_t) AS production_sites_ref,
+		d_from.production_site_id
 		
 	FROM raw_material_cons_rate_dates d_from
 	LEFT JOIN production_sites AS production_sites_ref_t ON production_sites_ref_t.id = d_from.production_site_id
