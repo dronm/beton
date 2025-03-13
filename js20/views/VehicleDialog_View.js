@@ -123,7 +123,7 @@ function VehicleDialog_View(id,options){
 	var r_bd = [
 		new DataBinding({"control":this.getElement("plate")})
 		,new DataBinding({"control":this.getElement("load_capacity")})
-		,new DataBinding({"control":this.getElement("driver")})
+		,new DataBinding({"control":this.getElement("driver"), "fieldId": "drivers_ref" })
 		,new DataBinding({"control":this.getElement("make")})
 		,new DataBinding({"control":this.getElement("owners"),"fieldId":"vehicle_owners"})
 		,new DataBinding({"control":this.getElement("insurance_osago"),"fieldId":"insurance_osago"})

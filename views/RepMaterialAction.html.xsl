@@ -160,7 +160,7 @@
 <xsl:template match="model[@id='MaterialActionList1_Model']/row">
 	<xsl:variable name="tr_class">
 		<xsl:choose>
-			<xsl:when test="contains(material_name, 'Шлак')">
+			<xsl:when test="contains(material_name, 'Шлак') or contains(material_name, 'Добав')">
 				<xsl:text>RepMaterialAction-tr</xsl:text>
 			</xsl:when>
 			<xsl:otherwise></xsl:otherwise>		
@@ -218,7 +218,7 @@
 <xsl:template match="model[@id='MaterialActionList2_Model']/row">
 	<xsl:variable name="tr_class">
 		<xsl:choose>
-			<xsl:when test="contains(material_name, 'Шлак')">
+			<xsl:when test="contains(material_name, 'Шлак') or contains(material_name, 'Добав')">
 				<xsl:text>RepMaterialAction-tr</xsl:text>
 			</xsl:when>
 			<xsl:otherwise></xsl:otherwise>		
@@ -265,7 +265,7 @@
 <xsl:template match="model[@id='MaterialActionList3_Model']/row">
 	<xsl:variable name="tr_class">
 		<xsl:choose>
-			<xsl:when test="contains(material_name, 'Шлак')">
+			<xsl:when test="contains(material_name, 'Шлак') or contains(material_name, 'Добав')">
 				<xsl:text>RepMaterialAction-tr</xsl:text>
 			</xsl:when>
 			<xsl:otherwise></xsl:otherwise>		

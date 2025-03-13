@@ -10,28 +10,13 @@ CREATE OR REPLACE VIEW production_sites_last_production_list AS
 		
 		p_s.last_elkon_production_id AS last_production_id,
 		
-		/*		
-		coalesce(
-			(SELECT pr.production_dt_end IS NOT NULL FROM productions AS pr WHERE pr.production_id=p_s.last_elkon_production_id
-			)
-		,FALSE) AS closed,
-		*/
-		
 		(
 		SELECT
-			array_agg(production_id)
-			/*||(
-				SELECT CASE
-					WHEN (SELECT TRUE FROM productions
-						WHERE production_site_id=p_s.id AND production_id=p_s.last_elkon_production_id
-					) THEN NULL
-					ELSE ARRAY[p_s.last_elkon_production_id]
-					END
-			)
-			
-			*/
+			array_agg(production_id ORDER BY production_id)
 		FROM productions
-		WHERE production_site_id=p_s.id AND production_dt_end IS NULL
+		WHERE 
+			production_site_id=p_s.id AND production_dt_end IS NULL
+			AND production_id NOT IN (SELECT UNNEST(p_s.unclosed_production_ids))
 		) AS production_ids,
 		
 		p_s.missing_elkon_production_ids
@@ -41,4 +26,3 @@ CREATE OR REPLACE VIEW production_sites_last_production_list AS
 	WHERE p_s.active AND p_s.elkon_connection IS NOT NULL AND p_s.last_elkon_production_id IS NOT NULL
 	;
 	
-ALTER VIEW production_sites_last_production_list OWNER TO ;

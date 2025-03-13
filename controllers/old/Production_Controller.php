@@ -1360,7 +1360,6 @@ UPDATE public.production_sites
 								}
 							}
 						}					
-						sleep(1);
 					}
 				}
 				

@@ -1493,9 +1493,22 @@ VehicleListReport.html.xsl
 1) MaterialActionReport, color
 
 
-1.00364 
+1.00364 12/03/2025
 1) RawMaterialConsRadeDateList added filter,
 	RawMaterialConsRadeDateList_Model added field production_site_id
+2)  LoginTM
+
+
+1.00365 13/03/2025
+1) ProductionController->isnsert_elkon_productions()
+	pg settings, devide to max query count
+Production_Controller->check_data(); set pause between production load.
+2) production_sites added field unclosed_production_ids int[] - productions that are defenetely unclosed and should not
+	be checked when retrieving data from elkon.
+	Modified production_sites_last_production_list.sql not to check productions in unclosed_production_ids.
+DO NOT MODIFIED Production_Controller->isnsert_elkon_productions(), need to test!!!
+LEFT OLD VERSION!!!
+- Silo picture in mobile version
 
 
 

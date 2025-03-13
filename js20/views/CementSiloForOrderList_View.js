@@ -90,12 +90,14 @@ CementSiloForOrderList_View.prototype.setData = function(modelSilos){
 			//	continue;
 			//}
 			if(!prod_site || prod_site.productionSiteId!=cur_prod_site.getKey("id")){
-				prod_site = {
-					"productionSiteName":cur_prod_site.getDescr(),
-					"productionSiteId":cur_prod_site.getKey("id"),
-					"silos":[]
-				};
-				templ_opts.productionSites.push(prod_site);
+				if(cur_prod_site.getDescr){
+					prod_site = {
+						"productionSiteName":cur_prod_site.getDescr(),
+						"productionSiteId":cur_prod_site.getKey("id"),
+						"silos":[]
+					};
+					templ_opts.productionSites.push(prod_site);
+				}
 			}
 			prod_site.silos.push({
 				"siloName":s_name,

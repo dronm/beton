@@ -432,6 +432,8 @@ UPDATE public.production_sites
 		
 		$q_del_head = "DELETE FROM productions WHERE ";				
 		$q_del_body = '';
+
+		$queryCount = 0;
 		
 		$max_production_id = 0;
 		foreach($productionsData as $production_data){
@@ -499,34 +501,116 @@ UPDATE public.production_sites
 			if($max_production_id &lt; $id_db){
 				$max_production_id = $id_db;
 			}
-		}
-		if(strlen($q_body)){
-			try{
-				$this->log_action($productionSiteId,'Выполнение запроса по вставке нового производства: '.$q_head.' '.$q_body,self::LOG_LEVEL_DEBUG,$elkonLogLevel);	
-				
-				$this->getDbLinkMaster()->query('BEGIN');						
-				$this->getDbLinkMaster()->query($q_del_head.' '.$q_del_body);
-				$this->getDbLinkMaster()->query($q_head.' '.$q_body);				
 
-				if($updateLastProduction){			
-					$this->getDbLinkMaster()->query(sprintf(
-						'UPDATE production_sites
-						SET last_elkon_production_id=%d
-						WHERE id=%d',
-						$max_production_id,
-						$productionSiteId
-					));
-				}
-				$this->getDbLinkMaster()->query('COMMIT');
-			}
-			catch(Exception $e){
-				$this->getDbLinkMaster()->query('ROLLBACK');
-				
-				throw $e;
+			$queryCount++;
+			if($queryCount >= $maxQueryCount){
+				$params = [
+					"q_head" => $q_head,
+					"q_body" => $q_body,
+					"q_del_head" => $q_del_head,
+					"q_del_body" => $q_del_body,
+					"max_production_id" => $max_production_id,
+					"productionSiteId" => $productionSiteId
+				];
+				$this->execute_query_from_elkon($params);
+				$q_body = '';
+				$q_del_body = '';
+				$queryCount = 0;
 			}
 		}
-	
-	
+
+		if(strlen($q_body)){
+			$params = [
+				"q_head" => $q_head,
+				"q_body" => $q_body,
+				"q_del_head" => $q_del_head,
+				"q_del_body" => $q_del_body,
+				"max_production_id" => $max_production_id,
+				"productionSiteId" => $productionSiteId
+			];
+			$this->execute_query_from_elkon($params);
+		}
+
+		<!-- if(strlen($q_body)){ -->
+		<!-- 	//pg settings for bot -->
+		<!---->
+		<!-- 	$this->getDbLinkMaster()->query("SET work_mem = '16MB'");						 -->
+		<!---->
+		<!-- 	//increase these values to make PostgreSQL prefer less CPU-intensive plans -->
+		<!-- 	$this->getDbLinkMaster()->query("SET cpu_tuple_cost = 0.1");						 -->
+		<!-- 	$this->getDbLinkMaster()->query("SET cpu_index_tuple_cost = 0.1");						 -->
+		<!---->
+		<!-- 	$this->getDbLinkMaster()->query("SET statement_timeout = '10min'");						 -->
+		<!---->
+		<!-- 	try{ -->
+		<!-- 		$this->log_action($productionSiteId,'Выполнение запроса по вставке нового производства: '.$q_head.' '.$q_body,self::LOG_LEVEL_DEBUG,$elkonLogLevel);	 -->
+		<!-- 		$this->getDbLinkMaster()->query('BEGIN');						 -->
+		<!-- 		$this->getDbLinkMaster()->query($q_del_head.' '.$q_del_body); -->
+		<!-- 		$this->getDbLinkMaster()->query($q_head.' '.$q_body);				 -->
+		<!---->
+		<!-- 		if($updateLastProduction){			 -->
+		<!-- 			$this->getDbLinkMaster()->query(sprintf( -->
+		<!-- 				'UPDATE production_sites -->
+		<!-- 				SET last_elkon_production_id=%d -->
+		<!-- 				WHERE id=%d', -->
+		<!-- 				$max_production_id, -->
+		<!-- 				$productionSiteId -->
+		<!-- 			)); -->
+		<!-- 		} -->
+		<!-- 		$this->getDbLinkMaster()->query('COMMIT'); -->
+		<!-- 	} -->
+		<!-- 	catch(Exception $e){ -->
+		<!-- 		$this->getDbLinkMaster()->query('ROLLBACK'); -->
+		<!---->
+		<!-- 		throw $e; -->
+		<!-- 	} -->
+		<!-- 	$q_body = ''; -->
+		<!-- 	$q_del_body = ''; -->
+		<!-- 	$queryCount = 0; -->
+		<!-- } -->
+	}
+
+	public fuction execute_query_from_elkon($params){
+		$q_head = $params["q_head"];
+		$q_body = $params["q_body"];
+		$elkonLogLevel = $params["elkonLogLevel"];
+		$q_del_head = $params["q_del_head"];
+		$q_del_body = $params["q_del_body"];
+		$max_production_id = $params["max_production_id "];
+		$productionSiteId = $params["productionSiteId"];
+
+		//pg settings for bot
+
+		$this->getDbLinkMaster()->query("SET work_mem = '16MB'");						
+
+		//increase these values to make PostgreSQL prefer less CPU-intensive plans
+		$this->getDbLinkMaster()->query("SET cpu_tuple_cost = 0.1");						
+		$this->getDbLinkMaster()->query("SET cpu_index_tuple_cost = 0.1");						
+
+		$this->getDbLinkMaster()->query("SET statement_timeout = '10min'");						
+
+		try{
+			$this->log_action($productionSiteId,'Выполнение запроса по вставке нового производства: '.$q_head.' '.$q_body, self::LOG_LEVEL_DEBUG,$elkonLogLevel);	
+			$this->getDbLinkMaster()->query('BEGIN');						
+			$this->getDbLinkMaster()->query($q_del_head.' '.$q_del_body);
+			$this->getDbLinkMaster()->query($q_head.' '.$q_body);				
+
+			if($updateLastProduction){			
+				$this->getDbLinkMaster()->query(sprintf(
+					'UPDATE production_sites
+					SET last_elkon_production_id=%d
+					WHERE id=%d',
+					$max_production_id,
+					$productionSiteId
+				));
+			}
+			$this->getDbLinkMaster()->query('COMMIT');
+		}
+		catch(Exception $e){
+			$this->getDbLinkMaster()->query('ROLLBACK');
+			
+			throw $e;
+		}
 	}
 	
 	public function check_production_by_id($productionSiteId, $productionId){
@@ -1011,7 +1095,8 @@ UPDATE public.production_sites
 									throw $e;
 								}
 							}
-						}					
+						}
+						sleep(1); //
 					}
 				}
 				
