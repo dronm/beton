@@ -1,22 +1,28 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?php
+require_once(FRAME_WORK_PATH.'basic_classes/ControllerSQL.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtInt.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtFloat.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtEnum.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtText.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDateTime.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDate.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtTime.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtPassword.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBool.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtInterval.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDateTimeTZ.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSON.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtArray.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-<xsl:import href="Controller_php.xsl"/>
+/**
+ * THIS FILE IS GENERATED FROM TEMPLATE build/templates/controllers/Controller_php.xsl
+ * ALL DIRECT MODIFICATIONS WILL BE LOST WITH THE NEXT BUILD PROCESS!!!
+ */
 
-<!-- -->
-<xsl:variable name="CONTROLLER_ID" select="'Shipment'"/>
-<!-- -->
 
-<xsl:output method="text" indent="yes"
-			doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" 
-			doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
-			
-<xsl:template match="/">
-	<xsl:apply-templates select="metadata/controllers/controller[@id=$CONTROLLER_ID]"/>
-</xsl:template>
-
-<xsl:template match="controller"><![CDATA[<?php]]>
-<xsl:call-template name="add_requirements"/>
 require_once(USER_MODELS_PATH.'ShipmentRep_Model.php');
 require_once(USER_MODELS_PATH.'ShipmentOperator_Model.php');
 require_once(USER_MODELS_PATH.'ShipmentForOrderList_Model.php');
@@ -43,11 +49,789 @@ require_once(USER_CONTROLLERS_PATH.'ExcelTemplate_Controller.php');
 require_once(USER_CONTROLLERS_PATH.'Order_Controller.php');
 
 require_once(ABSOLUTE_PATH.'functions/checkPmPeriod.php');
+
 require_once(ABSOLUTE_PATH.'functions/ExtProg.php');
 
-class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
+class Shipment_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
-		parent::__construct($dbLinkMaster, $dbLink);<xsl:apply-templates/>
+		parent::__construct($dbLinkMaster, $dbLink);
+			
+
+		/* insert */
+		$pm = new PublicMethod('insert');
+		
+			$f_params = array();
+			
+				$f_params['alias']='Дата';
+			$param = new FieldExtDateTime('date_time'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Заявка';
+			
+				$f_params['required']=TRUE;
+			$param = new FieldExtInt('order_id'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Экипаж';
+			
+				$f_params['required']=TRUE;
+			$param = new FieldExtInt('vehicle_schedule_id'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Количество';
+			$param = new FieldExtFloat('quant'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Автор';
+			$param = new FieldExtInt('user_id'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Завод';
+			
+				$f_params['required']=FALSE;
+			$param = new FieldExtInt('production_site_id'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Баллы';
+			$param = new FieldExtInt('client_mark'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Простой';
+			$param = new FieldExtInterval('demurrage'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Наличие бланков';
+			$param = new FieldExtBool('blanks_exist'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtBool('owner_agreed'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtDateTimeTZ('owner_agreed_date_time'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtText('acc_comment'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtText('acc_comment_shipment'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtBool('owner_pump_agreed'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtDateTimeTZ('owner_pump_agreed_date_time'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtFloat('pump_cost'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtBool('pump_cost_edit'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtFloat('ship_cost'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtBool('ship_cost_edit'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtFloat('pump_for_client_cost'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtBool('pump_for_client_cost_edit'
+				,$f_params);
+		$pm->addParam($param);
+		
+		$pm->addParam(new FieldExtInt('ret_id'));
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			]
+		];
+		$pm->addEvent('Shipment.insert',$ev_opts);
+		
+		$this->addPublicMethod($pm);
+		$this->setInsertModelId('Shipment_Model');
+
+			
+		/* update */		
+		$pm = new PublicMethod('update');
+		
+		$pm->addParam(new FieldExtInt('old_id',array('required'=>TRUE)));
+		
+		$pm->addParam(new FieldExtInt('obj_mode'));
+		
+			$f_params=array();
+			
+				$f_params['alias']='Код';
+			$param = new FieldExtInt('id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Дата';
+			$param = new FieldExtDateTime('date_time'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Заявка';
+			$param = new FieldExtInt('order_id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Экипаж';
+			$param = new FieldExtInt('vehicle_schedule_id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Количество';
+			$param = new FieldExtFloat('quant'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Автор';
+			$param = new FieldExtInt('user_id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Завод';
+			$param = new FieldExtInt('production_site_id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Баллы';
+			$param = new FieldExtInt('client_mark'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Простой';
+			$param = new FieldExtInterval('demurrage'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Наличие бланков';
+			$param = new FieldExtBool('blanks_exist'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtBool('owner_agreed'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtDateTimeTZ('owner_agreed_date_time'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtText('acc_comment'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtText('acc_comment_shipment'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtBool('owner_pump_agreed'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtDateTimeTZ('owner_pump_agreed_date_time'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtFloat('pump_cost'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtBool('pump_cost_edit'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtFloat('ship_cost'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtBool('ship_cost_edit'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtFloat('pump_for_client_cost'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtBool('pump_for_client_cost_edit'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$param = new FieldExtInt('id',array(
+			
+				'alias'=>'Код'
+			));
+			$pm->addParam($param);
+		
+			//default event
+			$ev_opts = [
+				'dbTrigger'=>FALSE
+				,'eventParams' =>['id'
+				]
+			];
+			$pm->addEvent('Shipment.update',$ev_opts);
+			
+			$this->addPublicMethod($pm);
+			$this->setUpdateModelId('Shipment_Model');
+
+			
+		/* delete */
+		$pm = new PublicMethod('delete');
+		
+		$pm->addParam(new FieldExtInt('id'
+		));		
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));				
+				
+		
+		//default event
+		$ev_opts = [
+			'dbTrigger'=>FALSE
+			,'eventParams' =>['id'
+			]
+		];
+		$pm->addEvent('Shipment.delete',$ev_opts);
+		
+		$this->addPublicMethod($pm);					
+		$this->setDeleteModelId('Shipment_Model');
+
+			
+		/* get_list */
+		$pm = new PublicMethod('get_list');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
+		$this->addPublicMethod($pm);
+		
+		$this->setListModelId('ShipmentList_Model');
+		
+			
+		$pm = new PublicMethod('get_list_for_veh_owner');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_list_for_client');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_list_for_client_veh_owner');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_list_for_order');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_pump_list');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_pump_list_for_veh_owner');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_shipment_date_list');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
+		$this->addPublicMethod($pm);
+
+			
+		/* get_object */
+		$pm = new PublicMethod('get_object');
+		$pm->addParam(new FieldExtString('mode'));
+		
+		$pm->addParam(new FieldExtInt('id'
+		));
+		
+		$pm->addParam(new FieldExtString('lsn'));
+		$this->addPublicMethod($pm);
+		$this->setObjectModelId('ShipmentDialog_Model');		
+
+			
+		$pm = new PublicMethod('get_assigned_vehicle_list');
+		
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('production_site_id',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('production_base_id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_operator_list');
+		
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtDate('date',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('set_shipped');
+		
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('unset_shipped');
+		
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('shipment_report');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('grp_fields',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('agg_fields',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('shipment_invoice');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('id',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('templ',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('inline',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('shipment_ttn');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('shipment_putevoi_list');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('shipment_transp_nakl');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_time_list');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtString('templ',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('set_blanks_exist');
+		
+				
+	$opts=array();
+	
+		$opts['length']=13;				
+		$pm->addParam(new FieldExtString('barcode',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('delete_shipped');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('shipment_id',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=500;
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtString('comment_text',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('delete_assigned');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('shipment_id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('owner_set_agreed');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('shipment_id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('owner_set_agreed_all');
+		
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('owner_set_pump_agreed');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('shipment_id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('owner_set_pump_agreed_all');
+		
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_shipped_vihicles_list');
+		
+		$this->addPublicMethod($pm);
+
+			
+		/* complete  */
+		$pm = new PublicMethod('complete');
+		$pm->addParam(new FieldExtString('pattern'));
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('ic'));
+		$pm->addParam(new FieldExtInt('mid'));
+		$pm->addParam(new FieldExtString('id'));		
+		$this->addPublicMethod($pm);					
+		$this->setCompleteModelId('ShipmentList_Model');
+
+			
+		$pm = new PublicMethod('get_passport_ship');
+		
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_passport_all');
+		
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_passport_stamp_ship');
+		
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_passport_stamp_all');
+		
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_list_for_doc');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
+		$this->addPublicMethod($pm);
+
+		
 	}
 	
 	public function shipment_report($pm){
@@ -83,7 +867,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		//Вставка производства в Elkon, запуск скрипта из под php5.6
 		//$script = FUNC_PATH.'elkon_production_insert.php';
-		//exec("php5.6 ".$script." ".$inserted_id_ar['id']." > /dev/null 2>&amp;1 &amp;");
+		//exec("php5.6 ".$script." ".$inserted_id_ar['id']." > /dev/null 2>&1 &");
 	}
 	
 	public function delete($pm){
@@ -119,12 +903,12 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			EXTRACT(DAY FROM sh.date_time::date) AS day,
 			EXTRACT(YEAR FROM sh.date_time::date) AS year,
 			CASE WHEN
-				date_part('hour',sh.date_time) &lt; 10 THEN 
+				date_part('hour',sh.date_time) < 10 THEN 
 				'0' || date_part('hour',sh.date_time)::text
 				ELSE date_part('hour',sh.date_time)::text
 			END || '-' ||
 			CASE WHEN
-				date_part('minute',sh.date_time) &lt; 10 THEN 
+				date_part('minute',sh.date_time) < 10 THEN 
 				'0' || date_part('minute',sh.date_time)::text
 				ELSE date_part('minute',sh.date_time)::text
 			END AS time,
@@ -166,7 +950,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			FROM shipments AS t_sh
 			WHERE t_sh.order_id=o.id
 				AND t_sh.shipped
-				AND t_sh.ship_date_time&lt;=sh.ship_date_time
+				AND t_sh.ship_date_time<=sh.ship_date_time
 			),0) AS quant_shipped
 			
 		FROM shipments AS sh
@@ -228,11 +1012,11 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	public function set_blanks_exist($pm){
 		$barcode = $pm->getParamValue("barcode");
 		$shipment_id = 0;
-		if (strlen($barcode)==13 &amp;&amp; substr($barcode,0,1)=='0'){
+		if (strlen($barcode)==13 && substr($barcode,0,1)=='0'){
 			//by barcode
 			$shipment_id = intval(substr($barcode,1,11));
 		}
-		else if (strlen($barcode)==12 &amp;&amp; substr($barcode,0,1)=='0'){
+		else if (strlen($barcode)==12 && substr($barcode,0,1)=='0'){
 			//by barcode
 			$shipment_id = intval(substr($barcode,1,10));
 		}		
@@ -261,7 +1045,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 	}
 	
-	private static function get_operator_query($date_from_db,$date_to_db,&amp;$operator_cond_tot){
+	private static function get_operator_query($date_from_db,$date_to_db,&$operator_cond_tot){
 		$operator_cond = '';
 		$operator_cond_tot = '';
 		$operator_with = '';
@@ -293,7 +1077,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			END AS ship_bal_min";
 			$extra_join = "LEFT JOIN (SELECT t.shipment_id,t.date_time FROM vehicle_schedule_states t WHERE t.state='assigned' GROUP BY t.shipment_id,t.date_time) vs2 ON vs2.shipment_id = sh.id";
 			
-			if(isset($_SESSION['production_site_id']) &amp;&amp; intval($_SESSION['production_site_id']) &gt; 0){
+			if(isset($_SESSION['production_site_id']) && intval($_SESSION['production_site_id']) > 0){
 				$operator_with = sprintf('prod_site AS (SELECT %d AS production_site_id),', $_SESSION['production_site_id']);
 				$operator_cond = ' AND sh.production_site_id = (SELECT prod_site.production_site_id FROM prod_site)';
 				$operator_cond_tot = sprintf(' AND sh.production_site_id = %d', $_SESSION['production_site_id']);			
@@ -356,7 +1140,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		);	
 	}
 	
-	public static function addOperatorModels(&amp;$controller,$dateFromForDb,$dateToForDb){
+	public static function addOperatorModels(&$controller,$dateFromForDb,$dateToForDb){
 	
 		$operator_cond_tot = '';
 		$q = self::get_operator_query($dateFromForDb,$dateToForDb,$operator_cond_tot);
@@ -390,7 +1174,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				$_SESSION['user_id']
 			);
 			
-		}else if(isset($_SESSION['production_site_id']) &amp;&amp; intval($_SESSION['production_site_id']) > 0){
+		}else if(isset($_SESSION['production_site_id']) && intval($_SESSION['production_site_id']) > 0){
 			//Если есть привязка к заводу - только его
 			$prod_site_q = sprintf(
 				'SELECT ps.name
@@ -465,7 +1249,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			);
 			$link = $this->getDbLinkMaster();
 			Order_Controller::add_production_bases($link);
-			if(isset($_SESSION['production_bases']) &amp;&amp; count($_SESSION['production_bases'])){
+			if(isset($_SESSION['production_bases']) && count($_SESSION['production_bases'])){
 				foreach($_SESSION['production_bases'] as $prod_id){
 					$this->addNewModel(
 						"SELECT * FROM cement_silos_for_order_list
@@ -558,7 +1342,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					LEFT JOIN orders AS d_o ON d_o.id = d_sh.order_id
 					WHERE d_sh.ship_date_time::date = shipments.ship_date_time::date
 					AND d_vs.vehicle_id = vs.vehicle_id
-					AND d_sh.id &lt;&gt; shipments.id
+					AND d_sh.id <> shipments.id
 					AND d_o.destination_id = orders.destination_id
 					)
 				,0)=0)				
@@ -567,7 +1351,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			CASE WHEN coalesce(v.tracker_id,'') = '' THEN FALSE
 			ELSE
 				(SELECT
-					(now() - (tr.period+age(now(), timezone('UTC'::text, now())::timestamp with time zone)) ) &lt; '00:30:00'::interval
+					(now() - (tr.period+age(now(), timezone('UTC'::text, now())::timestamp with time zone)) ) < '00:30:00'::interval
 				FROM car_tracking AS tr
 				WHERE tr.car_id=v.tracker_id
 				ORDER BY tr.period DESC
@@ -592,10 +1376,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		LEFT JOIN vehicles AS v ON v.id=vs.vehicle_id
 		LEFT JOIN destinations AS dest ON dest.id=orders.destination_id
 		
-		LEFT JOIN contacts AS ct ON coalesce(orders.phone_cel,'')&lt;&gt;'' AND ct.tel = orders.phone_cel
+		LEFT JOIN contacts AS ct ON coalesce(orders.phone_cel,'')<>'' AND ct.tel = orders.phone_cel
 		LEFT JOIN notifications.ext_users_list AS e_user ON e_user.app_id = 1 AND e_user.ext_contact_id = ct.id
 		
-		LEFT JOIN contacts AS ct_d ON coalesce(d.phone_cel,'')&lt;&gt;'' AND ct_d.tel = d.phone_cel
+		LEFT JOIN contacts AS ct_d ON coalesce(d.phone_cel,'')<>'' AND ct_d.tel = d.phone_cel
 		LEFT JOIN notifications.ext_users_list AS e_user_d ON e_user_d.app_id = 1 AND e_user_d.ext_contact_id = ct_d.id
 		
 		WHERE shipments.id=%d",
@@ -605,7 +1389,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$d_phone_exists = (strlen($ar['d_phone'])==10);
 		
 		//responsible person notification through TM
-		if (strlen($ar['phone_cel']) &amp;&amp; isset($ar['ext_contact_id'])){
+		if (strlen($ar['phone_cel']) && isset($ar['ext_contact_id'])){
 			$text = $ar['text'];
 			$text = str_replace('[quant]',$ar['quant'],$text);
 			$text = str_replace('[concrete]',$ar['concrete'],$text);
@@ -644,10 +1428,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		//СМС миксеристу с маршрутом
 		//Если в этот день на этот объект уже отправляли - не отправлять!
 		if(isset($ar['send_route_sms'])
-		&amp;&amp; $ar['send_route_sms']=='t'
-		&amp;&amp; $d_phone_exists
-		&amp;&amp; $ar['tracker_exists']=='t'
-		&amp;&amp; isset($ar['dr_ext_contact_id'])
+		&& $ar['send_route_sms']=='t'
+		&& $d_phone_exists
+		&& $ar['tracker_exists']=='t'
+		&& isset($ar['dr_ext_contact_id'])
 		){
 			$mix_pat = $dbLink->query_first(
 				"SELECT pattern FROM sms_patterns WHERE sms_type='mixer_route'::sms_types LIMIT 1"
@@ -810,7 +1594,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					coalesce(
 						(SELECT sh_p.price
 						FROM shipment_for_owner_costs sh_p
-						WHERE sh_p.date&lt;=o.date_time::date AND sh_p.distance_to>=dest.distance
+						WHERE sh_p.date<=o.date_time::date AND sh_p.distance_to>=dest.distance
 						ORDER BY sh_p.date DESC,sh_p.distance_to ASC
 						LIMIT 1
 						),			
@@ -902,7 +1686,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			
 			}
 			
-			$date_to = $where->getFieldsById('ship_date_time','&lt;=');
+			$date_to = $where->getFieldsById('ship_date_time','<=');
 		}
 		*/
 		$this->modelGetList(new ShipmentTimeList_Model($this->getDbLink()),$pm);
@@ -1083,7 +1867,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				d_from AS (
 					SELECT (
 						(CASE WHEN (SELECT v FROM mon)=12 THEN extract('year' FROM now())-1 ELSE extract('year' FROM now()) END)::text
-						||'-'|| (CASE WHEN (SELECT v FROM mon)&lt;10 THEN '0' ELSE '' END )||(SELECT v FROM mon) ||'-01'
+						||'-'|| (CASE WHEN (SELECT v FROM mon)<10 THEN '0' ELSE '' END )||(SELECT v FROM mon) ||'-01'
 					)::date+
 					const_first_shift_start_time_val()
 					AS v
@@ -1126,7 +1910,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				d_from AS (
 					SELECT (
 						(CASE WHEN (SELECT v FROM mon)=12 THEN extract('year' FROM now())-1 ELSE extract('year' FROM now()) END)::text
-						||'-'|| (CASE WHEN (SELECT v FROM mon)&lt;10 THEN '0' ELSE '' END )||(SELECT v FROM mon) ||'-01'
+						||'-'|| (CASE WHEN (SELECT v FROM mon)<10 THEN '0' ELSE '' END )||(SELECT v FROM mon) ||'-01'
 					)::date+
 					const_first_shift_start_time_val()
 					AS v
@@ -1259,7 +2043,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					sh.id
 				FROM shipments AS sh
 				LEFT JOIN orders AS o ON o.id = sh.order_id
-				WHERE o.id = (SELECT order_id FROM shipments WHERE id = %d)"
+				WHERE o.id = (SELECT order_id FROM shimpents WHERE id = %d)"
 				,$anyDocId
 			)
 		);
@@ -1278,7 +2062,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			ExcelTemplate_Controller::genFilledTemplate($link, $templateName, array($shAr["id"]), $erEmpty, $outFile, $fileName);		
 			$fileNameParts = pathinfo($fileName,  PATHINFO_EXTENSION);
 			$fileExt = '';
-			if(is_array($fileNameParts) &amp;&amp; isset($fileNameParts['extension'])){
+			if(is_array($fileNameParts) && isset($fileNameParts['extension'])){
 				$fileExt = $fileNameParts['extension'];
 			}else if (gettype($fileNameParts) == "string"){
 				$fileExt = $fileNameParts;
@@ -1293,8 +2077,6 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			usleep(500000);
 		}
 
-		$zip->close();
-
 		//delete files, as they are already in a zip
 		foreach($fileList as $fl){
 			unlink($fl);
@@ -1303,36 +2085,13 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		return $zipFileName;
 	}
 
-	//all shipments
-	public function shipment_transp_nakl_all($pm){
-		$docId = $this->getExtDbVal($pm, 'id');
-		try{
-			$outFile = $this->shipment_transp_nakl_all_operation($docId);
-			$fileName = "ТН.zip";
-			$flMime = getMimeTypeOnExt($fileName);
-			ob_clean();
-			downloadFile(
-				$outFile,
-				$flMime,
-				'attachment;',
-				$fileName
-			);
-			
-			return TRUE;
-		}finally{
-			if(file_exists($outFile)){
-				unlink($outFile);
-			}
-		}
-	}
-
 	//one shipment
 	public function shipment_transp_nakl($pm){
 		$docId = $this->getExtDbVal($pm, 'id');
 		$this->check_1c_attrs_for_tn($docId);
 
 		return ExcelTemplate_Controller::downloadFilledTemplate(
-			$this->getDbLink()
+			$link
 			,'Транспортная накладная'
 			,array($docId)
 			,'Отгрузка не найдена!'
@@ -1480,7 +2239,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		if($all){
 			$ar = $link->query_first(sprintf(
 				"SELECT		
-					CASE WHEN EXTRACT(DAY FROM o.date_time)&lt;10 THEN
+					CASE WHEN EXTRACT(DAY FROM o.date_time)<10 THEN
 						'0' || EXTRACT(DAY FROM o.date_time)::varchar || '-' || trim(to_char(o.number,'000'))
 					ELSE
 						EXTRACT(DAY FROM o.date_time)::varchar || '-' || trim(to_char(o.number,'000'))
@@ -1502,7 +2261,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					ORDER BY sh.ship_date_time		
 				)
 				SELECT		
-					CASE WHEN EXTRACT(DAY FROM o.date_time)&lt;10 THEN
+					CASE WHEN EXTRACT(DAY FROM o.date_time)<10 THEN
 						'0' || EXTRACT(DAY FROM o.date_time)::varchar || '-' || trim(to_char(o.number,'000'))
 					ELSE
 						EXTRACT(DAY FROM o.date_time)::varchar || '-' || trim(to_char(o.number,'000'))
@@ -1524,8 +2283,4 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$this->modelGetList(new ShipmentForDocList_Model($this->getDbLink()), $pm);
 	}
 }
-<![CDATA[?>]]>
-</xsl:template>
-
-</xsl:stylesheet>
-
+?>

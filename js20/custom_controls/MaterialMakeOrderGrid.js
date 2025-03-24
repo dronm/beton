@@ -23,7 +23,7 @@ function MaterialMakeOrderGrid(id,options){
 	CommonHelper.merge(options,
 		{
 			"attrs":{"style":"width:100%;"},
-			"keyIds":["material_id"],
+			"keyIds":["material_descr"],
 			"readPublicMethod":null,
 			"editInline":false,
 			"editWinClass":null,

@@ -1,11 +1,12 @@
 -- View: public.vehicles_dialog
 
--- DROP VIEW public.vehicles_dialog;
+DROP VIEW public.vehicles_dialog;
  
 CREATE OR REPLACE VIEW public.vehicles_dialog AS 
 	SELECT
 		v.id,
 		v.plate,
+		v.plate_region,
 		v.load_capacity,
 		v.make,
 		v.owner,
@@ -78,6 +79,4 @@ CREATE OR REPLACE VIEW public.vehicles_dialog AS
 	ORDER BY v.plate
 	;
 
-ALTER TABLE public.vehicles_dialog
-  OWNER TO ;
 

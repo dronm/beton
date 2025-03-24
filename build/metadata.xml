@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-03-12 08:02:50</lastBuild></version>
+		<lastBuild>2025-03-24 06:52:52</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -269,6 +269,7 @@
 		<version dateOpen="2025-03-11 18:02:11" dateClose="2025-03-11 18:02:35">1.00363</version>
 		<version dateOpen="2025-03-12 06:43:24" dateClose="2025-03-12 08:03:03">1.00364</version>
 		<version dateOpen="2025-03-13 06:28:56" dateClose="2025-03-13 06:29:15">1.00365</version>
+		<version dateOpen="2025-03-13 07:01:32" dateClose="2025-03-24 06:53:15">1.00366</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -823,6 +824,8 @@
 			<field id="inn" dataType="String" length="12"/>
 			<field id="kpp" dataType="String" length="10"/>
 			<field id="address_legal" dataType="Text"/>
+			<field id="address_fact" dataType="Text"/>
+			<field id="tels_1c" dataType="Text"/>
 			<field id="user_id" dataType="Int" refTable="users" refField="id" alias="Аккаунт"/>
 			<field id="account_from_date" dataType="Date" alias="Дата начала выборки данных"/>
 			<field id="bank_bik" dataType="String" length="9" alias="БИК банка"/>
@@ -881,6 +884,7 @@
 			<field id="banks_ref" dataType="JSON" alias="БИК банка"/>
 			<field id="kpp" dataType="String" length="10"/>
 			<field id="address_legal" dataType="Text"/>
+			<field id="address_fact" dataType="Text"/>
 			<field id="ref_1c" dataType="String"/>
 			<field id="shipment_quant_for_cost" dataType="Float" length="19" precision="3"/>
 		</model>
@@ -1022,6 +1026,7 @@
 			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="TRUE" sysCol="TRUE"/>
 			<field id="plate" dataType="String" required="TRUE" length="6" alias="Номер"/>
+			<field id="plate_region" dataType="String" length="3" alias="Регин номера"/>
 			<field id="plate_n" dataType="Int" alias="Номер число для сортировки"/>
 			<field id="load_capacity" dataType="Float" required="TRUE" length="15" precision="2" alias="Грузоподъемность"/>
 			<field id="make" dataType="String" required="FALSE" length="200" alias="Марка"/>
@@ -1059,6 +1064,7 @@
 		<model id="VehicleDialog" parent="ModelSQLBeton" dataTable="vehicles_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
 			<field id="plate" dataType="String" required="TRUE" length="6" alias="Номер"/>
+			<field id="plate_region" dataType="String" length="3" alias="Регион номера"/>
 			<field id="load_capacity" dataType="Float" required="TRUE" length="15" precision="2" alias="Грузоподъемность"/>
 			<field id="make" dataType="String" required="FALSE" length="200" alias="Марка"/>
 			<field id="drivers_ref" dataType="JSONB"/>
@@ -1110,6 +1116,7 @@
 			<field id="driver_licence" dataType="Text" alias="Водительское удостоверение"/>
 			<field id="driver_licence_class" dataType="String" length="10" alias="Класс водительского удостоверения"/>
 			<field id="employed" dataType="Bool" alias="Официально устроен"/>
+			<field id="inn" dataType="Text" alias="Person inn"/>
 			<index id="driver_name_index">
 				<expression>lower(name)</expression>
 			</index>
@@ -1125,6 +1132,7 @@
 			<field id="contact_list" dataType="JSON" alias="Контакты"/>
 			<field id="contact_ids" dataType="Text" alias="Контакты"/>
 			<field id="employed" dataType="Bool" alias="Официально устроен"/>
+			<field id="inn" dataType="Text" alias="ИНН водителя"/>
 		</model>
 		<model id="RawMaterial" parent="ModelSQLBeton" dataTable="raw_materials" virtual="FALSE">
 			<defaultOrder>
@@ -1750,6 +1758,20 @@
 			<field id="destination_id" dataType="Int" refTable="destinations" refField="id" alias="Зона"/>
 			<field id="production_plant_type" dataType="Enum" enumId="production_plant_types" alias="Вид завода"/>
 			<field id="production_base_id" dataType="Int" refTable="production_bases" refField="id" alias="База"/>
+			<field id="dispatcher_id" dataType="Int" refTable="employees" refField="id" alias="Диспетчер (ТТН)"/>
+		</model>
+		<model id="ProductionSiteDialog" parent="ModelSQLBeton" dataTable="production_sites_dialog" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="name" dataType="String" length="100"/>
+			<field id="elkon_connection" dataType="JSONB"/>
+			<field id="elkon_params" dataType="JSONB"/>
+			<field id="active" dataType="Bool" alias="Активен"/>
+			<field id="last_elkon_production_id" dataType="Int"/>
+			<field id="missing_elkon_production_ids" dataType="Array" arrayType="Int"/>
+			<field id="destination_id" dataType="Int" refTable="destinations" refField="id" alias="Зона"/>
+			<field id="production_plant_type" dataType="Enum" enumId="production_plant_types" alias="Вид завода"/>
+			<field id="production_base_id" dataType="Int" refTable="production_bases" refField="id" alias="База"/>
+			<field id="dispatchers_ref" dataType="JSONB" alias="Диспетчер (ТТН)"/>
 		</model>
 		<model id="ProductionSiteList" parent="ModelSQLBeton" dataTable="production_sites_list" virtual="FALSE">
 			<defaultOrder>
@@ -2891,8 +2913,10 @@
 		<model id="Employee" parent="ModelSQLBeton" dataTable="employees" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="TRUE"/>
 			<field id="name" dataType="String" length="80" required="TRUE"/>
-			<field id="employed" dataType="Bool" required="TRUE" defaultValue="TRUE"/>
+			<field id="employed" dataType="Bool" defaultValue="TRUE"/>
 			<field id="user_id" dataType="Int" refTable="users" refField="id"/>
+			<field id="inn" dataType="Text"/>
+			<field id="post" dataType="Text"/>
 			<index id="employees_name_index">
 				<expression>lower(name)</expression>
 			</index>
@@ -2903,8 +2927,10 @@
 			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="TRUE"/>
 			<field id="name" dataType="String" length="80" required="TRUE"/>
-			<field id="employed" dataType="Bool" required="TRUE" defaultValue="TRUE"/>
+			<field id="employed" dataType="Bool"/>
 			<field id="users_ref" dataType="JSON"/>
+			<field id="inn" dataType="Text"/>
+			<field id="post" dataType="Text"/>
 		</model>
 		<model id="EmployeeWorkTimeSchedule" parent="ModelSQLBeton" dataTable="employee_work_time_schedules" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="TRUE"/>
@@ -5101,6 +5127,14 @@
 			<field id="date_time" dataType="DateTimeTZ"/>
 			<field id="message" dataType="JSONB"/>
 		</model>
+		<model id="BuhDoc" parent="ModelSQL" dataTable="buh_docs" virtual="FALSE" alias="Бух документ УПД">
+			<field id="order_id" dataType="Int" refTable="orders" refField="id" primaryKey="TRUE"/>
+			<field id="nomer" dataType="Text"/>
+			<field id="data" dataType="Text" alias="Formatted document datetime"/>
+			<field id="fakture_nomer" dataType="Text"/>
+			<field id="faktura_data" dataType="Text" alias="Formatted document datetime"/>
+			<field id="ref_1c" dataType="String" length="36"/>
+		</model>
 	</models>
 	<constants>
 		<constant id="doc_per_page_count" name="Количество документов на странице" descr="Количество документов на странице в журнале документов" dataType="Int" defaultValue="60" autoload="TRUE"/>
@@ -5647,6 +5681,11 @@
 			</publicMethod>
 			<publicMethod id="shipment_transp_nakl" modelId="ModelSQL">
 				<field id="id" dataType="Int" required="TRUE"/>
+				<field id="faksim" dataType="Bool" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="shipment_transp_nakl_all" modelId="ModelSQL">
+				<field id="id" dataType="Int" required="TRUE"/>
+				<field id="faksim" dataType="Bool" required="TRUE"/>
 			</publicMethod>
 			<publicMethod id="get_time_list" modelId="ShipmentTimeList" condFields="TRUE">
 				<field id="templ" dataType="String"/>
@@ -8794,6 +8833,7 @@
 		<jsScript file="js20/controllers/ClientContract1c_Controller.js"/>
 		<jsScript file="js20/models/ClientContract1cList_Model.js"/>
 		<jsScript file="js20/controllers/Connect1cCheck_Controller.js"/>
+		<jsScript file="js20/models/BuhDoc_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

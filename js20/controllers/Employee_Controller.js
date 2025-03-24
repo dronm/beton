@@ -1,5 +1,5 @@
 /**
- * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017 - 2024
  
  * THIS FILE IS GENERATED FROM TEMPLATE build/templates/controllers/Controller_js20.xsl
  * ALL DIRECT MODIFICATIONS WILL BE LOST WITH THE NEXT BUILD PROCESS!!!
@@ -52,7 +52,7 @@ extend(Employee_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.required = true;
+	
 	var field = new FieldBool("employed",options);
 	
 	pm.addField(field);
@@ -60,6 +60,18 @@ extend(Employee_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldInt("user_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldText("inn",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldText("post",options);
 	
 	pm.addField(field);
 	
@@ -96,6 +108,18 @@ extend(Employee_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldInt("user_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldText("inn",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldText("post",options);
 	
 	pm.addField(field);
 	
@@ -140,6 +164,12 @@ extend(Employee_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldJSON("users_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldText("inn",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldText("post",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");
 	
 }

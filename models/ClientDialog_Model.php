@@ -174,6 +174,14 @@ class ClientDialog_Model extends ModelSQLBeton{
 		$this->addField($f_address_legal);
 		//********************
 		
+		//*** Field address_fact ***
+		$f_opts = array();
+		$f_opts['id']="address_fact";
+						
+		$f_address_fact=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"address_fact",$f_opts);
+		$this->addField($f_address_fact);
+		//********************
+		
 		//*** Field ref_1c ***
 		$f_opts = array();
 		$f_opts['id']="ref_1c";

@@ -40,6 +40,7 @@ class ExtProg{
 				'timeout' => $CON_TIMEOUT
 			)
 		);
+		/* file_put_contents(OUTPUT_PATH.'get_shipment.data', var_export($params,true)); */
 		$context = stream_context_create($options);
 		$contents = @file_get_contents('http://'.HOST_1C.':'.PORT_1C.'/api.php', FALSE, $context);
 		if($contents === FALSE){
@@ -140,6 +141,14 @@ class ExtProg{
 
 	public static function getClientContract(string $contractRef1c): array {
 		return (array)ExtProg::send_query('get_client_dog', array('ref_1c'=>$contractRef1c), TRUE);
+	}
+
+	public static function getClient(string $clientRef1c): array {
+		return (array)ExtProg::send_query('get_client', array('ref_1c'=>$clientRef1c), TRUE);
+	}
+
+	public static function getShipment(string $clientRef1c, string $date): array {
+		return (array)ExtProg::send_query('get_shipment', array('client_ref_1c'=>$clientRef1c, "date"=>$date), TRUE);
 	}
 
 	public static function ping(): bool {

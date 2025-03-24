@@ -30,11 +30,12 @@ CREATE OR REPLACE VIEW drivers_list AS
 		WHERE en.entity_type = 'drivers' AND en.entity_id = dr.id
 		) AS contact_ids,
 		
-		dr.employed
+		dr.employed,
+		dr.inn
 		
 	 	
  	FROM drivers AS dr
 	ORDER BY dr.name;
 
-ALTER TABLE drivers_list OWNER TO ;
+-- ALTER TABLE drivers_list OWNER TO ;
 

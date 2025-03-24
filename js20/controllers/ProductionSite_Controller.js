@@ -100,6 +100,12 @@ extend(ProductionSite_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Диспетчер (ТТН)";
+	var field = new FieldInt("dispatcher_id",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -174,6 +180,12 @@ extend(ProductionSite_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Диспетчер (ТТН)";
+	var field = new FieldInt("dispatcher_id",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -233,6 +245,9 @@ extend(ProductionSite_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "База";
 	pm.addField(new FieldInt("production_base_id",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Диспетчер (ТТН)";
+	pm.addField(new FieldInt("dispatcher_id",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");
 	
 }

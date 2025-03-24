@@ -16,6 +16,10 @@ function VehicleDialog_View(id,options){
 		"maxLength":"6",
 		"required":true
 	}));	
+	this.addElement(new EditString(id+":plate_region",{
+		"labelCaption":"Регион номера:",
+		"maxLength":"3"
+	}));	
 	this.addElement(new EditFloat(id+":load_capacity",{
 		"precision":"2",
 		"labelCaption":"Грузоподъемность:"
@@ -122,6 +126,7 @@ function VehicleDialog_View(id,options){
 	//read
 	var r_bd = [
 		new DataBinding({"control":this.getElement("plate")})
+		,new DataBinding({"control":this.getElement("plate_region")})
 		,new DataBinding({"control":this.getElement("load_capacity")})
 		,new DataBinding({"control":this.getElement("driver"), "fieldId": "drivers_ref" })
 		,new DataBinding({"control":this.getElement("make")})
@@ -147,6 +152,7 @@ function VehicleDialog_View(id,options){
 	//write
 	this.setWriteBindings([
 		new CommandBinding({"control":this.getElement("plate")})
+		,new CommandBinding({"control":this.getElement("plate_region")})
 		,new CommandBinding({"control":this.getElement("load_capacity")})
 		,new CommandBinding({"control":this.getElement("driver"),"fieldId":"driver_id"})
 		,new CommandBinding({"control":this.getElement("make")})

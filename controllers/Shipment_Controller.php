@@ -49,6 +49,7 @@ require_once(USER_CONTROLLERS_PATH.'ExcelTemplate_Controller.php');
 require_once(USER_CONTROLLERS_PATH.'Order_Controller.php');
 
 require_once(ABSOLUTE_PATH.'functions/checkPmPeriod.php');
+require_once(ABSOLUTE_PATH.'functions/ExtProg.php');
 
 class Shipment_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
@@ -650,6 +651,30 @@ class Shipment_Controller extends ControllerSQL{
 	
 		$opts['required']=TRUE;				
 		$pm->addParam(new FieldExtInt('id',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtBool('faksim',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('shipment_transp_nakl_all');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('id',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtBool('faksim',$opts));
 	
 			
 		$this->addPublicMethod($pm);
@@ -1993,14 +2018,217 @@ class Shipment_Controller extends ControllerSQL{
 		);
 	}
 
+	private function check_client_rekv($cl) {
+		if(!isset($cl["inn"]) || !isset($cl["address_fact"])
+			|| !isset($cl["name_full"])
+		){
+			//retrieve data from 1c
+			if(gettype($cl["ref_1c"]) == "string"){
+				$ref1c = json_decode($cl["ref_1c"], TRUE);
+			}else {
+				$ref1c = $cl["ref_1c"];
+			}
+			$resp = ExtProg::getClient($ref1c["keys"]["ref_1c"]);
+			$rows = $resp["models"]["Client1c_Model"]["rows"];
+			/* file_put_contents(OUTPUT_PATH."getClient.data", var_export($rows, true)); */
+			$this->getDbLinkMaster()->query(
+				sprintf(
+					"UPDATE clients 
+					SET
+						name_full = '%s',
+						address_fact = '%s',
+						address_legal = '%s',
+						inn = '%s',
+						kpp = '%s',
+						tels_1c = '%s'
+					WHERE id = %d"
+					,$rows["name_full"]
+					,$rows["address_fact"]
+					,$rows["address_legal"]
+					,$rows["inn"]
+					,$rows["kpp"]
+					,$rows["tels"]
+					,$cl["id"]
+				)
+			);
+		}
+	}
+
+	//all shipments, background operation 
+	//returns zip file name with all shipments
+	public function shipment_transp_nakl_all_operation($anyDocId){
+		$this->check_1c_attrs_for_tn($anyDocId);
+		$link = $this->getDbLink();
+		//all shipments of an order
+		$queryId = $link->query(
+			sprintf(
+				"SELECT
+					sh.id
+				FROM shipments AS sh
+				LEFT JOIN orders AS o ON o.id = sh.order_id
+				WHERE o.id = (SELECT order_id FROM shipments WHERE id = %d)"
+				,$anyDocId
+			)
+		);
+		$fileList = array();
+		$templateName = 'Транспортная накладная';
+		$erEmpty = 'Отгрузка не найдена!';
+		$zipFileName = OUTPUT_PATH. md5(uniqid()).'.zip';
+		$zip = new ZipArchive();
+		if ($zip->open($zipFileName, ZIPARCHIVE::CREATE)!==TRUE) {
+			throw new Exception("cannot open ".$zipFileName);
+		}
+
+		while($shAr = $link->fetch_array($queryId)){
+			$outFile = '';
+			$fileName = '';
+			ExcelTemplate_Controller::genFilledTemplate($link, $templateName, array($shAr["id"]), $erEmpty, $outFile, $fileName);		
+			$fileNameParts = pathinfo($fileName,  PATHINFO_EXTENSION);
+			$fileExt = '';
+			if(is_array($fileNameParts) && isset($fileNameParts['extension'])){
+				$fileExt = $fileNameParts['extension'];
+			}else if (gettype($fileNameParts) == "string"){
+				$fileExt = $fileNameParts;
+			}
+			if(!strlen($fileExt)){
+				$fileExt = '.xlsx';
+			}else if($fileExt[0] != '.'){
+				$fileExt = '.'.$fileExt;
+			}
+			$zip->addFile($outFile, $shAr["id"].'.xls');
+			array_push($fileList, $outFile);
+			usleep(500000);
+		}
+
+		$zip->close();
+
+		//delete files, as they are already in a zip
+		foreach($fileList as $fl){
+			unlink($fl);
+		}
+
+		return $zipFileName;
+	}
+
+	//all shipments
+	public function shipment_transp_nakl_all($pm){
+		$docId = $this->getExtDbVal($pm, 'id');
+		try{
+			$outFile = $this->shipment_transp_nakl_all_operation($docId);
+			$fileName = "ТН.zip";
+			$flMime = getMimeTypeOnExt($fileName);
+			ob_clean();
+			downloadFile(
+				$outFile,
+				$flMime,
+				'attachment;',
+				$fileName
+			);
+			
+			return TRUE;
+		}finally{
+			if(file_exists($outFile)){
+				unlink($outFile);
+			}
+		}
+	}
+
+	//one shipment
 	public function shipment_transp_nakl($pm){
+		$docId = $this->getExtDbVal($pm, 'id');
+		$this->check_1c_attrs_for_tn($docId);
+
 		return ExcelTemplate_Controller::downloadFilledTemplate(
 			$this->getDbLink()
 			,'Транспортная накладная'
-			,array($this->getExtDbVal($pm, 'id'))
+			,array($docId)
 			,'Отгрузка не найдена!'
 			,'Транспортная накладная'
 		);
+	}
+
+	public function check_1c_attrs_for_tn($docId){
+		//get client data from 1c
+		$link = $this->getDbLink();
+		$cl = $link->query_first(
+			sprintf(
+				"WITH 
+				data AS (SELECT 
+						o.client_id, 
+						o.id AS order_id,
+						sh.date_time::date AS ship_date,
+						(SELECT  
+							json_build_object(
+								'id', vh_cl.id,
+								'ref_1c', vh_cl.ref_1c,
+								'inn', vh_cl.inn,
+								'name_full', vh_cl.name_full,
+								'address_fact', vh_cl.address_fact
+							)
+						FROM vehicle_owners AS vh_own 
+						LEFT JOIN clients AS vh_cl ON vh_cl.id = vh_own.client_id
+						WHERE vh_own.id = wehicle_owner_last(vh.id)
+						) AS veh_owner_client
+					FROM shipments AS sh
+					LEFT JOIN orders AS o ON o.id = sh.order_id
+					LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+					LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+					WHERE sh.id = %d
+				)
+				SELECT 
+					cl.id,
+					cl.name,
+					cl.name_full,
+					cl.inn,
+					cl.kpp,
+					cl.ref_1c,
+					cl.address_fact,
+					(SELECT order_id FROM data) AS order_id,
+					(SELECT veh_owner_client FROM data) AS veh_owner_client,
+					(SELECT ship_date FROM data) AS ship_date,
+					(SELECT ref_1c FROM buh_docs WHERE order_id =(SELECT order_id FROM data)) AS doc_ref_1c
+				FROM clients AS cl
+				WHERE cl.id = (SELECT client_id FROM data)"
+				,$docId
+			)
+		);
+		if(!is_array($cl) || !count($cl)) {
+			throw new Exception(sprintf("document not found by id %d", $docId));
+		}
+		if(!isset($cl["ref_1c"])) {
+			throw new Exception(sprintf("Контрагент %s не связан с 1с", $cl["name"]));
+		}
+
+		$vehOwnerClient = json_decode($cl["veh_owner_client"], TRUE);
+		if(!isset($vehOwnerClient["ref_1c"])) {
+			throw new Exception(sprintf("Перевозчик %s не связан с 1с", $cl["name"]));
+		}
+
+		$this->check_client_rekv($cl);
+		$this->check_client_rekv($vehOwnerClient);
+
+		//documents: nakl, schet-faktura
+		if(!isset($cl["doc_ref_1c"]) ){
+			//retrieve data from 1c
+			$ref1c = json_decode($cl["ref_1c"], TRUE);
+			$resp = ExtProg::getShipment($ref1c["keys"]["ref_1c"], $cl["ship_date"]);
+			$rows = $resp["models"]["ShipmentDoc_Model"]["rows"];
+			/* file_put_contents(OUTPUT_PATH."getClient.data", var_export($rows, true)); */
+			$this->getDbLinkMaster()->query(
+				sprintf(
+					"INSERT INTO buh_docs (order_id, nomer, data, faktura_nomer, faktura_data, ref_1c) 
+					VALUES (
+						%d, '%s', '%s', '%s', '%s', '%s' 
+					)"
+					,$cl["order_id"]
+					,$rows["nomer"]
+					,$rows["data"]
+					,$rows["faktura_nomer"]
+					,$rows["faktura_data"]
+					,$rows["ref_1c"]
+				)
+			);
+		}
 	}
 		
 	public function shipment_ttn($pm){

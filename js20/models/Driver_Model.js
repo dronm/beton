@@ -73,6 +73,15 @@ function Driver_Model(options){
 	
 	options.fields.employed = new FieldBool("employed",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Person inn';
+	filed_options.autoInc = false;	
+	
+	options.fields.inn = new FieldText("inn",filed_options);
+	
 			
 		Driver_Model.superclass.constructor.call(this,id,options);
 }

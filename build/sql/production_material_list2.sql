@@ -59,6 +59,7 @@ CREATE OR REPLACE VIEW production_material_list AS
 	
 		,CASE
 			WHEN mat.id IS NULL THEN FALSE
+			WHEN t.raw_material_id IS NULL AND coalesce(ra_mat.quant,0) = 0 THEN FALSE --no fact, and no norm(quant=0)
 			WHEN t.raw_material_id IS NULL THEN TRUE --no fact
 			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN TRUE
 			ELSE
@@ -128,7 +129,8 @@ CREATE OR REPLACE VIEW production_material_list AS
 		
 		,CASE
 			WHEN mat.id IS NULL THEN FALSE
-			WHEN t.raw_material_id IS NULL THEN TRUE --no fact
+			WHEN t.raw_material_id IS NULL AND coalesce(ra_mat.quant,0) = 0 THEN FALSE --no fact, and no norm(quant=0)
+			WHEN t.raw_material_id IS NULL THEN TRUE --no fact, norm exists
 			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN TRUE
 			ELSE
 				coalesce(
@@ -196,5 +198,4 @@ CREATE OR REPLACE VIEW production_material_list AS
 			
 	;
 	
-ALTER VIEW production_material_list OWNER TO ;
 

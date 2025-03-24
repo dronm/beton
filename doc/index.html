@@ -242,6 +242,7 @@
 <li><a href="#ProductionBase_Model">ProductionBase_Model</a></li>
 <li><a href="#ProductionBaseList_Model">ProductionBaseList_Model</a></li>
 <li><a href="#ProductionSite_Model">ProductionSite_Model</a></li>
+<li><a href="#ProductionSiteDialog_Model">ProductionSiteDialog_Model</a></li>
 <li><a href="#ProductionSiteList_Model">ProductionSiteList_Model</a></li>
 <li><a href="#ProductionSiteForEditList_Model">ProductionSiteForEditList_Model</a></li>
 <li><a href="#Shipment_Model">Shipment_Model</a></li>
@@ -503,6 +504,7 @@
 <li><a href="#UserChatLastOpen_Model">UserChatLastOpen_Model</a></li>
 <li><a href="#UserChatMessageView_Model">UserChatMessageView_Model</a></li>
 <li><a href="#ShipmentMediaList_Model">ShipmentMediaList_Model</a></li>
+<li><a href="#BuhDoc_Model">BuhDoc_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -3604,6 +3606,7 @@
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_ttn</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_putevoi_list</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_transp_nakl</h2>
+<a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_transp_nakl_all</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>get_time_list</h2>
 <a href="#ShipmentTimeList_Model">Model: ShipmentTimeList_Model</a><h2>set_blanks_exist</h2>
 <p>Arguments:</p>
@@ -5991,6 +5994,48 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="BuhDoc_Model" class="content_box">
+<h1>BuhDoc_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>order_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>nomer</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>data</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>fakture_nomer</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>faktura_data</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:36</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="BuhRBP1cList_Model" class="content_box">
 <h1>BuhRBP1cList_Model</h1>
 <div class="content_item">
@@ -6506,6 +6551,18 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>address_fact</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>tels_1c</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>user_id</h2>
 <div>Type:Int</div>
 <div>Primary key:</div>
@@ -6879,6 +6936,12 @@
 <div>Length:10</div>
 <div>Precision:</div>
 <h2>address_legal</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>address_fact</h2>
 <div>Type:Text</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -9314,6 +9377,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>inn</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="DriverList_Model" class="content_box">
@@ -9358,6 +9427,12 @@
 <div>Precision:</div>
 <h2>employed</h2>
 <div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>inn</h2>
+<div>Type:Text</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -9539,11 +9614,23 @@
 <h2>employed</h2>
 <div>Type:Bool</div>
 <div>Primary key:</div>
-<div>Required:TRUE</div>
+<div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
 <h2>user_id</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>inn</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>post</h2>
+<div>Type:Text</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -9569,11 +9656,23 @@
 <h2>employed</h2>
 <div>Type:Bool</div>
 <div>Primary key:</div>
-<div>Required:TRUE</div>
+<div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
 <h2>users_ref</h2>
 <div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>inn</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>post</h2>
+<div>Type:Text</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -15329,6 +15428,84 @@
 <div>Precision:</div>
 <h2>production_base_id</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>dispatcher_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ProductionSiteDialog_Model" class="content_box">
+<h1>ProductionSiteDialog_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:100</div>
+<div>Precision:</div>
+<h2>elkon_connection</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>elkon_params</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>active</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>last_elkon_production_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>missing_elkon_production_ids</h2>
+<div>Type:Array</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destination_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_plant_type</h2>
+<div>Type:Enum</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_base_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>dispatchers_ref</h2>
+<div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -22719,6 +22896,12 @@
 <div>Required:TRUE</div>
 <div>Length:6</div>
 <div>Precision:</div>
+<h2>plate_region</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:3</div>
+<div>Precision:</div>
 <h2>plate_n</h2>
 <div>Type:Int</div>
 <div>Primary key:</div>
@@ -22856,6 +23039,12 @@
 <div>Primary key:</div>
 <div>Required:TRUE</div>
 <div>Length:6</div>
+<div>Precision:</div>
+<h2>plate_region</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:3</div>
 <div>Precision:</div>
 <h2>load_capacity</h2>
 <div>Type:Float</div>

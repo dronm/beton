@@ -42,14 +42,22 @@ class Employee_Controller extends ControllerSQL{
 		$pm->addParam($param);
 		
 			$f_params = array();
-			
-				$f_params['required']=TRUE;
 			$param = new FieldExtBool('employed'
 				,$f_params);
 		$pm->addParam($param);
 		
 			$f_params = array();
 			$param = new FieldExtInt('user_id'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtText('inn'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtText('post'
 				,$f_params);
 		$pm->addParam($param);
 		
@@ -91,6 +99,16 @@ class Employee_Controller extends ControllerSQL{
 		
 			$f_params=array();
 			$param = new FieldExtInt('user_id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtText('inn'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtText('post'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -187,7 +205,7 @@ class Employee_Controller extends ControllerSQL{
 		$this->addPublicMethod($pm);
 
 		
-	}	
+	}
 	
 	public function set_work_schedule_hour($pm){
 		$par = new ParamsSQL($pm,$this->getDbLink());				

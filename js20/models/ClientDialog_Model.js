@@ -186,6 +186,15 @@ function ClientDialog_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.address_fact = new FieldText("address_fact",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.ref_1c = new FieldString("ref_1c",filed_options);
 	
 				

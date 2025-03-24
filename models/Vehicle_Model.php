@@ -48,6 +48,17 @@ class Vehicle_Model extends ModelSQLBeton{
 		$this->addField($f_plate);
 		//********************
 		
+		//*** Field plate_region ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Регин номера';
+		$f_opts['length']=3;
+		$f_opts['id']="plate_region";
+						
+		$f_plate_region=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"plate_region",$f_opts);
+		$this->addField($f_plate_region);
+		//********************
+		
 		//*** Field plate_n ***
 		$f_opts = array();
 		

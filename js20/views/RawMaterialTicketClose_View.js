@@ -40,23 +40,27 @@ function RawMaterialTicketClose_View(id,options){
 	
 		var model = options.listView? options.model : ((options.models&&options.models.RawMaterialTicketCarrierAggList_Model)? options.models.RawMaterialTicketCarrierAggList_Model : new RawMaterialTicketCarrierAggList_Model());
 		
-		var constants, contr;
+		let constants, contr;
 		if(!options.listView){
 			constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 			window.getApp().getConstantManager().get(constants);
-			contr = new RawMaterialTicket_Controller();		
 		}
+		contr = new RawMaterialTicket_Controller();		
 		
 		window.getApp().getConstantManager().get(constants);		
 		this.addElement(new GridAjx(id+":grid",{
 			"model":model,
 			"attrs":{"style":"width:100%;"},
-			"className": options.listView? OrderMakeList_View.prototype.TABLE_CLASS : null,
-			"readPublicMethod": options.listView? null : contr.gePublicMethod("get_carrier_agg_list"),
+			//"className": options.listView? OrderMakeList_View.prototype.TABLE_CLASS : null,
+			// "readPublicMethod": options.listView? null : contr.gePublicMethod("get_carrier_agg_list"),
+			"readPublicMethod": contr.getPublicMethod("get_carrier_agg_list"),
 			"controller": contr,
 			"editInline":true,
 			"editWinClass":null,		
-			"commands": null, //new GridCmdContainerAjx(id+":grid:cmd"),//
+			"commands": new GridCmdContainerAjx(id+":grid:cmd", {
+				"cmdInsert": false,
+				"cmdAllCommands": false
+			}),//
 			"popUpMenu":null,
 			"head":new GridHead(id+"-grid:head",{
 				"elements":[
@@ -66,25 +70,34 @@ function RawMaterialTicketClose_View(id,options){
 								"value":"Перевозчик",
 								"columns":[
 									new GridColumnRef({
-										"field":model.getField("carriers_ref")
+										"field":model.getField("carriers_ref"),
+										"ctrlBindFieldId": "carrier_id",
+										"ctrlClass": SupplierEdit
 									})
-								]
+								],
+								"sortable":true
 							})
 							,new GridCellHead(id+":grid:head:raw_materials_ref",{
 								"value":"Материал",
 								"columns":[
 									new GridColumnRef({
-										"field":model.getField("raw_materials_ref")
+										"field":model.getField("raw_materials_ref"),
+										"ctrlBindFieldId": "raw_material_id",
+										"ctrlClass": MaterialSelect
 									})
-								]
+								],
+								"sortable":true
 							})
 							,new GridCellHead(id+":grid:head:quarries_ref",{
 								"value":"Карьер",
 								"columns":[
 									new GridColumnRef({
-										"field":model.getField("quarries_ref")
+										"field":model.getField("quarries_ref"),
+										"ctrlBindFieldId": "quarry_id",
+										"ctrlClass": QuarryEdit
 									})
-								]
+								],
+								"sortable":true
 							})
 							,new GridCellHead(id+":grid:head:ticket_count",{
 								"value":"Количество",

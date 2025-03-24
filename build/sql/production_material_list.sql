@@ -9,7 +9,7 @@
 -- 25/11/24
 -- ***********************************
 
-
+/*
 CREATE OR REPLACE VIEW production_material_list AS
 	
 	SELECT
@@ -198,6 +198,7 @@ CREATE OR REPLACE VIEW production_material_list AS
 		mat.ord
 			
 	;
+*/
 	
 ALTER VIEW production_material_list OWNER TO ;
 

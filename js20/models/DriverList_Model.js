@@ -91,6 +91,15 @@ function DriverList_Model(options){
 	
 	options.fields.employed = new FieldBool("employed",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'ИНН водителя';
+	filed_options.autoInc = false;	
+	
+	options.fields.inn = new FieldText("inn",filed_options);
+	
 		DriverList_Model.superclass.constructor.call(this,id,options);
 }
 extend(DriverList_Model,ModelXML);

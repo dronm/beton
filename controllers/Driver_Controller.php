@@ -62,6 +62,13 @@ class Driver_Controller extends ControllerSQL{
 				,$f_params);
 		$pm->addParam($param);
 		
+			$f_params = array();
+			
+				$f_params['alias']='Person inn';
+			$param = new FieldExtText('inn'
+				,$f_params);
+		$pm->addParam($param);
+		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		//default event
@@ -115,6 +122,13 @@ class Driver_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Официально устроен';
 			$param = new FieldExtBool('employed'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Person inn';
+			$param = new FieldExtText('inn'
 				,$f_params);
 			$pm->addParam($param);
 		

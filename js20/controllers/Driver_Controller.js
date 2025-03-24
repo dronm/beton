@@ -70,6 +70,12 @@ extend(Driver_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Person inn";
+	var field = new FieldText("inn",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -109,6 +115,12 @@ extend(Driver_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Официально устроен";
 	var field = new FieldBool("employed",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Person inn";
+	var field = new FieldText("inn",options);
 	
 	pm.addField(field);
 	
@@ -162,6 +174,9 @@ extend(Driver_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Официально устроен";
 	pm.addField(new FieldBool("employed",f_opts));
+	var f_opts = {};
+	f_opts.alias = "ИНН водителя";
+	pm.addField(new FieldText("inn",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");
 	
 }

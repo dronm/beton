@@ -99,6 +99,11 @@ function ClientDialog_View(id,options){
 			"placeholder":"Юридический адрес организации/предпринимателя"
 		}));		
 		
+		this.addElement(new EditString(id+":address_fact",{ "labelCaption":"Адрес:",
+			"maxLength":"500",
+			"title":"Фактический адрес организации/предпринимателя",
+			"placeholder":"Фактический адрес организации/предпринимателя"
+		}));		
 		this.addElement(new UserEditRef(id+":accounts_ref",{
 			"labelCaption":"Аккаунт:"
 		}));	
@@ -142,6 +147,8 @@ function ClientDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("client_come_from"),"fieldId":"client_come_from_ref"})
 		,new DataBinding({"control":this.getElement("client_type"),"fieldId":"client_types_ref"})
 		,new DataBinding({"control":this.getElement("inn")})
+		,new DataBinding({"control":this.getElement("address_legal")})
+		,new DataBinding({"control":this.getElement("address_fact")})
 		,new DataBinding({"control":this.getElement("account_from_date")})
 		,new DataBinding({"control":this.getElement("bank_account")})
 		,new DataBinding({"control":this.getElement("banks_ref"),"fieldId":"banks_ref"})
@@ -161,6 +168,8 @@ function ClientDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("client_come_from"),"fieldId":"client_come_from_id"})
 		,new CommandBinding({"control":this.getElement("client_type"),"fieldId":"client_type_id"})
 		,new CommandBinding({"control":this.getElement("inn")})
+		,new CommandBinding({"control":this.getElement("address_legal")})
+		,new CommandBinding({"control":this.getElement("address_fact")})
 		,new CommandBinding({"control":this.getElement("account_from_date")})
 		,new CommandBinding({"control":this.getElement("bank_account")})
 		,new CommandBinding({"control":this.getElement("banks_ref"),"fieldId":"bank_bik"})

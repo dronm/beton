@@ -1511,6 +1511,13 @@ LEFT OLD VERSION!!!
 - Silo picture in mobile version
 
 
+1.00366
+1) Rollup equal materials on main page. mat_total.sql
+2) OrderMakeForWeighingList_View totals 
+	tmpl/OrderMakeForWeighingList.html
+	RawMaterialTicketClose_View.js
+3) drivers new field inn
+4) employees new field inn
 
 
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели

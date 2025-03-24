@@ -16,24 +16,20 @@
  * @param {Object} options
  */
 
-function EmployeeList_Model(options){
-	var id = 'EmployeeList_Model';
+function BuhDoc_Model(options){
+	var id = 'BuhDoc_Model';
 	options = options || {};
 	
 	options.fields = {};
 	
-			
-				
-			
 				
 	
 	var filed_options = {};
 	filed_options.primaryKey = true;	
 	
-	filed_options.autoInc = true;	
+	filed_options.autoInc = false;	
 	
-	options.fields.id = new FieldInt("id",filed_options);
-	options.fields.id.getValidator().setRequired(true);
+	options.fields.order_id = new FieldInt("order_id",filed_options);
 	
 				
 	
@@ -42,9 +38,7 @@ function EmployeeList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.name = new FieldString("name",filed_options);
-	options.fields.name.getValidator().setRequired(true);
-	options.fields.name.getValidator().setMaxLength('80');
+	options.fields.nomer = new FieldText("nomer",filed_options);
 	
 				
 	
@@ -53,7 +47,7 @@ function EmployeeList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.employed = new FieldBool("employed",filed_options);
+	options.fields.date = new FieldDateTime("date",filed_options);
 	
 				
 	
@@ -62,27 +56,10 @@ function EmployeeList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.users_ref = new FieldJSON("users_ref",filed_options);
+	options.fields.ref_1c = new FieldString("ref_1c",filed_options);
+	options.fields.ref_1c.getValidator().setMaxLength('36');
 	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.inn = new FieldText("inn",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.post = new FieldText("post",filed_options);
-	
-		EmployeeList_Model.superclass.constructor.call(this,id,options);
+		BuhDoc_Model.superclass.constructor.call(this,id,options);
 }
-extend(EmployeeList_Model,ModelXML);
+extend(BuhDoc_Model,ModelXML);
 

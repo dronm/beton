@@ -115,6 +115,16 @@ class ProductionSite_Model extends ModelSQLBeton{
 		$f_production_base_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_base_id",$f_opts);
 		$this->addField($f_production_base_id);
 		//********************
+		
+		//*** Field dispatcher_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Диспетчер (ТТН)';
+		$f_opts['id']="dispatcher_id";
+						
+		$f_dispatcher_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"dispatcher_id",$f_opts);
+		$this->addField($f_dispatcher_id);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

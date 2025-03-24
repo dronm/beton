@@ -99,7 +99,18 @@ function EmployeeList_View(id,options){
 								})
 							]
 						})								
-						
+						,new GridCellHead(id+":grid:head:post",{
+							"value":"Должность",
+							"columns":[
+								new GridColumn({"field":model.getField("post")})
+							]
+						})
+						,new GridCellHead(id+":grid:head:inn",{
+							"value":"ИНН",
+							"columns":[
+								new GridColumn({"field":model.getField("inn")})
+							]
+						})
 					]
 				})
 			]

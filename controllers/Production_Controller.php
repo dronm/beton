@@ -780,9 +780,13 @@ UPDATE public.production_sites
 		
 		$q_del_head = "DELETE FROM productions WHERE ";				
 		$q_del_body = '';
+
+		$queryCount = 0;
+		$maxQueryCount = 10;
 		
 		$max_production_id = 0;
 		foreach($productionsData as $production_data){
+			echo "working on a production ID:".$production_data["id"].PHP_EOL;
 		
 			$id_db = 0;
 			FieldSQLInt::formatForDb($production_data['id'],$id_db);
@@ -847,34 +851,86 @@ UPDATE public.production_sites
 			if($max_production_id < $id_db){
 				$max_production_id = $id_db;
 			}
-		}
-		if(strlen($q_body)){
-			try{
-				$this->log_action($productionSiteId,'Выполнение запроса по вставке нового производства: '.$q_head.' '.$q_body,self::LOG_LEVEL_DEBUG,$elkonLogLevel);	
-				
-				$this->getDbLinkMaster()->query('BEGIN');						
-				$this->getDbLinkMaster()->query($q_del_head.' '.$q_del_body);
-				$this->getDbLinkMaster()->query($q_head.' '.$q_body);				
 
-				if($updateLastProduction){			
-					$this->getDbLinkMaster()->query(sprintf(
-						'UPDATE production_sites
-						SET last_elkon_production_id=%d
-						WHERE id=%d',
-						$max_production_id,
-						$productionSiteId
-					));
-				}
-				$this->getDbLinkMaster()->query('COMMIT');
+			$queryCount++;
+			if($queryCount >= $maxQueryCount){
+				$params = [
+					"q_head" => $q_head,
+					"q_body" => $q_body,
+					"q_del_head" => $q_del_head,
+					"q_del_body" => $q_del_body,
+					"max_production_id" => $max_production_id,
+					"productionSiteId" => $productionSiteId,
+					"elkonLogLevel" => $elkonLogLevel,
+					"updateLastProduction" => $updateLastProduction
+				];
+				$this->execute_query_from_elkon($params);
+				$q_body = '';
+				$q_del_body = '';
+				$queryCount = 0;
 			}
-			catch(Exception $e){
-				$this->getDbLinkMaster()->query('ROLLBACK');
-				
-				throw $e;
-			}
+			usleep(100000);
 		}
-	
-	
+
+		if(strlen($q_body)){
+			$params = [
+				"q_head" => $q_head,
+				"q_body" => $q_body,
+				"q_del_head" => $q_del_head,
+				"q_del_body" => $q_del_body,
+				"max_production_id" => $max_production_id,
+				"productionSiteId" => $productionSiteId,
+				"elkonLogLevel" => $elkonLogLevel,
+				"updateLastProduction" => $updateLastProduction
+			];
+			$this->execute_query_from_elkon($params);
+		}
+
+		
+	}
+
+	public function execute_query_from_elkon($params){
+		$q_head = $params["q_head"];
+		$q_body = $params["q_body"];
+		$elkonLogLevel = $params["elkonLogLevel"];
+		$q_del_head = $params["q_del_head"];
+		$q_del_body = $params["q_del_body"];
+		$max_production_id = $params["max_production_id"];
+		$productionSiteId = $params["productionSiteId"];
+		$updateLastProduction = $params["updateLastProduction"];
+
+		//pg settings for bot
+
+		$this->getDbLinkMaster()->query("SET work_mem = '16MB'");						
+
+		//increase these values to make PostgreSQL prefer less CPU-intensive plans
+		$this->getDbLinkMaster()->query("SET cpu_tuple_cost = 0.1");						
+		$this->getDbLinkMaster()->query("SET cpu_index_tuple_cost = 0.1");						
+
+		$this->getDbLinkMaster()->query("SET statement_timeout = '10min'");						
+
+		try{
+			$this->log_action($productionSiteId,'Выполнение запроса по вставке нового производства: '.$q_head.' '.$q_body, self::LOG_LEVEL_DEBUG,$elkonLogLevel);	
+			$this->getDbLinkMaster()->query('BEGIN');						
+			$this->getDbLinkMaster()->query($q_del_head.' '.$q_del_body);
+			$this->getDbLinkMaster()->query($q_head.' '.$q_body);				
+
+			if($updateLastProduction){			
+				$this->getDbLinkMaster()->query(sprintf(
+					'UPDATE production_sites
+					SET last_elkon_production_id=%d
+					WHERE id=%d',
+					$max_production_id,
+					$productionSiteId
+				));
+			}
+			$this->getDbLinkMaster()->query('COMMIT');
+		}
+		catch(Exception $e){
+			$this->getDbLinkMaster()->query('ROLLBACK');
+			
+			throw $e;
+		}
 	}
 	
 	public function check_production_by_id($productionSiteId, $productionId){
@@ -982,6 +1038,7 @@ UPDATE public.production_sites
 						
 						$material_data = $this->elkon_get_materials_on_closed_production($serv['id'],$elkon_con,$production_id);
 						if(is_array($material_data) && count($material_data)){
+							echo "closing production ".$production_id.PHP_EOL;
 							$this->log_action($serv['id'],'Закрываем производство: '.$production_id,self::LOG_LEVEL_DEBUG,$elkon_con->logLevel);	
 						
 							/*
@@ -1359,8 +1416,8 @@ UPDATE public.production_sites
 									throw $e;
 								}
 							}
-						}					
-						sleep(1);
+						}
+						usleep(100000); //
 					}
 				}
 				
@@ -1370,6 +1427,8 @@ UPDATE public.production_sites
 				
 				//Получение новых производств
 				$productions_data = $this->elkon_get_next_productions($serv['id'],$elkon_con,$max_production_id);
+				echo 'Got elkon data, production count:'.count($productions_data).' for ID:'.$serv['id'].PHP_EOL;
+
 				$this->insert_elkon_productions($serv['id'],$productions_data,$elkon_con->logLevel,TRUE);
 				
 				//Дырки в производствах
@@ -1377,9 +1436,10 @@ UPDATE public.production_sites
 					$missing_elkon_production_ids_s = substr($serv['missing_elkon_production_ids'],1,strlen($serv['missing_elkon_production_ids'])-2);
 					$missing_elkon_production_ids = explode(',',$missing_elkon_production_ids_s);
 					foreach($missing_elkon_production_ids as $missing_elkon_production_id){
+						//getting one production at a time
 						$productions_data = $this->elkon_get_production_by_id($serv['id'], $elkon_con,$missing_elkon_production_id);
 						$this->insert_elkon_productions($serv['id'],$productions_data,$elkon_con->logLevel,FALSE);
-						
+						usleep(500000);
 					}
 				}
 				

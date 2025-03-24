@@ -117,6 +117,15 @@ function ProductionSite_Model(options){
 	
 	options.fields.production_base_id = new FieldInt("production_base_id",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Диспетчер (ТТН)';
+	filed_options.autoInc = false;	
+	
+	options.fields.dispatcher_id = new FieldInt("dispatcher_id",filed_options);
+	
 		ProductionSite_Model.superclass.constructor.call(this,id,options);
 }
 extend(ProductionSite_Model,ModelXML);

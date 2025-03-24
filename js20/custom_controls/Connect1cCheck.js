@@ -31,6 +31,7 @@ extend(Connect1cCheck,Control);
 
 /* Constants */
 Connect1cCheck.prototype.DEF_REFRESH = 1*60;//every 1 minute
+Connect1cCheck.prototype.DEF_REFRESH_AJX = 10*60;//every 10 minute
 Connect1cCheck.prototype.m_lastValue;
 Connect1cCheck.prototype.PIC_OK = "./img/dot_green.png";
 Connect1cCheck.prototype.PIC_ERR = "./img/dot_red.png";
@@ -75,8 +76,10 @@ Connect1cCheck.prototype.toDOM = function(p){
 				self.setRefreshInterval(0);
 			}
 		};
+		this.setRefreshInterval(this.DEF_REFRESH * 1000);
+	}else{
+		this.setRefreshInterval(this.DEF_REFRESH_AJX * 1000);
 	}
-	this.setRefreshInterval(this.DEF_REFRESH * 1000);
 
 	Connect1cCheck.superclass.toDOM.call(this,p);
 

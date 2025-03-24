@@ -41193,3 +41193,6214 @@ CREATE OR REPLACE VIEW transp_nakl AS
 	;
 	
 ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 13/03/2025 10:02:54 ******************
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+	v_is_cement bool;
+	v_dif_store bool;
+	v_production_base_id int;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+
+		RETURN NEW;
+
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
+
+		-- IF v_is_cement THEN
+		-- 	--ЦЕМЕНТ
+		-- 	RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
+
+		--ELSIF v_dif_store AND NEW.production_site_id IS NULL THEN
+		--	RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+
+		IF NEW.production_site_id IS NULL THEN
+			RAISE EXCEPTION 'Укажите завод!';
+		END IF;
+
+		SELECT
+			production_base_id
+		INTO
+			v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+
+		IF v_dif_store AND v_is_cement = FALSE THEN --Добавка
+			--different query
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time, ARRAY[NEW.production_site_id],ARRAY[NEW.material_id])),0);
+		ELSE
+			-- завод не учитывается!!!
+			-- только база
+			add_quant = coalesce(
+				(SELECT quant FROM rg_material_facts_balance(
+					ra_date_time,
+					ARRAY[v_production_base_id],
+					'{}',
+					ARRAY[NEW.material_id])
+				)
+			,0);
+		END IF;
+		add_quant = add_quant - NEW.required_balance_quant;
+
+		--RAISE EXCEPTION 'BALANCE=%',add_quant;
+		IF add_quant <> 0 THEN
+			--RAISE EXCEPTION 'add_quant=%',add_quant;
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.production_site_id	= CASE WHEN v_dif_store THEN NEW.production_site_id ELSE NULL END;
+			reg_material_facts.production_base_id	= v_production_base_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
+
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+
+		RETURN NEW;
+
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		ELSE
+			--Event support
+			PERFORM pg_notify(
+					'RAMaterialFact.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',OLD.date_time::date
+					)
+				)::text
+			);		
+		END IF;
+
+		RETURN OLD;
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+-- ******************* update 13/03/2025 10:10:31 ******************
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+	v_is_cement bool;
+	v_dif_store bool;
+	v_production_base_id int;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+
+		RETURN NEW;
+
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
+
+		-- IF v_is_cement THEN
+		-- 	--ЦЕМЕНТ
+		-- 	RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
+
+		--ELSIF v_dif_store AND NEW.production_site_id IS NULL THEN
+		--	RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+
+		IF NEW.production_site_id IS NULL THEN
+			RAISE EXCEPTION 'Укажите завод!';
+		END IF;
+
+		SELECT
+			production_base_id
+		INTO
+			v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+
+		IF v_dif_store AND v_is_cement = FALSE THEN --Добавка
+			--different query
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time, ARRAY[NEW.production_site_id],ARRAY[NEW.material_id])),0);
+		ELSE
+			-- завод не учитывается!!!
+			-- только база
+			add_quant = coalesce(
+				(SELECT quant FROM rg_material_facts_balance(
+					ra_date_time,
+					ARRAY[v_production_base_id],
+					'{}',
+					ARRAY[NEW.material_id])
+				)
+			,0);
+		END IF;
+		add_quant = add_quant - NEW.required_balance_quant;
+
+		RAISE EXCEPTION 'BALANCE=%',add_quant;
+		IF add_quant <> 0 THEN
+			--RAISE EXCEPTION 'add_quant=%',add_quant;
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.production_site_id	= CASE WHEN v_dif_store THEN NEW.production_site_id ELSE NULL END;
+			reg_material_facts.production_base_id	= v_production_base_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
+
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+
+		RETURN NEW;
+
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		ELSE
+			--Event support
+			PERFORM pg_notify(
+					'RAMaterialFact.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',OLD.date_time::date
+					)
+				)::text
+			);		
+		END IF;
+
+		RETURN OLD;
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+-- ******************* update 13/03/2025 10:13:12 ******************
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+	v_is_cement bool;
+	v_dif_store bool;
+	v_production_base_id int;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+
+		RETURN NEW;
+
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
+
+		-- IF v_is_cement THEN
+		-- 	--ЦЕМЕНТ
+		-- 	RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
+
+		--ELSIF v_dif_store AND NEW.production_site_id IS NULL THEN
+		--	RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+RAISE EXCEPTION 'v_is_cement=%, dif_store=%',v_is_cement,dif_store;
+		IF NEW.production_site_id IS NULL THEN
+			RAISE EXCEPTION 'Укажите завод!';
+		END IF;
+
+		SELECT
+			production_base_id
+		INTO
+			v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+
+		IF v_dif_store AND v_is_cement = FALSE THEN --Добавка
+			--different query
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time, ARRAY[NEW.production_site_id],ARRAY[NEW.material_id])),0);
+		ELSE
+			-- завод не учитывается!!!
+			-- только база
+			add_quant = coalesce(
+				(SELECT quant FROM rg_material_facts_balance(
+					ra_date_time,
+					ARRAY[v_production_base_id],
+					'{}',
+					ARRAY[NEW.material_id])
+				)
+			,0);
+		END IF;
+		add_quant = add_quant - NEW.required_balance_quant;
+
+		RAISE EXCEPTION 'BALANCE=%',add_quant;
+		IF add_quant <> 0 THEN
+			--RAISE EXCEPTION 'add_quant=%',add_quant;
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.production_site_id	= CASE WHEN v_dif_store THEN NEW.production_site_id ELSE NULL END;
+			reg_material_facts.production_base_id	= v_production_base_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
+
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+
+		RETURN NEW;
+
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		ELSE
+			--Event support
+			PERFORM pg_notify(
+					'RAMaterialFact.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',OLD.date_time::date
+					)
+				)::text
+			);		
+		END IF;
+
+		RETURN OLD;
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+-- ******************* update 13/03/2025 10:13:18 ******************
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+	v_is_cement bool;
+	v_dif_store bool;
+	v_production_base_id int;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+
+		RETURN NEW;
+
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
+
+		-- IF v_is_cement THEN
+		-- 	--ЦЕМЕНТ
+		-- 	RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
+
+		--ELSIF v_dif_store AND NEW.production_site_id IS NULL THEN
+		--	RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+RAISE EXCEPTION 'v_is_cement=%, dif_store=%',v_is_cement,dif_store;
+		IF NEW.production_site_id IS NULL THEN
+			RAISE EXCEPTION 'Укажите завод!';
+		END IF;
+
+		SELECT
+			production_base_id
+		INTO
+			v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+
+		IF v_dif_store AND v_is_cement = FALSE THEN --Добавка
+			--different query
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time, ARRAY[NEW.production_site_id],ARRAY[NEW.material_id])),0);
+		ELSE
+			-- завод не учитывается!!!
+			-- только база
+			add_quant = coalesce(
+				(SELECT quant FROM rg_material_facts_balance(
+					ra_date_time,
+					ARRAY[v_production_base_id],
+					'{}',
+					ARRAY[NEW.material_id])
+				)
+			,0);
+		END IF;
+		add_quant = add_quant - NEW.required_balance_quant;
+
+		RAISE EXCEPTION 'BALANCE=%',add_quant;
+		IF add_quant <> 0 THEN
+			--RAISE EXCEPTION 'add_quant=%',add_quant;
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.production_site_id	= CASE WHEN v_dif_store THEN NEW.production_site_id ELSE NULL END;
+			reg_material_facts.production_base_id	= v_production_base_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
+
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+
+		RETURN NEW;
+
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		ELSE
+			--Event support
+			PERFORM pg_notify(
+					'RAMaterialFact.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',OLD.date_time::date
+					)
+				)::text
+			);		
+		END IF;
+
+		RETURN OLD;
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+-- ******************* update 13/03/2025 10:13:37 ******************
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+	v_is_cement bool;
+	v_dif_store bool;
+	v_production_base_id int;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+
+		RETURN NEW;
+
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
+
+		-- IF v_is_cement THEN
+		-- 	--ЦЕМЕНТ
+		-- 	RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
+
+		--ELSIF v_dif_store AND NEW.production_site_id IS NULL THEN
+		--	RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+RAISE EXCEPTION 'v_is_cement=%, dif_store=%',v_is_cement,dif_store;
+		IF NEW.production_site_id IS NULL THEN
+			RAISE EXCEPTION 'Укажите завод!';
+		END IF;
+
+		SELECT
+			production_base_id
+		INTO
+			v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+
+		IF v_dif_store AND v_is_cement = FALSE THEN --Добавка
+			--different query
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time, ARRAY[NEW.production_site_id],ARRAY[NEW.material_id])),0);
+		ELSE
+			-- завод не учитывается!!!
+			-- только база
+			add_quant = coalesce(
+				(SELECT quant FROM rg_material_facts_balance(
+					ra_date_time,
+					ARRAY[v_production_base_id],
+					'{}',
+					ARRAY[NEW.material_id])
+				)
+			,0);
+		END IF;
+		add_quant = add_quant - NEW.required_balance_quant;
+
+		RAISE EXCEPTION 'BALANCE=%',add_quant;
+		IF add_quant <> 0 THEN
+			--RAISE EXCEPTION 'add_quant=%',add_quant;
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.production_site_id	= CASE WHEN v_dif_store THEN NEW.production_site_id ELSE NULL END;
+			reg_material_facts.production_base_id	= v_production_base_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
+
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+
+		RETURN NEW;
+
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		ELSE
+			--Event support
+			PERFORM pg_notify(
+					'RAMaterialFact.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',OLD.date_time::date
+					)
+				)::text
+			);		
+		END IF;
+
+		RETURN OLD;
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+-- ******************* update 13/03/2025 10:14:13 ******************
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+	v_is_cement bool;
+	v_dif_store bool;
+	v_production_base_id int;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+
+		RETURN NEW;
+
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
+
+		-- IF v_is_cement THEN
+		-- 	--ЦЕМЕНТ
+		-- 	RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
+
+		--ELSIF v_dif_store AND NEW.production_site_id IS NULL THEN
+		--	RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+RAISE EXCEPTION 'v_is_cement=%, dif_store=%',v_is_cement,dif_store;
+		IF NEW.production_site_id IS NULL THEN
+			RAISE EXCEPTION 'Укажите завод!';
+		END IF;
+
+		SELECT
+			production_base_id
+		INTO
+			v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+
+		IF v_dif_store AND v_is_cement = FALSE THEN --Добавка
+			--different query
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time, ARRAY[NEW.production_site_id],ARRAY[NEW.material_id])),0);
+		ELSE
+			-- завод не учитывается!!!
+			-- только база
+			add_quant = coalesce(
+				(SELECT quant FROM rg_material_facts_balance(
+					ra_date_time,
+					ARRAY[v_production_base_id],
+					'{}',
+					ARRAY[NEW.material_id])
+				)
+			,0);
+		END IF;
+		add_quant = add_quant - NEW.required_balance_quant;
+
+		RAISE EXCEPTION 'BALANCE=%',add_quant;
+		IF add_quant <> 0 THEN
+			--RAISE EXCEPTION 'add_quant=%',add_quant;
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.production_site_id	= CASE WHEN v_dif_store THEN NEW.production_site_id ELSE NULL END;
+			reg_material_facts.production_base_id	= v_production_base_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
+
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+
+		RETURN NEW;
+
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		ELSE
+			--Event support
+			PERFORM pg_notify(
+					'RAMaterialFact.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',OLD.date_time::date
+					)
+				)::text
+			);		
+		END IF;
+
+		RETURN OLD;
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+-- ******************* update 13/03/2025 10:15:34 ******************
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+	v_is_cement bool;
+	v_dif_store bool;
+	v_production_base_id int;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+
+		RETURN NEW;
+
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
+
+		-- IF v_is_cement THEN
+		-- 	--ЦЕМЕНТ
+		-- 	RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
+
+		--ELSIF v_dif_store AND NEW.production_site_id IS NULL THEN
+		--	RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+RAISE EXCEPTION 'v_is_cement=%, dif_store=%',v_is_cement,dif_store;
+		IF NEW.production_site_id IS NULL THEN
+			RAISE EXCEPTION 'Укажите завод!';
+		END IF;
+
+		SELECT
+			production_base_id
+		INTO
+			v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+
+		IF v_dif_store AND v_is_cement = FALSE THEN --Добавка
+			--different query
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time, ARRAY[NEW.production_site_id],ARRAY[NEW.material_id])),0);
+		ELSE
+			-- завод не учитывается!!!
+			-- только база
+			add_quant = coalesce(
+				(SELECT quant FROM rg_material_facts_balance(
+					ra_date_time,
+					ARRAY[v_production_base_id],
+					'{}',
+					ARRAY[NEW.material_id])
+				)
+			,0);
+		END IF;
+		add_quant = add_quant - NEW.required_balance_quant;
+
+		RAISE EXCEPTION 'BALANCE=%',add_quant;
+		IF add_quant <> 0 THEN
+			--RAISE EXCEPTION 'add_quant=%',add_quant;
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.production_site_id	= CASE WHEN v_dif_store THEN NEW.production_site_id ELSE NULL END;
+			reg_material_facts.production_base_id	= v_production_base_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
+
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+
+		RETURN NEW;
+
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		ELSE
+			--Event support
+			PERFORM pg_notify(
+					'RAMaterialFact.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',OLD.date_time::date
+					)
+				)::text
+			);		
+		END IF;
+
+		RETURN OLD;
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+-- ******************* update 13/03/2025 10:24:37 ******************
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+	v_is_cement bool;
+	v_dif_store bool;
+	v_production_base_id int;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+
+		RETURN NEW;
+
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
+
+		-- IF v_is_cement THEN
+		-- 	--ЦЕМЕНТ
+		-- 	RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
+
+		--ELSIF v_dif_store AND NEW.production_site_id IS NULL THEN
+		--	RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+RAISE EXCEPTION 'v_is_cement=%, dif_store=%',v_is_cement,dif_store;
+		IF NEW.production_site_id IS NULL THEN
+			RAISE EXCEPTION 'Укажите завод!';
+		END IF;
+
+		SELECT
+			production_base_id
+		INTO
+			v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+
+		IF v_dif_store AND v_is_cement = FALSE THEN --Добавка
+			--different query
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time, ARRAY[NEW.production_site_id],ARRAY[NEW.material_id])),0);
+		ELSE
+			-- завод не учитывается!!!
+			-- только база
+			add_quant = coalesce(
+				(SELECT quant FROM rg_material_facts_balance(
+					ra_date_time,
+					ARRAY[v_production_base_id],
+					'{}',
+					ARRAY[NEW.material_id])
+				)
+			,0);
+		END IF;
+		add_quant = add_quant - NEW.required_balance_quant;
+
+		RAISE EXCEPTION 'BALANCE=%',add_quant;
+		IF add_quant <> 0 THEN
+			--RAISE EXCEPTION 'add_quant=%',add_quant;
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.production_site_id	= CASE WHEN v_dif_store THEN NEW.production_site_id ELSE NULL END;
+			reg_material_facts.production_base_id	= v_production_base_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
+
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+
+		RETURN NEW;
+
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		ELSE
+			--Event support
+			PERFORM pg_notify(
+					'RAMaterialFact.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',OLD.date_time::date
+					)
+				)::text
+			);		
+		END IF;
+
+		RETURN OLD;
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+-- ******************* update 13/03/2025 10:25:49 ******************
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+	v_is_cement bool;
+	v_dif_store bool;
+	v_production_base_id int;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+
+		RETURN NEW;
+
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
+
+		-- IF v_is_cement THEN
+		-- 	--ЦЕМЕНТ
+		-- 	RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
+
+		--ELSIF v_dif_store AND NEW.production_site_id IS NULL THEN
+		--	RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+RAISE EXCEPTION 'v_is_cement=%, v_dif_store=%',v_is_cement,v_dif_store;
+		IF NEW.production_site_id IS NULL THEN
+			RAISE EXCEPTION 'Укажите завод!';
+		END IF;
+
+		SELECT
+			production_base_id
+		INTO
+			v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+
+		IF v_dif_store AND v_is_cement = FALSE THEN --Добавка
+			--different query
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time, ARRAY[NEW.production_site_id],ARRAY[NEW.material_id])),0);
+		ELSE
+			-- завод не учитывается!!!
+			-- только база
+			add_quant = coalesce(
+				(SELECT quant FROM rg_material_facts_balance(
+					ra_date_time,
+					ARRAY[v_production_base_id],
+					'{}',
+					ARRAY[NEW.material_id])
+				)
+			,0);
+		END IF;
+		add_quant = add_quant - NEW.required_balance_quant;
+
+		RAISE EXCEPTION 'BALANCE=%',add_quant;
+		IF add_quant <> 0 THEN
+			--RAISE EXCEPTION 'add_quant=%',add_quant;
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.production_site_id	= CASE WHEN v_dif_store THEN NEW.production_site_id ELSE NULL END;
+			reg_material_facts.production_base_id	= v_production_base_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
+
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+
+		RETURN NEW;
+
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		ELSE
+			--Event support
+			PERFORM pg_notify(
+					'RAMaterialFact.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',OLD.date_time::date
+					)
+				)::text
+			);		
+		END IF;
+
+		RETURN OLD;
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+-- ******************* update 13/03/2025 10:28:34 ******************
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+	v_is_cement bool;
+	v_dif_store bool;
+	v_production_base_id int;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+
+		RETURN NEW;
+
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
+
+		-- IF v_is_cement THEN
+		-- 	--ЦЕМЕНТ
+		-- 	RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
+
+		--ELSIF v_dif_store AND NEW.production_site_id IS NULL THEN
+		--	RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+--RAISE EXCEPTION 'v_is_cement=%, v_dif_store=%',v_is_cement,v_dif_store;
+		IF NEW.production_site_id IS NULL THEN
+			RAISE EXCEPTION 'Укажите завод!';
+		END IF;
+
+		SELECT
+			production_base_id
+		INTO
+			v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+
+		IF v_dif_store AND v_is_cement = FALSE THEN --Добавка
+			--different query
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time, ARRAY[NEW.production_site_id],ARRAY[NEW.material_id])),0);
+		ELSE
+			-- завод не учитывается!!!
+			-- только база
+			add_quant = coalesce(
+				(SELECT quant FROM rg_material_facts_balance(
+					ra_date_time,
+					ARRAY[v_production_base_id],
+					'{}',
+					ARRAY[NEW.material_id])
+				)
+			,0);
+		END IF;
+		add_quant = add_quant - NEW.required_balance_quant;
+
+		RAISE EXCEPTION 'BALANCE=%',add_quant;
+		IF add_quant <> 0 THEN
+			--RAISE EXCEPTION 'add_quant=%',add_quant;
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.production_site_id	= CASE WHEN v_dif_store THEN NEW.production_site_id ELSE NULL END;
+			reg_material_facts.production_base_id	= v_production_base_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
+
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+
+		RETURN NEW;
+
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		ELSE
+			--Event support
+			PERFORM pg_notify(
+					'RAMaterialFact.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',OLD.date_time::date
+					)
+				)::text
+			);		
+		END IF;
+
+		RETURN OLD;
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+-- ******************* update 13/03/2025 10:29:26 ******************
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+	v_is_cement bool;
+	v_dif_store bool;
+	v_production_base_id int;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+
+		RETURN NEW;
+
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
+
+		-- IF v_is_cement THEN
+		-- 	--ЦЕМЕНТ
+		-- 	RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
+
+		--ELSIF v_dif_store AND NEW.production_site_id IS NULL THEN
+		--	RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+--RAISE EXCEPTION 'v_is_cement=%, v_dif_store=%',v_is_cement,v_dif_store;
+		IF NEW.production_site_id IS NULL THEN
+			RAISE EXCEPTION 'Укажите завод!';
+		END IF;
+
+		SELECT
+			production_base_id
+		INTO
+			v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+
+		IF v_dif_store AND v_is_cement = FALSE THEN --Добавка
+			--different query
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time, ARRAY[NEW.production_site_id],ARRAY[NEW.material_id])),0);
+		ELSE
+			-- завод не учитывается!!!
+			-- только база
+			add_quant = coalesce(
+				(SELECT quant FROM rg_material_facts_balance(
+					ra_date_time,
+					ARRAY[v_production_base_id],
+					'{}',
+					ARRAY[NEW.material_id])
+				)
+			,0);
+		END IF;
+		add_quant = add_quant - NEW.required_balance_quant;
+
+		RAISE EXCEPTION 'BALANCE=%, NEW.material_id=%, v_production_base_id=%',add_quant, NEW.material_id,v_production_base_id;
+		IF add_quant <> 0 THEN
+			--RAISE EXCEPTION 'add_quant=%',add_quant;
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.production_site_id	= CASE WHEN v_dif_store THEN NEW.production_site_id ELSE NULL END;
+			reg_material_facts.production_base_id	= v_production_base_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
+
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+
+		RETURN NEW;
+
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		ELSE
+			--Event support
+			PERFORM pg_notify(
+					'RAMaterialFact.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',OLD.date_time::date
+					)
+				)::text
+			);		
+		END IF;
+
+		RETURN OLD;
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+-- ******************* update 13/03/2025 10:34:55 ******************
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+	v_is_cement bool;
+	v_dif_store bool;
+	v_production_base_id int;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+
+		RETURN NEW;
+
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time-'1 second'::interval;
+
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
+
+		-- IF v_is_cement THEN
+		-- 	--ЦЕМЕНТ
+		-- 	RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
+
+		--ELSIF v_dif_store AND NEW.production_site_id IS NULL THEN
+		--	RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+--RAISE EXCEPTION 'v_is_cement=%, v_dif_store=%',v_is_cement,v_dif_store;
+		IF NEW.production_site_id IS NULL THEN
+			RAISE EXCEPTION 'Укажите завод!';
+		END IF;
+
+		SELECT
+			production_base_id
+		INTO
+			v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+
+		IF v_dif_store AND v_is_cement = FALSE THEN --Добавка
+			--different query
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time, ARRAY[NEW.production_site_id],ARRAY[NEW.material_id])),0);
+		ELSE
+			-- завод не учитывается!!!
+			-- только база
+			add_quant = coalesce(
+				(SELECT quant FROM rg_material_facts_balance(
+					ra_date_time,
+					ARRAY[v_production_base_id],
+					'{}',
+					ARRAY[NEW.material_id])
+				)
+			,0);
+		END IF;
+		add_quant = add_quant - NEW.required_balance_quant;
+
+		RAISE EXCEPTION 'BALANCE=%, NEW.material_id=%, v_production_base_id=%',add_quant+NEW.required_balance_quant, NEW.material_id,v_production_base_id;
+		IF add_quant <> 0 THEN
+			--RAISE EXCEPTION 'add_quant=%',add_quant;
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.production_site_id	= CASE WHEN v_dif_store THEN NEW.production_site_id ELSE NULL END;
+			reg_material_facts.production_base_id	= v_production_base_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
+
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+
+		RETURN NEW;
+
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		ELSE
+			--Event support
+			PERFORM pg_notify(
+					'RAMaterialFact.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',OLD.date_time::date
+					)
+				)::text
+			);		
+		END IF;
+
+		RETURN OLD;
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+-- ******************* update 13/03/2025 10:36:01 ******************
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+	v_is_cement bool;
+	v_dif_store bool;
+	v_production_base_id int;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+
+		RETURN NEW;
+
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time;---'1 second'::interval;
+
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
+
+		-- IF v_is_cement THEN
+		-- 	--ЦЕМЕНТ
+		-- 	RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
+
+		--ELSIF v_dif_store AND NEW.production_site_id IS NULL THEN
+		--	RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+--RAISE EXCEPTION 'v_is_cement=%, v_dif_store=%',v_is_cement,v_dif_store;
+		IF NEW.production_site_id IS NULL THEN
+			RAISE EXCEPTION 'Укажите завод!';
+		END IF;
+
+		SELECT
+			production_base_id
+		INTO
+			v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+
+		IF v_dif_store AND v_is_cement = FALSE THEN --Добавка
+			--different query
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time, ARRAY[NEW.production_site_id],ARRAY[NEW.material_id])),0);
+		ELSE
+			-- завод не учитывается!!!
+			-- только база
+			add_quant = coalesce(
+				(SELECT quant FROM rg_material_facts_balance(
+					ra_date_time,
+					ARRAY[v_production_base_id],
+					'{}',
+					ARRAY[NEW.material_id])
+				)
+			,0);
+		END IF;
+		add_quant = add_quant - NEW.required_balance_quant;
+
+		RAISE EXCEPTION 'BALANCE=%, NEW.material_id=%, v_production_base_id=%',add_quant+NEW.required_balance_quant, NEW.material_id,v_production_base_id;
+		IF add_quant <> 0 THEN
+			--RAISE EXCEPTION 'add_quant=%',add_quant;
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.production_site_id	= CASE WHEN v_dif_store THEN NEW.production_site_id ELSE NULL END;
+			reg_material_facts.production_base_id	= v_production_base_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
+
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+
+		RETURN NEW;
+
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		ELSE
+			--Event support
+			PERFORM pg_notify(
+					'RAMaterialFact.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',OLD.date_time::date
+					)
+				)::text
+			);		
+		END IF;
+
+		RETURN OLD;
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+-- ******************* update 13/03/2025 12:22:42 ******************
+-- DROP FUNCTION public.material_fact_balance_corrections_process();
+
+CREATE OR REPLACE FUNCTION public.material_fact_balance_corrections_process()
+  RETURNS trigger AS
+$$
+DECLARE
+	reg_material_facts ra_material_facts%ROWTYPE;
+	reg_cement ra_cement%ROWTYPE;
+	add_quant numeric(19,4);
+	ra_date_time timestamp;	
+	v_is_cement bool;
+	v_dif_store bool;
+	v_production_base_id int;
+BEGIN
+	IF TG_WHEN='BEFORE' AND TG_OP='INSERT' THEN
+		IF NEW.balance_date_time IS NULL THEN
+			NEW.balance_date_time = get_shift_start(NEW.date_time);
+		END IF;
+
+		RETURN NEW;
+
+	ELSIF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
+		IF (TG_OP='INSERT') THEN						
+			--log
+			PERFORM doc_log_insert('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		ra_date_time = NEW.balance_date_time;---'1 second'::interval;
+
+		--attributes
+		SELECT
+			is_cement
+			,dif_store
+		INTO
+			v_is_cement
+			,v_dif_store
+		FROM raw_materials
+		WHERE id=NEW.material_id;
+
+		-- IF v_is_cement THEN
+		-- 	--ЦЕМЕНТ
+		-- 	RAISE EXCEPTION 'Остатки по материалам, учитываемым в силосах, корректируются в разрезе силосов!';
+
+		--ELSIF v_dif_store AND NEW.production_site_id IS NULL THEN
+		--	RAISE EXCEPTION 'По материалу % ведется учет остатков в разрезе мест хранения!',(SELECT name FROM raw_materials WHERE id=NEW.material_id);
+--RAISE EXCEPTION 'v_is_cement=%, v_dif_store=%',v_is_cement,v_dif_store;
+		IF NEW.production_site_id IS NULL THEN
+			RAISE EXCEPTION 'Укажите завод!';
+		END IF;
+
+		SELECT
+			production_base_id
+		INTO
+			v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+
+		IF v_dif_store AND v_is_cement = FALSE THEN --Добавка
+			--different query
+			add_quant = coalesce((SELECT quant FROM rg_material_facts_balance(ra_date_time, ARRAY[NEW.production_site_id],ARRAY[NEW.material_id])),0);
+		ELSE
+			-- завод не учитывается!!!
+			-- только база
+			add_quant = coalesce(
+				(SELECT quant FROM rg_material_facts_balance(
+					ra_date_time,
+					ARRAY[v_production_base_id],
+					'{}',
+					ARRAY[NEW.material_id])
+				)
+			,0);
+		END IF;
+		add_quant = add_quant - NEW.required_balance_quant;
+
+		--RAISE EXCEPTION 'BALANCE=%, NEW.material_id=%, v_production_base_id=%',add_quant+NEW.required_balance_quant, NEW.material_id,v_production_base_id;
+		IF add_quant <> 0 THEN
+			--RAISE EXCEPTION 'add_quant=%',add_quant;
+			--register actions ra_material_facts		
+			reg_material_facts.date_time		= ra_date_time;
+			reg_material_facts.deb			= (add_quant<0);
+			reg_material_facts.doc_type  		= 'material_fact_balance_correction'::doc_types;
+			reg_material_facts.doc_id  		= NEW.id;
+			reg_material_facts.material_id		= NEW.material_id;
+			reg_material_facts.production_site_id	= CASE WHEN v_dif_store THEN NEW.production_site_id ELSE NULL END;
+			reg_material_facts.production_base_id	= v_production_base_id;
+			reg_material_facts.quant		= abs(add_quant);
+			PERFORM ra_material_facts_add_act(reg_material_facts);	
+		END IF;
+
+		--Event support
+		PERFORM pg_notify(
+				'RAMaterialFact.change'
+			,json_build_object(
+				'params',json_build_object(
+					'cond_date',NEW.date_time::date
+				)
+			)::text
+		);
+
+		RETURN NEW;
+
+	ELSEIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN
+		IF NEW.balance_date_time<>OLD.balance_date_time THEN
+			PERFORM doc_log_update('material_fact_balance_correction'::doc_types,NEW.id,NEW.balance_date_time-'1 second'::interval);
+		END IF;
+
+		PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+
+		RETURN NEW;
+
+	ELSEIF TG_OP='DELETE' THEN
+		IF TG_WHEN='BEFORE' THEN		
+			--log
+			PERFORM doc_log_delete('material_fact_balance_correction'::doc_types,OLD.id);
+
+			PERFORM ra_material_facts_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+			PERFORM ra_cement_remove_acts('material_fact_balance_correction'::doc_types,OLD.id);
+		ELSE
+			--Event support
+			PERFORM pg_notify(
+					'RAMaterialFact.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',OLD.date_time::date
+					)
+				)::text
+			);		
+		END IF;
+
+		RETURN OLD;
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+-- ******************* update 21/03/2025 10:53:10 ******************
+-- FUNCTION: public.mat_totals(in_d date, in_production_base_id int)
+
+-- DROP FUNCTION public.mat_totals(in_d date, in_production_base_id int);
+
+CREATE OR REPLACE FUNCTION public.mat_totals2(in_d date, in_production_base_id int)
+    RETURNS TABLE(
+    	material_descr text,
+    	quant_ordered numeric,
+    	quant_procured numeric,
+    	quant_balance numeric,
+    	quant_fact_balance numeric,
+    	quant_morn_balance numeric,
+    	quant_morn_next_balance numeric,
+    	quant_morn_cur_balance numeric,
+    	quant_morn_fact_cur_balance numeric,
+    	balance_corrected_data json
+    ) 
+    LANGUAGE 'sql'
+
+    COST 100
+    VOLATILE 
+    ROWS 1000
+AS $BODY$
+WITH
+	--filter
+	prod_base_sites AS (SELECT p_st.id FROM production_sites AS p_st WHERE p_st.production_base_id = in_production_base_id)
+	
+	,shift_time_from AS (SELECT in_d + const_first_shift_start_time_val() AS v)
+	,shift_time_to AS (SELECT get_shift_end(shift_time_from.v) AS v FROM shift_time_from)
+	SELECT
+		sub.material_descr,
+		sum(sub.quant_ordered) AS quant_ordered,
+		sum(sub.quant_procured) AS quant_procured,
+		sum(sub.quant_balance) AS quant_balance,
+		sum(sub.quant_fact_balance) AS quant_fact_balance,
+		sum(sub.quant_morn_balance) AS quant_morn_balance,
+		sum(sub.quant_morn_next_balance) AS quant_morn_next_balance,
+		sum(sub.quant_morn_cur_balance) AS quant_morn_cur_balance,
+		sum(sub.quant_morn_fact_cur_balance) AS quant_morn_fact_cur_balance,
+		(sub.balance_corrected_data::text)::json AS balance_corrected_data
+	FROM (
+		SELECT
+			m.name::text AS material_descr,
+			
+			--заявки поставщикам на сегодня
+			0::numeric AS quant_ordered,
+			
+			--Поставки
+			COALESCE(proc.quant, 0)::numeric AS quant_procured,
+			
+			--остатки
+			COALESCE(bal.quant, 0)::numeric AS quant_balance,
+			
+			COALESCE(bal_fact.quant, 0)::numeric AS quant_fact_balance,
+			
+			--остатки на завтра на утро
+			-- начиная с 12/08/20 без прогноза будующего прихода, просто тек.остаток-расход по подборам от тек.времени до конца смены
+			--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+			--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+			COALESCE(bal_fact.quant, 0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
+			COALESCE(bal_fact.quant, 0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
+			
+			COALESCE(bal_morn.quant, 0)::numeric AS quant_morn_cur_balance,
+			
+			COALESCE(bal_morn_fact.quant, 0)::numeric AS quant_morn_fact_cur_balance,
+			
+			--Корректировки
+			(SELECT
+				json_agg(
+					json_build_object(
+						'date_time',cr.date_time,
+						'balance_date_time',cr.balance_date_time,
+						'users_ref',users_ref(cr_u),
+						'materials_ref',materials_ref(m),
+						'required_balance_quant',cr.required_balance_quant,
+						'comment_text',cr.comment_text
+					)
+				)
+			FROM material_fact_balance_corrections AS cr
+			LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+			WHERE
+				cr.material_id = m.id
+				AND cr.balance_date_time=(SELECT shift_time_from.v FROM shift_time_from)
+				AND cr.production_site_id IN (SELECT pr_sites.id FROM prod_base_sites AS pr_sites)
+			) AS balance_corrected_data
+			
+		FROM raw_materials AS m
+
+		LEFT JOIN (
+			SELECT *
+			FROM rg_materials_balance((SELECT shift_time_from.v FROM shift_time_from)-'1 second'::interval, ARRAY[in_production_base_id], '{}'::int[])
+		) AS bal_morn ON bal_morn.material_id=m.id
+		
+		LEFT JOIN (
+			SELECT * FROM rg_material_facts_balance((SELECT shift_time_from.v FROM shift_time_from), ARRAY[in_production_base_id], '{}'::int[], '{}'::int[])
+		) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+		
+		LEFT JOIN (
+			SELECT *
+			FROM rg_materials_balance(ARRAY[in_production_base_id], '{}'::int[])
+		) AS bal ON bal.material_id=m.id
+		LEFT JOIN (
+			SELECT
+				material_id,
+				sum(quant) AS quant
+			FROM rg_material_facts_balance(ARRAY[in_production_base_id], '{}'::int[], '{}'::int[])
+			GROUP BY material_id		
+		) AS bal_fact ON bal_fact.material_id=m.id
+		
+		LEFT JOIN (
+			SELECT
+				ra.material_id,
+				sum(ra.quant) AS quant
+			FROM ra_materials ra
+			WHERE ra.date_time BETWEEN (SELECT shift_time_from.v FROM shift_time_from) AND (SELECT shift_time_to.v FROM shift_time_to)
+				AND ra.deb
+				AND ra.doc_type='material_procurement'
+				AND ra.production_base_id = in_production_base_id
+			GROUP BY ra.material_id
+		) AS proc ON proc.material_id=m.id
+		
+		/*
+		LEFT JOIN (
+			SELECT
+				plan_proc.material_id,
+				plan_proc.balance_start AS quant
+			FROM mat_plan_procur(
+				get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+				now()::timestamp,
+				now()::timestamp,
+				NULL
+			) AS plan_proc
+		) AS plan_proc ON plan_proc.material_id=m.id
+		*/
+		
+		/*
+		LEFT JOIN (
+			SELECT
+				so.material_id,
+				SUM(so.quant) AS quant
+			FROM supplier_orders AS so
+			WHERE so.date = in_d
+			GROUP BY so.material_id
+		) AS sup_ord ON sup_ord.material_id=m.id
+		*/
+		
+		LEFT JOIN (
+			SELECT *
+			FROM mat_virtual_consumption(
+				(SELECT shift_time_from.v FROM shift_time_from)
+				,(SELECT shift_time_to.v FROM shift_time_to)
+			)
+		) AS mat_virt_cons ON mat_virt_cons.material_id = m.id
+		
+		WHERE m.concrete_part
+		ORDER BY m.ord
+	) AS sub
+	GROUP BY sub.material_descr,sub.balance_corrected_data::text;
+$BODY$;
+
+-- ALTER FUNCTION public.mat_totals(in_d date, in_production_base_id int)
+--     OWNER TO beton;
+--
+-- GRANT EXECUTE ON FUNCTION public.mat_totals(in_d date, in_production_base_id int) TO beton;
+--
+-- GRANT EXECUTE ON FUNCTION public.mat_totals(in_d date, in_production_base_id int) TO PUBLIC;
+
+
+
+
+-- ******************* update 21/03/2025 10:57:07 ******************
+-- FUNCTION: public.mat_totals(in_d date, in_production_base_id int)
+
+-- DROP FUNCTION public.mat_totals(in_d date, in_production_base_id int);
+
+CREATE OR REPLACE FUNCTION public.mat_totals2(in_d date, in_production_base_id int)
+    RETURNS TABLE(
+    	material_descr text,
+    	quant_ordered numeric,
+    	quant_procured numeric,
+    	quant_balance numeric,
+    	quant_fact_balance numeric,
+    	quant_morn_balance numeric,
+    	quant_morn_next_balance numeric,
+    	quant_morn_cur_balance numeric,
+    	quant_morn_fact_cur_balance numeric,
+    	balance_corrected_data json
+    ) 
+    LANGUAGE 'sql'
+
+    COST 100
+    VOLATILE 
+    ROWS 1000
+AS $BODY$
+WITH
+	--filter
+	prod_base_sites AS (SELECT p_st.id FROM production_sites AS p_st WHERE p_st.production_base_id = in_production_base_id)
+	
+	,shift_time_from AS (SELECT in_d + const_first_shift_start_time_val() AS v)
+	,shift_time_to AS (SELECT get_shift_end(shift_time_from.v) AS v FROM shift_time_from)
+	SELECT
+		sub.material_descr,
+		sum(sub.quant_ordered) AS quant_ordered,
+		sum(sub.quant_procured) AS quant_procured,
+		sum(sub.quant_balance) AS quant_balance,
+		sum(sub.quant_fact_balance) AS quant_fact_balance,
+		sum(sub.quant_morn_balance) AS quant_morn_balance,
+		sum(sub.quant_morn_next_balance) AS quant_morn_next_balance,
+		sum(sub.quant_morn_cur_balance) AS quant_morn_cur_balance,
+		sum(sub.quant_morn_fact_cur_balance) AS quant_morn_fact_cur_balance,
+		(sub.balance_corrected_data::text)::json AS balance_corrected_data
+	FROM (
+		SELECT
+			m.ord AS material_ord,
+			m.name::text AS material_descr,
+			
+			--заявки поставщикам на сегодня
+			0::numeric AS quant_ordered,
+			
+			--Поставки
+			COALESCE(proc.quant, 0)::numeric AS quant_procured,
+			
+			--остатки
+			COALESCE(bal.quant, 0)::numeric AS quant_balance,
+			
+			COALESCE(bal_fact.quant, 0)::numeric AS quant_fact_balance,
+			
+			--остатки на завтра на утро
+			-- начиная с 12/08/20 без прогноза будующего прихода, просто тек.остаток-расход по подборам от тек.времени до конца смены
+			--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+			--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+			COALESCE(bal_fact.quant, 0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
+			COALESCE(bal_fact.quant, 0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
+			
+			COALESCE(bal_morn.quant, 0)::numeric AS quant_morn_cur_balance,
+			
+			COALESCE(bal_morn_fact.quant, 0)::numeric AS quant_morn_fact_cur_balance,
+			
+			--Корректировки
+			(SELECT
+				json_agg(
+					json_build_object(
+						'date_time',cr.date_time,
+						'balance_date_time',cr.balance_date_time,
+						'users_ref',users_ref(cr_u),
+						'materials_ref',materials_ref(m),
+						'required_balance_quant',cr.required_balance_quant,
+						'comment_text',cr.comment_text
+					)
+				)
+			FROM material_fact_balance_corrections AS cr
+			LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+			WHERE
+				cr.material_id = m.id
+				AND cr.balance_date_time=(SELECT shift_time_from.v FROM shift_time_from)
+				AND cr.production_site_id IN (SELECT pr_sites.id FROM prod_base_sites AS pr_sites)
+			) AS balance_corrected_data
+			
+		FROM raw_materials AS m
+
+		LEFT JOIN (
+			SELECT *
+			FROM rg_materials_balance((SELECT shift_time_from.v FROM shift_time_from)-'1 second'::interval, ARRAY[in_production_base_id], '{}'::int[])
+		) AS bal_morn ON bal_morn.material_id=m.id
+		
+		LEFT JOIN (
+			SELECT * FROM rg_material_facts_balance((SELECT shift_time_from.v FROM shift_time_from), ARRAY[in_production_base_id], '{}'::int[], '{}'::int[])
+		) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+		
+		LEFT JOIN (
+			SELECT *
+			FROM rg_materials_balance(ARRAY[in_production_base_id], '{}'::int[])
+		) AS bal ON bal.material_id=m.id
+		LEFT JOIN (
+			SELECT
+				material_id,
+				sum(quant) AS quant
+			FROM rg_material_facts_balance(ARRAY[in_production_base_id], '{}'::int[], '{}'::int[])
+			GROUP BY material_id		
+		) AS bal_fact ON bal_fact.material_id=m.id
+		
+		LEFT JOIN (
+			SELECT
+				ra.material_id,
+				sum(ra.quant) AS quant
+			FROM ra_materials ra
+			WHERE ra.date_time BETWEEN (SELECT shift_time_from.v FROM shift_time_from) AND (SELECT shift_time_to.v FROM shift_time_to)
+				AND ra.deb
+				AND ra.doc_type='material_procurement'
+				AND ra.production_base_id = in_production_base_id
+			GROUP BY ra.material_id
+		) AS proc ON proc.material_id=m.id
+		
+		/*
+		LEFT JOIN (
+			SELECT
+				plan_proc.material_id,
+				plan_proc.balance_start AS quant
+			FROM mat_plan_procur(
+				get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+				now()::timestamp,
+				now()::timestamp,
+				NULL
+			) AS plan_proc
+		) AS plan_proc ON plan_proc.material_id=m.id
+		*/
+		
+		/*
+		LEFT JOIN (
+			SELECT
+				so.material_id,
+				SUM(so.quant) AS quant
+			FROM supplier_orders AS so
+			WHERE so.date = in_d
+			GROUP BY so.material_id
+		) AS sup_ord ON sup_ord.material_id=m.id
+		*/
+		
+		LEFT JOIN (
+			SELECT *
+			FROM mat_virtual_consumption(
+				(SELECT shift_time_from.v FROM shift_time_from)
+				,(SELECT shift_time_to.v FROM shift_time_to)
+			)
+		) AS mat_virt_cons ON mat_virt_cons.material_id = m.id
+		
+		WHERE m.concrete_part
+	) AS sub
+	GROUP BY sub.material_ord, sub.material_descr,sub.balance_corrected_data::text
+	ORDER BY sub.material_ord
+;
+$BODY$;
+
+-- ALTER FUNCTION public.mat_totals(in_d date, in_production_base_id int)
+--     OWNER TO beton;
+--
+-- GRANT EXECUTE ON FUNCTION public.mat_totals(in_d date, in_production_base_id int) TO beton;
+--
+-- GRANT EXECUTE ON FUNCTION public.mat_totals(in_d date, in_production_base_id int) TO PUBLIC;
+
+
+
+
+-- ******************* update 21/03/2025 10:58:39 ******************
+-- FUNCTION: public.mat_totals(in_d date, in_production_base_id int)
+
+ DROP FUNCTION public.mat_totals(in_d date, in_production_base_id int);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(in_d date, in_production_base_id int)
+    RETURNS TABLE(
+    	material_descr text,
+    	quant_ordered numeric,
+    	quant_procured numeric,
+    	quant_balance numeric,
+    	quant_fact_balance numeric,
+    	quant_morn_balance numeric,
+    	quant_morn_next_balance numeric,
+    	quant_morn_cur_balance numeric,
+    	quant_morn_fact_cur_balance numeric,
+    	balance_corrected_data json
+    ) 
+    LANGUAGE 'sql'
+
+    COST 100
+    VOLATILE 
+    ROWS 1000
+AS $BODY$
+WITH
+	--filter
+	prod_base_sites AS (SELECT p_st.id FROM production_sites AS p_st WHERE p_st.production_base_id = in_production_base_id)
+	
+	,shift_time_from AS (SELECT in_d + const_first_shift_start_time_val() AS v)
+	,shift_time_to AS (SELECT get_shift_end(shift_time_from.v) AS v FROM shift_time_from)
+	SELECT
+		sub.material_descr,
+		sum(sub.quant_ordered) AS quant_ordered,
+		sum(sub.quant_procured) AS quant_procured,
+		sum(sub.quant_balance) AS quant_balance,
+		sum(sub.quant_fact_balance) AS quant_fact_balance,
+		sum(sub.quant_morn_balance) AS quant_morn_balance,
+		sum(sub.quant_morn_next_balance) AS quant_morn_next_balance,
+		sum(sub.quant_morn_cur_balance) AS quant_morn_cur_balance,
+		sum(sub.quant_morn_fact_cur_balance) AS quant_morn_fact_cur_balance,
+		(sub.balance_corrected_data::text)::json AS balance_corrected_data
+	FROM (
+		SELECT
+			m.ord AS material_ord,
+			m.name::text AS material_descr,
+			
+			--заявки поставщикам на сегодня
+			0::numeric AS quant_ordered,
+			
+			--Поставки
+			COALESCE(proc.quant, 0)::numeric AS quant_procured,
+			
+			--остатки
+			COALESCE(bal.quant, 0)::numeric AS quant_balance,
+			
+			COALESCE(bal_fact.quant, 0)::numeric AS quant_fact_balance,
+			
+			--остатки на завтра на утро
+			-- начиная с 12/08/20 без прогноза будующего прихода, просто тек.остаток-расход по подборам от тек.времени до конца смены
+			--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+			--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+			COALESCE(bal_fact.quant, 0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
+			COALESCE(bal_fact.quant, 0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
+			
+			COALESCE(bal_morn.quant, 0)::numeric AS quant_morn_cur_balance,
+			
+			COALESCE(bal_morn_fact.quant, 0)::numeric AS quant_morn_fact_cur_balance,
+			
+			--Корректировки
+			(SELECT
+				json_agg(
+					json_build_object(
+						'date_time',cr.date_time,
+						'balance_date_time',cr.balance_date_time,
+						'users_ref',users_ref(cr_u),
+						'materials_ref',materials_ref(m),
+						'required_balance_quant',cr.required_balance_quant,
+						'comment_text',cr.comment_text
+					)
+				)
+			FROM material_fact_balance_corrections AS cr
+			LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+			WHERE
+				cr.material_id = m.id
+				AND cr.balance_date_time=(SELECT shift_time_from.v FROM shift_time_from)
+				AND cr.production_site_id IN (SELECT pr_sites.id FROM prod_base_sites AS pr_sites)
+			) AS balance_corrected_data
+			
+		FROM raw_materials AS m
+
+		LEFT JOIN (
+			SELECT *
+			FROM rg_materials_balance((SELECT shift_time_from.v FROM shift_time_from)-'1 second'::interval, ARRAY[in_production_base_id], '{}'::int[])
+		) AS bal_morn ON bal_morn.material_id=m.id
+		
+		LEFT JOIN (
+			SELECT * FROM rg_material_facts_balance((SELECT shift_time_from.v FROM shift_time_from), ARRAY[in_production_base_id], '{}'::int[], '{}'::int[])
+		) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+		
+		LEFT JOIN (
+			SELECT *
+			FROM rg_materials_balance(ARRAY[in_production_base_id], '{}'::int[])
+		) AS bal ON bal.material_id=m.id
+		LEFT JOIN (
+			SELECT
+				material_id,
+				sum(quant) AS quant
+			FROM rg_material_facts_balance(ARRAY[in_production_base_id], '{}'::int[], '{}'::int[])
+			GROUP BY material_id		
+		) AS bal_fact ON bal_fact.material_id=m.id
+		
+		LEFT JOIN (
+			SELECT
+				ra.material_id,
+				sum(ra.quant) AS quant
+			FROM ra_materials ra
+			WHERE ra.date_time BETWEEN (SELECT shift_time_from.v FROM shift_time_from) AND (SELECT shift_time_to.v FROM shift_time_to)
+				AND ra.deb
+				AND ra.doc_type='material_procurement'
+				AND ra.production_base_id = in_production_base_id
+			GROUP BY ra.material_id
+		) AS proc ON proc.material_id=m.id
+		
+		/*
+		LEFT JOIN (
+			SELECT
+				plan_proc.material_id,
+				plan_proc.balance_start AS quant
+			FROM mat_plan_procur(
+				get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+				now()::timestamp,
+				now()::timestamp,
+				NULL
+			) AS plan_proc
+		) AS plan_proc ON plan_proc.material_id=m.id
+		*/
+		
+		/*
+		LEFT JOIN (
+			SELECT
+				so.material_id,
+				SUM(so.quant) AS quant
+			FROM supplier_orders AS so
+			WHERE so.date = in_d
+			GROUP BY so.material_id
+		) AS sup_ord ON sup_ord.material_id=m.id
+		*/
+		
+		LEFT JOIN (
+			SELECT *
+			FROM mat_virtual_consumption(
+				(SELECT shift_time_from.v FROM shift_time_from)
+				,(SELECT shift_time_to.v FROM shift_time_to)
+			)
+		) AS mat_virt_cons ON mat_virt_cons.material_id = m.id
+		
+		WHERE m.concrete_part
+	) AS sub
+	GROUP BY sub.material_ord, sub.material_descr,sub.balance_corrected_data::text
+	ORDER BY sub.material_ord
+;
+$BODY$;
+
+-- ALTER FUNCTION public.mat_totals(in_d date, in_production_base_id int)
+--     OWNER TO beton;
+--
+-- GRANT EXECUTE ON FUNCTION public.mat_totals(in_d date, in_production_base_id int) TO beton;
+--
+-- GRANT EXECUTE ON FUNCTION public.mat_totals(in_d date, in_production_base_id int) TO PUBLIC;
+
+
+
+
+-- ******************* update 21/03/2025 12:54:11 ******************
+
+		ALTER TABLE public.clients ADD COLUMN address_fact text;
+
+
+
+-- ******************* update 21/03/2025 13:18:02 ******************
+-- FUNCTION: public.mat_totals(in_d date, in_production_base_id int)
+
+ DROP FUNCTION public.mat_totals(in_d date, in_production_base_id int);
+
+CREATE OR REPLACE FUNCTION public.mat_totals(in_d date, in_production_base_id int)
+    RETURNS TABLE(
+    	material_descr text,
+    	material_id int,
+    	quant_ordered numeric,
+    	quant_procured numeric,
+    	quant_balance numeric,
+    	quant_fact_balance numeric,
+    	quant_morn_balance numeric,
+    	quant_morn_next_balance numeric,
+    	quant_morn_cur_balance numeric,
+    	quant_morn_fact_cur_balance numeric,
+    	balance_corrected_data json
+    ) 
+    LANGUAGE 'sql'
+
+    COST 100
+    VOLATILE 
+    ROWS 1000
+AS $BODY$
+WITH
+	--filter
+	prod_base_sites AS (SELECT p_st.id FROM production_sites AS p_st WHERE p_st.production_base_id = in_production_base_id)
+	
+	,shift_time_from AS (SELECT in_d + const_first_shift_start_time_val() AS v)
+
+	,shift_time_to AS (SELECT get_shift_end(shift_time_from.v) AS v FROM shift_time_from)
+/*	SELECT
+		sub.material_descr,
+		sum(sub.quant_ordered) AS quant_ordered,
+		sum(sub.quant_procured) AS quant_procured,
+		sum(sub.quant_balance) AS quant_balance,
+		sum(sub.quant_fact_balance) AS quant_fact_balance,
+		sum(sub.quant_morn_balance) AS quant_morn_balance,
+		sum(sub.quant_morn_next_balance) AS quant_morn_next_balance,
+		sum(sub.quant_morn_cur_balance) AS quant_morn_cur_balance,
+		sum(sub.quant_morn_fact_cur_balance) AS quant_morn_fact_cur_balance,
+		(sub.balance_corrected_data::text)::json AS balance_corrected_data
+	FROM (
+*/	
+		SELECT			
+			m.name::text AS material_descr,
+			m.id AS material_id,
+			
+			--заявки поставщикам на сегодня
+			0::numeric AS quant_ordered,
+			
+			--Поставки
+			COALESCE(proc.quant, 0)::numeric AS quant_procured,
+			
+			--остатки
+			COALESCE(bal.quant, 0)::numeric AS quant_balance,
+			
+			COALESCE(bal_fact.quant, 0)::numeric AS quant_fact_balance,
+			
+			--остатки на завтра на утро
+			-- начиная с 12/08/20 без прогноза будующего прихода, просто тек.остаток-расход по подборам от тек.времени до конца смены
+			--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_balance,
+			--COALESCE(plan_proc.quant,0)::numeric AS quant_morn_next_balance,
+			COALESCE(bal_fact.quant, 0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
+			COALESCE(bal_fact.quant, 0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
+			
+			COALESCE(bal_morn.quant, 0)::numeric AS quant_morn_cur_balance,
+			
+			COALESCE(bal_morn_fact.quant, 0)::numeric AS quant_morn_fact_cur_balance,
+			
+			--Корректировки
+			(SELECT
+				json_agg(
+					json_build_object(
+						'date_time',cr.date_time,
+						'balance_date_time',cr.balance_date_time,
+						'users_ref',users_ref(cr_u),
+						'materials_ref',materials_ref(m),
+						'required_balance_quant',cr.required_balance_quant,
+						'comment_text',cr.comment_text
+					)
+				)
+			FROM material_fact_balance_corrections AS cr
+			LEFT JOIN users AS cr_u ON cr_u.id=cr.user_id	
+			WHERE
+				cr.material_id = m.id
+				AND cr.balance_date_time=(SELECT shift_time_from.v FROM shift_time_from)
+				AND cr.production_site_id IN (SELECT pr_sites.id FROM prod_base_sites AS pr_sites)
+			) AS balance_corrected_data
+			
+		FROM raw_materials AS m
+
+		LEFT JOIN (
+			SELECT *
+			FROM rg_materials_balance((SELECT shift_time_from.v FROM shift_time_from)-'1 second'::interval, ARRAY[in_production_base_id], '{}'::int[])
+		) AS bal_morn ON bal_morn.material_id=m.id
+		
+		LEFT JOIN (
+			SELECT * FROM rg_material_facts_balance((SELECT shift_time_from.v FROM shift_time_from), ARRAY[in_production_base_id], '{}'::int[], '{}'::int[])
+		) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
+
+		
+		LEFT JOIN (
+			SELECT *
+			FROM rg_materials_balance(ARRAY[in_production_base_id], '{}'::int[])
+		) AS bal ON bal.material_id=m.id
+		LEFT JOIN (
+			SELECT
+				material_id,
+				sum(quant) AS quant
+			FROM rg_material_facts_balance(ARRAY[in_production_base_id], '{}'::int[], '{}'::int[])
+			GROUP BY material_id		
+		) AS bal_fact ON bal_fact.material_id=m.id
+		
+		LEFT JOIN (
+			SELECT
+				ra.material_id,
+				sum(ra.quant) AS quant
+			FROM ra_materials ra
+			WHERE ra.date_time BETWEEN (SELECT shift_time_from.v FROM shift_time_from) AND (SELECT shift_time_to.v FROM shift_time_to)
+				AND ra.deb
+				AND ra.doc_type='material_procurement'
+				AND ra.production_base_id = in_production_base_id
+			GROUP BY ra.material_id
+		) AS proc ON proc.material_id=m.id
+		
+		/*
+		LEFT JOIN (
+			SELECT
+				plan_proc.material_id,
+				plan_proc.balance_start AS quant
+			FROM mat_plan_procur(
+				get_shift_end((get_shift_end(get_shift_start(now()::timestamp))+'1 second')),
+				now()::timestamp,
+				now()::timestamp,
+				NULL
+			) AS plan_proc
+		) AS plan_proc ON plan_proc.material_id=m.id
+		*/
+		
+		/*
+		LEFT JOIN (
+			SELECT
+				so.material_id,
+				SUM(so.quant) AS quant
+			FROM supplier_orders AS so
+			WHERE so.date = in_d
+			GROUP BY so.material_id
+		) AS sup_ord ON sup_ord.material_id=m.id
+		*/
+		
+		LEFT JOIN (
+			SELECT *
+			FROM mat_virtual_consumption(
+				(SELECT shift_time_from.v FROM shift_time_from)
+				,(SELECT shift_time_to.v FROM shift_time_to)
+			)
+		) AS mat_virt_cons ON mat_virt_cons.material_id = m.id
+		
+		WHERE m.concrete_part
+		ORDER BY m.ord
+	--) AS sub
+	--GROUP BY sub.material_ord, sub.material_descr,sub.balance_corrected_data::text
+	--ORDER BY sub.material_ord
+;
+$BODY$;
+
+-- ALTER FUNCTION public.mat_totals(in_d date, in_production_base_id int)
+--     OWNER TO beton;
+--
+-- GRANT EXECUTE ON FUNCTION public.mat_totals(in_d date, in_production_base_id int) TO beton;
+--
+-- GRANT EXECUTE ON FUNCTION public.mat_totals(in_d date, in_production_base_id int) TO PUBLIC;
+
+
+
+
+-- ******************* update 21/03/2025 15:01:44 ******************
+
+		ALTER TABLE public.clients ADD COLUMN tels_1c text;
+
+
+
+-- ******************* update 21/03/2025 15:09:48 ******************
+-- VIEW: ttn
+
+--DROP VIEW ttn;
+
+CREATE OR REPLACE VIEW ttn AS
+	SELECT
+		sh.id AS nomer,
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.ship_date_time::date,'DD TMMonth YYYY') AS data_propis,
+		
+		to_char(sh.ship_date_time::date,'DD') AS data_den,
+		to_char(sh.ship_date_time::date,'TMMonth') AS data_mes,
+		to_char(sh.ship_date_time::date,'YYYY')||'г.' AS data_god,
+		
+		coalesce(cl.name_full, cl.name)||' '||
+		coalesce('ИНН '||cl.inn||' ', '')||
+		coalesce('КПП '||cl.kpp||' ', '')||
+		coalesce(', '||cl.address_legal, '')		
+		AS platelschik,
+		 
+		sh.quant AS nomen_kol,
+		sh.quant*2.4 AS nomen_massa,
+		'Бетон '||ct.name AS nomen_naim,
+		substr('00000',1,5-length(ct.id::text))||ct.id AS nomen_kod,
+		
+		trim(to_char(
+			CASE WHEN coalesce(sh.quant,0)=0 THEN 0
+			ELSE shipments_cost(dest, o.concrete_type_id, o.date_time::date, sh, TRUE) / sh.quant
+			END
+		, '9999999D99'
+		)) AS nomen_cena,
+		
+		trim(to_char(shipments_cost(dest, o.concrete_type_id, o.date_time::date, sh, TRUE), '9999999D99')) AS nomen_summa,
+		ucase(
+			num_spelled(shipments_cost(dest, o.concrete_type_id, o.date_time::date, sh, TRUE), 'M', '{рубль,рубля,рублей}', 'F', '{копейка,копейки,копеек}', '00d')
+		) AS nomen_summa_propis,
+		
+		person_init(dr.name) AS voditel_fio,
+		coalesce(dr.driver_licence,'') AS voditel_udost,
+		dest.name AS punkt_razgruzki,
+		coalesce(vh.plate,'') AS avto_nomer,
+		coalesce(vh.make,'') AS avto_marka,
+		
+		coalesce(vh.weight_t,0) + sh.quant*2.4 AS massa_brutto,
+		ucase(num_spelled((sh.quant*2.4)::numeric, 'F', '{тонна,тонны,тонн}', 'M', '{кг}', '999d')) AS nomen_massa_propis,
+		
+		ucase(num_spelled((coalesce(vh.weight_t,0) + sh.quant*2.4)::numeric, 'F', '{тонна,тонны,тонн}', 'M', '{кг}', '999d')) AS massa_brutto_propis,
+		
+		(SELECT 
+			coalesce(perev.name||', ', '')||
+			coalesce('ИНН '||perev.inn||' ', '')||
+			coalesce('КПП '||perev.kpp||' ', '')||
+			coalesce(', '||perev.address_legal, '')||
+			coalesce(', р/с '||perev.bank_account, '')||
+			coalesce(', в банке '||bnk.name, '')||
+			coalesce(', БИК '||perev.bank_bik, '')||
+			coalesce(', к/с '||bnk.korshet, '')
+		FROM
+		(SELECT jsonb_array_elements(vh.vehicle_owners->'rows') As r) AS s
+		LEFT JOIN vehicle_owners AS perev_org ON (s.r->'fields'->'owner'->'keys'->>'id')::int = perev_org.id
+		LEFT JOIN clients AS perev ON perev.id = perev_org.client_id
+		LEFT JOIN banks.banks AS bnk ON bnk.bik = perev.bank_bik		
+		
+		WHERE (s.r->'fields'->>'dt_from')::timestamp with time zone <= sh.ship_date_time
+		ORDER BY (s.r->'fields'->>'dt_from')::timestamp with time zone DESC
+		LIMIT 1
+		) AS perevozchik
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW ttn OWNER TO beton;
+
+
+-- ******************* update 21/03/2025 15:10:14 ******************
+-- VIEW: ttn
+
+--DROP VIEW ttn;
+
+CREATE OR REPLACE VIEW ttn AS
+	SELECT
+		sh.id AS nomer,
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.ship_date_time::date,'DD TMMonth YYYY') AS data_propis,
+		
+		to_char(sh.ship_date_time::date,'DD') AS data_den,
+		to_char(sh.ship_date_time::date,'TMMonth') AS data_mes,
+		to_char(sh.ship_date_time::date,'YYYY')||'г.' AS data_god,
+		
+		coalesce(cl.name_full, cl.name)||' '||
+		coalesce('ИНН '||cl.inn||' ', '')||
+		coalesce('КПП '||cl.kpp||' ', '')||
+		coalesce(', '||cl.address_legal, '')||
+		coalesce(', '||cl.tels_1c, '')		
+		AS platelschik,
+		 
+		sh.quant AS nomen_kol,
+		sh.quant*2.4 AS nomen_massa,
+		'Бетон '||ct.name AS nomen_naim,
+		substr('00000',1,5-length(ct.id::text))||ct.id AS nomen_kod,
+		
+		trim(to_char(
+			CASE WHEN coalesce(sh.quant,0)=0 THEN 0
+			ELSE shipments_cost(dest, o.concrete_type_id, o.date_time::date, sh, TRUE) / sh.quant
+			END
+		, '9999999D99'
+		)) AS nomen_cena,
+		
+		trim(to_char(shipments_cost(dest, o.concrete_type_id, o.date_time::date, sh, TRUE), '9999999D99')) AS nomen_summa,
+		ucase(
+			num_spelled(shipments_cost(dest, o.concrete_type_id, o.date_time::date, sh, TRUE), 'M', '{рубль,рубля,рублей}', 'F', '{копейка,копейки,копеек}', '00d')
+		) AS nomen_summa_propis,
+		
+		person_init(dr.name) AS voditel_fio,
+		coalesce(dr.driver_licence,'') AS voditel_udost,
+		dest.name AS punkt_razgruzki,
+		coalesce(vh.plate,'') AS avto_nomer,
+		coalesce(vh.make,'') AS avto_marka,
+		
+		coalesce(vh.weight_t,0) + sh.quant*2.4 AS massa_brutto,
+		ucase(num_spelled((sh.quant*2.4)::numeric, 'F', '{тонна,тонны,тонн}', 'M', '{кг}', '999d')) AS nomen_massa_propis,
+		
+		ucase(num_spelled((coalesce(vh.weight_t,0) + sh.quant*2.4)::numeric, 'F', '{тонна,тонны,тонн}', 'M', '{кг}', '999d')) AS massa_brutto_propis,
+		
+		(SELECT 
+			coalesce(perev.name||', ', '')||
+			coalesce('ИНН '||perev.inn||' ', '')||
+			coalesce('КПП '||perev.kpp||' ', '')||
+			coalesce(', '||perev.address_legal, '')||
+			coalesce(', р/с '||perev.bank_account, '')||
+			coalesce(', в банке '||bnk.name, '')||
+			coalesce(', БИК '||perev.bank_bik, '')||
+			coalesce(', к/с '||bnk.korshet, '')
+		FROM
+		(SELECT jsonb_array_elements(vh.vehicle_owners->'rows') As r) AS s
+		LEFT JOIN vehicle_owners AS perev_org ON (s.r->'fields'->'owner'->'keys'->>'id')::int = perev_org.id
+		LEFT JOIN clients AS perev ON perev.id = perev_org.client_id
+		LEFT JOIN banks.banks AS bnk ON bnk.bik = perev.bank_bik		
+		
+		WHERE (s.r->'fields'->>'dt_from')::timestamp with time zone <= sh.ship_date_time
+		ORDER BY (s.r->'fields'->>'dt_from')::timestamp with time zone DESC
+		LIMIT 1
+		) AS perevozchik
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW ttn OWNER TO beton;
+
+
+-- ******************* update 21/03/2025 15:16:06 ******************
+-- VIEW: ttn
+
+--DROP VIEW ttn;
+
+CREATE OR REPLACE VIEW ttn AS
+	SELECT
+		sh.id AS nomer,
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.ship_date_time::date,'DD TMMonth YYYY') AS data_propis,
+		
+		to_char(sh.ship_date_time::date,'DD') AS data_den,
+		to_char(sh.ship_date_time::date,'TMMonth') AS data_mes,
+		to_char(sh.ship_date_time::date,'YYYY')||'г.' AS data_god,
+		
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		coalesce(', КПП '||cl.kpp, '')||
+		coalesce(', '||cl.address_legal, '')||
+		coalesce(', '||cl.tels_1c, '')		
+		AS platelschik,
+		 
+		sh.quant AS nomen_kol,
+		sh.quant*2.4 AS nomen_massa,
+		'Бетон '||ct.name AS nomen_naim,
+		substr('00000',1,5-length(ct.id::text))||ct.id AS nomen_kod,
+		
+		trim(to_char(
+			CASE WHEN coalesce(sh.quant,0)=0 THEN 0
+			ELSE shipments_cost(dest, o.concrete_type_id, o.date_time::date, sh, TRUE) / sh.quant
+			END
+		, '9999999D99'
+		)) AS nomen_cena,
+		
+		trim(to_char(shipments_cost(dest, o.concrete_type_id, o.date_time::date, sh, TRUE), '9999999D99')) AS nomen_summa,
+		ucase(
+			num_spelled(shipments_cost(dest, o.concrete_type_id, o.date_time::date, sh, TRUE), 'M', '{рубль,рубля,рублей}', 'F', '{копейка,копейки,копеек}', '00d')
+		) AS nomen_summa_propis,
+		
+		person_init(dr.name) AS voditel_fio,
+		coalesce(dr.driver_licence,'') AS voditel_udost,
+		dest.name AS punkt_razgruzki,
+		coalesce(vh.plate,'') AS avto_nomer,
+		coalesce(vh.make,'') AS avto_marka,
+		
+		coalesce(vh.weight_t,0) + sh.quant*2.4 AS massa_brutto,
+		ucase(num_spelled((sh.quant*2.4)::numeric, 'F', '{тонна,тонны,тонн}', 'M', '{кг}', '999d')) AS nomen_massa_propis,
+		
+		ucase(num_spelled((coalesce(vh.weight_t,0) + sh.quant*2.4)::numeric, 'F', '{тонна,тонны,тонн}', 'M', '{кг}', '999d')) AS massa_brutto_propis,
+		
+		(SELECT 
+			coalesce(perev.name||', ', '')||
+			coalesce('ИНН '||perev.inn||' ', '')||
+			coalesce('КПП '||perev.kpp||' ', '')||
+			coalesce(', '||perev.address_legal, '')||
+			coalesce(', р/с '||perev.bank_account, '')||
+			coalesce(', в банке '||bnk.name, '')||
+			coalesce(', БИК '||perev.bank_bik, '')||
+			coalesce(', к/с '||bnk.korshet, '')
+		FROM
+		(SELECT jsonb_array_elements(vh.vehicle_owners->'rows') As r) AS s
+		LEFT JOIN vehicle_owners AS perev_org ON (s.r->'fields'->'owner'->'keys'->>'id')::int = perev_org.id
+		LEFT JOIN clients AS perev ON perev.id = perev_org.client_id
+		LEFT JOIN banks.banks AS bnk ON bnk.bik = perev.bank_bik		
+		
+		WHERE (s.r->'fields'->>'dt_from')::timestamp with time zone <= sh.ship_date_time
+		ORDER BY (s.r->'fields'->>'dt_from')::timestamp with time zone DESC
+		LIMIT 1
+		) AS perevozchik
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+--ALTER VIEW ttn OWNER TO beton;
+
+
+-- ******************* update 21/03/2025 15:27:47 ******************
+-- VIEW: ttn
+
+--DROP VIEW ttn;
+
+CREATE OR REPLACE VIEW ttn AS
+	SELECT
+		sh.id AS nomer,
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.ship_date_time::date,'DD TMMonth YYYY') AS data_propis,
+		
+		to_char(sh.ship_date_time::date,'DD') AS data_den,
+		to_char(sh.ship_date_time::date,'TMMonth') AS data_mes,
+		to_char(sh.ship_date_time::date,'YYYY')||'г.' AS data_god,
+		
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS platelschik,
+		 
+		sh.quant AS nomen_kol,
+		sh.quant*2.4 AS nomen_massa,
+		'Бетон '||ct.name AS nomen_naim,
+		substr('00000',1,5-length(ct.id::text))||ct.id AS nomen_kod,
+		
+		trim(to_char(
+			CASE WHEN coalesce(sh.quant,0)=0 THEN 0
+			ELSE shipments_cost(dest, o.concrete_type_id, o.date_time::date, sh, TRUE) / sh.quant
+			END
+		, '9999999D99'
+		)) AS nomen_cena,
+		
+		trim(to_char(shipments_cost(dest, o.concrete_type_id, o.date_time::date, sh, TRUE), '9999999D99')) AS nomen_summa,
+		ucase(
+			num_spelled(shipments_cost(dest, o.concrete_type_id, o.date_time::date, sh, TRUE), 'M', '{рубль,рубля,рублей}', 'F', '{копейка,копейки,копеек}', '00d')
+		) AS nomen_summa_propis,
+		
+		person_init(dr.name) AS voditel_fio,
+		coalesce(dr.driver_licence,'') AS voditel_udost,
+		dest.name AS punkt_razgruzki,
+		coalesce(vh.plate,'') AS avto_nomer,
+		coalesce(vh.make,'') AS avto_marka,
+		
+		coalesce(vh.weight_t,0) + sh.quant*2.4 AS massa_brutto,
+		ucase(num_spelled((sh.quant*2.4)::numeric, 'F', '{тонна,тонны,тонн}', 'M', '{кг}', '999d')) AS nomen_massa_propis,
+		
+		ucase(num_spelled((coalesce(vh.weight_t,0) + sh.quant*2.4)::numeric, 'F', '{тонна,тонны,тонн}', 'M', '{кг}', '999d')) AS massa_brutto_propis,
+		
+		(SELECT 
+			coalesce(perev.name||', ', '')||
+			coalesce('ИНН '||perev.inn||' ', '')||
+			coalesce('КПП '||perev.kpp||' ', '')||
+			coalesce(', '||perev.address_legal, '')||
+			coalesce(', р/с '||perev.bank_account, '')||
+			coalesce(', в банке '||bnk.name, '')||
+			coalesce(', БИК '||perev.bank_bik, '')||
+			coalesce(', к/с '||bnk.korshet, '')
+		FROM
+		(SELECT jsonb_array_elements(vh.vehicle_owners->'rows') As r) AS s
+		LEFT JOIN vehicle_owners AS perev_org ON (s.r->'fields'->'owner'->'keys'->>'id')::int = perev_org.id
+		LEFT JOIN clients AS perev ON perev.id = perev_org.client_id
+		LEFT JOIN banks.banks AS bnk ON bnk.bik = perev.bank_bik		
+		
+		WHERE (s.r->'fields'->>'dt_from')::timestamp with time zone <= sh.ship_date_time
+		ORDER BY (s.r->'fields'->>'dt_from')::timestamp with time zone DESC
+		LIMIT 1
+		) AS perevozchik
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+--ALTER VIEW ttn OWNER TO beton;
+
+
+-- ******************* update 21/03/2025 15:30:00 ******************
+-- VIEW: transp_nakl
+
+--DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id AS nomer,
+		sh.id AS nomer2,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel1,
+
+		coalesce(cl.name||' ', '')||
+		coalesce(', '||cl.address_legal, '')		
+		AS gruzopoluchatel,
+		
+		'Бетон '||ct.name AS gruz_naim,
+		1 AS gruz_mest,
+		sh.quant*2.4*1000 AS gruz_massa,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		vh.plate AS avto_nomer,
+		
+		coalesce(dr.name,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 21/03/2025 15:34:20 ******************
+-- VIEW: transp_nakl
+
+--DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id AS nomer,
+		sh.id AS nomer2,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		'Бетон '||ct.name AS gruz_naim,
+		1 AS gruz_mest,
+		sh.quant*2.4*1000 AS gruz_massa,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		vh.plate AS avto_nomer,
+		
+		coalesce(dr.name,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 21/03/2025 15:40:27 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id AS nomer,
+		sh.id AS nomer2,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000 AS gruz_massa,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		vh.plate AS avto_nomer,
+		
+		coalesce(dr.name,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 21/03/2025 15:41:45 ******************
+-- VIEW: transp_nakl
+
+--DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id AS nomer,
+		sh.id AS nomer2,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000 AS gruz_massa,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		vh.plate AS avto_nomer,
+		
+		coalesce(dr.name,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 21/03/2025 15:43:04 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id AS nomer,
+		sh.id AS nomer2,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000||' кг, '||sh.quant||' м3' AS gruz_massa,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		vh.plate AS avto_nomer,
+		
+		coalesce(dr.name,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 21/03/2025 16:02:40 ******************
+
+	-- ********** Adding new table from model **********
+	CREATE TABLE public.buh_docs
+	(order_id int NOT NULL REFERENCES orders(id),nomer text,ref_1c  varchar(36),CONSTRAINT buh_docs_pkey PRIMARY KEY (order_id)
+	);
+	ALTER TABLE public.buh_docs OWNER TO beton;
+
+
+
+-- ******************* update 21/03/2025 16:19:13 ******************
+
+		ALTER TABLE public.buh_docs add column data timestamp;
+
+
+
+-- ******************* update 21/03/2025 16:19:23 ******************
+
+		ALTER TABLE public.buh_docs add column date_time timestamp;
+
+
+
+-- ******************* update 21/03/2025 16:19:37 ******************
+
+		ALTER TABLE public.buh_docs drop column data;
+
+
+
+-- ******************* update 21/03/2025 17:15:36 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer,
+		
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer2,
+		
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000||' кг, '||sh.quant||' м3' AS gruz_massa,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		vh.plate AS avto_nomer,
+		
+		coalesce(dr.name,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 21/03/2025 17:16:04 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id,
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer,
+		
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer2,
+		
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000||' кг, '||sh.quant||' м3' AS gruz_massa,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		vh.plate AS avto_nomer,
+		
+		coalesce(dr.name,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 21/03/2025 17:29:42 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id,
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer,
+		
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer2,
+		
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		(SELECT faktura_nomer FROM buh_docs WHERE order_id = o.id) AS faktura_nomer,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000||' кг, '||sh.quant||' м3' AS gruz_massa,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		vh.plate AS avto_nomer,
+		
+		coalesce(dr.name,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 21/03/2025 17:38:53 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id,
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer,
+		
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer2,
+		
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		(SELECT REGEXP_REPLACE(faktura_nomer, '^0+', '', 'g') FROM buh_docs WHERE order_id = o.id)::text||' '||
+		(SELECT SUBSTRING(faktura_data,1,10) FROM buh_docs WHERE order_id = o.id)
+		AS faktura_nomer,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000||' кг, '||sh.quant||' м3' AS gruz_massa,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		vh.plate AS avto_nomer,
+		
+		coalesce(dr.name,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 21/03/2025 17:38:56 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id,
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer,
+		
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer2,
+		
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		(SELECT REGEXP_REPLACE(faktura_nomer, '^0+', '', 'g') FROM buh_docs WHERE order_id = o.id)::text||' от '||
+		(SELECT SUBSTRING(faktura_data,1,10) FROM buh_docs WHERE order_id = o.id)
+		AS faktura_nomer,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000||' кг, '||sh.quant||' м3' AS gruz_massa,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		vh.plate AS avto_nomer,
+		
+		coalesce(dr.name,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 21/03/2025 18:08:52 ******************
+CREATE OR REPLACE FUNCTION sms_new_pwd(in_vehicle_id int)
+RETURNS int AS
+$$
+	select
+		(r.rows->'fields'->'owner'->'keys'->'id')::int
+	FROM	
+	(select jsonb_array_elements(vehicle_owners->'rows') AS rows from vehicles where id=in_vehicle_id) AS r
+	order by r.rows->'dt_from' asc
+	limit 1;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+
+
+-- ******************* update 21/03/2025 18:09:08 ******************
+﻿-- Function: sms_new_pwd(in_user_id int, in_pwd text)
+
+ DROP FUNCTION sms_new_pwd(in_user_id int, in_pwd text);
+
+/**
+ * Используется именно функция
+ * из User_Controller
+ */
+CREATE OR REPLACE FUNCTION sms_new_pwd(in_user_id int, in_pwd text)
+  RETURNS TABLE(
+  	phone_cel text,
+  	message text,
+  	ext_contact_id int
+  ) AS
+$$
+	SELECT
+		format_cel_standart(ct.tel) AS tel,
+		sms_templates_text(
+			ARRAY[
+				format('("pwd","%s")'::text, in_pwd)::template_value,
+				format('("name","%s")'::text, u.name::text)::template_value
+			],
+			( SELECT t.pattern
+			FROM sms_patterns t
+			WHERE t.sms_type = 'new_pwd'::sms_types AND t.lang_id = ((const_def_lang_val())->'keys'->>'id')::int
+			)
+		) AS message,
+		ct.id AS ext_contact_id
+	
+	FROM users AS u
+	LEFT JOIN entity_contacts AS e_ct ON e_ct.entity_type = 'users' AND e_ct.entity_id = in_user_id
+	LEFT JOIN contacts AS ct ON ct.id = e_ct.contact_id
+	WHERE u.id = in_user_id;	
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+ALTER FUNCTION sms_new_pwd(in_user_id int, in_pwd text) OWNER TO beton;
+
+
+-- ******************* update 21/03/2025 18:09:32 ******************
+CREATE OR REPLACE FUNCTION wehicle_owner_last(in_vehicle_id int)
+RETURNS int AS
+$$
+	select
+		(r.rows->'fields'->'owner'->'keys'->'id')::int
+	FROM	
+	(select jsonb_array_elements(vehicle_owners->'rows') AS rows from vehicles where id=in_vehicle_id) AS r
+	order by r.rows->'dt_from' asc
+	limit 1;
+$$
+  LANGUAGE sql VOLATILE
+  COST 100;
+
+
+-- ******************* update 22/03/2025 07:56:57 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id,
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer,
+		
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer2,
+		
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		--coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		(SELECT REGEXP_REPLACE(faktura_nomer, '^0+', '', 'g') FROM buh_docs WHERE order_id = o.id)::text||' от '||
+		(SELECT SUBSTRING(faktura_data,1,10) FROM buh_docs WHERE order_id = o.id)
+		AS faktura_nomer,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000||' кг, '||sh.quant||' м3' AS gruz_massa,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		vh.plate AS avto_nomer,
+		
+		coalesce(dr.name,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 22/03/2025 08:02:30 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id,
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer,
+		
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer2,
+		
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		--coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		(SELECT REGEXP_REPLACE(faktura_nomer, '^0+', '', 'g') FROM buh_docs WHERE order_id = o.id)::text||' от '||
+		(SELECT SUBSTRING(faktura_data,1,10) FROM buh_docs WHERE order_id = o.id)
+		AS faktura_nomer,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000||' кг, '||sh.quant||' м3' AS gruz_massa,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		UPPER(vh.plate) AS avto_nomer,
+		
+		coalesce(dr.name,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 22/03/2025 08:03:12 ******************
+-- VIEW: transp_nakl
+
+--DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id,
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer,
+		
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer2,
+		
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		--coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		'УПД '||(SELECT REGEXP_REPLACE(faktura_nomer, '^0+', '', 'g') FROM buh_docs WHERE order_id = o.id)::text||' от '||
+		(SELECT SUBSTRING(faktura_data,1,10) FROM buh_docs WHERE order_id = o.id)
+		AS faktura_nomer,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000||' кг, '||sh.quant||' м3' AS gruz_massa,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		UPPER(vh.plate) AS avto_nomer,
+		
+		coalesce(dr.name,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 22/03/2025 08:04:08 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id,
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer,
+		
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer2,
+		
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		--coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		'УПД '||(SELECT REGEXP_REPLACE(faktura_nomer, '^0+', '', 'g') FROM buh_docs WHERE order_id = o.id)::text||' от '||
+		(SELECT SUBSTRING(faktura_data,1,10) FROM buh_docs WHERE order_id = o.id)
+		AS faktura,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000||' кг, '||sh.quant||' м3' AS gruz_massa,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		UPPER(vh.plate) AS avto_nomer,
+		
+		coalesce(dr.name,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 22/03/2025 08:23:14 ******************
+
+		ALTER TABLE public.drivers ADD COLUMN inn text;
+		
+
+
+-- ******************* update 22/03/2025 08:29:53 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id,
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer,
+		
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer2,
+		
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		--coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		'УПД '||(SELECT REGEXP_REPLACE(faktura_nomer, '^0+', '', 'g') FROM buh_docs WHERE order_id = o.id)::text||' от '||
+		(SELECT SUBSTRING(faktura_data,1,10) FROM buh_docs WHERE order_id = o.id)
+		AS faktura,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000||' кг, '||sh.quant||' м3' AS gruz_massa,
+		
+		(SELECT
+			coalesce(cl_per.name_full, cl_per.name)||
+			coalesce(', ИНН '||cl_per.inn, '')||
+			--coalesce(', КПП '||cl_per.kpp, '')||
+			', '||coalesce( coalesce(cl_per.address_fact, cl_per.address_legal), dest.name)||
+			coalesce(', '||cl_per.tels_1c, '')		
+		FROM
+		(SELECT  
+			vh_cl.name_full,
+			vh_cl.name,
+			vh_cl.inn,
+			vh_cl.id,
+			vh_cl.ref_1c,
+			vh_cl.address_fact,
+			vh_cl.address_legal,
+			vh_cl.tels_1c
+		FROM vehicle_owners AS vh_own 
+		LEFT JOIN clients AS vh_cl ON vh_cl.id = vh_own.client_id
+		WHERE vh_own.id = wehicle_owner_last(vh.id)
+		) AS cl_per
+		) AS perevozchik,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		UPPER(vh.plate) AS avto_nomer,
+		
+		coalesce(dr.name,'')||
+		coalesce(', ИНН '||dr.inn,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 22/03/2025 08:34:54 ******************
+ALTER TABLE public.vehicles ADD COLUMN plate_region  varchar(3);
+
+
+
+-- ******************* update 22/03/2025 08:39:39 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id,
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer,
+		
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer2,
+		
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		--coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		'УПД '||(SELECT REGEXP_REPLACE(faktura_nomer, '^0+', '', 'g') FROM buh_docs WHERE order_id = o.id)::text||' от '||
+		(SELECT SUBSTRING(faktura_data,1,10) FROM buh_docs WHERE order_id = o.id)
+		AS faktura,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000||' кг, '||sh.quant||' м3' AS gruz_massa,
+		
+		(SELECT
+			coalesce(cl_per.name_full, cl_per.name)||
+			coalesce(', ИНН '||cl_per.inn, '')||
+			--coalesce(', КПП '||cl_per.kpp, '')||
+			', '||coalesce( coalesce(cl_per.address_fact, cl_per.address_legal), dest.name)||
+			coalesce(', '||cl_per.tels_1c, '')		
+		FROM
+		(SELECT  
+			vh_cl.name_full,
+			vh_cl.name,
+			vh_cl.inn,
+			vh_cl.id,
+			vh_cl.ref_1c,
+			vh_cl.address_fact,
+			vh_cl.address_legal,
+			vh_cl.tels_1c
+		FROM vehicle_owners AS vh_own 
+		LEFT JOIN clients AS vh_cl ON vh_cl.id = vh_own.client_id
+		WHERE vh_own.id = wehicle_owner_last(vh.id)
+		) AS cl_per
+		) AS perevozchik,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		UPPER(vh.plate)||coalesce(vh.plate_region,' 72') AS avto_nomer,
+		
+		coalesce(dr.name,'')||
+		coalesce(', ИНН '||dr.inn,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 22/03/2025 08:47:52 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id,
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer,
+		
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer2,
+		
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		--coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		'УПД '||(SELECT REGEXP_REPLACE(faktura_nomer, '^0+', '', 'g') FROM buh_docs WHERE order_id = o.id)::text||' от '||
+		(SELECT SUBSTRING(faktura_data,1,10) FROM buh_docs WHERE order_id = o.id)
+		AS faktura,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000||' кг, '||sh.quant||' м3' AS gruz_massa,
+		
+		(SELECT
+			coalesce(cl_per.name_full, cl_per.name)||
+			coalesce(', ИНН '||cl_per.inn, '')||
+			--coalesce(', КПП '||cl_per.kpp, '')||
+			', '||coalesce( coalesce(cl_per.address_fact, cl_per.address_legal), dest.name)||
+			coalesce(', '||cl_per.tels_1c, '')		
+		FROM
+		(SELECT  
+			vh_cl.name_full,
+			vh_cl.name,
+			vh_cl.inn,
+			vh_cl.id,
+			vh_cl.ref_1c,
+			vh_cl.address_fact,
+			vh_cl.address_legal,
+			vh_cl.tels_1c
+		FROM vehicle_owners AS vh_own 
+		LEFT JOIN clients AS vh_cl ON vh_cl.id = vh_own.client_id
+		WHERE vh_own.id = wehicle_owner_last(vh.id)
+		) AS cl_per
+		) AS perevozchik,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		UPPER(vh.plate)||coalesce(vh.plate_region,' 72') AS avto_nomer,
+		
+		coalesce(dr.name,'')||
+		coalesce(', ИНН '||dr.inn,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time ASC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time DESC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 22/03/2025 08:48:27 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id,
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer,
+		
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer2,
+		
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		--coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		'УПД '||(SELECT REGEXP_REPLACE(faktura_nomer, '^0+', '', 'g') FROM buh_docs WHERE order_id = o.id)::text||' от '||
+		(SELECT SUBSTRING(faktura_data,1,10) FROM buh_docs WHERE order_id = o.id)
+		AS faktura,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000||' кг, '||sh.quant||' м3' AS gruz_massa,
+		
+		(SELECT
+			coalesce(cl_per.name_full, cl_per.name)||
+			coalesce(', ИНН '||cl_per.inn, '')||
+			--coalesce(', КПП '||cl_per.kpp, '')||
+			', '||coalesce( coalesce(cl_per.address_fact, cl_per.address_legal), dest.name)||
+			coalesce(', '||cl_per.tels_1c, '')		
+		FROM
+		(SELECT  
+			vh_cl.name_full,
+			vh_cl.name,
+			vh_cl.inn,
+			vh_cl.id,
+			vh_cl.ref_1c,
+			vh_cl.address_fact,
+			vh_cl.address_legal,
+			vh_cl.tels_1c
+		FROM vehicle_owners AS vh_own 
+		LEFT JOIN clients AS vh_cl ON vh_cl.id = vh_own.client_id
+		WHERE vh_own.id = wehicle_owner_last(vh.id)
+		) AS cl_per
+		) AS perevozchik,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		UPPER(vh.plate)||coalesce(vh.plate_region,' 72') AS avto_nomer,
+		
+		coalesce(dr.name,'')||
+		coalesce(', ИНН '||dr.inn,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time ASC
+		LIMIT 1
+		) AS data_vremia_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'assigned'
+		ORDER BY st.date_time ASC
+		LIMIT 1
+		) AS data_fakt_prib_pogruzki,
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_dest'
+		ORDER BY st.date_time ASC
+		LIMIT 1
+		) AS data_fakt_ubit_pogruzki,
+		
+		
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'at_dest'
+		ORDER BY st.date_time ASC
+		LIMIT 1
+		) AS data_fakt_prib_vigruzki,
+
+		(SELECT
+			to_char(st.date_time,'DD.MM.YY HH24:MI')
+		FROM vehicle_schedule_states AS st
+		WHERE st.schedule_id = sh.vehicle_schedule_id
+			AND st.date_time > sh.date_time
+			AND st.state = 'left_for_base'
+		ORDER BY st.date_time ASC
+		LIMIT 1
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 22/03/2025 08:51:54 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id,
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer,
+		
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer2,
+		
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		--coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		'УПД '||(SELECT REGEXP_REPLACE(faktura_nomer, '^0+', '', 'g') FROM buh_docs WHERE order_id = o.id)::text||' от '||
+		(SELECT SUBSTRING(faktura_data,1,10) FROM buh_docs WHERE order_id = o.id)
+		AS faktura,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		sh.quant*2.4*1000||' кг, '||sh.quant||' м3' AS gruz_massa,
+		
+		(SELECT
+			coalesce(cl_per.name_full, cl_per.name)||
+			coalesce(', ИНН '||cl_per.inn, '')||
+			--coalesce(', КПП '||cl_per.kpp, '')||
+			', '||coalesce( coalesce(cl_per.address_fact, cl_per.address_legal), dest.name)||
+			coalesce(', '||cl_per.tels_1c, '')		
+		FROM
+		(SELECT  
+			vh_cl.name_full,
+			vh_cl.name,
+			vh_cl.inn,
+			vh_cl.id,
+			vh_cl.ref_1c,
+			vh_cl.address_fact,
+			vh_cl.address_legal,
+			vh_cl.tels_1c
+		FROM vehicle_owners AS vh_own 
+		LEFT JOIN clients AS vh_cl ON vh_cl.id = vh_own.client_id
+		WHERE vh_own.id = wehicle_owner_last(vh.id)
+		) AS cl_per
+		) AS perevozchik,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		UPPER(vh.plate)||coalesce(vh.plate_region,' 72') AS avto_nomer,
+		
+		coalesce(dr.name,'')||
+		coalesce(', ИНН '||dr.inn,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		
+		coalesce(
+			(SELECT
+				to_char(st.date_time,'DD.MM.YY HH24:MI')
+			FROM vehicle_schedule_states AS st
+			WHERE st.schedule_id = sh.vehicle_schedule_id
+				AND st.date_time > sh.date_time
+				AND st.state = 'at_dest'
+			ORDER BY st.date_time ASC
+			LIMIT 1),			
+			to_char(sh.date_time,'DD.MM.YY')	
+		) AS data_vremia_vigruzki,
+
+		coalesce(
+			(SELECT
+				to_char(st.date_time,'DD.MM.YY HH24:MI')
+			FROM vehicle_schedule_states AS st
+			WHERE st.schedule_id = sh.vehicle_schedule_id
+				AND st.date_time > sh.date_time
+				AND st.state = 'assigned'
+			ORDER BY st.date_time ASC
+			LIMIT 1),			
+			to_char(sh.date_time,'DD.MM.YY')	
+		) AS data_fakt_prib_pogruzki,
+		
+		coalesce(
+			(SELECT
+				to_char(st.date_time,'DD.MM.YY HH24:MI')
+			FROM vehicle_schedule_states AS st
+			WHERE st.schedule_id = sh.vehicle_schedule_id
+				AND st.date_time > sh.date_time
+				AND st.state = 'left_for_dest'
+			ORDER BY st.date_time ASC
+			LIMIT 1),			
+			to_char(sh.date_time,'DD.MM.YY')	
+		) AS data_fakt_ubit_pogruzki,
+		
+		coalesce(
+			(SELECT
+				to_char(st.date_time,'DD.MM.YY HH24:MI')
+			FROM vehicle_schedule_states AS st
+			WHERE st.schedule_id = sh.vehicle_schedule_id
+				AND st.date_time > sh.date_time
+				AND st.state = 'at_dest'
+			ORDER BY st.date_time ASC
+			LIMIT 1),			
+			to_char(sh.date_time,'DD.MM.YY')	
+		) AS data_fakt_prib_vigruzki,
+		
+		coalesce(
+			(SELECT
+				to_char(st.date_time,'DD.MM.YY HH24:MI')
+			FROM vehicle_schedule_states AS st
+			WHERE st.schedule_id = sh.vehicle_schedule_id
+				AND st.date_time > sh.date_time
+				AND st.state = 'left_for_base'
+			ORDER BY st.date_time ASC
+			LIMIT 1),			
+			to_char(sh.date_time,'DD.MM.YY')	
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 22/03/2025 09:21:13 ******************
+
+		ALTER TABLE public.production_sites ADD COLUMN dispatcher_id int REFERENCES employees(id);
+
+
+
+-- ******************* update 22/03/2025 09:24:57 ******************
+ALTER TABLE public.employees add column inn text;
+
+
+
+-- ******************* update 22/03/2025 09:35:56 ******************
+ALTER TABLE public.employees ADD COLUMN post text;
+
+
+
+-- ******************* update 22/03/2025 11:10:34 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id,
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer,
+		
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer2,
+		
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		--coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		'УПД '||(SELECT REGEXP_REPLACE(faktura_nomer, '^0+', '', 'g') FROM buh_docs WHERE order_id = o.id)::text||' от '||
+		(SELECT SUBSTRING(faktura_data,1,10) FROM buh_docs WHERE order_id = o.id)
+		AS faktura,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		round(sh.quant*2.4*1000)||' кг, '||sh.quant||' м3' AS gruz_massa,
+		
+		(SELECT
+			coalesce(cl_per.name_full, cl_per.name)||
+			coalesce(', ИНН '||cl_per.inn, '')||
+			--coalesce(', КПП '||cl_per.kpp, '')||
+			', '||coalesce( coalesce(cl_per.address_fact, cl_per.address_legal), dest.name)||
+			coalesce(', '||cl_per.tels_1c, '')		
+		FROM
+		(SELECT  
+			vh_cl.name_full,
+			vh_cl.name,
+			vh_cl.inn,
+			vh_cl.id,
+			vh_cl.ref_1c,
+			vh_cl.address_fact,
+			vh_cl.address_legal,
+			vh_cl.tels_1c
+		FROM vehicle_owners AS vh_own 
+		LEFT JOIN clients AS vh_cl ON vh_cl.id = vh_own.client_id
+		WHERE vh_own.id = wehicle_owner_last(vh.id)
+		) AS cl_per
+		) AS perevozchik,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		UPPER(vh.plate)||coalesce(vh.plate_region,' 72') AS avto_nomer,
+		
+		coalesce(dr.name,'')||
+		coalesce(', ИНН '||dr.inn,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		coalesce(
+			(SELECT
+				to_char(st.date_time,'DD.MM.YY HH24:MI')
+			FROM vehicle_schedule_states AS st
+			WHERE st.schedule_id = sh.vehicle_schedule_id
+				AND st.date_time > sh.date_time
+				AND st.state = 'at_dest'
+			ORDER BY st.date_time ASC
+			LIMIT 1),			
+			to_char(sh.date_time,'DD.MM.YY')	
+		) AS data_vremia_vigruzki,
+
+		coalesce(
+			(SELECT
+				to_char(st.date_time,'DD.MM.YY HH24:MI')
+			FROM vehicle_schedule_states AS st
+			WHERE st.schedule_id = sh.vehicle_schedule_id
+				AND st.date_time > sh.date_time
+				AND st.state = 'assigned'
+			ORDER BY st.date_time ASC
+			LIMIT 1),			
+			to_char(sh.date_time,'DD.MM.YY')	
+		) AS data_fakt_prib_pogruzki,
+		
+		to_char(sh.ship_date_time, 'DD.MM.YY HH24:MI') AS data_fakt_ubit_pogruzki,
+		
+		coalesce(
+			(SELECT
+				to_char(st.date_time,'DD.MM.YY HH24:MI')
+			FROM vehicle_schedule_states AS st
+			WHERE st.schedule_id = sh.vehicle_schedule_id
+				AND st.date_time > sh.date_time
+				AND st.state = 'at_dest'
+			ORDER BY st.date_time ASC
+			LIMIT 1),			
+			to_char(sh.date_time,'DD.MM.YY')	
+		) AS data_fakt_prib_vigruzki,
+		
+		coalesce(
+			(SELECT
+				to_char(st.date_time,'DD.MM.YY HH24:MI')
+			FROM vehicle_schedule_states AS st
+			WHERE st.schedule_id = sh.vehicle_schedule_id
+				AND st.date_time > sh.date_time
+				AND st.state = 'left_for_base'
+			ORDER BY st.date_time ASC
+			LIMIT 1),			
+			to_char(sh.date_time,'DD.MM.YY')	
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln,
+		
+		coalesce(emp_disp.name, 'Верхорубов Евгений Николаевич') AS dispetcher,
+		coalesce(emp_disp.post, 'Диспетчер РБУ') AS dispetcher_dolzhnost
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	LEFT JOIN production_sites pr_st ON pr_st.id = sh.production_site_id
+	LEFT JOIN employees emp_disp ON emp_disp.id = pr_st.dispatcher_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;
+
+
+-- ******************* update 22/03/2025 11:18:46 ******************
+-- VIEW: transp_nakl
+
+DROP VIEW transp_nakl;
+
+CREATE OR REPLACE VIEW transp_nakl AS
+	SELECT
+		sh.id,
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer,
+		
+		(SELECT nomer FROM buh_docs WHERE order_id = o.id)||'/'||
+		(SELECT
+			ranks.sh_rank
+		FROM 
+			(SELECT
+				rank() over (order by t.ship_date_time) AS sh_rank,
+				t.id
+			FROM
+				shipments AS t
+			WHERE t.order_id = o.id 
+			)
+		AS ranks
+		WHERE ranks.id = sh.id	
+		) AS nomer2,
+		
+		to_char(sh.date_time::date,'DD.MM.YY') AS data,
+		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
+		
+		'' AS gruzopoluchatel1,
+
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		--coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
+		AS gruzopoluchatel,
+		
+		'УПД '||(SELECT REGEXP_REPLACE(faktura_nomer, '^0+', '', 'g') FROM buh_docs WHERE order_id = o.id)::text||' от '||
+		(SELECT SUBSTRING(faktura_data,1,10) FROM buh_docs WHERE order_id = o.id)
+		AS faktura,
+		
+		CASE
+			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
+			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
+			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			ELSE 'Бетон (БСТ)'
+		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
+		
+		'1 место' AS gruz_mest,
+		round(sh.quant*2.4*1000)||' кг, '||sh.quant||' м3' AS gruz_massa,
+		round(sh.quant*2.4*1000)||' кг' AS massa_netto,
+		
+		(SELECT
+			coalesce(cl_per.name_full, cl_per.name)||
+			coalesce(', ИНН '||cl_per.inn, '')||
+			--coalesce(', КПП '||cl_per.kpp, '')||
+			', '||coalesce( coalesce(cl_per.address_fact, cl_per.address_legal), dest.name)||
+			coalesce(', '||cl_per.tels_1c, '')		
+		FROM
+		(SELECT  
+			vh_cl.name_full,
+			vh_cl.name,
+			vh_cl.inn,
+			vh_cl.id,
+			vh_cl.ref_1c,
+			vh_cl.address_fact,
+			vh_cl.address_legal,
+			vh_cl.tels_1c
+		FROM vehicle_owners AS vh_own 
+		LEFT JOIN clients AS vh_cl ON vh_cl.id = vh_own.client_id
+		WHERE vh_own.id = wehicle_owner_last(vh.id)
+		) AS cl_per
+		) AS perevozchik,
+		
+		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
+		UPPER(vh.plate)||coalesce(vh.plate_region,' 72') AS avto_nomer,
+		
+		coalesce(dr.name,'')||
+		coalesce(', ИНН '||dr.inn,'') AS voditel,
+		
+		
+		dest.name AS adres,
+		
+		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		
+		coalesce(
+			(SELECT
+				to_char(st.date_time,'DD.MM.YY HH24:MI')
+			FROM vehicle_schedule_states AS st
+			WHERE st.schedule_id = sh.vehicle_schedule_id
+				AND st.date_time > sh.date_time
+				AND st.state = 'at_dest'
+			ORDER BY st.date_time ASC
+			LIMIT 1),			
+			to_char(sh.date_time,'DD.MM.YY')	
+		) AS data_vremia_vigruzki,
+
+		coalesce(
+			(SELECT
+				to_char(st.date_time,'DD.MM.YY HH24:MI')
+			FROM vehicle_schedule_states AS st
+			WHERE st.schedule_id = sh.vehicle_schedule_id
+				AND st.date_time > sh.date_time
+				AND st.state = 'assigned'
+			ORDER BY st.date_time ASC
+			LIMIT 1),			
+			to_char(sh.date_time,'DD.MM.YY')	
+		) AS data_fakt_prib_pogruzki,
+		
+		to_char(sh.ship_date_time, 'DD.MM.YY HH24:MI') AS data_fakt_ubit_pogruzki,
+		
+		coalesce(
+			(SELECT
+				to_char(st.date_time,'DD.MM.YY HH24:MI')
+			FROM vehicle_schedule_states AS st
+			WHERE st.schedule_id = sh.vehicle_schedule_id
+				AND st.date_time > sh.date_time
+				AND st.state = 'at_dest'
+			ORDER BY st.date_time ASC
+			LIMIT 1),			
+			to_char(sh.date_time,'DD.MM.YY')	
+		) AS data_fakt_prib_vigruzki,
+		
+		coalesce(
+			(SELECT
+				to_char(st.date_time,'DD.MM.YY HH24:MI')
+			FROM vehicle_schedule_states AS st
+			WHERE st.schedule_id = sh.vehicle_schedule_id
+				AND st.date_time > sh.date_time
+				AND st.state = 'left_for_base'
+			ORDER BY st.date_time ASC
+			LIMIT 1),			
+			to_char(sh.date_time,'DD.MM.YY')	
+		) AS data_fakt_ubit_vigruzki,
+		
+		'' AS sost_gruza_pogruzka,
+		'' AS sost_gruza_vigruzka,
+		
+		sh.quant*2.4*1000 AS gruz_massa_pogruzka,
+		sh.quant*2.4*1000 AS gruz_massa_vigruzka,
+		
+		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln,
+		
+		coalesce(emp_disp.name, 'Верхорубов Евгений Николаевич') AS dispetcher,
+		coalesce(emp_disp.post, 'Диспетчер РБУ') AS dispetcher_dolzhnost
+		
+	FROM shipments AS sh
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
+	
+	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	LEFT JOIN destinations dest ON dest.id = o.destination_id
+	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+	LEFT JOIN production_sites pr_st ON pr_st.id = sh.production_site_id
+	LEFT JOIN employees emp_disp ON emp_disp.id = pr_st.dispatcher_id
+	;
+	
+ALTER VIEW transp_nakl OWNER TO beton;

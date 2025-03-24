@@ -30,6 +30,11 @@ function DriverDialog_View(id,options){
 			"labelCaption":"Сотрудник:"
 		}));	
 
+		this.addElement(new Edit(id+":inn",{
+			"labelCaption":"ИНН:",
+			"title": "ИНН физического лица"
+		}));	
+
 		this.addElement(new EntityContactList_View(id+":contacts_list",{
 			"detail":true
 		}));		
@@ -45,6 +50,7 @@ function DriverDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("driver_licence")})
 		,new DataBinding({"control":this.getElement("driver_licence_class")})
 		,new DataBinding({"control":this.getElement("employed")})
+		,new DataBinding({"control":this.getElement("inn")})
 	];
 	this.setDataBindings(r_bd);
 	
@@ -54,6 +60,7 @@ function DriverDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("driver_licence")})
 		,new CommandBinding({"control":this.getElement("driver_licence_class")})
 		,new CommandBinding({"control":this.getElement("employed")})
+		,new CommandBinding({"control":this.getElement("inn")})
 	]);
 	var self = this;
 	this.addDetailDataSet({

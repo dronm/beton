@@ -9,6 +9,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
  
 class Employee_Model extends ModelSQLBeton{
@@ -55,6 +56,22 @@ class Employee_Model extends ModelSQLBeton{
 						
 		$f_user_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_id",$f_opts);
 		$this->addField($f_user_id);
+		//********************
+		
+		//*** Field inn ***
+		$f_opts = array();
+		$f_opts['id']="inn";
+						
+		$f_inn=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"inn",$f_opts);
+		$this->addField($f_inn);
+		//********************
+		
+		//*** Field post ***
+		$f_opts = array();
+		$f_opts['id']="post";
+						
+		$f_post=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"post",$f_opts);
+		$this->addField($f_post);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

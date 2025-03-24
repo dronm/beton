@@ -50,6 +50,16 @@ function Vehicle_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Регин номера';
+	filed_options.autoInc = false;	
+	
+	options.fields.plate_region = new FieldString("plate_region",filed_options);
+	options.fields.plate_region.getValidator().setMaxLength('3');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Номер число для сортировки';
 	filed_options.autoInc = false;	
 	

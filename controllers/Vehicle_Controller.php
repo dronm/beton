@@ -50,6 +50,13 @@ class Vehicle_Controller extends ControllerSQL{
 		
 			$f_params = array();
 			
+				$f_params['alias']='Регин номера';
+			$param = new FieldExtString('plate_region'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
 				$f_params['alias']='Номер число для сортировки';
 			$param = new FieldExtInt('plate_n'
 				,$f_params);
@@ -214,6 +221,13 @@ class Vehicle_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Номер';
 			$param = new FieldExtString('plate'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Регин номера';
+			$param = new FieldExtString('plate_region'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -1096,7 +1110,5 @@ class Vehicle_Controller extends ControllerSQL{
 			'ModelVars'
 		);	
 	}
-
 }
-
 ?>

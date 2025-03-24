@@ -46,6 +46,16 @@ function VehicleDialog_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Регион номера';
+	filed_options.autoInc = false;	
+	
+	options.fields.plate_region = new FieldString("plate_region",filed_options);
+	options.fields.plate_region.getValidator().setMaxLength('3');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Грузоподъемность';
 	filed_options.autoInc = false;	
 	

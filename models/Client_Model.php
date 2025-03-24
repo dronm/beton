@@ -163,6 +163,22 @@ class Client_Model extends ModelSQLBeton{
 		$this->addField($f_address_legal);
 		//********************
 		
+		//*** Field address_fact ***
+		$f_opts = array();
+		$f_opts['id']="address_fact";
+						
+		$f_address_fact=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"address_fact",$f_opts);
+		$this->addField($f_address_fact);
+		//********************
+		
+		//*** Field tels_1c ***
+		$f_opts = array();
+		$f_opts['id']="tels_1c";
+						
+		$f_tels_1c=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tels_1c",$f_opts);
+		$this->addField($f_tels_1c);
+		//********************
+		
 		//*** Field user_id ***
 		$f_opts = array();
 		

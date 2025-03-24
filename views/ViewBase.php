@@ -2126,6 +2126,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/controllers/ClientContract1c_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/ClientContract1c_Controller.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/ClientContract1cList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ClientContract1cList_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controllers/Connect1cCheck_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/Connect1cCheck_Controller.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/BuhDoc_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/BuhDoc_Model.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

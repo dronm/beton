@@ -380,6 +380,8 @@ $permissions = array();
 				
 					$permissions['Shipment_Controller_shipment_transp_nakl']=TRUE;
 				
+					$permissions['Shipment_Controller_shipment_transp_nakl_all']=TRUE;
+				
 					$permissions['Shipment_Controller_get_time_list']=TRUE;
 				
 					$permissions['Shipment_Controller_set_blanks_exist']=TRUE;

@@ -19,6 +19,8 @@ function OrderMakeForWeighingList_View(id,options){
 	};
 	window.getApp().getConstantManager().get(constants);
 
+	this.resetTotals();
+
 	//this.m_refreshInterval = constants.order_grid_refresh_interval.getValue()*1000;
 
 	var st_time = constants.first_shift_start_time.getValue();
@@ -179,6 +181,14 @@ OrderMakeForWeighingList_View.prototype.FORCE_REFRESH_INTERVAL = 30*60*1000;
 OrderMakeForWeighingList_View.prototype.m_startShiftMS;
 OrderMakeForWeighingList_View.prototype.m_endShiftMS;
 
+OrderMakeForWeighingList_View.prototype.m_orderedTotal;
+OrderMakeForWeighingList_View.prototype.m_restTotal;
+OrderMakeForWeighingList_View.prototype.m_shippedTotal;
+OrderMakeForWeighingList_View.prototype.m_orderedSum;
+OrderMakeForWeighingList_View.prototype.m_orderedDay;
+OrderMakeForWeighingList_View.prototype.m_orderedBeforeNow = 0;
+OrderMakeForWeighingList_View.prototype.m_shippedBeforeNow = 0;
+OrderMakeForWeighingList_View.prototype.m_shippedDayBeforeNow = 0;
 
 OrderMakeForWeighingList_View.prototype.setRefreshInterval = function(v){
 	if(this.m_refreshInterval == v){
@@ -220,6 +230,8 @@ OrderMakeForWeighingList_View.prototype.toDOM = function(p){
 		this.setRefreshInterval(this.m_httpRefreshInterval);
 	}
 	
+	this.showTotals();
+
 	window.getApp().addCollapseOnClick();
 	window.getApp().initViewPanels(this);
 	
@@ -276,7 +288,41 @@ OrderMakeForWeighingList_View.prototype.onRefreshResponse = function(resp){
 		grid.getModel().setData(resp.getModelData("OrderMakeList_Model"));
 		grid.onGetData();
 	}	
-	
+
+	//totals
+	this.showTotals();
+}
+
+OrderMakeForWeighingList_View .prototype.showTotals = function(){
+	var n = DateHelper.time();
+	var dif_sec = (n.getTime() - (DateHelper.getStartOfShift(n)).getTime())/1000;
+	//console.log("dif_sec="+dif_sec)
+	this.setTotalVal("totOrdered",this.m_orderedTotal.toFixed(2));
+	this.setTotalVal("totShipped",this.m_shippedTotal.toFixed(2));
+	this.setTotalVal("totBalance",(this.m_orderedTotal-this.m_shippedTotal).toFixed(2));
+	this.setTotalVal("totEfficiency",(Math.round((this.m_shippedBeforeNow-this.m_orderedBeforeNow)*100)/100).toFixed(2));
+	this.setTotalVal("totDayVelocity",(Math.round(this.m_orderedDay/13*100)/100).toFixed(2));
+	this.setTotalVal("totCurVelocity",(Math.round(this.m_shippedDayBeforeNow/dif_sec*60*60*100)/100).toFixed(2));
+	this.setTotalVal("totOrderedDay",this.m_orderedDay.toFixed(2));
+
+}
+
+OrderMakeForWeighingList_View .prototype.resetTotals = function(){
+	this.m_orderedTotal = 0;
+	this.m_restTotal = 0;
+	this.m_shippedTotal = 0;
+	this.m_orderedSum = 0;
+	this.m_orderedDay = 0;
+	this.m_orderedBeforeNow = 0;
+	this.m_shippedBeforeNow = 0;
+	this.m_shippedDayBeforeNow = 0;
+}
+
+OrderMakeForWeighingList_View .prototype.setTotalVal = function(id,v){
+	var n = document.getElementById(id);
+	if(n){
+		n.textContent = v;
+	}
 }
 
 OrderMakeForWeighingList_View.prototype.runSpecificUpdateMethod = function(meth, lsn){

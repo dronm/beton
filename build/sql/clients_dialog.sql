@@ -23,6 +23,7 @@ CREATE OR REPLACE VIEW public.clients_dialog AS
 		,banks.banks_ref(bnk) AS banks_ref
 		,cl.kpp
 		,cl.address_legal
+		,cl.address_fact
 		,cl.ref_1c
 		,cl.shipment_quant_for_cost
 		
@@ -34,6 +35,5 @@ CREATE OR REPLACE VIEW public.clients_dialog AS
 	LEFT JOIN banks.banks bnk ON bnk.bik = cl.bank_bik
 	;
 
-ALTER TABLE public.clients_dialog
-  OWNER TO beton;
+-- ALTER TABLE public.clients_dialog OWNER TO beton;
 

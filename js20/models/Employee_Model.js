@@ -52,7 +52,6 @@ function Employee_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.employed = new FieldBool("employed",filed_options);
-	options.fields.employed.getValidator().setRequired(true);
 	
 				
 	
@@ -62,6 +61,24 @@ function Employee_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.user_id = new FieldInt("user_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.inn = new FieldText("inn",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.post = new FieldText("post",filed_options);
 	
 			
 		Employee_Model.superclass.constructor.call(this,id,options);

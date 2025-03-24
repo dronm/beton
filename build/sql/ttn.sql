@@ -12,10 +12,11 @@ CREATE OR REPLACE VIEW ttn AS
 		to_char(sh.ship_date_time::date,'TMMonth') AS data_mes,
 		to_char(sh.ship_date_time::date,'YYYY')||'г.' AS data_god,
 		
-		coalesce(cl.name||' ', '')||
-		coalesce('ИНН '||cl.inn||' ', '')||
-		coalesce('КПП '||cl.kpp||' ', '')||
-		coalesce(', '||cl.address_legal, '')		
+		coalesce(cl.name_full, cl.name)||
+		coalesce(', ИНН '||cl.inn, '')||
+		coalesce(', КПП '||cl.kpp, '')||
+		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		coalesce(', '||cl.tels_1c, '')		
 		AS platelschik,
 		 
 		sh.quant AS nomen_kol,
@@ -76,4 +77,4 @@ CREATE OR REPLACE VIEW ttn AS
 	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
 	;
 	
-ALTER VIEW ttn OWNER TO ;
+--ALTER VIEW ttn OWNER TO ;

@@ -97,6 +97,16 @@ class DriverList_Model extends ModelSQLBeton{
 		$f_employed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"employed",$f_opts);
 		$this->addField($f_employed);
 		//********************
+		
+		//*** Field inn ***
+		$f_opts = array();
+		
+		$f_opts['alias']='ИНН водителя';
+		$f_opts['id']="inn";
+						
+		$f_inn=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"inn",$f_opts);
+		$this->addField($f_inn);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

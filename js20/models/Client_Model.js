@@ -162,6 +162,24 @@ function Client_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.address_fact = new FieldText("address_fact",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.tels_1c = new FieldText("tels_1c",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Аккаунт';
 	filed_options.autoInc = false;	
 	

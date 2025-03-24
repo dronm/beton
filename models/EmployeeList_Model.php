@@ -9,6 +9,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
@@ -44,7 +45,6 @@ class EmployeeList_Model extends ModelSQLBeton{
 		
 		//*** Field employed ***
 		$f_opts = array();
-		$f_opts['defaultValue']='TRUE';
 		$f_opts['id']="employed";
 						
 		$f_employed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"employed",$f_opts);
@@ -57,6 +57,22 @@ class EmployeeList_Model extends ModelSQLBeton{
 						
 		$f_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"users_ref",$f_opts);
 		$this->addField($f_users_ref);
+		//********************
+		
+		//*** Field inn ***
+		$f_opts = array();
+		$f_opts['id']="inn";
+						
+		$f_inn=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"inn",$f_opts);
+		$this->addField($f_inn);
+		//********************
+		
+		//*** Field post ***
+		$f_opts = array();
+		$f_opts['id']="post";
+						
+		$f_post=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"post",$f_opts);
+		$this->addField($f_post);
 		//********************
 	
 		$order = new ModelOrderSQL();		

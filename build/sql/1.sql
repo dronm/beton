@@ -1,2 +1,5 @@
--- select * from  client_specifications;
-select name,ref_1c from clients where ref_1c is not null;
+		
+
+-- SELECT * FROM rg_material_facts_balance('2025-01-01T00:00:00', ARRAY[1], '{}'::int[], '{}'::int[])
+SELECT 1, 2
+
