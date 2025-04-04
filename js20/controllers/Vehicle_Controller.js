@@ -192,6 +192,12 @@ extend(Vehicle_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "УДАЛИТЬ Владелец";
+	var field = new FieldInt("official_vehicle_owner_id",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -342,6 +348,12 @@ extend(Vehicle_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "УДАЛИТЬ Владелец";
+	var field = new FieldInt("official_vehicle_owner_id",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -446,6 +458,9 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Insurance kasko data";
 	pm.addField(new FieldJSONB("insurance_kasko",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("official_vehicle_owners_ref",f_opts));
 }
 
 			Vehicle_Controller.prototype.addGetObject = function(){

@@ -129,6 +129,22 @@ class ContactDialog_Model extends ModelSQL{
 		$f_tm_first_name=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tm_first_name",$f_opts);
 		$this->addField($f_tm_first_name);
 		//********************
+		
+		//*** Field tm_first_name ***
+		$f_opts = array();
+		$f_opts['id']="tm_first_name";
+						
+		$f_tm_first_name=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"tm_first_name",$f_opts);
+		$this->addField($f_tm_first_name);
+		//********************
+		
+		//*** Field attachments_list ***
+		$f_opts = array();
+		$f_opts['id']="attachments_list";
+						
+		$f_attachments_list=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"attachments_list",$f_opts);
+		$this->addField($f_attachments_list);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

@@ -130,6 +130,18 @@ extend(Client_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
+	
+	var field = new FieldText("address_fact",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldText("tels_1c",options);
+	
+	pm.addField(field);
+	
+	var options = {};
 	options.alias = "Аккаунт";
 	var field = new FieldInt("user_id",options);
 	
@@ -260,6 +272,18 @@ extend(Client_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldText("address_legal",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldText("address_fact",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldText("tels_1c",options);
 	
 	pm.addField(field);
 	

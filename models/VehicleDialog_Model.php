@@ -13,6 +13,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLArray.php');
  
@@ -263,6 +264,14 @@ class VehicleDialog_Model extends ModelSQLBeton{
 						
 		$f_insurance_kasko=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"insurance_kasko",$f_opts);
 		$this->addField($f_insurance_kasko);
+		//********************
+		
+		//*** Field official_vehicle_owners_ref ***
+		$f_opts = array();
+		$f_opts['id']="official_vehicle_owners_ref";
+						
+		$f_official_vehicle_owners_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"official_vehicle_owners_ref",$f_opts);
+		$this->addField($f_official_vehicle_owners_ref);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

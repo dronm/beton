@@ -97,6 +97,9 @@ class User_Controller extends ControllerSQL{
 	const TM_ALLOWED_TRIES = 3;
 	const TM_TEL_DURATION_SEC = 10*24*60*60;
 
+	const USER_TM_LOGIN_MAX_INCORRECT_COUNT = 4;
+	const USER_TM_LOGIN_WAIT_SEC = 120;
+
 	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
 		parent::__construct($dbLinkMaster, $dbLink);
 			
@@ -2256,8 +2259,21 @@ class User_Controller extends ControllerSQL{
 	/**
 	 * Получение данных по номеру телефона
 	 * Генерация нового кода
+	 * TODO: make maximum incorrect call count, then wait
 	 */
 	public function tm_check_tel($pm){
+		if(isset($_SESSION["user_tel_login_incorrect_count"]) && 
+		$_SESSION["user_tel_login_incorrect_count"] > self::USER_TM_LOGIN_MAX_INCORRECT_COUNT 
+		){
+			if(isset($_SESSION["user_tel_login_incorrect_time"]) &&
+				time() - $_SESSION["user_tel_login_incorrect_time"] < self::USER_TM_LOGIN_WAIT_SEC
+			){
+				throw new Exception("Слишком много неправильных ответов");
+				$_SESSION["user_tel_login_incorrect_time"] = time();
+			}
+			unset($_SESSION["user_tel_login_incorrect_time"]);
+		}
+
 		$ar_log = $this->getDbLink()->query_first(sprintf(
 			"SELECT
 				l.*,
@@ -2300,8 +2316,15 @@ class User_Controller extends ControllerSQL{
 		));
 
 		if(!is_array($ar) || !count($ar)){
+			if(!isset($_SESSION["user_tel_login_incorrect_count"])){
+				$_SESSION["user_tel_login_incorrect_count"] = 0;
+				$_SESSION["user_tel_login_incorrect_time"] = time();
+			}
+			$_SESSION["user_tel_login_incorrect_count"]++;
 			throw new Exception(self::ER_USER_NOT_DEFIND);
 		}
+		unset($_SESSION["user_tel_login_incorrect_count"]);
+		unset($_SESSION["user_tel_login_incorrect_time"]);
 		
 		$this->addModel(new ModelVars(
 			array('id'=>'TmUserData_Model',

@@ -76,6 +76,14 @@ class ExcelTemplate_Model extends ModelSQLBeton{
 		$this->addField($f_cell_matching);
 		//********************
 		
+		//*** Field image_sql ***
+		$f_opts = array();
+		$f_opts['id']="image_sql";
+						
+		$f_image_sql=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"image_sql",$f_opts);
+		$this->addField($f_image_sql);
+		//********************
+		
 		//*** Field update_dt ***
 		$f_opts = array();
 		$f_opts['id']="update_dt";

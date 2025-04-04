@@ -255,6 +255,15 @@ function VehicleDialog_Model(options){
 	
 	options.fields.insurance_kasko = new FieldJSONB("insurance_kasko",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.official_vehicle_owners_ref = new FieldJSON("official_vehicle_owners_ref",filed_options);
+	
 			
 		VehicleDialog_Model.superclass.constructor.call(this,id,options);
 }

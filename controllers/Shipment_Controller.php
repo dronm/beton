@@ -2138,9 +2138,10 @@ class Shipment_Controller extends ControllerSQL{
 		$docId = $this->getExtDbVal($pm, 'id');
 		$this->check_1c_attrs_for_tn($docId);
 
+		$tmplName = ($this->getExtVal($pm, 'faksim') == "1")? "Транспортная накладная (факсимиле)" : "Транспортная накладная";
 		return ExcelTemplate_Controller::downloadFilledTemplate(
 			$this->getDbLink()
-			,'Транспортная накладная'
+			,$tmplName
 			,array($docId)
 			,'Отгрузка не найдена!'
 			,'Транспортная накладная'
@@ -2167,7 +2168,7 @@ class Shipment_Controller extends ControllerSQL{
 							)
 						FROM vehicle_owners AS vh_own 
 						LEFT JOIN clients AS vh_cl ON vh_cl.id = vh_own.client_id
-						WHERE vh_own.id = wehicle_owner_last(vh.id)
+						WHERE vh_own.id = vh.official_vehicle_owner_id
 						) AS veh_owner_client
 					FROM shipments AS sh
 					LEFT JOIN orders AS o ON o.id = sh.order_id

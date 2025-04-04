@@ -1386,6 +1386,16 @@ $permissions = array();
 				
 					$permissions['ExcelTemplateFieldMatch_Controller_get_object']=TRUE;
 				
+					$permissions['ExcelTemplateImageSQL_Controller_insert']=TRUE;
+				
+					$permissions['ExcelTemplateImageSQL_Controller_update']=TRUE;
+				
+					$permissions['ExcelTemplateImageSQL_Controller_delete']=TRUE;
+				
+					$permissions['ExcelTemplateImageSQL_Controller_get_list']=TRUE;
+				
+					$permissions['ExcelTemplateImageSQL_Controller_get_object']=TRUE;
+				
 					$permissions['Bank_Controller_get_list']=TRUE;
 				
 					$permissions['Bank_Controller_get_object']=TRUE;
@@ -1745,6 +1755,16 @@ $permissions = array();
 					$permissions['CementSiloMaterial_Controller_get_list']=TRUE;
 				
 					$permissions['CementSiloMaterial_Controller_get_object']=TRUE;
+				
+					$permissions['OperatorForTranspNakl_Controller_insert']=TRUE;
+				
+					$permissions['OperatorForTranspNakl_Controller_update']=TRUE;
+				
+					$permissions['OperatorForTranspNakl_Controller_delete']=TRUE;
+				
+					$permissions['OperatorForTranspNakl_Controller_get_list']=TRUE;
+				
+					$permissions['OperatorForTranspNakl_Controller_get_object']=TRUE;
 				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

@@ -24,7 +24,8 @@ function LoginTM(id,options){
 			new EditPhone(id+":tel",{
 				"cmdClear":false,
 				"focus":true,
-				"editContClassName": "input-group "+window.getBsCol(12),
+				// "editContClassName": "input-group "+window.getBsCol(12),
+				"editContClassName": "",
 				"events":{
 					"keyup":function(){
 						var t = self.getElement("tel").getValue();

@@ -5,7 +5,7 @@ $$
 		(r.rows->'fields'->'owner'->'keys'->'id')::int
 	FROM	
 	(select jsonb_array_elements(vehicle_owners->'rows') AS rows from vehicles where id=in_vehicle_id) AS r
-	order by r.rows->'dt_from' asc
+	order by (r.rows->'fields'->>'dt_from')::date desc
 	limit 1;
 $$
   LANGUAGE sql VOLATILE

@@ -82,6 +82,12 @@ extend(ExcelTemplate_Controller,ControllerObjServer);
 	
 	var options = {};
 	
+	var field = new FieldJSON("image_sql",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
 	var field = new FieldDateTimeTZ("update_dt",options);
 	
 	pm.addField(field);
@@ -139,6 +145,12 @@ extend(ExcelTemplate_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldJSON("cell_matching",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldJSON("image_sql",options);
 	
 	pm.addField(field);
 	

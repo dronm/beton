@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-03-24 06:52:52</lastBuild></version>
+		<lastBuild>2025-04-04 06:46:38</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -270,6 +270,7 @@
 		<version dateOpen="2025-03-12 06:43:24" dateClose="2025-03-12 08:03:03">1.00364</version>
 		<version dateOpen="2025-03-13 06:28:56" dateClose="2025-03-13 06:29:15">1.00365</version>
 		<version dateOpen="2025-03-13 07:01:32" dateClose="2025-03-24 06:53:15">1.00366</version>
+		<version dateOpen="2025-04-01 09:47:50" dateClose="2025-04-04 06:46:54">1.00367</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1047,6 +1048,7 @@
 			<field id="leasing_total" dataType="Float" length="15" precision="2"/>
 			<field id="insurance_osago" dataType="JSONB" alias="Insurance osago data"/>
 			<field id="insurance_kasko" dataType="JSONB" alias="Insurance kasko data"/>
+			<field id="official_vehicle_owner_id" dataType="Int" refTable="vehicle_owners" refField="id" alias="УДАЛИТЬ Владелец"/>
 			<index id="vehicles_plate_idx" unique="TRUE">
 				<expression>lower(plate)</expression>
 			</index>
@@ -1087,6 +1089,7 @@
 			<field id="leasing_total" dataType="Float" length="15" precision="2"/>
 			<field id="insurance_osago" dataType="JSONB" alias="Insurance osago data"/>
 			<field id="insurance_kasko" dataType="JSONB" alias="Insurance kasko data"/>
+			<field id="official_vehicle_owners_ref" dataType="JSON"/>
 			<globalFilter id="vehicle_owner_list" fieldId="vehicle_owners_ar"/>
 		</model>
 		<model id="VehicleMileage" parent="ModelSQLBeton" dataTable="vehicle_mileages" virtual="FALSE">
@@ -3099,6 +3102,8 @@
 			<field id="tm_photo" dataType="String"/>
 			<field id="ext_id" dataType="Int"/>
 			<field id="tm_first_name" dataType="String"/>
+			<field id="tm_first_name" dataType="String"/>
+			<field id="attachments_list" dataType="JSON"/>
 		</model>
 		<model id="EntityContact" parent="ModelSQL" dataTable="entity_contacts" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" sysCol="TRUE"/>
@@ -4372,6 +4377,7 @@
 			<field id="file_info" dataType="JSON"/>
 			<field id="sql_query" dataType="Text"/>
 			<field id="cell_matching" dataType="JSON"/>
+			<field id="image_sql" dataType="JSON"/>
 			<field id="update_dt" dataType="DateTimeTZ"/>
 		</model>
 		<model id="ExcelTemplateList" parent="ModelSQLBeton" dataTable="excel_templates_list" virtual="TRUE">
@@ -4384,12 +4390,19 @@
 			<field id="name" dataType="Text" alias="Описание шаблона"/>
 			<field id="file_info" dataType="JSON"/>
 			<field id="sql_query" dataType="Text"/>
+			<field id="image_sql" dataType="JSON"/>
 			<field id="cell_matching" dataType="JSON"/>
 		</model>
 		<model id="ExcelTemplateFieldMatch" parentJS="ModelJSON" virtual="TRUE" server="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="field" dataType="String" length="100"/>
 			<field id="cell" dataType="String" length="20"/>
+		</model>
+		<model id="ExcelTemplateImageSQL" parentJS="ModelJSON" virtual="TRUE" server="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="name" dataType="String" length="100"/>
+			<field id="sql_query" dataType="String" length="5000"/>
+			<field id="comment_text" dataType="String" length="5000"/>
 		</model>
 		<model id="Bank" parent="ModelSQL" dataTable="banks" virtual="FALSE" dataSchema="banks">
 			<defaultOrder>
@@ -5134,6 +5147,16 @@
 			<field id="fakture_nomer" dataType="Text"/>
 			<field id="faktura_data" dataType="Text" alias="Formatted document datetime"/>
 			<field id="ref_1c" dataType="String" length="36"/>
+		</model>
+		<model id="OperatorForTranspNakl" parent="ModelSQL" dataTable="operators_for_transp_nakl" virtual="FALSE" alias="Список операторов">
+			<field id="user_id" dataType="Int" refTable="users" refField="id" primaryKey="TRUE"/>
+			<field id="production_site_id" dataType="Int" refTable="production_sites" refField="id"/>
+		</model>
+		<model id="OperatorForTranspNaklList" parent="ModelSQL" dataTable="operators_for_transp_nakls_list" virtual="FALSE" alias="Список операторов">
+			<field id="user_id" dataType="Int" refTable="users" refField="id" primaryKey="TRUE"/>
+			<field id="production_site_id" dataType="Int" refTable="production_sites" refField="id"/>
+			<field id="production_sites_ref" dataType="JSON"/>
+			<field id="users_ref" dataType="JSON"/>
 		</model>
 	</models>
 	<constants>
@@ -6685,6 +6708,13 @@
 			<publicMethod id="get_list" modelId="ExcelTemplateFieldMatch"/>
 			<publicMethod id="get_object" modelId="ExcelTemplateFieldMatch"/>
 		</controller>
+		<controller id="ExcelTemplateImageSQL" parentIdJS="ControllerObjClient" server="FALSE">
+			<publicMethod id="insert" modelId="ExcelTemplateImageSQL"/>
+			<publicMethod id="update" modelId="ExcelTemplateImageSQL"/>
+			<publicMethod id="delete" modelId="ExcelTemplateImageSQL"/>
+			<publicMethod id="get_list" modelId="ExcelTemplateImageSQL"/>
+			<publicMethod id="get_object" modelId="ExcelTemplateImageSQL"/>
+		</controller>
 		<controller id="Bank" parentId="ControllerSQL" noState="FALSE">
 			<publicMethod id="get_list" modelId="BankList"/>
 			<publicMethod id="get_object" modelId="BankList"/>
@@ -7088,6 +7118,13 @@
 			<publicMethod id="get_list" modelId="CementSiloMaterialList"/>
 			<publicMethod id="get_object" modelId="CementSiloMaterialList"/>
 		</controller>
+		<controller id="OperatorForTranspNakl" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="OperatorForTranspNakl"/>
+			<publicMethod id="update" modelId="OperatorForTranspNakl"/>
+			<publicMethod id="delete" modelId="OperatorForTranspNakl"/>
+			<publicMethod id="get_list" modelId="OperatorForTranspNaklList"/>
+			<publicMethod id="get_object" modelId="OperatorForTranspNaklList"/>
+		</controller>
 	</controllers>
 	<permissions>
 		<permission type="allow" controllerId="all" methodId="all" roleId="owner"/>
@@ -7272,6 +7309,7 @@
 		<view id="10053" c="Firm1c_Controller" t="Firm1cList" f="get_list" section="Справочники" descr="Организации 1с"/>
 		<view id="10054" c="ChatStatus_Controller" t="ChatStatusList" f="get_list" section="Справочники" descr="Статусы чата"/>
 		<view id="10055" c="CementSiloMaterial_Controller" t="CementSiloMaterialList" f="get_list" section="Справочники" descr="Материалы в силосах"/>
+		<view id="10056" c="OperatorForTranspNakl" t="OperatorForTranspNaklList" f="get_list" section="Справочники" descr="Список операторов для трансп.накл."/>
 		<view id="20000" c="Order_Controller" t="OrderList" f="get_list" section="Документы" descr="Заявки"/>
 		<view id="20001" c="OrderPump_Controller" t="OrderPumpList" f="get_list" section="Документы" descr="Заявки (насосы)"/>
 		<view id="20002" c="Shipment_Controller" t="ShipmentList" f="get_list" section="Документы" descr="Отгрузки"/>
@@ -7499,6 +7537,7 @@
 		<serverTemplate id="CementSiloMaterialList" class="list"/>
 		<serverTemplate id="VehicleOwnerTotIncomeAllRep"/>
 		<serverTemplate id="VehicleMileageList" class="list"/>
+		<serverTemplate id="OperatorForTranspNaklList" class="list"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="js20/tmpl/FatalException.html"/>
@@ -8146,6 +8185,7 @@
 		<jsScript file="js20/views/VehicleOwnerTotIncomeAllRep_View.js"/>
 		<jsScript file="js20/views/CementSiloMaterialList_View.js"/>
 		<jsScript file="js20/views/VehicleMileageList_View.js"/>
+		<jsScript file="js20/views/OperatorsForTranspNaklList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="js20/forms/ViewList_Form.js"/>
 		<jsScript file="js20/forms/MainMenuConstructor_Form.js"/>
@@ -8300,6 +8340,7 @@
 		<jsScript file="js20/custom_controls/ProductionMaterialListGridDelCmd.js"/>
 		<jsScript file="js20/custom_controls/RawMaterialConsRateDateEdit.js"/>
 		<jsScript file="js20/custom_controls/ExcelTemplateFieldMatchGrid.js"/>
+		<jsScript file="js20/custom_controls/ExcelTemplateImageSQLGrid.js"/>
 		<jsScript file="js20/custom_controls/EditBankAcc.js"/>
 		<jsScript file="js20/custom_controls/BankEditRef.js"/>
 		<jsScript file="js20/custom_controls/Chat_View.js"/>
@@ -8332,6 +8373,7 @@
 		<jsScript file="js20/custom_controls/InsuranceIssuerEdit.js"/>
 		<jsScript file="js20/custom_controls/LeasorEdit.js"/>
 		<jsScript file="js20/custom_controls/ClientContract1cEdit.js"/>
+		<jsScript file="js20/custom_controls/AttachmentManager.js"/>
 		<jsScript file="js20/views/rs_ru.js"/>
 		<jsScript file="js20/views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -8834,6 +8876,11 @@
 		<jsScript file="js20/models/ClientContract1cList_Model.js"/>
 		<jsScript file="js20/controllers/Connect1cCheck_Controller.js"/>
 		<jsScript file="js20/models/BuhDoc_Model.js"/>
+		<jsScript file="js20/models/OperatorForTranspNakl_Model.js"/>
+		<jsScript file="js20/controllers/OperatorForTranspNakl_Controller.js"/>
+		<jsScript file="js20/models/OperatorForTranspNaklList_Model.js"/>
+		<jsScript file="js20/models/ExcelTemplateImageSQL_Model.js"/>
+		<jsScript file="js20/controllers/ExcelTemplateImageSQL_Controller.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

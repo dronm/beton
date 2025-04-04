@@ -17,6 +17,18 @@ CREATE OR REPLACE VIEW contacts_dialog AS
 		e_us.tm_photo,
 		e_us.tm_first_name,
 		e_us.id AS ext_id
+
+		,(SELECT
+			jsonb_agg(
+				att.content_info || 
+				case when att.content_preview is not null then 
+					jsonb_build_object('dataBase64',encode(att.content_preview, 'base64'))
+				else '{}'::jsonb
+				end
+			)
+		FROM attachments AS att
+		WHERE att.ref->>'dataType' = 'contacts' AND (att.ref->'keys'->>'id')::int = ct.id
+		) AS attachments_list
 		
 	FROM contacts AS ct
 	LEFT JOIN posts AS p ON p.id = ct.post_id
@@ -24,4 +36,3 @@ CREATE OR REPLACE VIEW contacts_dialog AS
 	ORDER BY ct.name
 	;
 	
-ALTER VIEW contacts_dialog OWNER TO ;

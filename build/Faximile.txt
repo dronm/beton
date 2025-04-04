@@ -1,0 +1,25 @@
+
+
+Well, this took some time, but I finally got it work.
+
+$mainTempName = "$baseDir/reports/MainReportTemplate.xlsx" ;
+$mainTempReader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader("Xlsx") ;
+$mainTempFile = $mainTempReader->load($mainTempName, \PhpOffice\PhpSpreadsheet\Reader\IReader::LOAD_WITH_CHARTS) ;
+
+$mainTempFile = swapImage($mainTempFile,$localFilePath,$excelImageName,$localFileName) ;
+
+function swapImage($inFile,$iPath,$iName,$iFile) {
+  foreach ($inFile->getDefinedNames() as $name) {
+    if ($name->getName() == $iName) {
+      $picID = str_replace("\"","",$name->getValue()) ;
+    }
+  }
+
+  foreach ($inFile->getSheetByName("Chart Data")->getDrawingCollection() as $fImage) {
+    if ($fImage->getName() == $picID) {
+      $fImage->setPath($iPath.$iFile) ;
+    }
+  }
+  return $inFile ;
+}
+

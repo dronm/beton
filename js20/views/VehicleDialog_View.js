@@ -26,6 +26,11 @@ function VehicleDialog_View(id,options){
 	}));	
 	this.addElement(new DriverEditRef(id+":driver"));	
 	
+	this.addElement(new VehicleOwnerEdit(id+":official_owner"), {
+		labelCaption: "Официальный владелец:",
+		title: "Официальный владелец для транспортной накладной"
+	});	
+
 	this.addElement(new MakeEdit(id+":make"));	
 	
 	this.addElement(new FeatureEdit(id+":feature"));	
@@ -129,6 +134,7 @@ function VehicleDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("plate_region")})
 		,new DataBinding({"control":this.getElement("load_capacity")})
 		,new DataBinding({"control":this.getElement("driver"), "fieldId": "drivers_ref" })
+		,new DataBinding({"control":this.getElement("official_owner"), "fieldId": "official_vehicle_owners_ref" })
 		,new DataBinding({"control":this.getElement("make")})
 		,new DataBinding({"control":this.getElement("owners"),"fieldId":"vehicle_owners"})
 		,new DataBinding({"control":this.getElement("insurance_osago"),"fieldId":"insurance_osago"})
@@ -155,6 +161,7 @@ function VehicleDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("plate_region")})
 		,new CommandBinding({"control":this.getElement("load_capacity")})
 		,new CommandBinding({"control":this.getElement("driver"),"fieldId":"driver_id"})
+		,new CommandBinding({"control":this.getElement("official_owner"),"fieldId":"official_vehicle_owner_id"})
 		,new CommandBinding({"control":this.getElement("make")})
 		,new CommandBinding({"control":this.getElement("owners"),"fieldId":"vehicle_owners"})
 		,new CommandBinding({"control":this.getElement("insurance_osago"),"fieldId":"insurance_osago"})

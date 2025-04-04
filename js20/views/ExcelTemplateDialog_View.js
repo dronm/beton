@@ -53,6 +53,10 @@ function ExcelTemplateDialog_View(id,options){
 		this.addElement(new ExcelTemplateFieldMatchGrid(id+":cell_matching",{
 		}));		
 
+		//********* image_sql grid ***********************
+		this.addElement(new ExcelTemplateImageSQLGrid(id+":image_sql",{
+		}));		
+
 	}
 	
 	ExcelTemplateDialog_View.superclass.constructor.call(this,id,options);
@@ -63,6 +67,7 @@ function ExcelTemplateDialog_View(id,options){
 		new DataBinding({"control":this.getElement("name")})
 		,new DataBinding({"control":this.getElement("sql_query")})
 		,new DataBinding({"control":this.getElement("cell_matching")})
+		,new DataBinding({"control":this.getElement("image_sql")})
 		,new DataBinding({"control":this.getElement("excel_file"),"field":this.m_model.getField("file_info")})
 	]);
 	
@@ -72,6 +77,7 @@ function ExcelTemplateDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("sql_query")})
 		,new CommandBinding({"control":this.getElement("excel_file"),"fieldId":"excel_file"})
 		,new CommandBinding({"control":this.getElement("cell_matching"),"fieldId":"cell_matching"})
+		,new CommandBinding({"control":this.getElement("image_sql"),"fieldId":"image_sql"})
 	]);
 			
 }

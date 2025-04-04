@@ -242,6 +242,15 @@ function Vehicle_Model(options){
 	
 	options.fields.insurance_kasko = new FieldJSONB("insurance_kasko",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'УДАЛИТЬ Владелец';
+	filed_options.autoInc = false;	
+	
+	options.fields.official_vehicle_owner_id = new FieldInt("official_vehicle_owner_id",filed_options);
+	
 			
 			
 			

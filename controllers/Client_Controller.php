@@ -123,6 +123,16 @@ class Client_Controller extends ControllerSQL{
 		$pm->addParam($param);
 		
 			$f_params = array();
+			$param = new FieldExtText('address_fact'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtText('tels_1c'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
 			
 				$f_params['alias']='Аккаунт';
 			$param = new FieldExtInt('user_id'
@@ -269,6 +279,16 @@ class Client_Controller extends ControllerSQL{
 		
 			$f_params=array();
 			$param = new FieldExtText('address_legal'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtText('address_fact'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtText('tels_1c'
 				,$f_params);
 			$pm->addParam($param);
 		

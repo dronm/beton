@@ -24,7 +24,7 @@ class ExtProg{
 	 * If $ileOpts is not null, then the returned value from 1c is treated as file.
 	 * Function returnes parsed/unparsed responce from 1c or file path.
 	 */
-	private static function send_query($cmd, $params, $parseContent, $fileOpts=NULL): string|array {
+	private static function send_query($cmd, $params, $parseContent, $fileOpts=NULL){
 		$CON_TIMEOUT = 120;//seconds
 		
 		$params['key'] = KEY_1C;
@@ -115,43 +115,43 @@ class ExtProg{
 		}
 	}
 
-	public static function getClientList(string $search): array {
+	public static function getClientList(string $search){
 		return (array)ExtProg::send_query('get_catalog_by_attr', array('catalog'=>'clients','search'=>$search), TRUE);
 	}
 	
-	public static function getClientOnPP(string $ppNum): array {
+	public static function getClientOnPP(string $ppNum){
 		return (array)ExtProg::send_query('get_client_on_pp', array('pp_num'=>$ppNum), TRUE);
 	}
 
-	public static function getClientOborot(): array {
+	public static function getClientOborot(){
 		return (array)ExtProg::send_query('get_client_dog_oborot', array(), TRUE);
 	}
 
-	public static function getClientDebtList(): array {
+	public static function getClientDebtList(){
 		return (array)ExtProg::send_query('get_client_debt_list', array(), TRUE);
 	}
 
-	public static function getBuhRBPList(string $search): array {
+	public static function getBuhRBPList(string $search){
 		return  (array)ExtProg::send_query('get_catalog_by_attr', array('catalog'=>'rbp','search'=>$search), TRUE);
 	}
 
-	public static function completeClientContract(string $clientRef1c, string $search): array {
+	public static function completeClientContract(string $clientRef1c, string $search){
 		return (array)ExtProg::send_query('complete_client_dog', array('client_ref_1c'=>$clientRef1c,'search'=>$search), TRUE);
 	}
 
-	public static function getClientContract(string $contractRef1c): array {
+	public static function getClientContract(string $contractRef1c){
 		return (array)ExtProg::send_query('get_client_dog', array('ref_1c'=>$contractRef1c), TRUE);
 	}
 
-	public static function getClient(string $clientRef1c): array {
+	public static function getClient(string $clientRef1c){
 		return (array)ExtProg::send_query('get_client', array('ref_1c'=>$clientRef1c), TRUE);
 	}
 
-	public static function getShipment(string $clientRef1c, string $date): array {
+	public static function getShipment(string $clientRef1c, string $date){
 		return (array)ExtProg::send_query('get_shipment', array('client_ref_1c'=>$clientRef1c, "date"=>$date), TRUE);
 	}
 
-	public static function ping(): bool {
+	public static function ping(){
 		try{
 			$respModel = ExtProg::send_query('ping', array(), TRUE);
 		}catch(Exception $e){

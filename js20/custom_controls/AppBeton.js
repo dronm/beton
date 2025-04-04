@@ -1243,3 +1243,17 @@ AppBeton.prototype.controlePumpVehicle = function() {
 	let role_id = this.getServVar("role_id");
 	return !(role_id == "admin" || role_id == "boss" || role_id == "owner");
 }
+
+/**
+ * cont is for context, for massage being shown in context window not in parent
+ */
+AppBeton.prototype.openHrefDownload = function(cont, pm, viewId, href){
+	var wnd = pm.openHref(viewId, href);
+	if(pm.fieldExists("inline") && (!wnd || !wnd.top)){
+		pm.setFieldValue("inline", 0);
+		pm.download();	
+		cont.showTempWarn("Всплывающие окна заблокированы, файл открыт в режиме скачивания",null,10000);
+	}
+
+}
+

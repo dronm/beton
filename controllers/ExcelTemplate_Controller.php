@@ -26,6 +26,8 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
 
 require_once('common/downloader.php');
 
+require_once(USER_CONTROLLERS_PATH.'Attachment_Controller.php');
+
 class ExcelTemplate_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
 		parent::__construct($dbLinkMaster,$dbLink);
@@ -58,6 +60,11 @@ class ExcelTemplate_Controller extends ControllerSQL{
 		
 			$f_params = array();
 			$param = new FieldExtJSON('cell_matching'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtJSON('image_sql'
 				,$f_params);
 		$pm->addParam($param);
 		
@@ -129,6 +136,11 @@ class ExcelTemplate_Controller extends ControllerSQL{
 		
 			$f_params=array();
 			$param = new FieldExtJSON('cell_matching'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtJSON('image_sql'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -450,6 +462,7 @@ class ExcelTemplate_Controller extends ControllerSQL{
 			reverse(substring(reverse(file_info->>'name') from 1 for strpos(reverse(file_info->>'name'),'.')-1)) AS file_ext,
 			sql_query,
 			cell_matching->'rows' AS cell_matching,
+			image_sql->'rows' AS image_sql,
 			update_dt
 			FROM excel_templates	
 		WHERE name = '%s'",
@@ -501,6 +514,39 @@ class ExcelTemplate_Controller extends ControllerSQL{
 			file_put_contents($tmpl_fl, pg_unescape_bytea($ar_cont['file_content']));
 		}		
 
+		$attachments = []; //images to be changes
+
+		//generate images for image_sql
+		$query_results = [];
+		$image_sql = json_decode($ar['image_sql']);
+		foreach($image_sql as $image){
+			if(isset($image->fields)){
+				$fields = $image->fields;
+			}else{
+				$fields = $image;
+			}
+			
+			if(isset($fields->field) && isset($fields->name) ){
+				if(!array_key_exists($fields->sql_query, $query_results)){
+					$ar_att = $dbLink->query_first(
+						sprintf(
+							$fields->sql_query,
+							$ar["id"]
+						)
+					);
+					if(!is_array($ar_att) || !count($ar_att) || !isset($ar_att['attachment_id'])){
+						throw new Exception("Не найден файл вложения для '".$fields->sql_query."'");
+
+					}
+					$query_results[$fields->sql_query] = $att["id"];
+					$attFile = Attachment_Controller::save_to_tmp($dbLink, $query_results[$fields->sql_query]);
+					array_push($attachments, array(
+						'fileName' => $attFile
+					));
+				}
+			}
+		}
+
 		$reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($reader_tp);
 		$spreadsheet = $reader->load($tmpl_fl);
 		$sheet = $spreadsheet->getActiveSheet();
@@ -518,11 +564,28 @@ class ExcelTemplate_Controller extends ControllerSQL{
 				$sheet->setCellValue($fields->cell, $ar_data[$fields->field]);
 			}
 		}
+
+		//image changes
 					
 		$writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
 		$writer->save($outFl);
 		
 		$flName = $ar["file_name"]; 
+	}
+
+	//inFile IReader spreadsheet
+	private static function swapImage($inFile, $iPath, $iName, $iFile) {
+	  foreach ($inFile->getDefinedNames() as $name) {
+		if ($name->getName() == $iName) {
+		  $picID = str_replace("\"","",$name->getValue()) ;
+		}
+	  }
+
+	  foreach ($inFile->getSheetByName("Chart Data")->getDrawingCollection() as $fImage) {
+		if ($fImage->getName() == $picID) {
+		  $fImage->setPath($iPath.$iFile) ;
+		}
+	  }
 	}
 
 	//downloads template as docx, xlsx.

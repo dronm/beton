@@ -58,6 +58,14 @@ class ExcelTemplateDialog_Model extends ModelSQLBeton{
 		$this->addField($f_sql_query);
 		//********************
 		
+		//*** Field image_sql ***
+		$f_opts = array();
+		$f_opts['id']="image_sql";
+						
+		$f_image_sql=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"image_sql",$f_opts);
+		$this->addField($f_image_sql);
+		//********************
+		
 		//*** Field cell_matching ***
 		$f_opts = array();
 		$f_opts['id']="cell_matching";

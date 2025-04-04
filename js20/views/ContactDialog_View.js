@@ -1,5 +1,5 @@
 /**
- * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017,2025
  
  * @extends ViewObjectAjx.js
  * @requires core/extend.js  
@@ -86,10 +86,34 @@ function ContactDialog_View(id,options){
 			}
 		}));	
 		
+		this.addElement(new EditFile(id+":attachments_list",{
+			"maxWidth":"100",
+			"maxHeight":"100",
+			"multipleFiles":false
+			,"showHref":true
+			,"showPic":false
+			,"onDeleteFile":function(fileId,callBack){
+				self.m_attachManager.deleteAttachment(fileId,callBack);
+			}
+			,"onFileAdded":function(fileId){
+				//self.addAttachment(fileId);
+				self.m_attachManager.addAttachment(fileId);
+			}
+			,"onDownload":function(fileId){
+				self.m_attachManager.downloadAttachment(fileId);
+			}
+			,"allowedFileExtList":"jpeg,png,jpg"
+		}));	
 	}
 	
 	ContactDialog_View.superclass.constructor.call(this,id,options);
 	
+	this.m_attachManager = new AttachmentManager({
+		"view": this,
+		"dataType": "contacts",
+		"attachmentViewName": "attachments_list"
+	});
+
 	//****************************************************
 	//read
 	this.setDataBindings([
@@ -99,6 +123,7 @@ function ContactDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("tel")})
 		,new DataBinding({"control":this.getElement("tel_ext")})
 		,new DataBinding({"control":this.getElement("comment_text")})
+		,new DataBinding({"control":this.getElement("attachments_list")})
 	]);
 	
 	//write

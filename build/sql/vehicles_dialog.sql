@@ -60,11 +60,14 @@ CREATE OR REPLACE VIEW public.vehicles_dialog AS
 		v.leasing_contract_date,
 		v.leasing_contract_num,
 		v.insurance_osago,
-		v.insurance_kasko
+		v.insurance_kasko,
+		
+		vehicle_owners_ref(of_v_own) AS official_vehicle_owners_ref
 		
 	FROM vehicles v
 	LEFT JOIN drivers dr ON dr.id = v.driver_id
 	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
+	LEFT JOIN vehicle_owners of_v_own ON of_v_own.id = v.official_vehicle_owner_id
 	LEFT JOIN gps_trackers AS gps_tr ON gps_tr.id = v.tracker_id
 	/*
 	LEFT JOIN (

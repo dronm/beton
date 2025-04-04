@@ -60,6 +60,7 @@
 <li><a href="#Event_Controller">Event_Controller</a></li>
 <li><a href="#ExcelTemplate_Controller">ExcelTemplate_Controller</a></li>
 <li><a href="#ExcelTemplateFieldMatch_Controller">ExcelTemplateFieldMatch_Controller</a></li>
+<li><a href="#ExcelTemplateImageSQL_Controller">ExcelTemplateImageSQL_Controller</a></li>
 <li><a href="#Firm1c_Controller">Firm1c_Controller</a></li>
 <li><a href="#GPSTracker_Controller">GPSTracker_Controller</a></li>
 <li><a href="#GornyiCarrierMatch_Controller">GornyiCarrierMatch_Controller</a></li>
@@ -79,6 +80,7 @@
 <li><a href="#MaterialFactBalanceCorretion_Controller">MaterialFactBalanceCorretion_Controller</a></li>
 <li><a href="#MaterialFactConsumption_Controller">MaterialFactConsumption_Controller</a></li>
 <li><a href="#MaterialFactConsumptionCorretion_Controller">MaterialFactConsumptionCorretion_Controller</a></li>
+<li><a href="#OperatorForTranspNakl_Controller">OperatorForTranspNakl_Controller</a></li>
 <li><a href="#Order_Controller">Order_Controller</a></li>
 <li><a href="#OrderFromClient_Controller">OrderFromClient_Controller</a></li>
 <li><a href="#OrderGarbage_Controller">OrderGarbage_Controller</a></li>
@@ -442,6 +444,7 @@
 <li><a href="#ExcelTemplateList_Model">ExcelTemplateList_Model</a></li>
 <li><a href="#ExcelTemplateDialog_Model">ExcelTemplateDialog_Model</a></li>
 <li><a href="#ExcelTemplateFieldMatch_Model">ExcelTemplateFieldMatch_Model</a></li>
+<li><a href="#ExcelTemplateImageSQL_Model">ExcelTemplateImageSQL_Model</a></li>
 <li><a href="#Bank_Model">Bank_Model</a></li>
 <li><a href="#BankList_Model">BankList_Model</a></li>
 <li><a href="#PeriodValue_Model">PeriodValue_Model</a></li>
@@ -505,6 +508,8 @@
 <li><a href="#UserChatMessageView_Model">UserChatMessageView_Model</a></li>
 <li><a href="#ShipmentMediaList_Model">ShipmentMediaList_Model</a></li>
 <li><a href="#BuhDoc_Model">BuhDoc_Model</a></li>
+<li><a href="#OperatorForTranspNakl_Model">OperatorForTranspNakl_Model</a></li>
+<li><a href="#OperatorForTranspNaklList_Model">OperatorForTranspNaklList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -1799,6 +1804,19 @@
 <a href="#ExcelTemplateFieldMatch_Model">Model: ExcelTemplateFieldMatch_Model</a>
 </div>
 </div>
+<div id="ExcelTemplateImageSQL_Controller" class="content_box">
+<h1>ExcelTemplateImageSQL_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#ExcelTemplateImageSQL_Model">Model: ExcelTemplateImageSQL_Model</a><h2>update</h2>
+<a href="#ExcelTemplateImageSQL_Model">Model: ExcelTemplateImageSQL_Model</a><h2>delete</h2>
+<a href="#ExcelTemplateImageSQL_Model">Model: ExcelTemplateImageSQL_Model</a><h2>get_list</h2>
+<a href="#ExcelTemplateImageSQL_Model">Model: ExcelTemplateImageSQL_Model</a><h2>get_object</h2>
+<a href="#ExcelTemplateImageSQL_Model">Model: ExcelTemplateImageSQL_Model</a>
+</div>
+</div>
 <div id="Firm1c_Controller" class="content_box">
 <h1>Firm1c_Controller</h1>
 <div class="content_item">
@@ -2364,6 +2382,19 @@
 <p>Length:500</p>
 </div>
 </div>
+</div>
+</div>
+<div id="OperatorForTranspNakl_Controller" class="content_box">
+<h1>OperatorForTranspNakl_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#OperatorForTranspNakl_Model">Model: OperatorForTranspNakl_Model</a><h2>update</h2>
+<a href="#OperatorForTranspNakl_Model">Model: OperatorForTranspNakl_Model</a><h2>delete</h2>
+<a href="#OperatorForTranspNakl_Model">Model: OperatorForTranspNakl_Model</a><h2>get_list</h2>
+<a href="#OperatorForTranspNaklList_Model">Model: OperatorForTranspNaklList_Model</a><h2>get_object</h2>
+<a href="#OperatorForTranspNaklList_Model">Model: OperatorForTranspNaklList_Model</a>
 </div>
 </div>
 <div id="Order_Controller" class="content_box">
@@ -8129,6 +8160,18 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>tm_first_name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>attachments_list</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="ContactList_Model" class="content_box">
@@ -9911,6 +9954,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>image_sql</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>update_dt</h2>
 <div>Type:DateTimeTZ</div>
 <div>Primary key:</div>
@@ -9947,6 +9996,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>image_sql</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>cell_matching</h2>
 <div>Type:JSON</div>
 <div>Primary key:</div>
@@ -9976,6 +10031,36 @@
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:20</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ExcelTemplateImageSQL_Model" class="content_box">
+<h1>ExcelTemplateImageSQL_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:100</div>
+<div>Precision:</div>
+<h2>sql_query</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:5000</div>
+<div>Precision:</div>
+<h2>comment_text</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:5000</div>
 <div>Precision:</div>
 </div>
 </div>
@@ -12578,6 +12663,54 @@
 <div>Precision:</div>
 <h2>ast_call_unique_id</h2>
 <div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="OperatorForTranspNakl_Model" class="content_box">
+<h1>OperatorForTranspNakl_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="OperatorForTranspNaklList_Model" class="content_box">
+<h1>OperatorForTranspNaklList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_sites_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>users_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -23022,6 +23155,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>official_vehicle_owner_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="VehicleDialog_Model" class="content_box">
@@ -23174,6 +23313,12 @@
 <div>Precision:</div>
 <h2>insurance_kasko</h2>
 <div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>official_vehicle_owners_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

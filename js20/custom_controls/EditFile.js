@@ -24,7 +24,13 @@
  * @param {Control} options.label       
  * @param {bool} options.multiSignature
  * @param {function} options.onSignFile
- * @param {function} options.onSignClick   
+ * @param {function} options.onSignClick
+ * @param {array} options.allowedFileExtList
+ * @param {array} options.allowedFileTypeList
+ * @param {bool} [options.showHref=true]
+ * @param {bool} [options.showPic=true]
+ * @param {int} [options.maxWidth]
+ * @param {int} [options.maxHeight] 
  */
 function EditFile(id,options){
 	options = options || {};	
@@ -32,7 +38,8 @@ function EditFile(id,options){
 	options.template = options.template || window.getApp().getTemplate("EditFile");
 	
 	this.m_fileInfTemplate = options.fileInfTemplate || window.getApp().getTemplate("EditFileInf");
-	this.m_fileInfTemplateOptions = options.fileInfTemplateOptions;
+	this.m_fileInfTemplateOptions = options.fileInfTemplateOptions || {};
+	this.m_fileInfTemplateOptions.IMG_CLASS =this.m_fileInfTemplateOptions.IMG_CLASS || "attachmentPic";
 	
 	this.m_onDownload = options.onDownload;
 	this.m_onDeleteFile = options.onDeleteFile;
@@ -47,15 +54,14 @@ function EditFile(id,options){
 	this.m_onSignFile = options.onSignFile;
 	this.m_onSignClick = options.onSignClick;
 	
-	this.m_acceptSigFiles = options.acceptSigFiles
-		||(this.m_onSignFile!=undefined)
-		||(this.m_onSignClick!=undefined)
-		||this.m_multiSignature
-		||(this.m_onFileSigAdded!=undefined)
-		||(this.m_onFileSigAdded!=undefined)
-		||this.m_separateSignature
-		||this.m_allowOnlySignedFiles
-		;
+	this.m_allowedFileExtList = (options.allowedFileExtList!=undefined&&CommonHelper.isArray(options.allowedFileExtList))? options.allowedFileExtList:null;
+	this.m_allowedFileTypeList = (options.allowedFileTypeList!=undefined&&CommonHelper.isArray(options.allowedFileTypeList))? options.allowedFileTypeList:null;
+	
+	this.m_showHref = (options.showHref!=undefined)? options.showHref:true;
+	this.m_showPic = (options.showPic!=undefined)? options.showPic:false;
+	
+	this.m_maxWidth = options.maxWidth;
+	this.m_maxHeight = options.maxHeight;
 	
 	this.setContTagName(options.contTagName || this.DEF_CONT_TAG);	
 	
@@ -95,6 +101,7 @@ function EditFile(id,options){
 		
 		this.addElement(new ButtonCtrl(id+":add",{
 			"glyph":"glyphicon-plus",
+			"attrs":{"class":"btn btn-default fileAddBtn"},
 			"title":"Выбрать файл",
 			"onClick":function(){
 				$(self.getElement("file").getNode()).click();
@@ -105,8 +112,8 @@ function EditFile(id,options){
 			options.addControls.call(this);
 		}
 	}
-	
-	EditFile.superclass.constructor.call(this,id,"DIV",options);
+
+	EditFile.superclass.constructor.call(this,id, options.tagName||"DIV",options);
 	
 	if (init_val){
 		this.setInitValue(init_val);
@@ -153,12 +160,11 @@ EditFile.prototype.getFileControls = function(){
  * @param {json|file|FileList} v
  */
 EditFile.prototype.setValue = function(v){	
+	debugger
 	this.m_files = [];
 	this.getElement("file").getNode().value="";
-	//console.log("EditFile.prototype.setValue")
-	//console.dir(v)
 	
-	if (v && !CommonHelper.isArray(v) && v.id && v.name && v.size){
+	if (v && !CommonHelper.isArray(v) && ((v.id && v.name && v.size) || v.dataBase64) ){
 		var el = v;
 		v = [el];
 	}
@@ -168,21 +174,28 @@ EditFile.prototype.setValue = function(v){
 		cont.clear();
 		for (var i=0;i<v.length;i++){
 			v[i].uploaded = true;
-			this.addFile(v[i]);
+			this.addFile(v[i],true);
 		}
 		cont.toDOM(this.m_node);
 	}
 	this.m_modified = false;
 }
 
-EditFile.prototype.setInitValue = function(v){	
+EditFile.prototype.setInitValue = function(v){
+	/*Problem:
+		in ViewObjectAJX.onAfterUpsert()
+		EditFile.setInitValue(EditFile.getValue()) is called with the same control value
+		it has no base64 property!!!
+	*/
+	if(this.m_showPic && v && CommonHelper.isArray(v) && v.length && !v[0].dataBase64){
+		return; //stub
+	}
 	this.setValue(v);
 }
 
 EditFile.prototype.addFile =  function(fileInf){
-//console.dir(fileInf)
-//debugger
 	var cont = this.getElement("file_cont");
+	
 	if (!this.m_multipleFiles && !this.m_separateSignature){
 		cont.clear();
 	}
@@ -224,12 +237,13 @@ EditFile.prototype.addFile =  function(fileInf){
 	var file_template_opts = {
 		"file_uploaded":fileInf.uploaded,
 		"file_not_uploaded":!fileInf.uploaded,
-		"file_deletable":(fileInf.uploaded!==true)? true:((this.m_onDeleteFile)? true:false),
+		"file_deletable":(this.m_onDeleteFile)? true:false,
 		"separateSignature":this.m_separateSignature,
 		"allowOnlySignedFiles":this.m_allowOnlySignedFiles,
 		"allowNotOnlySignedFiles":!this.m_allowOnlySignedFiles,
 		"name":fileInf.name,
-		"file_size_formatted":CommonHelper.byteFormat(fileInf.size)
+		"file_size_formatted":CommonHelper.byteFormat(fileInf.size),
+		"show_href": this.m_showHref
 	};
 	CommonHelper.merge(file_template_opts,this.m_fileInfTemplateOptions||{});
 	var file_opts = {
@@ -249,26 +263,31 @@ EditFile.prototype.addFile =  function(fileInf){
 		file_opts.attrs = file_opts.attrs || {};
 		file_opts.attrs.file_name = fileInf.name;
 		file_opts.attrs.file_signed = fileInf.file_signed;
-	}	
-	var file_ctrl = new Control(fileInf.id,"TEMPLATE",file_opts);
+	}
+	//debugger	
+	var file_id = fileInf.id||fileInf.file_id;
+
+	var file_ctrl = new Control(file_id, "TEMPLATE", file_opts);
 	file_ctrl.isFileControl = true;
 	cont.addElement(file_ctrl);
 	
 	var self = this;
 	
-	cont.addElement(new Button(fileInf.id+"-href",{
-		"attrs":{"class":"","download_href":"true","file_id":fileInf.id,"file_uploaded":fileInf.uploaded},
-		"onClick":function(e){
-			e.preventDefault();
-			if (this.getAttr("file_uploaded")=="true"){
-				self.m_onDownload(this.getAttr("file_id"));				
+	if(this.m_showHref){
+		cont.addElement(new Button(file_id+"-href",{
+			"attrs":{"class":"","download_href":"true","file_id":fileInf.id,"file_uploaded":fileInf.uploaded},
+			"onClick":function(e){
+				e.preventDefault();
+				if (this.getAttr("file_uploaded")=="true"){
+					self.m_onDownload(this.getAttr("file_id"));				
+				}
 			}
-		}
-	}));
-
-	if(this.m_acceptSigFiles){
-		this.sigCont = new FileSigContainer(fileInf.id+"-sigList",{
-			"fileId":fileInf.id,
+		}));
+	}
+	
+	if(window["FileSigContainer"]){
+		this.sigCont = new FileSigContainer(file_id+"-sigList",{
+			"fileId":file_id,
 			"itemId":null,
 			"signatures":CommonHelper.unserialize(fileInf.signatures),//array!
 			"multiSignature":this.m_multiSignature,
@@ -284,15 +303,12 @@ EditFile.prototype.addFile =  function(fileInf){
 			}
 		});
 		cont.addElement(this.sigCont);
-	}
-	else{
-	
-	}
-	if (this.m_onDeleteFile || !fileInf.uploaded){		
-		cont.addElement(new Button(fileInf.id+"-del",{
-			"attrs":{"file_id":fileInf.id,"file_uploaded":fileInf.uploaded},
+	}	
+	if (this.m_onDeleteFile){		
+		cont.addElement(new Button(file_id+"-del",{
+			"attrs":{"file_id":file_id,"file_uploaded":fileInf.uploaded},
 			"onClick":function(){				
-				if (this.getAttr("file_uploaded")=="true" && self.m_onDeleteFile){					
+				if (this.getAttr("file_uploaded")=="true"){					
 					var file_id = this.getAttr("file_id");
 					self.m_onDeleteFile(						
 						file_id,
@@ -309,10 +325,49 @@ EditFile.prototype.addFile =  function(fileInf){
 			}
 		}));
 	}
-	if (this.m_onFileAdded){
-		this.m_onFileAdded();
-	}
 	
+	if (this.m_showPic && fileInf.dataBase64){		
+		var max_dim_exist = (this.m_maxWidth && this.m_maxHeight);
+		var self = this;
+		var pic_ctrl = new Control(file_id+"-preview","TEMPLATE",{
+			"attrs":{
+				"src":"data:image/png;base64, "+fileInf.dataBase64
+			},
+			"visible":!max_dim_exist,
+			"events": (max_dim_exist? {
+				"load":function(){
+					var n = this.m_node;
+					var dim = CommonHelper.calculateImgRatioFit(n.width, n.height, self.m_maxWidth, self.m_maxHeight);
+					n.width = dim.width;
+					n.height = dim.height;
+					DOMHelper.show(n);						
+				},
+				"click":this.m_showHref? null:function(e){
+					e.preventDefault();
+					if (e.target.getAttribute("file_uploaded")=="true"){
+						self.m_onDownload(e.target.getAttribute("file_id"));				
+					}
+				}
+			} : null)
+		});
+		if(!this.m_showHref){
+			pic_ctrl.setAttr("file_uploaded", fileInf.uploaded);
+			pic_ctrl.setAttr("file_id", file_id);
+			pic_ctrl.setAttr("style", "cursor:pointer;");
+		}
+		cont.addElement(pic_ctrl);
+		/*if(max_dim_exist){
+			var i = new Image();
+			i.onload = function(){
+				var dim = CommonHelper.calculateImgRatioFit(i.width, i.height, self.m_maxWidth, self.m_maxWidth);
+				pic_ctrl.m_node.width = dim.width;
+				pic_ctrl.m_node.height = dim.height;
+				pic_ctrl.setVisible(true);
+			};	
+			i.src = "data:image/png;base64, "+fileInf.dataBase64;		
+		}*/		
+	}	
+		
 }
 
 EditFile.prototype.deleteFileFromDOM = function(fileId){
@@ -320,7 +375,7 @@ EditFile.prototype.deleteFileFromDOM = function(fileId){
 	//console.log("FileId="+fileId)
 	if (this.m_multipleFiles){
 		for (var i=0;i<this.m_files.length;i++){
-			if (this.m_files[i].file_id && this.m_files[i].file_id==fileId){
+			if (this.m_files[i] && this.m_files[i].file_id && this.m_files[i].file_id==fileId){
 				delete this.m_files[i];
 				this.m_files[i] = undefined;
 				break;
@@ -329,6 +384,9 @@ EditFile.prototype.deleteFileFromDOM = function(fileId){
 		cont.delElement(fileId);
 		cont.delElement(fileId+"-href");
 		cont.delElement(fileId+"-del");
+		if (this.m_showPic){
+			cont.delElement(fileId+"-preview");
+		}
 	}
 	else{
 		this.m_files = [];
@@ -367,6 +425,12 @@ EditFile.prototype.setEnabled = function(v){
 	for(var i=0;i<hrefs.length;i++){
 		DOMHelper.delAttr(hrefs[i],"disabled");
 	}
+	/*var cont = this.getElement("file_cont");
+	var btn_add = cont.getElement("add");
+	if(btn_add){
+		btn_add.setEnabled(v);
+	}
+	*/
 	//$(".downloadHref").removeAttr("disabled");
 	/*
 	for (var elem_id in this.m_elements){
@@ -380,7 +444,8 @@ EditFile.prototype.setEnabled = function(v){
 	}
 	*/
 }
-EditFile.prototype.fileAdded = function(){	
+EditFile.prototype.fileAdded = function(){
+	//debugger
 	var fl_list = this.getElement("file").getNode().files;
 
 	if (!this.m_multipleFiles && !this.m_separateSignature && fl_list.length>1){
@@ -390,7 +455,23 @@ EditFile.prototype.fileAdded = function(){
 	if (!this.m_multipleFiles && !this.m_separateSignature){
 		this.m_files = [];
 	}
-debugger						
+	
+	if(this.m_allowedFileExtList){
+		//extension list
+		var ext_ar = fl_list[fl_list.length-1].name.split(".");
+		if(!ext_ar.length || ext_ar.length<2){
+			throw new Error(this.ER_EXT_NOT_DEFINED);
+		}
+		if(CommonHelper.inArray(ext_ar[ext_ar.length-1].toLowerCase(),this.m_allowedFileExtList)==-1){
+			throw new Error(CommonHelper.format(this.ER_EXT_NOT_ALLOWED,ext_ar[ext_ar.length-1]));
+		}
+	}
+	if(this.m_allowedFileTypeList && fl_list[fl_list.length-1].type){		
+		if(CommonHelper.inArray(fl_list[fl_list.length-1].type,this.m_allowedFileTypeList)==-1){
+			throw new Error(CommonHelper.format(this.ER_TYPE_NOT_ALLOWED,fl_list[fl_list.length-1].type));
+		}
+	}
+						
 	var sig_list = []//base file names;
 	var ctrls_to_add = {};
 	for (var fi=0;fi<fl_list.length;fi++){
@@ -449,27 +530,29 @@ debugger
 					"file_uploaded":false,
 					"file_signed":false,
 					"signatures":[]
-				});	
+				});
+				if (this.m_onFileAdded){
+					this.m_onFileAdded();
+				}					
 			}
 		}
 		
 	}
+	var cont = this.getElement("file_cont");
+	if (!this.m_multipleFiles && !this.m_separateSignature){
+		cont.clear();
+	}
+	
 	for (var n in ctrls_to_add){
 		this.addFile(ctrls_to_add[n]);
-	}
-	this.getElement("file_cont").toDOM();
-	
+		
+		if (this.m_onFileAdded){
+			this.m_onFileAdded(ctrls_to_add[n].id);
+		}		
+	}	
+	cont.toDOM(this.m_node);
 	this.m_modified = true;
 	
 	//console.dir(this.m_files)
 
-}
-
-EditFile.prototype.validate = function(){	
-	res = true;
-	if(this.getRequired()&&this.m_modified&&!this.m_files.length){
-		this.setNotValid("Нет файла!");
-		res = false;
-	}
-	return res;
 }

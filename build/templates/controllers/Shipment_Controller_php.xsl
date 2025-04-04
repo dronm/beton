@@ -1249,7 +1249,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 
 	//all shipments, background operation 
 	//returns zip file name with all shipments
-	public function shipment_transp_nakl_all_operation($anyDocId){
+	public function shipment_transp_nakl_all_operation($anyDocId, $faksim){
 		$this->check_1c_attrs_for_tn($anyDocId);
 		$link = $this->getDbLink();
 		//all shipments of an order
@@ -1264,7 +1264,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			)
 		);
 		$fileList = array();
-		$templateName = 'Транспортная накладная';
+		$templateName = $faksim? "Транспортная накладная (факсимиле)" : "Транспортная накладная";
 		$erEmpty = 'Отгрузка не найдена!';
 		$zipFileName = OUTPUT_PATH. md5(uniqid()).'.zip';
 		$zip = new ZipArchive();
@@ -1306,8 +1306,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	//all shipments
 	public function shipment_transp_nakl_all($pm){
 		$docId = $this->getExtDbVal($pm, 'id');
+		$faksim = ($this->getDbVal($pm, 'faksim') == "1");
 		try{
-			$outFile = $this->shipment_transp_nakl_all_operation($docId);
+			$outFile = $this->shipment_transp_nakl_all_operation($docId, $faksim);
 			$fileName = "ТН.zip";
 			$flMime = getMimeTypeOnExt($fileName);
 			ob_clean();
@@ -1331,9 +1332,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$docId = $this->getExtDbVal($pm, 'id');
 		$this->check_1c_attrs_for_tn($docId);
 
+		$tmplName = ($this->getExtVal($pm, 'faksim') == "1")? "Транспортная накладная (факсимиле)" : "Транспортная накладная";
 		return ExcelTemplate_Controller::downloadFilledTemplate(
 			$this->getDbLink()
-			,'Транспортная накладная'
+			,$tmplName
 			,array($docId)
 			,'Отгрузка не найдена!'
 			,'Транспортная накладная'
@@ -1360,7 +1362,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 							)
 						FROM vehicle_owners AS vh_own 
 						LEFT JOIN clients AS vh_cl ON vh_cl.id = vh_own.client_id
-						WHERE vh_own.id = wehicle_owner_last(vh.id)
+						WHERE vh_own.id = vh.official_vehicle_owner_id
 						) AS veh_owner_client
 					FROM shipments AS sh
 					LEFT JOIN orders AS o ON o.id = sh.order_id

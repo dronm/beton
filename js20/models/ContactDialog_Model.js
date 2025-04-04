@@ -130,6 +130,24 @@ function ContactDialog_Model(options){
 	
 	options.fields.tm_first_name = new FieldString("tm_first_name",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.tm_first_name = new FieldString("tm_first_name",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.attachments_list = new FieldJSON("attachments_list",filed_options);
+	
 		ContactDialog_Model.superclass.constructor.call(this,id,options);
 }
 extend(ContactDialog_Model,ModelXML);

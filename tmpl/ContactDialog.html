@@ -20,14 +20,23 @@
 	<div id="{{id}}:tel_ext">
 	</div>
 	
-	{{#TM_ACTIVATED}}
-	<div>Активирован Telegram
-	</div>
-	<img src="data:image/png;base64, {{TM_PHOTO}}">
-	</img>
-	{{/TM_ACTIVATED}}
-	
 	<div id="{{id}}:comment_text">
 	</div>
+	
+	<div sytle="display: flex; align-items: center;gap: 10px;">
+		<h5 class="panel-title">Факсимиле
+		</h5>
+		<div id="{{id}}:attachments_list">
+		</div>
+	</div>
+
+	{{#TM_ACTIVATED}}
+	<div sytle="display: flex; align-items: center;gap: 10px;">
+		<span>Активирован Telegram
+		</span>
+		<img src="data:image/png;base64, {{TM_PHOTO}}">
+		</img>
+	</div>
+	{{/TM_ACTIVATED}}
 	
 </div>	

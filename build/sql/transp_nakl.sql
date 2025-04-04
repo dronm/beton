@@ -59,15 +59,24 @@ CREATE OR REPLACE VIEW transp_nakl AS
 		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
 		
 		'1 место' AS gruz_mest,
-		round(sh.quant*2.4*1000)||' кг, '||sh.quant||' м3' AS gruz_massa,
+		-- round(sh.quant*2.4*1000)||' кг, '||sh.quant||' м3' AS gruz_massa,
+		sh.quant||' м3' AS gruz_massa,
 		round(sh.quant*2.4*1000)||' кг' AS massa_netto,
+
+		coalesce(vh_cl.name_full, vh_cl.name)||
+		coalesce(', ИНН '||vh_cl.inn, '')||
+		--coalesce(', КПП '||cl_per.kpp, '')||
+		', '||coalesce( coalesce(vh_cl.address_fact, vh_cl.address_legal), dest.name)||
+		coalesce(', '||vh_cl.tels_1c, '')
+		AS perevozchik,		
 		
+		/*
 		(SELECT
-			coalesce(cl_per.name_full, cl_per.name)||
-			coalesce(', ИНН '||cl_per.inn, '')||
+			coalesce(vh_cl.name_full, vh_cl.name)||
+			coalesce(', ИНН '||vh_cl.inn, '')||
 			--coalesce(', КПП '||cl_per.kpp, '')||
-			', '||coalesce( coalesce(cl_per.address_fact, cl_per.address_legal), dest.name)||
-			coalesce(', '||cl_per.tels_1c, '')		
+			', '||coalesce( coalesce(vh_cl.address_fact, vh_cl.address_legal), dest.name)||
+			coalesce(', '||vh_cl.tels_1c, '')		
 		FROM
 		(SELECT  
 			vh_cl.name_full,
@@ -83,6 +92,7 @@ CREATE OR REPLACE VIEW transp_nakl AS
 		WHERE vh_own.id = wehicle_owner_last(vh.id)
 		) AS cl_per
 		) AS perevozchik,
+		*/
 		
 		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
 		UPPER(vh.plate)||coalesce(vh.plate_region,' 72') AS avto_nomer,
@@ -153,8 +163,13 @@ CREATE OR REPLACE VIEW transp_nakl AS
 		
 		to_char(sh.ship_date_time::date,'DD.MM.YY') AS data_ispoln,
 		
-		coalesce(emp_disp.name, 'Верхорубов Евгений Николаевич') AS dispetcher,
-		coalesce(emp_disp.post, 'Диспетчер РБУ') AS dispetcher_dolzhnost
+		--coalesce(emp_disp.name, 'Верхорубов Евгений Николаевич') AS dispetcher,
+		--coalesce(emp_disp.post, 'Диспетчер РБУ') AS dispetcher_dolzhnost
+		(select users_ref->>'descr'
+		from operators_for_transp_nakls_list
+		where (production_sites_ref->'keys'->>'id')::int = sh.production_site_id
+		) AS dispetcher,
+		'Оператор' AS dispetcher_dolzhnost
 		
 	FROM shipments AS sh
 	LEFT JOIN orders o ON o.id = sh.order_id
@@ -162,11 +177,14 @@ CREATE OR REPLACE VIEW transp_nakl AS
 	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
 	
 	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
-	LEFT JOIN drivers dr ON dr.id = sch.driver_id
+	
 	LEFT JOIN destinations dest ON dest.id = o.destination_id
 	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
 	LEFT JOIN production_sites pr_st ON pr_st.id = sh.production_site_id
-	LEFT JOIN employees emp_disp ON emp_disp.id = pr_st.dispatcher_id
+	LEFT JOIN drivers dr ON dr.id = vh.driver_id
+	LEFT JOIN users AS op_u ON op_u.id=sh.operator_user_id
+	LEFT JOIN vehicle_owners AS v_own ON v_own.id = vh.official_vehicle_owner_id
+	LEFT JOIN clients AS vh_cl ON vh_cl.id = v_own.client_id
+
+	--LEFT JOIN employees emp_disp ON emp_disp.id = pr_st.dispatcher_id
 	;
-	
-ALTER VIEW transp_nakl OWNER TO ;

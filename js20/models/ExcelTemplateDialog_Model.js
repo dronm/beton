@@ -65,6 +65,15 @@ function ExcelTemplateDialog_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.image_sql = new FieldJSON("image_sql",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.cell_matching = new FieldJSON("cell_matching",filed_options);
 	
 		ExcelTemplateDialog_Model.superclass.constructor.call(this,id,options);

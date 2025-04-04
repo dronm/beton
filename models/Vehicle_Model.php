@@ -252,6 +252,16 @@ class Vehicle_Model extends ModelSQLBeton{
 		$f_insurance_kasko=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"insurance_kasko",$f_opts);
 		$this->addField($f_insurance_kasko);
 		//********************
+		
+		//*** Field official_vehicle_owner_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='УДАЛИТЬ Владелец';
+		$f_opts['id']="official_vehicle_owner_id";
+						
+		$f_official_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"official_vehicle_owner_id",$f_opts);
+		$this->addField($f_official_vehicle_owner_id);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		
