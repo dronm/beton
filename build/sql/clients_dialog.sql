@@ -1,6 +1,6 @@
 -- View: public.clients_dialog
 
--- DROP VIEW public.clients_dialog;
+--DROP VIEW public.clients_dialog;
 
 CREATE OR REPLACE VIEW public.clients_dialog AS 
 	SELECT

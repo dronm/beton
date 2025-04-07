@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-04-04 06:46:38</lastBuild></version>
+		<lastBuild>2025-04-07 13:11:01</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -271,6 +271,7 @@
 		<version dateOpen="2025-03-13 06:28:56" dateClose="2025-03-13 06:29:15">1.00365</version>
 		<version dateOpen="2025-03-13 07:01:32" dateClose="2025-03-24 06:53:15">1.00366</version>
 		<version dateOpen="2025-04-01 09:47:50" dateClose="2025-04-04 06:46:54">1.00367</version>
+		<version dateOpen="2025-04-04 12:29:37" dateClose="2025-04-07 13:11:25">1.00368</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1762,6 +1763,7 @@
 			<field id="production_plant_type" dataType="Enum" enumId="production_plant_types" alias="Вид завода"/>
 			<field id="production_base_id" dataType="Int" refTable="production_bases" refField="id" alias="База"/>
 			<field id="dispatcher_id" dataType="Int" refTable="employees" refField="id" alias="Диспетчер (ТТН)"/>
+			<field id="unclosed_production_ids" dataType="Array"/>
 		</model>
 		<model id="ProductionSiteDialog" parent="ModelSQLBeton" dataTable="production_sites_dialog" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
@@ -5144,7 +5146,7 @@
 			<field id="order_id" dataType="Int" refTable="orders" refField="id" primaryKey="TRUE"/>
 			<field id="nomer" dataType="Text"/>
 			<field id="data" dataType="Text" alias="Formatted document datetime"/>
-			<field id="fakture_nomer" dataType="Text"/>
+			<field id="faktura_nomer" dataType="Text"/>
 			<field id="faktura_data" dataType="Text" alias="Formatted document datetime"/>
 			<field id="ref_1c" dataType="String" length="36"/>
 		</model>

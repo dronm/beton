@@ -49,6 +49,3 @@ CREATE OR REPLACE VIEW raw_material_cons_rates_dates_list AS
 	LEFT JOIN production_sites AS production_sites_ref_t ON production_sites_ref_t.id = d_from.production_site_id
 	ORDER BY d_from.dt DESC;
 
-ALTER TABLE raw_material_cons_rates_dates_list
-  OWNER TO beton;
-

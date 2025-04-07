@@ -74,5 +74,4 @@ CREATE OR REPLACE VIEW public.clients_list AS
 	ORDER BY cl.name
 	;
 
-ALTER TABLE public.clients_list OWNER TO beton;
 

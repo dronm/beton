@@ -97,7 +97,7 @@ CREATE OR REPLACE VIEW transp_nakl AS
 		coalesce(vh.make,'') || ' ' ||coalesce(vh.load_capacity::text,'') AS avto_marka,
 		UPPER(vh.plate)||coalesce(vh.plate_region,' 72') AS avto_nomer,
 		
-		coalesce(dr.name,'')||
+		person_init(coalesce(dr.name,''))||
 		coalesce(', ИНН '||dr.inn,'') AS voditel,
 		
 		
@@ -165,10 +165,10 @@ CREATE OR REPLACE VIEW transp_nakl AS
 		
 		--coalesce(emp_disp.name, 'Верхорубов Евгений Николаевич') AS dispetcher,
 		--coalesce(emp_disp.post, 'Диспетчер РБУ') AS dispetcher_dolzhnost
-		(select users_ref->>'descr'
+		person_init((select users_ref->>'descr'
 		from operators_for_transp_nakls_list
 		where (production_sites_ref->'keys'->>'id')::int = sh.production_site_id
-		) AS dispetcher,
+		)::text) AS dispetcher,
 		'Оператор' AS dispetcher_dolzhnost
 		
 	FROM shipments AS sh

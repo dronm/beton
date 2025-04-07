@@ -24,6 +24,10 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
 
 
 
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
+use PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing;
+
 require_once('common/downloader.php');
 
 require_once(USER_CONTROLLERS_PATH.'Attachment_Controller.php');
@@ -526,26 +530,27 @@ class ExcelTemplate_Controller extends ControllerSQL{
 				$fields = $image;
 			}
 			
-			if(isset($fields->field) && isset($fields->name) ){
+			if(isset($fields->sql_query) && isset($fields->name) ){
 				if(!array_key_exists($fields->sql_query, $query_results)){
-					$ar_att = $dbLink->query_first(
-						sprintf(
-							$fields->sql_query,
-							$ar["id"]
-						)
-					);
+					$q = vsprintf($fields->sql_query,$paramArray);
+					$ar_att = $dbLink->query_first($q);
 					if(!is_array($ar_att) || !count($ar_att) || !isset($ar_att['attachment_id'])){
-						throw new Exception("Не найден файл вложения для '".$fields->sql_query."'");
-
+						throw new Exception("Не найден файл вложения для '".
+							(isset($fields->comment_text)? $fields->comment_text : $fields->name) .
+							"'"
+						);
 					}
-					$query_results[$fields->sql_query] = $att["id"];
-					$attFile = Attachment_Controller::save_to_tmp($dbLink, $query_results[$fields->sql_query]);
-					array_push($attachments, array(
-						'fileName' => $attFile
-					));
+					$attFile = Attachment_Controller::save_to_tmp($dbLink, $ar_att["attachment_id"]);
+					$query_results[$fields->sql_query] = $attFile;
 				}
+				array_push($attachments, array(
+					'imageName' => $fields->name,
+					'fileName' => $query_results[$fields->sql_query]
+				));
+
 			}
 		}
+		file_put_contents(OUTPUT_PATH.'att.txt',var_export($attachments, true));
 
 		$reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($reader_tp);
 		$spreadsheet = $reader->load($tmpl_fl);
@@ -566,6 +571,10 @@ class ExcelTemplate_Controller extends ControllerSQL{
 		}
 
 		//image changes
+		foreach($attachments as $att){
+			/* self::swapImage($spreadsheet, $sheet, $att["imageName"], $att["fileName"]); */
+			self::replaceImageByName($sheet, $att["imageName"], $att["fileName"]);
+		}
 					
 		$writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
 		$writer->save($outFl);
@@ -573,19 +582,36 @@ class ExcelTemplate_Controller extends ControllerSQL{
 		$flName = $ar["file_name"]; 
 	}
 
-	//inFile IReader spreadsheet
-	private static function swapImage($inFile, $iPath, $iName, $iFile) {
-	  foreach ($inFile->getDefinedNames() as $name) {
-		if ($name->getName() == $iName) {
-		  $picID = str_replace("\"","",$name->getValue()) ;
-		}
-	  }
+	private static function replaceImageByName($sheet, $imageNameToReplace, $newImagePath) {
+		$drawings = $sheet->getDrawingCollection();
+		
+		
+		$found = false;
+		$cnt = 0;
+		foreach ($drawings as $key => $drawing) {
+			// Check if it's a regular Drawing and name matches
+			if (
+					$drawing->getCoordinates() == $imageNameToReplace
+			) {
+				// Create a new Drawing
+				$newDrawing = new Drawing();
+				$newDrawing->setName($drawing->getName());
+				$newDrawing->setDescription($drawing->getDescription());
+				$newDrawing->setPath($newImagePath);
+				$newDrawing->setHeight($drawing->getHeight());
+				$newDrawing->setCoordinates($drawing->getCoordinates());
+				$newDrawing->setWorksheet($sheet);
 
-	  foreach ($inFile->getSheetByName("Chart Data")->getDrawingCollection() as $fImage) {
-		if ($fImage->getName() == $picID) {
-		  $fImage->setPath($iPath.$iFile) ;
+				// Remove the old drawing by unsetting
+				$found = true;
+				unset($drawings[$key]);
+				break; // assuming names are unique
+			}
+			$cnt++;
 		}
-	  }
+		if(!$found){
+			throw new Exception("image not found by getCoordinates() ".$imageNameToReplace." count:".$cnt);
+		}
 	}
 
 	//downloads template as docx, xlsx.

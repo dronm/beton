@@ -44,10 +44,28 @@ function BuhDoc_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Formatted document datetime';
+	filed_options.autoInc = false;	
+	
+	options.fields.data = new FieldText("data",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.date = new FieldDateTime("date",filed_options);
+	options.fields.faktura_nomer = new FieldText("faktura_nomer",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Formatted document datetime';
+	filed_options.autoInc = false;	
+	
+	options.fields.faktura_data = new FieldText("faktura_data",filed_options);
 	
 				
 	

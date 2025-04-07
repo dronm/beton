@@ -2056,7 +2056,7 @@ class Shipment_Controller extends ControllerSQL{
 
 	//all shipments, background operation 
 	//returns zip file name with all shipments
-	public function shipment_transp_nakl_all_operation($anyDocId){
+	public function shipment_transp_nakl_all_operation($anyDocId, $faksim){
 		$this->check_1c_attrs_for_tn($anyDocId);
 		$link = $this->getDbLink();
 		//all shipments of an order
@@ -2071,7 +2071,7 @@ class Shipment_Controller extends ControllerSQL{
 			)
 		);
 		$fileList = array();
-		$templateName = 'Транспортная накладная';
+		$templateName = $faksim? "Транспортная накладная (факсимиле)" : "Транспортная накладная";
 		$erEmpty = 'Отгрузка не найдена!';
 		$zipFileName = OUTPUT_PATH. md5(uniqid()).'.zip';
 		$zip = new ZipArchive();
@@ -2113,8 +2113,9 @@ class Shipment_Controller extends ControllerSQL{
 	//all shipments
 	public function shipment_transp_nakl_all($pm){
 		$docId = $this->getExtDbVal($pm, 'id');
+		$faksim = ($pm->getParamValue("id") == "1");
 		try{
-			$outFile = $this->shipment_transp_nakl_all_operation($docId);
+			$outFile = $this->shipment_transp_nakl_all_operation($docId, $faksim);
 			$fileName = "ТН.zip";
 			$flMime = getMimeTypeOnExt($fileName);
 			ob_clean();

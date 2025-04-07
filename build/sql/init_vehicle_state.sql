@@ -31,5 +31,5 @@ END;
 $BODY$;
 
 ALTER FUNCTION public.init_vehicle_state()
-    OWNER TO beton;
+    OWNER TO ;
 

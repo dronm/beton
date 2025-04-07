@@ -32,4 +32,4 @@ CREATE OR REPLACE VIEW sms_pump_remind AS
 		AND pvh.phone_cel<>''
 		AND o.quant<>0
 	;
-ALTER TABLE sms_pump_remind OWNER TO beton;
+

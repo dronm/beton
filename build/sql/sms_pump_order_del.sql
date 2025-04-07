@@ -39,6 +39,3 @@ CREATE OR REPLACE VIEW sms_pump_order_del AS
 		AND o.quant <> 0::double precision
 	;
 
-ALTER TABLE sms_pump_order_del
-  OWNER TO beton;
-

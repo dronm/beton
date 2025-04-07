@@ -47,7 +47,6 @@ BEGIN;
 	FROM const_ping1c AS t
 	;
 
-	ALTER VIEW const_ping1c_view OWNER TO beton;
 	CREATE OR REPLACE VIEW constants_list_view AS
 	SELECT *
 	FROM const_doc_per_page_count_view

@@ -101,4 +101,4 @@ CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
 	ORDER BY ship_date_time DESC
 	;
 	
-ALTER VIEW shipments_for_veh_owner_list OWNER TO ;
+

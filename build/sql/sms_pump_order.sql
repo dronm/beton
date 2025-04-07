@@ -1,12 +1,12 @@
 -- View: public.sms_pump_order
 
--- DROP VIEW public.sms_pump_order;
+--DROP VIEW public.sms_pump_order;
 
 CREATE OR REPLACE VIEW public.sms_pump_order
 AS
 	SELECT
 		o.id AS order_id,
-		format_cel_standart(pvh.phone_cel) AS phone_cel,
+		format_cel_standart(pvh.phone_cel::text) AS phone_cel,
 		sms_templates_text(
 			ARRAY[
 				format('("quant","%s")'::text, o.quant::text)::template_value,

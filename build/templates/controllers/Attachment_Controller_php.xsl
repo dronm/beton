@@ -122,7 +122,8 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		$ref = json_decode($this->getExtVal($pm, 'ref'), TRUE);
 		$query = sprintf(
 			"DELETE FROM attachments
-			WHERE (ref->'keys'->>'id')::int = %d AND content_info->>'id' = '%s'"
+			WHERE (ref->'keys'->>'id')::int = %d AND content_info->>'id' = '%s'
+			RETURNING id"
 			,$ref["keys"]["id"]
 			,$this->getExtVal($pm, 'content_id')
 		);
@@ -137,7 +138,16 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		return OUTPUT_PATH. md5('attachment_'. $attId);
 	}
 
-	public static function save_to_tmp($dbLink, $attId): string{
+	public static function save_to_tmp($dbLink, $attId) {
+		$tmplFile = self::get_tmp_file_name($attId);
+		if(file_exists($tmplFile)){
+			//check for zero length
+			if(filesize($tmplFile) != 0){
+				return $tmplFile;
+			}
+			unlink($tmplFile);
+		}
+
 		$query = sprintf(
 			"SELECT content_data 
 			FROM attachments
@@ -148,8 +158,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		if(!is_array($ar) || !isset($ar["content_data"])){
 			throw new Exception("attachment not found");
 		}
-		$tmplFile = self::get_tmp_file_name($attId);
-		file_put_contents($tmplFile, pg_unescape_bytea($ar['file_data']));
+		file_put_contents($tmplFile, pg_unescape_bytea($ar['content_data']));
 
 		return $tmplFile;
 	}

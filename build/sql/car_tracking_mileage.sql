@@ -46,6 +46,5 @@ $BODY$
 $BODY$
   LANGUAGE sql VOLATILE
   COST 100;
-ALTER FUNCTION public.car_tracking_mileage(in_car_id varchar(15), in_date_from timestampTZ, in_date_to timestampTZ)
-  OWNER TO beton;
+
 

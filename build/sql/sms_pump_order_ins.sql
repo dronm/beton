@@ -33,6 +33,4 @@ CREATE OR REPLACE VIEW sms_pump_order_ins AS
      LEFT JOIN clients cl ON cl.id = o.client_id
   WHERE o.pump_vehicle_id IS NOT NULL AND pvh.phone_cel IS NOT NULL AND pvh.phone_cel::text <> ''::text AND o.quant <> 0::double precision;
 
-ALTER TABLE sms_pump_order_ins
-  OWNER TO beton;
 

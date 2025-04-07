@@ -13,4 +13,3 @@ $BODY$
 	AS (first text,second text,middle text)
 $BODY$
 LANGUAGE sql IMMUTABLE COST 100;
-ALTER FUNCTION person_init(text) OWNER TO ;

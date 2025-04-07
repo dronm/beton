@@ -142,5 +142,5 @@ CREATE OR REPLACE VIEW public.shipments_dialog AS
 	ORDER BY sh.date_time;
 
 ALTER TABLE public.shipments_dialog
-  OWNER TO beton;
+  OWNER TO ;
 

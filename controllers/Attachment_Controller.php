@@ -122,8 +122,7 @@ class Attachment_Controller extends ControllerSQL{
 				$contentInfo = json_decode($this->getExtVal($pm, 'content_info'), TRUE);
 				$query = sprintf(
 					"DELETE FROM attachments
-					WHERE (ref->'keys'->>'id')::int = %d AND content_info->>'id' = '%s'
-					RETURNING id"
+					WHERE (ref->'keys'->>'id')::int = %d AND content_info->>'id' = '%s'"
 					,$ref["keys"]["id"]
 					,$contentInfo["id"]
 				);
@@ -202,21 +201,18 @@ class Attachment_Controller extends ControllerSQL{
 		}
 	}
 
-	private static function delete_tmp_file_name($attId){
-		$tmpFile = self::get_tmp_file_name($attId);
-		if(file_exists($tmpFile)){
-			unlink($tmpFile);
-		}
-	}
-
 	private static function get_tmp_file_name($attId){
 		return OUTPUT_PATH. md5('attachment_'. $attId);
 	}
 
-	public static function save_to_tmp($dbLink, $attId): string {
+	public static function save_to_tmp($dbLink, $attId){
 		$tmplFile = self::get_tmp_file_name($attId);
 		if(file_exists($tmplFile)){
-			return $tmplFile;
+			//check for zero length
+			if(filesize($tmplFile) != 0){
+				return $tmplFile;
+			}
+			unlink($tmplFile);
 		}
 
 		$query = sprintf(
@@ -229,9 +225,16 @@ class Attachment_Controller extends ControllerSQL{
 		if(!is_array($ar) || !isset($ar["content_data"])){
 			throw new Exception("attachment not found");
 		}
-		file_put_contents($tmplFile, pg_unescape_bytea($ar['file_data']));
+		file_put_contents($tmplFile, pg_unescape_bytea($ar['content_data']));
 
 		return $tmplFile;
+	}
+
+	private static function delete_tmp_file_name($attId){
+		$tmpFile = self::get_tmp_file_name($attId);
+		if(file_exists($tmpFile)){
+			unlink($tmpFile);
+		}
 	}
 
 

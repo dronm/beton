@@ -1,6 +1,6 @@
 -- VIEW: client_specifications_list
 
--- DROP VIEW client_specifications_list;
+--DROP VIEW client_specifications_list;
 
 CREATE OR REPLACE VIEW client_specifications_list AS
 	SELECT

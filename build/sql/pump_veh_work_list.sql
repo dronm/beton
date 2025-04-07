@@ -59,5 +59,5 @@ CREATE OR REPLACE VIEW public.pump_veh_work_list AS
 	ORDER BY v.plate;
 
 ALTER TABLE public.pump_veh_work_list
-  OWNER TO beton;
+  OWNER TO  ;
 

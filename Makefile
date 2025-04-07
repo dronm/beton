@@ -8,3 +8,6 @@ migshow:
 	migrate -database "$(DB_CONN)" -path migrations version
 migadd: 
 	migrate create -ext sql -dir migrations -seq NEW
+migver: 
+	migrate -database "$(DB_CONN)" -path migrations version
+

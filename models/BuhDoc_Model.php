@@ -10,7 +10,6 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
-require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
  
 class BuhDoc_Model extends ModelSQL{
 	
@@ -39,12 +38,32 @@ class BuhDoc_Model extends ModelSQL{
 		$this->addField($f_nomer);
 		//********************
 		
-		//*** Field date ***
+		//*** Field data ***
 		$f_opts = array();
-		$f_opts['id']="date";
+		
+		$f_opts['alias']='Formatted document datetime';
+		$f_opts['id']="data";
 						
-		$f_date=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date",$f_opts);
-		$this->addField($f_date);
+		$f_data=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"data",$f_opts);
+		$this->addField($f_data);
+		//********************
+		
+		//*** Field faktura_nomer ***
+		$f_opts = array();
+		$f_opts['id']="faktura_nomer";
+						
+		$f_faktura_nomer=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"faktura_nomer",$f_opts);
+		$this->addField($f_faktura_nomer);
+		//********************
+		
+		//*** Field faktura_data ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Formatted document datetime';
+		$f_opts['id']="faktura_data";
+						
+		$f_faktura_data=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"faktura_data",$f_opts);
+		$this->addField($f_faktura_data);
 		//********************
 		
 		//*** Field ref_1c ***

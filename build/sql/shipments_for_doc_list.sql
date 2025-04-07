@@ -35,4 +35,4 @@ CREATE OR REPLACE VIEW shipments_for_doc_list AS
 	ORDER BY sh.ship_date_time DESC
 	;
 	
-ALTER VIEW shipments_for_doc_list OWNER TO beton;
+ALTER VIEW shipments_for_doc_list OWNER TO ;

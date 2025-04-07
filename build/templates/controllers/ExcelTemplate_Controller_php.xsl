@@ -18,7 +18,13 @@
 <xsl:template match="controller"><![CDATA[<?php]]>
 <xsl:call-template name="add_requirements"/>
 
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
+use PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing;
+
 require_once('common/downloader.php');
+
+require_once(USER_CONTROLLERS_PATH.'Attachment_Controller.php');
 
 class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@parentId"/>{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
@@ -235,6 +241,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 			reverse(substring(reverse(file_info->>'name') from 1 for strpos(reverse(file_info->>'name'),'.')-1)) AS file_ext,
 			sql_query,
 			cell_matching->'rows' AS cell_matching,
+			image_sql->'rows' AS image_sql,
 			update_dt
 			FROM excel_templates	
 		WHERE name = '%s'",
@@ -286,6 +293,40 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 			file_put_contents($tmpl_fl, pg_unescape_bytea($ar_cont['file_content']));
 		}		
 
+		$attachments = []; //images to be changes
+
+		//generate images for image_sql
+		$query_results = [];
+		$image_sql = json_decode($ar['image_sql']);
+		foreach($image_sql as $image){
+			if(isset($image->fields)){
+				$fields = $image->fields;
+			}else{
+				$fields = $image;
+			}
+			
+			if(isset($fields->sql_query) &amp;&amp; isset($fields->name) ){
+				if(!array_key_exists($fields->sql_query, $query_results)){
+					$q = vsprintf($fields->sql_query,$paramArray);
+					$ar_att = $dbLink->query_first($q);
+					if(!is_array($ar_att) || !count($ar_att) || !isset($ar_att['attachment_id'])){
+						throw new Exception("Не найден файл вложения для '".
+							(isset($fields->comment_text)? $fields->comment_text : $fields->name) .
+							"'"
+						);
+					}
+					$attFile = Attachment_Controller::save_to_tmp($dbLink, $ar_att["attachment_id"]);
+					$query_results[$fields->sql_query] = $attFile;
+				}
+				array_push($attachments, array(
+					'imageName' => $fields->name,
+					'fileName' => $query_results[$fields->sql_query]
+				));
+
+			}
+		}
+		file_put_contents(OUTPUT_PATH.'att.txt',var_export($attachments, true));
+
 		$reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($reader_tp);
 		$spreadsheet = $reader->load($tmpl_fl);
 		$sheet = $spreadsheet->getActiveSheet();
@@ -303,11 +344,49 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 				$sheet->setCellValue($fields->cell, $ar_data[$fields->field]);
 			}
 		}
+
+		//image changes
+		foreach($attachments as $att){
+			/* self::swapImage($spreadsheet, $sheet, $att["imageName"], $att["fileName"]); */
+			self::replaceImageByName($sheet, $att["imageName"], $att["fileName"]);
+		}
 					
 		$writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
 		$writer->save($outFl);
 		
 		$flName = $ar["file_name"]; 
+	}
+
+	private static function replaceImageByName($sheet, $imageNameToReplace, $newImagePath) {
+		$drawings = $sheet->getDrawingCollection();
+		
+		<!-- file_put_contents(OUTPUT_PATH.'picts.txt',"***Looking for:".var_export($imageNameToReplace,true).PHP_EOL,FILE_APPEND); -->
+		$found = false;
+		$cnt = 0;
+		foreach ($drawings as $key => $drawing) {
+			// Check if it's a regular Drawing and name matches
+			if (
+					$drawing->getCoordinates() == $imageNameToReplace
+			) {
+				// Create a new Drawing
+				$newDrawing = new Drawing();
+				$newDrawing->setName($drawing->getName());
+				$newDrawing->setDescription($drawing->getDescription());
+				$newDrawing->setPath($newImagePath);
+				$newDrawing->setHeight($drawing->getHeight());
+				$newDrawing->setCoordinates($drawing->getCoordinates());
+				$newDrawing->setWorksheet($sheet);
+
+				// Remove the old drawing by unsetting
+				$found = true;
+				unset($drawings[$key]);
+				break; // assuming names are unique
+			}
+			$cnt++;
+		}
+		if(!$found){
+			throw new Exception("image not found by getCoordinates() ".$imageNameToReplace." count:".$cnt);
+		}
 	}
 
 	//downloads template as docx, xlsx.

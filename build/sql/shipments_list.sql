@@ -22,7 +22,7 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 			WHEN o.concrete_type_id = (select (const_water_val()->'keys'->>'id')::int) THEN
 				case
 					when sh.date_time::date>='2025-01-01' then
-						water_ship_cost_on_date(sh.date_time) * shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric, coalesce(cl.shipment_quant_for_cost,0))
+						water_ship_cost_on_date(sh.date_time) * shipments_quant_for_cost(sh.ship_date_time::date, sh.quant::numeric, dest.distance::numeric,  coalesce(cl.shipment_quant_for_cost,0))
 					else
 						--water_ship_cost_on_date(sh.date_time)
 						4000::numeric(15, 2)
@@ -255,5 +255,4 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 	--LIMIT 60
 	;
 
-ALTER TABLE public.shipments_list OWNER TO beton;
 

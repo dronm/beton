@@ -1306,7 +1306,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	//all shipments
 	public function shipment_transp_nakl_all($pm){
 		$docId = $this->getExtDbVal($pm, 'id');
-		$faksim = ($this->getDbVal($pm, 'faksim') == "1");
+		$faksim = ($pm->getParamValue("id") == "1");
 		try{
 			$outFile = $this->shipment_transp_nakl_all_operation($docId, $faksim);
 			$fileName = "ТН.zip";
