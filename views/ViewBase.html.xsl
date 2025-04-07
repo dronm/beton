@@ -159,7 +159,7 @@
 	<xsl:if test="not(/document/model[@id='ModelVars']/row/role_id='vehicle_owner') and not(/document/model[@id='ModelVars']/row/role_id='client')">
 	if(application.showTmChat()){
 
-		<xsl:if test="not(/document/model[@id='ModelVars']/row/ping_1c='1')">
+		<xsl:if test="/document/model[@id='ModelVars']/row/ping_1c='1'">
 		if (document.getElementById("connect1c")){
 			application.m_connect1c = new Connect1cCheck("connect1c",{"refreshInterval":60});
 			application.m_connect1c.toDOM();		
@@ -663,7 +663,7 @@ throw Error(CommonHelper.longString(function () {/*
 			<xsl:call-template name="initMenu"/>	
 			<ul class="nav navbar-nav navbar-right">			
 			
-				<xsl:if test="not(/document/model[@id='ModelVars']/row/ping_1c='1')">
+				<xsl:if test="/document/model[@id='ModelVars']/row/ping_1c='1'">
 				<li>
 					<span>1c:</span>
 					<img id="connect1c">
