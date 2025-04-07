@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
  
 class ProductionBase_Model extends ModelSQLBeton{
@@ -59,6 +60,16 @@ class ProductionBase_Model extends ModelSQLBeton{
 						
 		$f_address=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"address",$f_opts);
 		$this->addField($f_address);
+		//********************
+		
+		//*** Field deleted ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Deleted';
+		$f_opts['id']="deleted";
+						
+		$f_deleted=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"deleted",$f_opts);
+		$this->addField($f_deleted);
 		//********************
 	
 		$order = new ModelOrderSQL();		

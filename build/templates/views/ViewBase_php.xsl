@@ -128,7 +128,8 @@ class ViewBase extends ViewHTMLXSLT {
 			$this->getVarModel()->addField(new Field('chat_statuses_ref',DT_STRING));
 			$this->getVarModel()->addField(new Field('chat_private_id',DT_STRING));
 			$this->getVarModel()->addField(new Field('chat_out_id',DT_STRING));
-			$this->getVarModel()->addField(new Field('chat_unviewed_count',DT_INT));			
+			$this->getVarModel()->addField(new Field('chat_unviewed_count',DT_INT));
+			$this->getVarModel()->addField(new Field('ping_1c',DT_BOOL));			
 			
 			if(isset($_SESSION['token'])){
 				$this->getVarModel()->addField(new Field('token',DT_STRING));
@@ -185,6 +186,8 @@ class ViewBase extends ViewHTMLXSLT {
 			if(is_array($cnt_ar) &amp;&amp; count($cnt_ar) &amp;&amp;  isset($cnt_ar["cnt"])){
 				$this->setVarValue('chat_unviewed_count', $cnt_ar["cnt"]);
 			}
+			
+			$this->setVarValue('ping_1c', defined('HOST_1C'));
 			
 			$this->setVarValue('app_srv_host',APP_SERVER_HOST);
 			$this->setVarValue('app_srv_port', ($is_https&amp;&amp;defined('APP_SERVER_PORT_SECURED'))? APP_SERVER_PORT_SECURED:APP_SERVER_PORT);

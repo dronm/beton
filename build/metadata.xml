@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-04-07 13:11:01</lastBuild></version>
+		<lastBuild>2025-04-07 15:20:47</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -272,6 +272,7 @@
 		<version dateOpen="2025-03-13 07:01:32" dateClose="2025-03-24 06:53:15">1.00366</version>
 		<version dateOpen="2025-04-01 09:47:50" dateClose="2025-04-04 06:46:54">1.00367</version>
 		<version dateOpen="2025-04-04 12:29:37" dateClose="2025-04-07 13:11:25">1.00368</version>
+		<version dateOpen="2025-04-07 14:04:29" dateClose="2025-04-07 15:20:50">1.00369</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1738,6 +1739,7 @@
 			<field id="name" dataType="String" length="200"/>
 			<field id="destination_id" dataType="Int" refTable="destinations" refField="id" required="TRUE" alias="Геозона"/>
 			<field id="address" dataType="Text" alias="Адрес"/>
+			<field id="deleted" dataType="Bool" alias="Deleted"/>
 		</model>
 		<model id="ProductionBaseList" parent="ModelSQLBeton" dataTable="production_bases_list" virtual="TRUE">
 			<defaultOrder>
@@ -1747,6 +1749,7 @@
 			<field id="name" dataType="String"/>
 			<field id="destinations_ref" dataType="JSON" alias="Геозона"/>
 			<field id="address" dataType="Text" alias="Адрес"/>
+			<field id="deleted" dataType="Bool" alias="Deleted"/>
 		</model>
 		<model id="ProductionSite" parent="ModelSQLBeton" dataTable="production_sites" virtual="FALSE">
 			<defaultOrder>

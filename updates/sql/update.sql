@@ -54986,3 +54986,23 @@ $BODY$
   COST 100;
 ALTER FUNCTION logins_process()
   OWNER TO concrete1;
+
+
+
+-- ******************* update 07/04/2025 13:43:39 ******************
+-- VIEW: cement_silos_list
+
+--DROP VIEW cement_silos_list;
+
+CREATE OR REPLACE VIEW cement_silos_list AS
+	SELECT
+		t.*,
+		production_sites_ref(pst) AS production_sites_ref
+	FROM cement_silos AS t
+	LEFT JOIN production_sites AS pst ON pst.id=t.production_site_id
+	ORDER BY
+		pst.name,
+		t.production_descr
+	;
+	
+ALTER VIEW cement_silos_list OWNER TO concrete1;

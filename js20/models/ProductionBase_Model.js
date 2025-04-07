@@ -63,6 +63,15 @@ function ProductionBase_Model(options){
 	
 	options.fields.address = new FieldText("address",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Deleted';
+	filed_options.autoInc = false;	
+	
+	options.fields.deleted = new FieldBool("deleted",filed_options);
+	
 		ProductionBase_Model.superclass.constructor.call(this,id,options);
 }
 extend(ProductionBase_Model,ModelXML);

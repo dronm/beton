@@ -44,8 +44,11 @@ function OrderMakeList_View(id,options){
 	
 	//prodution bases
 	this.m_prodBaseList = [];	
-	if(options.models&&options.models.ProductionBase_Model){			
+	if(options.models && options.models.ProductionBase_Model){			
 		while(options.models.ProductionBase_Model.getNextRow()){
+			if(options.models.ProductionBase_Model.getFieldValue("deleted")){
+				continue;
+			}
 			this.m_prodBaseList.push({
 				"productionBaseId": options.models.ProductionBase_Model.getFieldValue("id")
 				,"productionBaseName": options.models.ProductionBase_Model.getFieldValue("name")

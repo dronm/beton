@@ -87,6 +87,15 @@ function ProductionBaseList_View(id,options){
 								})
 							]
 						})						
+						,new GridCellHead(id+":grid:head:deleted",{
+							"value":"Удален",
+							"columns":[
+								new GridColumnBool({
+									"field":model.getField("deleted"),
+									"showFalse": false
+								})
+							]
+						})						
 					]
 				})
 			]

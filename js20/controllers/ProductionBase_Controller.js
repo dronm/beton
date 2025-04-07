@@ -62,6 +62,12 @@ extend(ProductionBase_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Deleted";
+	var field = new FieldBool("deleted",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -95,6 +101,12 @@ extend(ProductionBase_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Адрес";
 	var field = new FieldText("address",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Deleted";
+	var field = new FieldBool("deleted",options);
 	
 	pm.addField(field);
 	
@@ -139,6 +151,9 @@ extend(ProductionBase_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Адрес";
 	pm.addField(new FieldText("address",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Deleted";
+	pm.addField(new FieldBool("deleted",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");
 	
 }
