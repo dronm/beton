@@ -47,6 +47,24 @@ function ExcelTemplateImageSQLGrid(id,options){
 				})
 			]
 		})
+		,new GridCellHead(id+":head:offset_y",{
+			"value":"Отступ сверху",
+			"columns":[
+				new GridColumn({
+					"field":model.getField("offset_y"),
+					"ctrlClass":EditInt
+				})
+			]
+		})
+		,new GridCellHead(id+":head:offset_x",{
+			"value":"Отступ слева",
+			"columns":[
+				new GridColumn({
+					"field":model.getField("offset_x"),
+					"ctrlClass":EditInt
+				})
+			]
+		})
 		,new GridCellHead(id+":head:sql_query",{
 			"value":"Запрос SQL",
 			"columns":[

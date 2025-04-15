@@ -323,6 +323,8 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 						'coord' => $fields->name,
 						'w' => $fields->w,
 						'h' => $fields->h,
+						'offset_y' => $fields->offset_y,
+						'offset_x' => $fields->offset_x,
 						'fileName' => $query_results[$fields->sql_query]
 					));
 				}
@@ -355,6 +357,8 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 			$newDrawing->setPath($att["fileName"]);
 			$newDrawing->setHeight($att["h"]);
 			$newDrawing->setHeight($att["w"]);
+			$newDrawing->setOffsetY($att["offset_y"]);
+			$newDrawing->setOffsetY($att["offset_x"]);
 			$newDrawing->setCoordinates($att["coord"]);
 			$newDrawing->setWorksheet($sheet);
 		}

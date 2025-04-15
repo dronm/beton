@@ -76,6 +76,24 @@ function ExcelTemplateImageSQL_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.offset_x = new FieldInt("offset_x",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.offset_y = new FieldInt("offset_y",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.comment_text = new FieldString("comment_text",filed_options);
 	options.fields.comment_text.getValidator().setMaxLength('5000');
 	

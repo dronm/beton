@@ -70,6 +70,18 @@ extend(ExcelTemplateImageSQL_Controller,ControllerObjClient);
 	
 	var options = {};
 	
+	var field = new FieldInt("offset_x",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("offset_y",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
 	var field = new FieldString("comment_text",options);
 	
 	pm.addField(field);
@@ -113,6 +125,18 @@ extend(ExcelTemplateImageSQL_Controller,ControllerObjClient);
 	var options = {};
 	
 	var field = new FieldInt("h",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("offset_x",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("offset_y",options);
 	
 	pm.addField(field);
 	
@@ -166,6 +190,12 @@ extend(ExcelTemplateImageSQL_Controller,ControllerObjClient);
 	var f_opts = {};
 	
 	pm.addField(new FieldInt("h",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("offset_x",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("offset_y",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldString("comment_text",f_opts));

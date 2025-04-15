@@ -548,6 +548,8 @@ class ExcelTemplate_Controller extends ControllerSQL{
 						'coord' => $fields->name,
 						'w' => $fields->w,
 						'h' => $fields->h,
+						'offset_y' => $fields->offset_y,
+						'offset_x' => $fields->offset_x,
 						'fileName' => $query_results[$fields->sql_query]
 					));
 
@@ -581,6 +583,8 @@ class ExcelTemplate_Controller extends ControllerSQL{
 			$newDrawing->setPath($att["fileName"]);
 			$newDrawing->setHeight($att["h"]);
 			$newDrawing->setHeight($att["w"]);
+			$newDrawing->setOffsetY($att["offset_y"]);
+			$newDrawing->setOffsetY($att["offset_x"]);
 			$newDrawing->setCoordinates($att["coord"]);
 			$newDrawing->setWorksheet($sheet);
 		}

@@ -64,6 +64,22 @@ class ExcelTemplateImageSQL_Model extends {
 		$this->addField($f_h);
 		//********************
 		
+		//*** Field offset_x ***
+		$f_opts = array();
+		$f_opts['id']="offset_x";
+						
+		$f_offset_x=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"offset_x",$f_opts);
+		$this->addField($f_offset_x);
+		//********************
+		
+		//*** Field offset_y ***
+		$f_opts = array();
+		$f_opts['id']="offset_y";
+						
+		$f_offset_y=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"offset_y",$f_opts);
+		$this->addField($f_offset_y);
+		//********************
+		
 		//*** Field comment_text ***
 		$f_opts = array();
 		$f_opts['length']=5000;
