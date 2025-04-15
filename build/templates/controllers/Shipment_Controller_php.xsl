@@ -45,6 +45,10 @@ require_once(USER_CONTROLLERS_PATH.'Order_Controller.php');
 require_once(ABSOLUTE_PATH.'functions/checkPmPeriod.php');
 require_once(ABSOLUTE_PATH.'functions/ExtProg.php');
 
+//for zip archiving
+set_time_limit(120);
+ini_set('memory_limit', '-1');
+
 class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
 		parent::__construct($dbLinkMaster, $dbLink);<xsl:apply-templates/>

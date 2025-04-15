@@ -55006,3 +55006,1168 @@ CREATE OR REPLACE VIEW cement_silos_list AS
 	;
 	
 ALTER VIEW cement_silos_list OWNER TO concrete1;
+
+
+-- ******************* update 08/04/2025 01:36:23 ******************
+-- VIEW: production_bases_list
+
+--DROP VIEW production_bases_list;
+
+CREATE OR REPLACE VIEW production_bases_list AS
+	SELECT
+		b.id ,
+		b.name,
+		destinations_ref(d) AS destinations_ref,
+		b.address,
+		b.deleted
+	FROM production_bases AS b
+	LEFT JOIN destinations AS d ON d.id = b.destination_id
+	ORDER BY b.name
+	;
+	
+
+
+-- ******************* update 08/04/2025 01:39:08 ******************
+-- Function: public.shipment_process()
+
+-- DROP FUNCTION public.shipment_process();
+
+CREATE OR REPLACE FUNCTION public.shipment_process()
+  RETURNS trigger AS
+$BODY$
+DECLARE quant_rest numeric;
+	v_vehicle_load_capacity vehicles.load_capacity%TYPE DEFAULT 0;
+	--v_vehicle_feature vehicles.feature%TYPE;
+	v_ord_date_time timestamp;
+	v_destination_id int;
+	--v_tracker_id varchar(15);
+	--v_shift_open boolean;
+BEGIN
+	/*
+	IF (TG_OP='UPDATE' AND NEW.shipped AND OLD.shipped) THEN
+		--closed shipment, but trying to change smth
+		RAISE EXCEPTION 'Для возможности изменения отмените отгрузку!';
+	END IF;
+	*/
+
+	IF (TG_WHEN='BEFORE' AND TG_OP='UPDATE' AND OLD.shipped=true) THEN
+		--register actions
+		PERFORM ra_materials_remove_acts('shipment'::doc_types,NEW.id);
+		PERFORM ra_material_consumption_remove_acts('shipment'::doc_types,NEW.id);
+	END IF;
+	
+	IF (TG_WHEN='BEFORE' AND TG_OP='UPDATE'
+	AND (OLD.vehicle_schedule_id<>NEW.vehicle_schedule_id OR OLD.id<>NEW.id)
+	)
+	THEN
+		--
+		DELETE FROM vehicle_schedule_states t WHERE t.shipment_id = OLD.id AND t.schedule_id = OLD.vehicle_schedule_id;	
+	END IF;
+	
+	-- vehicle data
+	/*
+	IF (TG_OP='INSERT' OR (TG_OP='UPDATE' AND NEW.shipped=false AND OLD.shipped=false)) THEN
+
+		IF (v_vehicle_feature IS NULL)
+		OR (
+			(v_vehicle_feature<>const_own_vehicles_feature_val())
+			AND (v_vehicle_feature<>const_backup_vehicles_feature_val()) 
+		) THEN
+			SELECT orders.destination_id INTO v_destination_id FROM orders WHERE orders.id=NEW.order_id;
+			IF v_destination_id <> const_self_ship_dest_id_val() THEN
+				RAISE EXCEPTION 'Данному автомобилю запрещено вывозить на этот объект!';
+			END IF;
+		END IF;
+		
+		--IF (TG_OP='INSERT' AND coalesce(v_tracker_id, '') <> '') THEN
+			--NEW.production_base_id = veh_cur_production_base_id(v_tracker_id);
+		--END IF;
+	END IF;
+	*/
+	
+	--checkings for bereg only! (current_database()::text <> 'concrete1') AND 
+	IF (TG_OP='INSERT' OR (TG_OP='UPDATE' AND NEW.shipped=false AND OLD.shipped=false)) THEN
+		SELECT
+			v.load_capacity
+		INTO
+			v_vehicle_load_capacity
+		FROM vehicle_schedules AS vs
+		LEFT JOIN vehicles AS v ON v.id = vs.vehicle_id
+		WHERE vs.id = NEW.vehicle_schedule_id;	
+	
+		-- ********** check balance ****************************************
+		SELECT
+			o.quant - SUM(COALESCE(s.quant,0)),
+			o.date_time
+		INTO
+			quant_rest,
+			v_ord_date_time
+		FROM orders AS o
+		LEFT JOIN shipments AS s ON s.order_id=o.id	
+		WHERE o.id = NEW.order_id
+		GROUP BY o.quant,o.date_time;
+
+		--order shift date MUST overlap shipment shift date!		
+		--IF get_shift_start(NEW.date_time)<>get_shift_start(v_ord_date_time) THEN
+		--	RAISE EXCEPTION 'Заявка из другой смены!';
+		--END IF;
+		
+
+		IF (TG_OP='UPDATE') THEN
+			quant_rest:= quant_rest + OLD.quant;
+		END IF;
+		
+		IF (quant_rest<NEW.quant::numeric) THEN
+			RAISE EXCEPTION 'Остаток по данной заявке: %, запрошено: %',quant_descr(quant_rest::numeric),quant_descr(NEW.quant::numeric);
+		END IF;
+		-- ********** check balance ****************************************
+
+		
+		-- *********  check load capacity *************************************		
+		IF v_vehicle_load_capacity < NEW.quant THEN
+			RAISE EXCEPTION 'Грузоподъемность автомобиля: "%", запрошено: %',quant_descr(v_vehicle_load_capacity::numeric),quant_descr(NEW.quant::numeric);
+		END IF;
+		-- *********  check load capacity *************************************
+	END IF;
+
+	IF TG_OP='UPDATE' THEN
+		IF (NEW.shipped AND OLD.shipped=false) THEN
+			NEW.ship_date_time = current_timestamp;
+			
+			--Если есть привязанное производство - пересчитать
+			--возможно изменение отклонений при списании материалов по подбору
+			UPDATE productions
+			SET
+				material_tolerance_violated = productions_get_mat_tolerance_violated(
+					production_site_id,
+					production_id
+				)				
+			WHERE shipment_id=NEW.id;
+			
+		ELSEIF (OLD.shipped AND NEW.shipped=false) THEN
+			NEW.ship_date_time = null;
+		END IF;
+		
+		IF (NEW.order_id <> OLD.order_id) THEN
+			/** смена заявки
+			 * 1) Удалить vehicle_schedule_states сданным id отгрузки и статусом at_dest, как будто и не доехал еще
+			 * 2) Исправить все оставшиеся vehicle_schedule_states where shipment_id = NEW.id на новый destionation_id из orders
+			 */
+			DELETE FROM vehicle_schedule_states WHERE shipment_id = NEW.id AND state= 'at_dest'::vehicle_states;
+			UPDATE vehicle_schedule_states
+			SET
+				destination_id = (SELECT orders.destination_id FROM orders WHERE orders.id=NEW.order_id)
+			WHERE shipment_id = NEW.id;
+		END IF;
+	END IF;
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.shipment_process()
+  OWNER TO beton;
+
+
+
+-- ******************* update 11/04/2025 15:47:38 ******************
+-- Function: public.productions_process()
+
+-- DROP FUNCTION public.productions_process();
+
+CREATE OR REPLACE FUNCTION public.productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+	
+		IF TG_OP='UPDATE' AND OLD.manual_correction=TRUE AND NEW.manual_correction=TRUE THEN
+			RETURN OLD;
+		END IF;	
+	
+		IF TG_OP='INSERT' OR
+			(TG_OP='UPDATE'
+			AND (
+				OLD.production_vehicle_descr!=NEW.production_vehicle_descr
+				OR OLD.production_dt_start!=NEW.production_dt_start
+			)
+			)
+		THEN		
+			SELECT *
+			INTO
+				NEW.vehicle_id,
+				NEW.vehicle_schedule_state_id,
+				NEW.shipment_id
+			FROM material_fact_consumptions_find_vehicle(
+				NEW.production_site_id,
+				coalesce(
+					(SELECT
+						v.plate::text
+					FROM production_vehicle_corrections AS p
+					LEFT JOIN vehicles AS v ON v.id=p.vehicle_id
+					WHERE p.production_site_id = NEW.production_site_id AND p.production_id = NEW.production_id
+					)
+					,NEW.production_vehicle_descr
+				),
+				NEW.production_dt_start::timestamp
+			) AS (
+				vehicle_id int,
+				vehicle_schedule_state_id int,
+				shipment_id int
+			);		
+		END IF;
+		
+		IF NEW.production_dt_end IS NOT NULL THEN
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+		END IF;
+				
+		/*
+		IF TG_OP='UPDATE'		
+			AND (
+				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
+				OR coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)
+				OR coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0)
+				OR coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+			)
+		THEN			
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);			
+		END IF;
+		*/
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='INSERT' THEN
+	
+		--закрываем дырку
+		-- для Konkred временно убрал
+		IF coalesce(
+			(SELECT TRUE
+			FROM production_sites
+			WHERE id = NEW.production_site_id
+			AND NEW.production_id =ANY(missing_elkon_production_ids))
+			,FALSE
+		) THEN
+			UPDATE production_sites
+			SET
+				missing_elkon_production_ids = array_diff(missing_elkon_production_ids,ARRAY[NEW.production_id])
+			WHERE id = NEW.production_site_id
+			;
+		END IF;
+		
+		PERFORM pg_notify(
+			'Production.insert'
+			,json_build_object(
+				'params',json_build_object(
+					'id',NEW.id
+				)
+			)::text
+		);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+		/*
+		IF coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+		THEN
+			UPDATE material_fact_consumptions
+			SET
+				concrete_type_id = NEW.concrete_type_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		*/
+		/* МЕНЯТЬ ТС ПРИ СМЕНЕ shipment_id*/
+		IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0))
+		OR (coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0))
+		OR (coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0))
+		OR (coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0))
+		OR (coalesce(NEW.concrete_quant,0)<>coalesce(OLD.concrete_quant,0))
+		THEN
+			--сменить shipment_id,vehicle_schedule_state_id
+			IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)) THEN
+				SELECT
+					vsch.vehicle_id
+					,vschst.id
+				INTO
+					NEW.vehicle_id
+					,NEW.vehicle_schedule_state_id	
+				FROM shipments AS sh
+				LEFT JOIN vehicle_schedules AS vsch ON vsch.id=sh.vehicle_schedule_id
+				LEFT JOIN vehicle_schedule_states AS vschst ON vschst.schedule_id=sh.vehicle_schedule_id AND vschst.shipment_id=sh.id
+				WHERE sh.id=NEW.shipment_id	
+				;
+			END IF;
+			
+			UPDATE material_fact_consumptions
+			SET
+				vehicle_schedule_state_id = NEW.vehicle_schedule_state_id,
+				vehicle_id = NEW.vehicle_id,
+				concrete_type_id = NEW.concrete_type_id,
+				concrete_quant = NEW.concrete_quant
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		
+		
+		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
+		--IF OLD.production_dt_end IS NULL
+		--AND NEW.production_dt_end IS NOT NULL
+		--AND NEW.shipment_id IS NOT NULL THEN
+		--END IF;
+		
+		PERFORM pg_notify(
+			'Production.update'
+			,json_build_object(
+				'params',json_build_object(
+					'id',NEW.id
+				)
+			)::text
+		);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
+		DELETE FROM material_fact_consumptions WHERE production_site_id = OLD.production_site_id AND production_id = OLD.production_id;
+		
+		RETURN OLD;
+
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='DELETE' THEN
+		
+		PERFORM pg_notify(
+			'Production.delete'
+			,json_build_object(
+				'params',json_build_object(
+					'id',OLD.id
+				)
+			)::text
+		);
+		
+		RETURN OLD;
+				
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.productions_process() OWNER TO concrete1;
+
+
+
+-- ******************* update 11/04/2025 15:47:51 ******************
+-- Function: public.productions_process()
+
+-- DROP FUNCTION public.productions_process();
+
+CREATE OR REPLACE FUNCTION public.productions_process()
+  RETURNS trigger AS
+$BODY$
+BEGIN
+	
+	IF TG_WHEN='BEFORE' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
+	
+		IF TG_OP='UPDATE' AND OLD.manual_correction=TRUE AND NEW.manual_correction=TRUE THEN
+			RETURN OLD;
+		END IF;	
+	
+		IF TG_OP='INSERT' OR
+			(TG_OP='UPDATE'
+			AND (
+				OLD.production_vehicle_descr!=NEW.production_vehicle_descr
+				OR OLD.production_dt_start!=NEW.production_dt_start
+			)
+			)
+		THEN		
+			SELECT *
+			INTO
+				NEW.vehicle_id,
+				NEW.vehicle_schedule_state_id,
+				NEW.shipment_id
+			FROM material_fact_consumptions_find_vehicle(
+				NEW.production_site_id,
+				coalesce(
+					(SELECT
+						v.plate::text
+					FROM production_vehicle_corrections AS p
+					LEFT JOIN vehicles AS v ON v.id=p.vehicle_id
+					WHERE p.production_site_id = NEW.production_site_id AND p.production_id = NEW.production_id
+					)
+					,NEW.production_vehicle_descr
+				),
+				NEW.production_dt_start::timestamp
+			) AS (
+				vehicle_id int,
+				vehicle_schedule_state_id int,
+				shipment_id int
+			);		
+		END IF;
+		
+		IF NEW.production_dt_end IS NOT NULL THEN
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+		END IF;
+				
+		/*
+		IF TG_OP='UPDATE'		
+			AND (
+				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
+				OR coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)
+				OR coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0)
+				OR coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+			)
+		THEN			
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);			
+		END IF;
+		*/
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='INSERT' THEN
+	
+		--закрываем дырку
+		-- для Konkred временно убрал
+		IF coalesce(
+			(SELECT TRUE
+			FROM production_sites
+			WHERE id = NEW.production_site_id
+			AND NEW.production_id =ANY(missing_elkon_production_ids))
+			,FALSE
+		) THEN
+			UPDATE production_sites
+			SET
+				missing_elkon_production_ids = array_diff(missing_elkon_production_ids,ARRAY[NEW.production_id])
+			WHERE id = NEW.production_site_id
+			;
+		END IF;
+		
+		PERFORM pg_notify(
+			'Production.insert'
+			,json_build_object(
+				'params',json_build_object(
+					'id',NEW.id
+				)
+			)::text
+		);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
+		/*
+		IF coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
+		THEN
+			UPDATE material_fact_consumptions
+			SET
+				concrete_type_id = NEW.concrete_type_id
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		*/
+		/* МЕНЯТЬ ТС ПРИ СМЕНЕ shipment_id*/
+		IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0))
+		OR (coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0))
+		OR (coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0))
+		OR (coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0))
+		OR (coalesce(NEW.concrete_quant,0)<>coalesce(OLD.concrete_quant,0))
+		THEN
+			--сменить shipment_id,vehicle_schedule_state_id
+			IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)) THEN
+				SELECT
+					vsch.vehicle_id
+					,vschst.id
+				INTO
+					NEW.vehicle_id
+					,NEW.vehicle_schedule_state_id	
+				FROM shipments AS sh
+				LEFT JOIN vehicle_schedules AS vsch ON vsch.id=sh.vehicle_schedule_id
+				LEFT JOIN vehicle_schedule_states AS vschst ON vschst.schedule_id=sh.vehicle_schedule_id AND vschst.shipment_id=sh.id
+				WHERE sh.id=NEW.shipment_id	
+				;
+			END IF;
+			
+			UPDATE material_fact_consumptions
+			SET
+				vehicle_schedule_state_id = NEW.vehicle_schedule_state_id,
+				vehicle_id = NEW.vehicle_id,
+				concrete_type_id = NEW.concrete_type_id,
+				concrete_quant = NEW.concrete_quant
+			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
+		END IF;
+		
+		
+		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
+		--IF OLD.production_dt_end IS NULL
+		--AND NEW.production_dt_end IS NOT NULL
+		--AND NEW.shipment_id IS NOT NULL THEN
+		--END IF;
+		
+		PERFORM pg_notify(
+			'Production.update'
+			,json_build_object(
+				'params',json_build_object(
+					'id',NEW.id
+				)
+			)::text
+		);
+		
+		RETURN NEW;
+		
+	ELSEIF TG_WHEN='BEFORE' AND TG_OP='DELETE' THEN
+		DELETE FROM material_fact_consumptions WHERE production_site_id = OLD.production_site_id AND production_id = OLD.production_id;
+		
+		RETURN OLD;
+
+	ELSEIF TG_WHEN='AFTER' AND TG_OP='DELETE' THEN
+		
+		PERFORM pg_notify(
+			'Production.delete'
+			,json_build_object(
+				'params',json_build_object(
+					'id',OLD.id
+				)
+			)::text
+		);
+		
+		RETURN OLD;
+				
+	END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.productions_process() OWNER TO concrete1;
+
+
+
+-- ******************* update 11/04/2025 16:43:53 ******************
+-- Function: public.set_vehicle_busy()
+
+-- DROP FUNCTION public.set_vehicle_busy();
+
+CREATE OR REPLACE FUNCTION public.set_vehicle_busy()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	dest_id int;
+	spec_id int;
+	new_state vehicle_states;
+	v_feature vehicles.feature%TYPE;
+	reg_act ra_material_consumption%ROWTYPE;
+	reg_act_mat ra_materials%ROWTYPE;
+	v_concrete_type_id int;
+	v_vehicle_id int;
+	v_driver_id int;
+	rate_row RECORD;
+	v_avg_dev numeric;
+	v_production_base_id int;
+	v_tracker_id varchar(15);
+BEGIN
+	--change state only if 1) insert
+	--		       2) update && shipped false==>true
+	IF (TG_OP='INSERT') OR (TG_OP='UPDATE' AND OLD.shipped=false AND NEW.shipped) THEN
+		IF NEW.shipped THEN
+			new_state = 'busy'::vehicle_states;
+			
+			--if self-shipment && empty feature - set state out
+			SELECT
+				o.destination_id,
+				coalesce(o.client_specification_id, 0)
+			INTO
+				dest_id,
+				spec_id
+			FROM orders AS o
+			WHERE o.id=NEW.order_id;
+			
+			IF dest_id = constant_self_ship_dest_id() THEN
+				SELECT v.feature INTO v_feature FROM vehicle_schedules AS vs
+				LEFT JOIN vehicles AS v ON v.id=vs.vehicle_id
+				WHERE vs.id=NEW.vehicle_schedule_id;
+				
+				IF (v_feature IS NULL) OR (v_feature='') THEN
+					new_state = 'out'::vehicle_states;
+				END IF;
+			END IF;
+			
+			--specification
+			/*IF spec_id > 0 THEN
+				INSERT INTO client_specification_flows
+				(client_specification_id, shipment_id, quant)
+				VALUES (
+					spec_id,
+					NEW.id,
+					NEW.quant
+				)
+				ON CONFLICT (client_specification_id, shipment_id) DO UPDATE
+				SET quant = NEW.quant;
+			END IF;*/
+		END IF;
+		
+		v_tracker_id = get_vehicle_tracker_id_on_schedule_id(NEW.vehicle_schedule_id);
+		INSERT INTO vehicle_schedule_states
+		(date_time, state, shipment_id, schedule_id, tracker_id, destination_id, production_base_id)
+		VALUES(
+			current_timestamp,
+			CASE
+			WHEN NEW.shipped THEN
+				new_state
+			ELSE
+				'assigned'::vehicle_states
+			END,
+			NEW.id,NEW.vehicle_schedule_id,
+			v_tracker_id,
+			dest_id,
+			veh_cur_production_base_id(v_tracker_id)
+		);
+
+	END IF;
+
+	IF (TG_OP='INSERT') THEN
+		--log
+		PERFORM doc_log_insert('shipment'::doc_types,NEW.id,NEW.date_time);
+	ELSE
+		--IF NEW.ship_date_time<>OLD.ship_date_time THEN
+			PERFORM doc_log_update('shipment'::doc_types,NEW.id,NEW.ship_date_time);
+		--END IF;			
+	END IF;
+
+	IF (TG_OP='INSERT' OR TG_OP='UPDATE') AND (NEW.shipped) THEN	
+		SELECT o.concrete_type_id INTO v_concrete_type_id FROM orders AS o WHERE o.id=NEW.order_id;
+		SELECT sch.vehicle_id,sch.driver_id INTO v_vehicle_id,v_driver_id FROM vehicle_schedules As sch WHERE sch.id=NEW.vehicle_schedule_id;
+		
+		--concrete
+		--reg acts				
+		reg_act.date_time		= NEW.ship_date_time;
+		reg_act.doc_type  		= 'shipment'::doc_types;
+		reg_act.doc_id  		= NEW.id;
+		reg_act.concrete_type_id 	= v_concrete_type_id;
+		reg_act.vehicle_id 		= v_vehicle_id;
+		reg_act.driver_id 		= v_driver_id;
+		reg_act.concrete_quant		= NEW.quant;
+		reg_act.material_quant		= 0;
+		reg_act.material_quant_norm	= 0;
+		PERFORM ra_material_consumption_add_act(reg_act);	
+
+
+		SELECT production_base_id INTO v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+		
+		--materials		
+		FOR rate_row IN
+			SELECT * FROM raw_material_cons_rates(NEW.production_site_id, v_concrete_type_id, NEW.ship_date_time)
+		LOOP
+			v_avg_dev = 0;--raw_mat_cons_avg_dev(NEW.ship_date_time::date,rate_row.material_id)*NEW.quant;
+			
+			--reg acts				
+			reg_act.date_time		= NEW.ship_date_time;
+			reg_act.doc_type  		= 'shipment'::doc_types;
+			reg_act.doc_id  		= NEW.id;
+			reg_act.concrete_type_id 	= v_concrete_type_id;
+			reg_act.vehicle_id 		= v_vehicle_id;
+			reg_act.driver_id 		= v_driver_id;			
+			reg_act.material_id 		= rate_row.material_id;
+			reg_act.material_quant		= (rate_row.rate * NEW.quant) + v_avg_dev;
+			reg_act.material_quant_norm	= rate_row.rate * NEW.quant;
+			reg_act.material_quant_corrected= (rate_row.rate * NEW.quant) + v_avg_dev;
+			reg_act.concrete_quant		= 0;
+			PERFORM ra_material_consumption_add_act(reg_act);	
+
+			--reg materials
+			reg_act_mat.date_time		= NEW.ship_date_time;
+			reg_act_mat.deb			= false;
+			reg_act_mat.doc_type  		= 'shipment'::doc_types;
+			reg_act_mat.doc_id  		= NEW.id;
+			reg_act_mat.production_base_id	= v_production_base_id;
+			reg_act_mat.material_id		= rate_row.material_id;
+			reg_act_mat.quant		= rate_row.rate*NEW.quant;
+			PERFORM ra_materials_add_act(reg_act_mat);	
+			
+		END LOOP;
+		
+		--пересчет нарушения норма/факт по производству
+		UPDATE productions
+		SET
+			material_tolerance_violated = productions_get_mat_tolerance_violated(
+				production_site_id,
+				production_id
+			)
+		WHERE shipment_id = NEW.id;
+		
+		--specification
+		SELECT
+			coalesce(o.client_specification_id, 0)
+		INTO
+			spec_id
+		FROM orders AS o
+		WHERE o.id=NEW.order_id;
+		
+		IF spec_id > 0 THEN
+			INSERT INTO client_specification_flows
+			(client_specification_id, shipment_id, quant)
+			VALUES (
+				spec_id,
+				NEW.id,
+				NEW.quant
+			)
+			ON CONFLICT (client_specification_id, shipment_id) DO UPDATE
+			SET quant = NEW.quant;
+		END IF;
+		
+	END IF;
+	
+	/*
+	IF NEW.date_time::date >= '2024-05-07' THEN
+		IF current_database()::text = 'beton' THEN
+			--check if client id Konkrid
+			IF
+				coalesce(
+					(SELECT
+						o.client_id = (const_konkrid_client_val()->'keys'->>'id')::int
+					FROM orders as o
+					WHERE o.id = NEW.order_id)
+				, FALSE)
+			THEN
+				INSERT INTO konkrid.replicate_events
+					VALUES ('Shipment.to_konkrid',
+						json_build_object('params',
+							json_build_object('id', NEW.id)
+						)::text
+				);
+			END IF;
+		END IF;
+	END IF;	
+	*/
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.set_vehicle_busy()
+  OWNER TO concrete1;
+
+
+
+-- ******************* update 11/04/2025 16:44:13 ******************
+-- Function: public.set_vehicle_busy()
+
+-- DROP FUNCTION public.set_vehicle_busy();
+
+CREATE OR REPLACE FUNCTION public.set_vehicle_busy()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	dest_id int;
+	spec_id int;
+	new_state vehicle_states;
+	v_feature vehicles.feature%TYPE;
+	reg_act ra_material_consumption%ROWTYPE;
+	reg_act_mat ra_materials%ROWTYPE;
+	v_concrete_type_id int;
+	v_vehicle_id int;
+	v_driver_id int;
+	rate_row RECORD;
+	v_avg_dev numeric;
+	v_production_base_id int;
+	v_tracker_id varchar(15);
+BEGIN
+	--change state only if 1) insert
+	--		       2) update && shipped false==>true
+	IF (TG_OP='INSERT') OR (TG_OP='UPDATE' AND OLD.shipped=false AND NEW.shipped) THEN
+		IF NEW.shipped THEN
+			new_state = 'busy'::vehicle_states;
+			
+			--if self-shipment && empty feature - set state out
+			SELECT
+				o.destination_id,
+				coalesce(o.client_specification_id, 0)
+			INTO
+				dest_id,
+				spec_id
+			FROM orders AS o
+			WHERE o.id=NEW.order_id;
+			
+			IF dest_id = constant_self_ship_dest_id() THEN
+				SELECT v.feature INTO v_feature FROM vehicle_schedules AS vs
+				LEFT JOIN vehicles AS v ON v.id=vs.vehicle_id
+				WHERE vs.id=NEW.vehicle_schedule_id;
+				
+				IF (v_feature IS NULL) OR (v_feature='') THEN
+					new_state = 'out'::vehicle_states;
+				END IF;
+			END IF;
+			
+			--specification
+			/*IF spec_id > 0 THEN
+				INSERT INTO client_specification_flows
+				(client_specification_id, shipment_id, quant)
+				VALUES (
+					spec_id,
+					NEW.id,
+					NEW.quant
+				)
+				ON CONFLICT (client_specification_id, shipment_id) DO UPDATE
+				SET quant = NEW.quant;
+			END IF;*/
+		END IF;
+		
+		v_tracker_id = get_vehicle_tracker_id_on_schedule_id(NEW.vehicle_schedule_id);
+		INSERT INTO vehicle_schedule_states
+		(date_time, state, shipment_id, schedule_id, tracker_id, destination_id, production_base_id)
+		VALUES(
+			current_timestamp,
+			CASE
+			WHEN NEW.shipped THEN
+				new_state
+			ELSE
+				'assigned'::vehicle_states
+			END,
+			NEW.id,NEW.vehicle_schedule_id,
+			v_tracker_id,
+			dest_id,
+			veh_cur_production_base_id(v_tracker_id)
+		);
+
+	END IF;
+
+	IF (TG_OP='INSERT') THEN
+		--log
+		PERFORM doc_log_insert('shipment'::doc_types,NEW.id,NEW.date_time);
+	ELSE
+		--IF NEW.ship_date_time<>OLD.ship_date_time THEN
+			PERFORM doc_log_update('shipment'::doc_types,NEW.id,NEW.ship_date_time);
+		--END IF;			
+	END IF;
+
+	IF (TG_OP='INSERT' OR TG_OP='UPDATE') AND (NEW.shipped) THEN	
+		SELECT o.concrete_type_id INTO v_concrete_type_id FROM orders AS o WHERE o.id=NEW.order_id;
+		SELECT sch.vehicle_id,sch.driver_id INTO v_vehicle_id,v_driver_id FROM vehicle_schedules As sch WHERE sch.id=NEW.vehicle_schedule_id;
+		
+		--concrete
+		--reg acts				
+		reg_act.date_time		= NEW.ship_date_time;
+		reg_act.doc_type  		= 'shipment'::doc_types;
+		reg_act.doc_id  		= NEW.id;
+		reg_act.concrete_type_id 	= v_concrete_type_id;
+		reg_act.vehicle_id 		= v_vehicle_id;
+		reg_act.driver_id 		= v_driver_id;
+		reg_act.concrete_quant		= NEW.quant;
+		reg_act.material_quant		= 0;
+		reg_act.material_quant_norm	= 0;
+		PERFORM ra_material_consumption_add_act(reg_act);	
+
+
+		SELECT production_base_id INTO v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+		
+		--materials		
+		FOR rate_row IN
+			SELECT * FROM raw_material_cons_rates(NEW.production_site_id, v_concrete_type_id, NEW.ship_date_time)
+		LOOP
+			v_avg_dev = 0;--raw_mat_cons_avg_dev(NEW.ship_date_time::date,rate_row.material_id)*NEW.quant;
+			
+			--reg acts				
+			reg_act.date_time		= NEW.ship_date_time;
+			reg_act.doc_type  		= 'shipment'::doc_types;
+			reg_act.doc_id  		= NEW.id;
+			reg_act.concrete_type_id 	= v_concrete_type_id;
+			reg_act.vehicle_id 		= v_vehicle_id;
+			reg_act.driver_id 		= v_driver_id;			
+			reg_act.material_id 		= rate_row.material_id;
+			reg_act.material_quant		= (rate_row.rate * NEW.quant) + v_avg_dev;
+			reg_act.material_quant_norm	= rate_row.rate * NEW.quant;
+			reg_act.material_quant_corrected= (rate_row.rate * NEW.quant) + v_avg_dev;
+			reg_act.concrete_quant		= 0;
+			PERFORM ra_material_consumption_add_act(reg_act);	
+
+			--reg materials
+			reg_act_mat.date_time		= NEW.ship_date_time;
+			reg_act_mat.deb			= false;
+			reg_act_mat.doc_type  		= 'shipment'::doc_types;
+			reg_act_mat.doc_id  		= NEW.id;
+			reg_act_mat.production_base_id	= v_production_base_id;
+			reg_act_mat.material_id		= rate_row.material_id;
+			reg_act_mat.quant		= rate_row.rate*NEW.quant;
+			PERFORM ra_materials_add_act(reg_act_mat);	
+			
+		END LOOP;
+		
+		--пересчет нарушения норма/факт по производству
+		UPDATE productions
+		SET
+			material_tolerance_violated = productions_get_mat_tolerance_violated(
+				production_site_id,
+				production_id
+			)
+		WHERE shipment_id = NEW.id;
+		
+		--specification
+		SELECT
+			coalesce(o.client_specification_id, 0)
+		INTO
+			spec_id
+		FROM orders AS o
+		WHERE o.id=NEW.order_id;
+		
+		IF spec_id > 0 THEN
+			INSERT INTO client_specification_flows
+			(client_specification_id, shipment_id, quant)
+			VALUES (
+				spec_id,
+				NEW.id,
+				NEW.quant
+			)
+			ON CONFLICT (client_specification_id, shipment_id) DO UPDATE
+			SET quant = NEW.quant;
+		END IF;
+		
+	END IF;
+	
+	/*
+	IF NEW.date_time::date >= '2024-05-07' THEN
+		IF current_database()::text = 'beton' THEN
+			--check if client id Konkrid
+			IF
+				coalesce(
+					(SELECT
+						o.client_id = (const_konkrid_client_val()->'keys'->>'id')::int
+					FROM orders as o
+					WHERE o.id = NEW.order_id)
+				, FALSE)
+			THEN
+				INSERT INTO konkrid.replicate_events
+					VALUES ('Shipment.to_konkrid',
+						json_build_object('params',
+							json_build_object('id', NEW.id)
+						)::text
+				);
+			END IF;
+		END IF;
+	END IF;	
+	*/
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.set_vehicle_busy()
+  OWNER TO beton;
+
+
+
+-- ******************* update 11/04/2025 16:44:14 ******************
+-- Function: public.set_vehicle_busy()
+
+-- DROP FUNCTION public.set_vehicle_busy();
+
+CREATE OR REPLACE FUNCTION public.set_vehicle_busy()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+	dest_id int;
+	spec_id int;
+	new_state vehicle_states;
+	v_feature vehicles.feature%TYPE;
+	reg_act ra_material_consumption%ROWTYPE;
+	reg_act_mat ra_materials%ROWTYPE;
+	v_concrete_type_id int;
+	v_vehicle_id int;
+	v_driver_id int;
+	rate_row RECORD;
+	v_avg_dev numeric;
+	v_production_base_id int;
+	v_tracker_id varchar(15);
+BEGIN
+	--change state only if 1) insert
+	--		       2) update && shipped false==>true
+	IF (TG_OP='INSERT') OR (TG_OP='UPDATE' AND OLD.shipped=false AND NEW.shipped) THEN
+		IF NEW.shipped THEN
+			new_state = 'busy'::vehicle_states;
+			
+			--if self-shipment && empty feature - set state out
+			SELECT
+				o.destination_id,
+				coalesce(o.client_specification_id, 0)
+			INTO
+				dest_id,
+				spec_id
+			FROM orders AS o
+			WHERE o.id=NEW.order_id;
+			
+			IF dest_id = constant_self_ship_dest_id() THEN
+				SELECT v.feature INTO v_feature FROM vehicle_schedules AS vs
+				LEFT JOIN vehicles AS v ON v.id=vs.vehicle_id
+				WHERE vs.id=NEW.vehicle_schedule_id;
+				
+				IF (v_feature IS NULL) OR (v_feature='') THEN
+					new_state = 'out'::vehicle_states;
+				END IF;
+			END IF;
+			
+			--specification
+			/*IF spec_id > 0 THEN
+				INSERT INTO client_specification_flows
+				(client_specification_id, shipment_id, quant)
+				VALUES (
+					spec_id,
+					NEW.id,
+					NEW.quant
+				)
+				ON CONFLICT (client_specification_id, shipment_id) DO UPDATE
+				SET quant = NEW.quant;
+			END IF;*/
+		END IF;
+		
+		v_tracker_id = get_vehicle_tracker_id_on_schedule_id(NEW.vehicle_schedule_id);
+		INSERT INTO vehicle_schedule_states
+		(date_time, state, shipment_id, schedule_id, tracker_id, destination_id, production_base_id)
+		VALUES(
+			current_timestamp,
+			CASE
+			WHEN NEW.shipped THEN
+				new_state
+			ELSE
+				'assigned'::vehicle_states
+			END,
+			NEW.id,NEW.vehicle_schedule_id,
+			v_tracker_id,
+			dest_id,
+			veh_cur_production_base_id(v_tracker_id)
+		);
+
+	END IF;
+
+	IF (TG_OP='INSERT') THEN
+		--log
+		PERFORM doc_log_insert('shipment'::doc_types,NEW.id,NEW.date_time);
+	ELSE
+		--IF NEW.ship_date_time<>OLD.ship_date_time THEN
+			PERFORM doc_log_update('shipment'::doc_types,NEW.id,NEW.ship_date_time);
+		--END IF;			
+	END IF;
+
+	IF (TG_OP='INSERT' OR TG_OP='UPDATE') AND (NEW.shipped) THEN	
+		SELECT o.concrete_type_id INTO v_concrete_type_id FROM orders AS o WHERE o.id=NEW.order_id;
+		SELECT sch.vehicle_id,sch.driver_id INTO v_vehicle_id,v_driver_id FROM vehicle_schedules As sch WHERE sch.id=NEW.vehicle_schedule_id;
+		
+		--concrete
+		--reg acts				
+		reg_act.date_time		= NEW.ship_date_time;
+		reg_act.doc_type  		= 'shipment'::doc_types;
+		reg_act.doc_id  		= NEW.id;
+		reg_act.concrete_type_id 	= v_concrete_type_id;
+		reg_act.vehicle_id 		= v_vehicle_id;
+		reg_act.driver_id 		= v_driver_id;
+		reg_act.concrete_quant		= NEW.quant;
+		reg_act.material_quant		= 0;
+		reg_act.material_quant_norm	= 0;
+		PERFORM ra_material_consumption_add_act(reg_act);	
+
+
+		SELECT production_base_id INTO v_production_base_id
+		FROM production_sites
+		WHERE id = NEW.production_site_id;
+		
+		--materials		
+		FOR rate_row IN
+			SELECT * FROM raw_material_cons_rates(NEW.production_site_id, v_concrete_type_id, NEW.ship_date_time)
+		LOOP
+			v_avg_dev = 0;--raw_mat_cons_avg_dev(NEW.ship_date_time::date,rate_row.material_id)*NEW.quant;
+			
+			--reg acts				
+			reg_act.date_time		= NEW.ship_date_time;
+			reg_act.doc_type  		= 'shipment'::doc_types;
+			reg_act.doc_id  		= NEW.id;
+			reg_act.concrete_type_id 	= v_concrete_type_id;
+			reg_act.vehicle_id 		= v_vehicle_id;
+			reg_act.driver_id 		= v_driver_id;			
+			reg_act.material_id 		= rate_row.material_id;
+			reg_act.material_quant		= (rate_row.rate * NEW.quant) + v_avg_dev;
+			reg_act.material_quant_norm	= rate_row.rate * NEW.quant;
+			reg_act.material_quant_corrected= (rate_row.rate * NEW.quant) + v_avg_dev;
+			reg_act.concrete_quant		= 0;
+			PERFORM ra_material_consumption_add_act(reg_act);	
+
+			--reg materials
+			reg_act_mat.date_time		= NEW.ship_date_time;
+			reg_act_mat.deb			= false;
+			reg_act_mat.doc_type  		= 'shipment'::doc_types;
+			reg_act_mat.doc_id  		= NEW.id;
+			reg_act_mat.production_base_id	= v_production_base_id;
+			reg_act_mat.material_id		= rate_row.material_id;
+			reg_act_mat.quant		= rate_row.rate*NEW.quant;
+			PERFORM ra_materials_add_act(reg_act_mat);	
+			
+		END LOOP;
+		
+		--пересчет нарушения норма/факт по производству
+		UPDATE productions
+		SET
+			material_tolerance_violated = productions_get_mat_tolerance_violated(
+				production_site_id,
+				production_id
+			)
+		WHERE shipment_id = NEW.id;
+		
+		--specification
+		SELECT
+			coalesce(o.client_specification_id, 0)
+		INTO
+			spec_id
+		FROM orders AS o
+		WHERE o.id=NEW.order_id;
+		
+		IF spec_id > 0 THEN
+			INSERT INTO client_specification_flows
+			(client_specification_id, shipment_id, quant)
+			VALUES (
+				spec_id,
+				NEW.id,
+				NEW.quant
+			)
+			ON CONFLICT (client_specification_id, shipment_id) DO UPDATE
+			SET quant = NEW.quant;
+		END IF;
+		
+	END IF;
+	
+	/*
+	IF NEW.date_time::date >= '2024-05-07' THEN
+		IF current_database()::text = 'beton' THEN
+			--check if client id Konkrid
+			IF
+				coalesce(
+					(SELECT
+						o.client_id = (const_konkrid_client_val()->'keys'->>'id')::int
+					FROM orders as o
+					WHERE o.id = NEW.order_id)
+				, FALSE)
+			THEN
+				INSERT INTO konkrid.replicate_events
+					VALUES ('Shipment.to_konkrid',
+						json_build_object('params',
+							json_build_object('id', NEW.id)
+						)::text
+				);
+			END IF;
+		END IF;
+	END IF;	
+	*/
+	
+	RETURN NEW;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.set_vehicle_busy()
+  OWNER TO beton;

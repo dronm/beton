@@ -55,8 +55,8 @@ BEGIN
 	END IF;
 	*/
 	
-	--checkings for bereg only!
-	IF (current_database()::text <> 'concrete1') AND (TG_OP='INSERT' OR (TG_OP='UPDATE' AND NEW.shipped=false AND OLD.shipped=false)) THEN
+	--checkings for bereg only! (current_database()::text <> 'concrete1') AND 
+	IF (TG_OP='INSERT' OR (TG_OP='UPDATE' AND NEW.shipped=false AND OLD.shipped=false)) THEN
 		SELECT
 			v.load_capacity
 		INTO

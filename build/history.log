@@ -1527,6 +1527,15 @@ LEFT OLD VERSION!!!
 2) Ping 1c server variable
 
 
+1.00371
+1) VehicleSchedule_Controller gen_schedule()
+
+
+1.00372
+1) ExcelTemplate_Controller, ExceltTemplateImageSQLGrid
+2) vendor folder
+
+
 
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели
 XXX Удаленные элементы справочника: фильтр вверху, пометка спереди, по возможности у всех справочиников. Example: PumpVehicle

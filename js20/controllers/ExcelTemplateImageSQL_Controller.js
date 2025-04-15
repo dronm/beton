@@ -58,6 +58,18 @@ extend(ExcelTemplateImageSQL_Controller,ControllerObjClient);
 	
 	var options = {};
 	
+	var field = new FieldInt("w",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("h",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
 	var field = new FieldString("comment_text",options);
 	
 	pm.addField(field);
@@ -89,6 +101,18 @@ extend(ExcelTemplateImageSQL_Controller,ControllerObjClient);
 	var options = {};
 	
 	var field = new FieldString("sql_query",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("w",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("h",options);
 	
 	pm.addField(field);
 	
@@ -136,6 +160,12 @@ extend(ExcelTemplateImageSQL_Controller,ControllerObjClient);
 	var f_opts = {};
 	
 	pm.addField(new FieldString("sql_query",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("w",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldInt("h",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldString("comment_text",f_opts));

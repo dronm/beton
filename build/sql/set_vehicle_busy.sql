@@ -173,6 +173,7 @@ BEGIN
 		
 	END IF;
 	
+	/*
 	IF NEW.date_time::date >= '2024-05-07' THEN
 		IF current_database()::text = 'beton' THEN
 			--check if client id Konkrid
@@ -193,6 +194,7 @@ BEGIN
 			END IF;
 		END IF;
 	END IF;	
+	*/
 	
 	RETURN NEW;
 END;

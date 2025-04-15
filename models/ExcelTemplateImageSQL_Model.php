@@ -48,6 +48,22 @@ class ExcelTemplateImageSQL_Model extends {
 		$this->addField($f_sql_query);
 		//********************
 		
+		//*** Field w ***
+		$f_opts = array();
+		$f_opts['id']="w";
+						
+		$f_w=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"w",$f_opts);
+		$this->addField($f_w);
+		//********************
+		
+		//*** Field h ***
+		$f_opts = array();
+		$f_opts['id']="h";
+						
+		$f_h=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"h",$f_opts);
+		$this->addField($f_h);
+		//********************
+		
 		//*** Field comment_text ***
 		$f_opts = array();
 		$f_opts['length']=5000;

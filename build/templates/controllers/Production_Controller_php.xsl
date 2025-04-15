@@ -1126,7 +1126,7 @@ UPDATE public.production_sites
 						//getting one production at a time
 						$productions_data = $this->elkon_get_production_by_id($serv['id'], $elkon_con,$missing_elkon_production_id);
 						$this->insert_elkon_productions($serv['id'],$productions_data,$elkon_con->logLevel,FALSE);
-						usleep(500000);
+						usleep(100000);
 					}
 				}
 				

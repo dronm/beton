@@ -63,13 +63,12 @@ BEGIN
 
 	IF (query_num>0) THEN
 		--RAISE EXCEPTION 'INSERT INTO vehicle_schedules (schedule_date,production_base_id,vehicle_id,driver_id,auto_gen) VALUES %',query_text;
-		EXECUTE 'INSERT INTO vehicle_schedules (schedule_date, edit_user_id, production_base_id, vehicle_id, driver_id, auto_gen) VALUES ' || query_text;
+		EXECUTE 'INSERT INTO vehicle_schedules (schedule_date, edit_user_id, production_base_id, vehicle_id, driver_id, auto_gen) VALUES ' 
+				|| query_text;
 	END IF;
 	
 
 END;
 $BODY$;
 
-ALTER FUNCTION public.gen_schedule(in_edit_user_id int, in_production_base_id int, in_vehicle_id int, in_dt_from timestamp without time zone, in_dt_to timestamp without time zone, in_mon boolean, in_tue boolean, in_wnd boolean, in_thr boolean, in_fr boolean, in_std boolean, in_snd boolean)
-    OWNER TO ;
 

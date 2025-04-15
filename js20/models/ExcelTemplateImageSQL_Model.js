@@ -58,6 +58,24 @@ function ExcelTemplateImageSQL_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.w = new FieldInt("w",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.h = new FieldInt("h",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.comment_text = new FieldString("comment_text",filed_options);
 	options.fields.comment_text.getValidator().setMaxLength('5000');
 	

@@ -522,35 +522,39 @@ class ExcelTemplate_Controller extends ControllerSQL{
 
 		//generate images for image_sql
 		$query_results = [];
-		$image_sql = json_decode($ar['image_sql']);
-		foreach($image_sql as $image){
-			if(isset($image->fields)){
-				$fields = $image->fields;
-			}else{
-				$fields = $image;
-			}
-			
-			if(isset($fields->sql_query) && isset($fields->name) ){
-				if(!array_key_exists($fields->sql_query, $query_results)){
-					$q = vsprintf($fields->sql_query,$paramArray);
-					$ar_att = $dbLink->query_first($q);
-					if(!is_array($ar_att) || !count($ar_att) || !isset($ar_att['attachment_id'])){
-						throw new Exception("Не найден файл вложения для '".
-							(isset($fields->comment_text)? $fields->comment_text : $fields->name) .
-							"'"
-						);
-					}
-					$attFile = Attachment_Controller::save_to_tmp($dbLink, $ar_att["attachment_id"]);
-					$query_results[$fields->sql_query] = $attFile;
+		if(isset($ar['image_sql'])){
+			$image_sql = json_decode($ar['image_sql']);
+			foreach($image_sql as $image){
+				if(isset($image->fields)){
+					$fields = $image->fields;
+				}else{
+					$fields = $image;
 				}
-				array_push($attachments, array(
-					'imageName' => $fields->name,
-					'fileName' => $query_results[$fields->sql_query]
-				));
+				
+				if(isset($fields->sql_query) && isset($fields->name) ){
+					if(!array_key_exists($fields->sql_query, $query_results)){
+						$q = vsprintf($fields->sql_query,$paramArray);
+						$ar_att = $dbLink->query_first($q);
+						if(!is_array($ar_att) || !count($ar_att) || !isset($ar_att['attachment_id'])){
+							throw new Exception("Не найден файл вложения для '".
+								(isset($fields->comment_text)? $fields->comment_text : $fields->name) .
+								"'"
+							);
+						}
+						$attFile = Attachment_Controller::save_to_tmp($dbLink, $ar_att["attachment_id"]);
+						$query_results[$fields->sql_query] = $attFile;
+					}
+					array_push($attachments, array(
+						'coord' => $fields->name,
+						'w' => $fields->w,
+						'h' => $fields->h,
+						'fileName' => $query_results[$fields->sql_query]
+					));
 
+				}
 			}
 		}
-		file_put_contents(OUTPUT_PATH.'att.txt',var_export($attachments, true));
+		/* file_put_contents(OUTPUT_PATH.'att.txt',var_export($attachments, true)); */
 
 		$reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($reader_tp);
 		$spreadsheet = $reader->load($tmpl_fl);
@@ -572,8 +576,13 @@ class ExcelTemplate_Controller extends ControllerSQL{
 
 		//image changes
 		foreach($attachments as $att){
-			/* self::swapImage($spreadsheet, $sheet, $att["imageName"], $att["fileName"]); */
-			self::replaceImageByName($sheet, $att["imageName"], $att["fileName"]);
+			/* self::replaceImageByName($sheet, $att); */
+			$newDrawing = new Drawing();
+			$newDrawing->setPath($att["fileName"]);
+			$newDrawing->setHeight($att["h"]);
+			$newDrawing->setHeight($att["w"]);
+			$newDrawing->setCoordinates($att["coord"]);
+			$newDrawing->setWorksheet($sheet);
 		}
 					
 		$writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
@@ -582,14 +591,22 @@ class ExcelTemplate_Controller extends ControllerSQL{
 		$flName = $ar["file_name"]; 
 	}
 
-	private static function replaceImageByName($sheet, $imageNameToReplace, $newImagePath) {
+	//$image["coord", "w", "h", "fileName"]
+	private static function replaceImageByName($sheet, $image) {
 		$drawings = $sheet->getDrawingCollection();
-		
 		
 		$found = false;
 		$cnt = 0;
 		foreach ($drawings as $key => $drawing) {
 			// Check if it's a regular Drawing and name matches
+			/* $img = [ */
+			/* 	'coord' => $drawing->getCoordinates(), */
+			/* 	'name' => $drawing->getName(), */
+			/* 	'w' => $drawing->getWidth(), */
+			/* 	'h' => $drawing->getHeight() */
+			/* ]; */
+		/* file_put_contents(OUTPUT_PATH.'images.txt',var_export($drawing->getCoordinates().PHP_EOL,true),FILE_APPEND); */
+		/* file_put_contents(OUTPUT_PATH.'images.txt',var_export($img,true).PHP_EOL); */
 			if (
 					$drawing->getCoordinates() == $imageNameToReplace
 			) {
@@ -599,6 +616,7 @@ class ExcelTemplate_Controller extends ControllerSQL{
 				$newDrawing->setDescription($drawing->getDescription());
 				$newDrawing->setPath($newImagePath);
 				$newDrawing->setHeight($drawing->getHeight());
+				$newDrawing->setWidth($drawing->getWidth());
 				$newDrawing->setCoordinates($drawing->getCoordinates());
 				$newDrawing->setWorksheet($sheet);
 

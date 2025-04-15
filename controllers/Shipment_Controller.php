@@ -51,6 +51,9 @@ require_once(USER_CONTROLLERS_PATH.'Order_Controller.php');
 require_once(ABSOLUTE_PATH.'functions/checkPmPeriod.php');
 require_once(ABSOLUTE_PATH.'functions/ExtProg.php');
 
+set_time_limit(120);
+ini_set('memory_limit', '-1');
+
 class Shipment_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
 		parent::__construct($dbLinkMaster, $dbLink);

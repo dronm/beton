@@ -173,8 +173,8 @@ CREATE OR REPLACE VIEW production_material_list AS
 	LEFT JOIN ra_materials AS ra_mat ON ra_mat.doc_type='shipment' AND ra_mat.doc_id=sh.id
 	FULL OUTER JOIN material_fact_consumptions AS t ON
 		prod.production_site_id = t.production_site_id
-		AND prod.production_id=t.production_id
-		AND t.raw_material_id=ra_mat.material_id
+		AND prod.production_id = t.production_id
+		AND t.raw_material_id = ra_mat.material_id
 	LEFT JOIN production_sites AS ps ON ps.id=t.production_site_id
 	LEFT JOIN raw_materials AS mat ON mat.id=coalesce(ra_mat.material_id, t.raw_material_id)
 	LEFT JOIN cement_silos AS cem ON cem.id=t.cement_silo_id

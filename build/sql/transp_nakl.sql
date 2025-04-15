@@ -1,6 +1,6 @@
 -- VIEW: transp_nakl
 
-DROP VIEW transp_nakl;
+-- DROP VIEW transp_nakl;
 
 CREATE OR REPLACE VIEW transp_nakl AS
 	SELECT

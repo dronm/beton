@@ -18,7 +18,7 @@ function ExcelTemplateImageSQLGrid(id,options){
 
 	var cells = [
 		new GridCellHead(id+":head:name",{
-			"value":"Наименование картинки",
+			"value":"Ячейка картинки",
 			"columns":[
 				new GridColumn({
 					"field":model.getField("name"),
@@ -26,6 +26,24 @@ function ExcelTemplateImageSQLGrid(id,options){
 					"ctrlOptions":{
 						"maxLength":100
 					}					
+				})
+			]
+		})
+		,new GridCellHead(id+":head:h",{
+			"value":"Длина",
+			"columns":[
+				new GridColumn({
+					"field":model.getField("h"),
+					"ctrlClass":EditInt
+				})
+			]
+		})
+		,new GridCellHead(id+":head:w",{
+			"value":"Ширина",
+			"columns":[
+				new GridColumn({
+					"field":model.getField("w"),
+					"ctrlClass":EditInt
 				})
 			]
 		})
