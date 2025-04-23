@@ -1538,10 +1538,15 @@ LEFT OLD VERSION!!!
 
 1.00373
 1) ExcelTemplate_Controller, ExceltTemplateImageSQLGrid
-2) OrderForTranspNaklList_View.js, ShipmentForTranspNaklList_View.js
+2) OrderForTranspNaklList_View.js, 
+		ShipmentForTranspNaklList_View.js
+		OrderGridCmdPrintTranspNakl.js
 3) Order_Controller->get_transp_nakl_list()
 
 
+1.00374
+1)OrderGridCmdPrintTranspNakl.js close form after print.
+	ControllerObjServer callback after download
 
 
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели

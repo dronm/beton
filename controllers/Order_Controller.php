@@ -2215,7 +2215,7 @@ class Order_Controller extends ControllerSQL{
 				}
 			}
 			foreach ($shIds as $id) {
-				$shId = intval($id);
+				$key = intval($id);
 				if($key && !array_key_exists($key, $shipmentsList)){
 					array_push($shipmentsList, $key);
 				}

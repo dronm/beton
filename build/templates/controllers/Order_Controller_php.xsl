@@ -1309,7 +1309,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				}
 			}
 			foreach ($shIds as $id) {
-				$shId = intval($id);
+				$key = intval($id);
 				if($key &amp;&amp; !array_key_exists($key, $shipmentsList)){
 					array_push($shipmentsList, $key);
 				}

@@ -277,6 +277,7 @@
 		<version dateOpen="2025-04-09 13:09:47" dateClose="2025-04-15 07:20:58">1.00371</version>
 		<version dateOpen="2025-04-15 07:36:51" dateClose="2025-04-15 07:40:41">1.00372</version>
 		<version dateOpen="2025-04-17 17:50:17" dateClose="2025-04-23 06:21:11">1.00373</version>
+		<version dateOpen="2025-04-23 06:24:46" dateClose="2025-04-23 07:04:43">1.00374</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
