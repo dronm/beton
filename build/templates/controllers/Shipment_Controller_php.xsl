@@ -1310,7 +1310,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	//all shipments
 	public function shipment_transp_nakl_all($pm){
 		$docId = $this->getExtDbVal($pm, 'id');
-		$faksim = ($pm->getParamValue("id") == "1");
+		$faksim = ($pm->getParamValue("faksim") == "1");
 		try{
 			$outFile = $this->shipment_transp_nakl_all_operation($docId, $faksim);
 			$fileName = "ТН.zip";
@@ -1367,11 +1367,21 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 						FROM vehicle_owners AS vh_own 
 						LEFT JOIN clients AS vh_cl ON vh_cl.id = vh_own.client_id
 						WHERE vh_own.id = vh.official_vehicle_owner_id
-						) AS veh_owner_client
+						) AS veh_owner_client,
+						json_build_object(
+							'no_sig', transp_nakl_operator_sgn(sh.id) IS NULL,
+							'name', op.users_ref->>'descr'
+						) AS operator,
+						json_build_object(
+							'no_sig', transp_nakl_driver_sgn(sh.id) IS NULL,
+							'name', dr.name
+						) AS driver
 					FROM shipments AS sh
 					LEFT JOIN orders AS o ON o.id = sh.order_id
 					LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
 					LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+					LEFT JOIN drivers dr ON dr.id = vh.driver_id
+					LEFT JOIN operators_for_transp_nakls_list op ON (op.production_sites_ref->'keys'->>'id')::int = sh.production_site_id
 					WHERE sh.id = %d
 				)
 				SELECT 
@@ -1385,7 +1395,11 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					(SELECT order_id FROM data) AS order_id,
 					(SELECT veh_owner_client FROM data) AS veh_owner_client,
 					(SELECT ship_date FROM data) AS ship_date,
-					(SELECT ref_1c FROM buh_docs WHERE order_id =(SELECT order_id FROM data)) AS doc_ref_1c
+					(SELECT ref_1c FROM buh_docs WHERE order_id =(SELECT order_id FROM data)) AS doc_ref_1c,
+					(SELECT bool_and((data.operator->>'no_sig')::bool) FROM data) AS operators_no_sig,
+					(SELECT string_agg(data.operator->>'name',',') FROM data WHERE (data.operator->>'no_sig')::bool) AS operators_no_sig_names,
+					(SELECT bool_and((data.driver->>'no_sig')::bool) FROM data) AS drivers_no_sig,
+					(SELECT string_agg(data.driver->>'name',',') FROM data WHERE (data.driver->>'no_sig')::bool) AS drivers_no_sig_names
 				FROM clients AS cl
 				WHERE cl.id = (SELECT client_id FROM data)"
 				,$docId
@@ -1403,6 +1417,20 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			throw new Exception(sprintf("Перевозчик %s не связан с 1с", $cl["name"]));
 		}
 
+		if($cl["drivers_no_sig"] == "t" || $cl["operators_no_sig"] == "t") {
+			$errText = "";
+			if($cl["drivers_no_sig"] == "t") {
+				$errText = "Водители без подписи: ".$cl["drivers_no_sig_names"];
+			}
+			if($cl["operators_no_sig"] == "t") {
+				if($errText != ""){
+					$errText.= ". ";
+				}
+				$errText.= "Операторы без подписи: ".$cl["operators_no_sig_names"];
+			}
+			throw new Exception($errText);
+		}
+
 		$this->check_client_rekv($cl);
 		$this->check_client_rekv($vehOwnerClient);
 
@@ -1412,7 +1440,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$ref1c = json_decode($cl["ref_1c"], TRUE);
 			$resp = ExtProg::getShipment($ref1c["keys"]["ref_1c"], $cl["ship_date"]);
 			$rows = $resp["models"]["ShipmentDoc_Model"]["rows"];
-			/* file_put_contents(OUTPUT_PATH."getClient.data", var_export($rows, true)); */
+			if(!isset($rows["ref"]) || !strlen($rows["ref"])){
+				throw new Exception("УПД не найдена в 1с");
+			}
 			$this->getDbLinkMaster()->query(
 				sprintf(
 					"INSERT INTO buh_docs (order_id, nomer, data, faktura_nomer, faktura_data, ref_1c) 
@@ -1424,7 +1454,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					,$rows["data"]
 					,$rows["faktura_nomer"]
 					,$rows["faktura_data"]
-					,$rows["ref_1c"]
+					,$rows["ref"]
 				)
 			);
 		}
@@ -1528,6 +1558,246 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	
 	public function get_list_for_doc($pm){	
 		$this->modelGetList(new ShipmentForDocList_Model($this->getDbLink()), $pm);
+	}
+
+	private function check_shipment_for_tn($shipmentId, $faksim){
+		$link = $this->getDbLink();
+		$cl = $link->query_first(
+			sprintf(
+				"WITH 
+				data AS (SELECT 
+						o.client_id, 
+						o.id AS order_id,
+						sh.date_time::date AS ship_date,
+						(SELECT  
+							json_build_object(
+								'id', vh_cl.id,
+								'ref_1c', vh_cl.ref_1c,
+								'inn', vh_cl.inn,
+								'name_full', vh_cl.name_full,
+								'address_fact', vh_cl.address_fact
+							)
+						FROM vehicle_owners AS vh_own 
+						LEFT JOIN clients AS vh_cl ON vh_cl.id = vh_own.client_id
+						WHERE vh_own.id = vh.official_vehicle_owner_id
+						) AS veh_owner_client,
+						json_build_object(
+							'no_sig', transp_nakl_operator_sgn(sh.id) IS NULL,
+							'name', op.users_ref->>'descr'
+						) AS operator,
+						json_build_object(
+							'no_sig', transp_nakl_driver_sgn(sh.id) IS NULL,
+							'name', dr.name
+						) AS driver,
+						json_build_object(
+							'no_driver', vh.driver_id IS NULL,
+							'plate', vh.plate
+						) AS veh_drivers
+					FROM shipments AS sh
+					LEFT JOIN orders AS o ON o.id = sh.order_id
+					LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
+					LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
+					LEFT JOIN drivers dr ON dr.id = vh.driver_id
+					LEFT JOIN operators_for_transp_nakls_list op ON (op.production_sites_ref->'keys'->>'id')::int = sh.production_site_id
+					WHERE sh.id = %d
+				)
+				SELECT 
+					cl.id,
+					cl.name,
+					cl.name_full,
+					cl.inn,
+					cl.kpp,
+					cl.ref_1c,
+					cl.address_fact,
+					(SELECT order_id FROM data) AS order_id,
+					(SELECT veh_owner_client FROM data) AS veh_owner_client,
+					(SELECT ship_date FROM data) AS ship_date,
+					(SELECT ref_1c FROM buh_docs WHERE order_id =(SELECT order_id FROM data)) AS doc_ref_1c,
+					(SELECT bool_and((data.operator->>'no_sig')::bool) FROM data) AS operators_no_sig,
+					(SELECT string_agg(data.operator->>'name',',') FROM data WHERE (data.operator->>'no_sig')::bool) AS operators_no_sig_names,
+					(SELECT bool_and((data.driver->>'no_sig')::bool) FROM data) AS drivers_no_sig,
+					(SELECT string_agg(data.driver->>'name',',') FROM data WHERE (data.driver->>'no_sig')::bool) AS drivers_no_sig_names,
+					(SELECT bool_and((data.veh_drivers->>'no_driver')::bool) FROM data) AS veh_no_drivers,
+					(SELECT string_agg(data.veh_drivers->>'plate',',') FROM data WHERE (data.veh_drivers->>'no_driver')::bool) AS veh_no_drivers_plates
+				FROM clients AS cl
+				WHERE cl.id = (SELECT client_id FROM data)"
+				,$shipmentId
+			)
+		);
+		if(!is_array($cl) || !count($cl)) {
+			throw new Exception(sprintf("document not found by id %d", $shipmentId));
+		}
+		if(!isset($cl["ref_1c"])) {
+			throw new Exception(sprintf("Контрагент %s не связан с 1с", $cl["name"]));
+		}
+
+		$vehOwnerClient = json_decode($cl["veh_owner_client"], TRUE);
+		if(!isset($vehOwnerClient["ref_1c"])) {
+			throw new Exception(sprintf("Перевозчик %s не связан с 1с", $cl["name"]));
+		}
+
+		if($cl["veh_no_drivers"] == "t" || $cl["drivers_no_sig"] == "t" || $cl["operators_no_sig"] == "t") {
+			$errText = "";
+			if($cl["veh_no_drivers"] == "t") {
+				if($errText != ""){
+					$errText.= ". ";
+				}
+				$errText = "ТС без водителей: ".$cl["veh_no_drivers_plates"];
+			}
+			if($cl["drivers_no_sig"] == "t" &amp;&amp; strlen($cl["drivers_no_sig_names"]) &amp;&amp; $faksim) {
+				if($errText != ""){
+					$errText.= ". ";
+				}
+				$errText.= "Водители без подписи: ".$cl["drivers_no_sig_names"];
+			}
+			if($cl["operators_no_sig"] == "t" &amp;&amp; $faksim) {
+				if($errText != ""){
+					$errText.= ". ";
+				}
+				$errText.= "Операторы без подписи: ".$cl["operators_no_sig_names"];
+			}
+			if(strlen($errText)){
+				throw new Exception($errText);
+			}
+		}
+
+		$this->check_client_rekv($cl);
+		$this->check_client_rekv($vehOwnerClient);
+	}
+
+	//print transp nakl on list on shipments
+	public function shipment_transp_nakl_on_list($pm){	
+		$docList = []; //shipments
+
+		$link = $this->getDbLinkMaster();
+
+		//from selected shipments
+		if($pm->getParamValue("shipment_ids")){
+			$shIds = json_decode("[".$this->getExtVal($pm, 'shipment_ids')."]", TRUE);
+			if(!count($shIds)){
+				throw new Exception("no ids found");
+			}
+			foreach ($shIds as $id) {
+				$shId = intval($id);
+				if($shId){
+					array_push($docList, $shId); 
+				}
+			}
+		}
+
+		if(!count($docList)){
+			throw new Exception("no doc found");
+		}
+
+		//must be one client!!!
+		$arId = $link->query(sprintf(
+			"SELECT 
+				o.client_id,
+				count(*) AS cnt
+		   	FROM shipments AS sh 
+			LEFT JOIN orders AS o ON o.id = sh.order_id
+			WHERE sh.id IN (%s)
+			GROUP BY o.client_id",
+			implode(",", $docList)
+		));
+		$cnt = 0;
+		while($ar = $link->fetch_array($arId)){
+			$cnt++;
+		}
+		if(!$cnt){
+			throw new Exception("docs not found");
+		}
+		if($cnt > 1){
+			throw new Exception("Документы принадлежат разным контрагентам");
+		}
+
+		$faksim = ($pm->getParamValue("faksim") == "1");
+		$buhDoc = $this->getExtDbVal($pm, "buh_doc");
+
+		//all shipments on order
+		$queryId = $link->query(
+			sprintf(
+				"SELECT
+					sh.id
+				FROM shipments AS sh
+				WHERE sh.id IN (%s)
+				ORDER BY sh.date_time"
+				,implode(",", $docList)
+			)
+		);
+
+		$templateName = $faksim? "Транспортная накладная (факсимиле)" : "Транспортная накладная";
+		$erEmpty = 'Отгрузка не найдена!';
+
+		$multiFile = (count($docList) &gt; 1);
+
+		if($multiFile) {
+			//many files: pack to zip
+			$fileList = array();
+			$outFileName = "ТН.zip";
+			$outFile = OUTPUT_PATH. md5(uniqid()).'.zip';
+			$zip = new ZipArchive();
+			if ($zip->open($outFile, ZIPARCHIVE::CREATE)!==TRUE) {
+				throw new Exception("cannot open ".$outFile);
+			}
+		}else{
+			$outFileName = "ТН.xlsx";
+			$outFile = OUTPUT_PATH. md5(uniqid()).'.zip';
+		}
+
+		$ind = 0;
+		while($shAr = $link->fetch_array($queryId)){
+			$ind++;
+			$this->check_shipment_for_tn($shAr["id"], $faksim? TRUE:FALSE);
+
+			$tFile = '';
+			$fileName = '';
+			ExcelTemplate_Controller::genFilledTemplate($link, $templateName, array($shAr["id"], $ind, $buhDoc), $erEmpty, $tFile, $fileName);		
+			$fileNameParts = pathinfo($fileName,  PATHINFO_EXTENSION);
+			$fileExt = '';
+			if(is_array($fileNameParts) &amp;&amp; isset($fileNameParts['extension'])){
+				$fileExt = $fileNameParts['extension'];
+			}else if (gettype($fileNameParts) == "string"){
+				$fileExt = $fileNameParts;
+			}
+			if(!strlen($fileExt)){
+				$fileExt = '.xlsx';
+			}else if($fileExt[0] != '.'){
+				$fileExt = '.'.$fileExt;
+			}
+
+			if($multiFile) {
+				$zip->addFile($tFile, $shAr["id"].'.xls');
+				array_push($fileList, $tFile);
+
+				usleep(500000);
+
+			}else{
+				$outFile = $tFile;
+			}
+		}
+
+		if($multiFile) {
+			$zip->close();
+
+			//delete files, as they are already in a zip
+			foreach($fileList as $fl){
+				unlink($fl);
+			}
+		}
+
+		try{
+			$flMime = getMimeTypeOnExt($outFileName);
+			ob_clean();
+			downloadFile(
+				$outFile,
+				$flMime,
+				'attachment;',
+				$outFileName
+			);
+		}finally{
+			unlink($outFile);
+		}
 	}
 }
 <![CDATA[?>]]>

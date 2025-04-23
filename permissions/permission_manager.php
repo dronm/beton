@@ -186,6 +186,12 @@ $permissions = array();
 				
 					$permissions['Order_Controller_calc_for_site']=TRUE;
 				
+					$permissions['Order_Controller_get_transp_nakl_list']=TRUE;
+				
+					$permissions['Order_Controller_get_transp_nakl_shipment_list']=TRUE;
+				
+					$permissions['Order_Controller_get_nakl_1c_list']=TRUE;
+				
 					$permissions['Driver_Controller_insert']=TRUE;
 				
 					$permissions['Driver_Controller_update']=TRUE;
@@ -381,6 +387,8 @@ $permissions = array();
 					$permissions['Shipment_Controller_shipment_transp_nakl']=TRUE;
 				
 					$permissions['Shipment_Controller_shipment_transp_nakl_all']=TRUE;
+				
+					$permissions['Shipment_Controller_shipment_transp_nakl_on_list']=TRUE;
 				
 					$permissions['Shipment_Controller_get_time_list']=TRUE;
 				

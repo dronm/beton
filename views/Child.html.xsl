@@ -113,7 +113,7 @@
 						
 						<!-- Footer -->
 						<div class="footer text-muted text-center">
-							2013г - 2024г <a href="#">Катрэн+</a>
+							2013г - 2025г <a href="#">Катрэн+</a>
 						</div>
 						<!-- /footer -->
 

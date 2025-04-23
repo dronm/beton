@@ -46,6 +46,7 @@ function Shipment_Controller(options){
 	this.add_shipment_putevoi_list();
 	this.add_shipment_transp_nakl();
 	this.add_shipment_transp_nakl_all();
+	this.add_shipment_transp_nakl_on_list();
 	this.add_get_time_list();
 	this.add_set_blanks_exist();
 	this.add_delete_shipped();
@@ -834,6 +835,36 @@ extend(Shipment_Controller,ControllerObjServer);
 		options.required = true;
 	
 		pm.addField(new FieldBool("faksim",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Shipment_Controller.prototype.add_shipment_transp_nakl_on_list = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('shipment_transp_nakl_on_list',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldText("shipment_ids",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldBool("faksim",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldText("buh_doc",options));
 	
 			
 	this.addPublicMethod(pm);

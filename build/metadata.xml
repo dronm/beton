@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-04-15 07:40:38</lastBuild></version>
+		<lastBuild>2025-04-23 06:21:01</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -276,6 +276,7 @@
 		<version dateOpen="2025-04-08 01:32:28" dateClose="2025-04-08 01:33:29">1.00370</version>
 		<version dateOpen="2025-04-09 13:09:47" dateClose="2025-04-15 07:20:58">1.00371</version>
 		<version dateOpen="2025-04-15 07:36:51" dateClose="2025-04-15 07:40:41">1.00372</version>
+		<version dateOpen="2025-04-17 17:50:17" dateClose="2025-04-23 06:21:11">1.00373</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -2000,6 +2001,41 @@
 			<sql/>
 			<globalFilter id="client_id"/>
 			<globalFilter id="client_from_date" fieldId="date_time"/>
+		</model>
+		<model id="OrderForTranspNaklList" parent="ModelSQLBeton" dataTable="orders_for_transp_nakl_list" virtual="TRUE">
+			<defaultOrder>
+				<field id="client_descr"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер заявки"/>
+			<field id="date_time" dataType="DateTime" alias="Дата заявки"/>
+			<field id="orders_ref" dataType="JSON" alias="Order"/>
+			<field id="order_num" dataType="String" alias="Order num"/>
+			<field id="clients_ref" dataType="JSON" alias="Клиент"/>
+			<field id="client_descr" dataType="String" alias="Клиент"/>
+			<field id="client_ref_1c_exists" dataType="Bool"/>
+			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
+			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
+			<field id="quant" dataType="Float" alias="Кол-во в заявке,м3"/>
+			<sql/>
+		</model>
+		<model id="ShipmentForTranspNaklList" parent="ModelSQLBeton" dataTable="shipments_for_transp_nakl_list" virtual="TRUE">
+			<defaultOrder>
+				<field id="date_time" sortDirect="DESC"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер"/>
+			<field id="order_id" dataType="Int" alias="Order ID"/>
+			<field id="date_time" dataType="DateTime" alias="Дата"/>
+			<field id="shipments_ref" dataType="JSON" alias="Shipment"/>
+			<field id="production_sites_ref" dataType="JSON" alias="Production site"/>
+			<field id="vehicles_ref" dataType="JSON" alias="Vehicle"/>
+			<field id="drivers_ref" dataType="JSON" alias="Driver"/>
+			<field id="driver_sig_exists" dataType="Bool" alias="Driver sig"/>
+			<field id="operators_ref" dataType="JSON" alias="Operator"/>
+			<field id="operator_sig_exists" dataType="Bool" alias="Operator sig"/>
+			<field id="carriers_ref" dataType="JSON" alias="Carrier"/>
+			<field id="carrier_ref_1c_exists" dataType="Bool"/>
+			<field id="quant" dataType="Float" alias="Кол-во,м3"/>
+			<sql/>
 		</model>
 		<model id="ShipmentForClientVehOwnerList" parent="ModelSQLBeton" dataTable="shipments_for_client_veh_owner_list" virtual="TRUE">
 			<aggFunctions>
@@ -5152,6 +5188,14 @@
 			<field id="date_time" dataType="DateTimeTZ"/>
 			<field id="message" dataType="JSONB"/>
 		</model>
+		<model id="ShipmentBuhDoc" parent="ModelSQL" dataTable="shipment_buh_docs" virtual="FALSE" alias="Бух документ УПД">
+			<field id="ref_1c" dataType="String" length="36" primaryKey="TRUE"/>
+			<field id="nomer" dataType="Text"/>
+			<field id="data" dataType="Text" alias="Formatted document datetime"/>
+			<field id="faktura_nomer" dataType="Text"/>
+			<field id="faktura_data" dataType="Text" alias="Formatted document datetime"/>
+			<field id="shipment_ids" dataType="Array"/>
+		</model>
 		<model id="BuhDoc" parent="ModelSQL" dataTable="buh_docs" virtual="FALSE" alias="Бух документ УПД">
 			<field id="order_id" dataType="Int" refTable="orders" refField="id" primaryKey="TRUE"/>
 			<field id="nomer" dataType="Text"/>
@@ -5469,6 +5513,12 @@
 				<field id="concrete_type_id" dataType="Int" required="TRUE"/>
 				<field id="quant" dataType="Float" required="TRUE"/>
 			</publicMethod>
+			<publicMethod id="get_transp_nakl_list" modelId="OrderForTranspNaklList" condFields="TRUE"/>
+			<publicMethod id="get_transp_nakl_shipment_list" modelId="ShipmentForTranspNaklList" condFields="TRUE"/>
+			<publicMethod id="get_nakl_1c_list">
+				<field id="shipment_ids" dataType="Text"/>
+				<field id="order_ids" dataType="Text"/>
+			</publicMethod>
 		</controller>
 		<controller id="Driver" parentId="ControllerSQL" state="TRUE" noState="FALSE">
 			<publicMethod id="insert" modelId="Driver"/>
@@ -5721,6 +5771,11 @@
 			<publicMethod id="shipment_transp_nakl_all" modelId="ModelSQL">
 				<field id="id" dataType="Int" required="TRUE"/>
 				<field id="faksim" dataType="Bool" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="shipment_transp_nakl_on_list" modelId="ModelSQL">
+				<field id="shipment_ids" dataType="Text"/>
+				<field id="faksim" dataType="Bool" required="TRUE"/>
+				<field id="buh_doc" dataType="Text" required="TRUE"/>
 			</publicMethod>
 			<publicMethod id="get_time_list" modelId="ShipmentTimeList" condFields="TRUE">
 				<field id="templ" dataType="String"/>
@@ -7386,6 +7441,7 @@
 		<view id="30037" c="VehicleTotRepBalance_Controller" t="VehicleTotRepBalanceList" f="get_list" section="Формы" descr="Остатки взаиморасчетов с собственниками ТС"/>
 		<view id="30038" c="ClientDebt_Controller" t="ClientDebtList" f="get_list" section="Формы" descr="Остатки взаиморасчетов 1с с контрагентами"/>
 		<view id="30039" c="ShipmentMedia_Controller" t="ShipmentMediaList" f="get_list" section="Формы" descr="Медиа файлы водителей"/>
+		<view id="30040" t="OrderForTranspNaklList" section="Формы" descr="Заявки для печати трансп.накладных"/>
 		<view id="50001" t="VehicleStopsReport" section="Отчеты" descr="Стоянки ТС"/>
 		<view id="50002" t="VehicleScheduleReportAll" section="Отчеты" descr="Печать графиков"/>
 		<view id="50003" t="RouteToDestAvgTimeRep" section="Отчеты" descr="Среднее время до объектов"/>
@@ -7811,6 +7867,7 @@
 		<jsScript file="js20/controls/GridColumnInterval.js"/>
 		<jsScript file="js20/controls/GridCell.js"/>
 		<jsScript file="js20/controls/GridCellHead.js"/>
+		<jsScript file="js20/controls/GridCellHeadMark.js"/>
 		<jsScript file="js20/controls/GridCellFoot.js"/>
 		<jsScript file="js20/controls/GridCellPhone.js"/>
 		<jsScript file="js20/controls/rs/GridCellPhone.rs_ru.js" resource="ru"/>
@@ -8041,6 +8098,8 @@
 		<jsScript file="js20/views/ShipmentForClientVehOwnerList_View.js"/>
 		<jsScript file="js20/views/ShipmentForClientList_View.js"/>
 		<jsScript file="js20/views/OrderForClientList_View.js"/>
+		<jsScript file="js20/views/OrderForTranspNaklList_View.js"/>
+		<jsScript file="js20/views/ShipmentForTranspNaklList_View.js"/>
 		<jsScript file="js20/views/ShipmentTimeList_View.js"/>
 		<jsScript file="js20/views/ShipmentDateList_View.js"/>
 		<jsScript file="js20/views/AstCallList_View.js"/>
@@ -8306,7 +8365,7 @@
 		<jsScript file="js20/custom_controls/PrintPassBtn.js"/>
 		<jsScript file="js20/custom_controls/ShipmentGridCmdPrintTTN.js"/>
 		<jsScript file="js20/custom_controls/ShipmentGridCmdPrintPutevoiList.js"/>
-		<jsScript file="js20/custom_controls/ShipmentGridCmdPrintTranspNakl.js"/>
+		<jsScript file="js20/custom_controls/OrderGridCmdPrintTranspNakl.js"/>
 		<jsScript file="js20/custom_controls/ShipmentGridCmdChangeOrder.js"/>
 		<jsScript file="js20/custom_controls/ShipmentGridCmdDelete.js"/>
 		<jsScript file="js20/custom_controls/RawMaterialConsRateCalcBtn.js"/>
@@ -8893,6 +8952,9 @@
 		<jsScript file="js20/models/OperatorForTranspNaklList_Model.js"/>
 		<jsScript file="js20/models/ExcelTemplateImageSQL_Model.js"/>
 		<jsScript file="js20/controllers/ExcelTemplateImageSQL_Controller.js"/>
+		<jsScript file="js20/models/OrderForTranspNaklList_Model.js"/>
+		<jsScript file="js20/models/ShipmentBuhDoc_Model.js"/>
+		<jsScript file="js20/models/ShipmentForTranspNaklList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

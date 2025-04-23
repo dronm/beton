@@ -253,6 +253,8 @@
 <li><a href="#ShipmentForClientList_Model">ShipmentForClientList_Model</a></li>
 <li><a href="#ShipmentForDocList_Model">ShipmentForDocList_Model</a></li>
 <li><a href="#OrderForClientList_Model">OrderForClientList_Model</a></li>
+<li><a href="#OrderForTranspNaklList_Model">OrderForTranspNaklList_Model</a></li>
+<li><a href="#ShipmentForTranspNaklList_Model">ShipmentForTranspNaklList_Model</a></li>
 <li><a href="#ShipmentForClientVehOwnerList_Model">ShipmentForClientVehOwnerList_Model</a></li>
 <li><a href="#ShipmentDialog_Model">ShipmentDialog_Model</a></li>
 <li><a href="#ShipmentPumpList_Model">ShipmentPumpList_Model</a></li>
@@ -507,6 +509,7 @@
 <li><a href="#UserChatLastOpen_Model">UserChatLastOpen_Model</a></li>
 <li><a href="#UserChatMessageView_Model">UserChatMessageView_Model</a></li>
 <li><a href="#ShipmentMediaList_Model">ShipmentMediaList_Model</a></li>
+<li><a href="#ShipmentBuhDoc_Model">ShipmentBuhDoc_Model</a></li>
 <li><a href="#BuhDoc_Model">BuhDoc_Model</a></li>
 <li><a href="#OperatorForTranspNakl_Model">OperatorForTranspNakl_Model</a></li>
 <li><a href="#OperatorForTranspNaklList_Model">OperatorForTranspNaklList_Model</a></li>
@@ -2660,6 +2663,26 @@
 								Да</p>
 </div>
 </div>
+<h2>get_transp_nakl_list</h2>
+<a href="#OrderForTranspNaklList_Model">Model: OrderForTranspNaklList_Model</a><h2>get_transp_nakl_shipment_list</h2>
+<a href="#ShipmentForTranspNaklList_Model">Model: ShipmentForTranspNaklList_Model</a><h2>get_nakl_1c_list</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>shipment_ids</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Text</p>
+<p>Required:
+								Нет</p>
+</div>
+<h3>order_ids</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Text</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
 </div>
 </div>
 <div id="OrderFromClient_Controller" class="content_box">
@@ -3638,6 +3661,7 @@
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_putevoi_list</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_transp_nakl</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_transp_nakl_all</h2>
+<a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_transp_nakl_on_list</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>get_time_list</h2>
 <a href="#ShipmentTimeList_Model">Model: ShipmentTimeList_Model</a><h2>set_blanks_exist</h2>
 <p>Arguments:</p>
@@ -13545,6 +13569,72 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="OrderForTranspNaklList_Model" class="content_box">
+<h1>OrderForTranspNaklList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>orders_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>order_num</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>clients_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_ref_1c_exists</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destinations_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_types_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="OrderFromClient_Model" class="content_box">
 <h1>OrderFromClient_Model</h1>
 <div class="content_item">
@@ -19017,6 +19107,48 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="ShipmentBuhDoc_Model" class="content_box">
+<h1>ShipmentBuhDoc_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>ref_1c</h2>
+<div>Type:String</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:36</div>
+<div>Precision:</div>
+<h2>nomer</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>data</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>faktura_nomer</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>faktura_data</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>shipment_ids</h2>
+<div>Type:Array</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="ShipmentCancelation_Model" class="content_box">
 <h1>ShipmentCancelation_Model</h1>
 <div class="content_item">
@@ -19851,6 +19983,90 @@
 <div>Precision:</div>
 <h2>comment_text</h2>
 <div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ShipmentForTranspNaklList_Model" class="content_box">
+<h1>ShipmentForTranspNaklList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>order_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>shipments_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_sites_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicles_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>drivers_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>driver_sig_exists</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>operators_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>operator_sig_exists</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>carriers_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>carrier_ref_1c_exists</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

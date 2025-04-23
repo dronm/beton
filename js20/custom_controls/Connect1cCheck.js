@@ -58,8 +58,8 @@ Connect1cCheck.prototype.setRefreshInterval = function(newInterval) {
 /* public methods */
 Connect1cCheck.prototype.toDOM = function(p){
 
-	const evSrvExists = window.getApp().getAppSrv();
-	if(evSrvExists){
+	const evSrv = window.getApp().getAppSrv();
+	if(evSrv && evSrv.connActive()){
 		//events
 		const self = this;
 		this.m_srvEvents = {

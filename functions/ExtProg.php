@@ -151,6 +151,10 @@ class ExtProg{
 		return (array)ExtProg::send_query('get_shipment', array('client_ref_1c'=>$clientRef1c, "date"=>$date), TRUE);
 	}
 
+	public static function getShipmentsAll(string $clientRef1c, string $date){
+		return (array)ExtProg::send_query('get_shipments_all', array('client_ref_1c'=>$clientRef1c, "date"=>$date), TRUE);
+	}
+
 	public static function ping(){
 		try{
 			$respModel = ExtProg::send_query('ping', array(), TRUE);

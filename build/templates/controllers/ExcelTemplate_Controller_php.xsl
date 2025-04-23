@@ -353,12 +353,14 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		//image changes
 		foreach($attachments as $att){
 			/* self::replaceImageByName($sheet, $att); */
+			$y = isset($att["offset_y"])? intval($att["offset_y"]) : 0;
+			$x = isset($att["offset_x"])? intval($att["offset_x"]) : 0;
 			$newDrawing = new Drawing();
 			$newDrawing->setPath($att["fileName"]);
 			$newDrawing->setHeight($att["h"]);
-			$newDrawing->setHeight($att["w"]);
-			$newDrawing->setOffsetY($att["offset_y"]);
-			$newDrawing->setOffsetY($att["offset_x"]);
+			$newDrawing->setWidth($att["w"]);
+			$newDrawing->setOffsetY($y);
+			$newDrawing->setOffsetX($x);
 			$newDrawing->setCoordinates($att["coord"]);
 			$newDrawing->setWorksheet($sheet);
 		}

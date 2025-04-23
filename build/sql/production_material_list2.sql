@@ -18,8 +18,10 @@ CREATE OR REPLACE VIEW production_material_list AS
 		sum(coalesce(t.material_quant_req,0)) AS quant_fact_req,
 		
 		--Подбор
-		CASE WHEN coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN 0
-		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		-- CASE WHEN coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN 0
+		-- ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		CASE WHEN coalesce(sh.quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, sh.quant)
 		END AS quant_consuption,
 		
 		coalesce(t_cor.quant,0) AS quant_corrected,
@@ -52,8 +54,10 @@ CREATE OR REPLACE VIEW production_material_list AS
 			ELSE (sum(coalesce(t.material_quant,0)) + coalesce(t_cor.quant,0))
 		END
 		-
-		CASE WHEN coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN 0
-		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		-- CASE WHEN coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN 0
+		-- ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		CASE WHEN coalesce(sh.quant,0)=0 THEN 0
+		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, sh.quant)
 		END 
 		AS quant_dif
 	
@@ -61,7 +65,8 @@ CREATE OR REPLACE VIEW production_material_list AS
 			WHEN mat.id IS NULL THEN FALSE
 			WHEN t.raw_material_id IS NULL AND coalesce(ra_mat.quant,0) = 0 THEN FALSE --no fact, and no norm(quant=0)
 			WHEN t.raw_material_id IS NULL THEN TRUE --no fact
-			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN TRUE
+			-- WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN TRUE
+			WHEN coalesce(ra_mat.quant,0) = 0 OR coalesce(sh.quant,0)=0 THEN TRUE
 			ELSE
 				coalesce(
 				( abs(
@@ -91,7 +96,7 @@ CREATE OR REPLACE VIEW production_material_list AS
 						ELSE (sum(t.material_quant) + coalesce(t_cor.quant,0))
 					END
 					
-				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant,o.quant,0)
+				) * 100 /coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, sh.quant, 0)
 					 	>= mat.max_fact_quant_tolerance_percent
 				)
 			,FALSE)

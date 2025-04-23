@@ -25,7 +25,7 @@ function OperatorList_View(id,options){
 	}
 	options.templateOptions.productionBases = this.m_prodBaseList;
 	
-	var constants = {"order_grid_refresh_interval":null};
+	var constants = {"order_grid_refresh_interval": null, water: null};
 	window.getApp().getConstantManager().get(constants);
 		
 	//events
@@ -467,7 +467,10 @@ function OperatorList_View(id,options){
 			opts.className = opts.className||"";
 			var m = this.getModel();
 			if (m.getFieldValue("shipped")){
-				opts.className+= (opts.className.length? " ":"")+"shipped";
+				opts.className+= (opts.className.length? " ":"") + " shipped";
+				if(m.getFieldValue("concrete_types_ref").getKey("id") == constants.water.getValue().getKey()){
+					opts.className+= " ship_water";
+				}
 			}
 		},
 		"onEventSetCellOptions":function(opts){

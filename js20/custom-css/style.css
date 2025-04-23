@@ -665,6 +665,14 @@ tr.veh_in_make_list{
 	cursor:pointer;
 }
 
+/* tr.ship_water { */
+/* 	background-color:#e1f4fa; */
+/* } */
+/**/
+tr.ship_water.shipped {
+	background-color:#b4e8fa;
+}
+
 tr.shipped{
 	background-color:#CDFFD7;
 }

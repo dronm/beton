@@ -35,8 +35,12 @@ require_once(USER_CONTROLLERS_PATH.'Destination_Controller.php');
 require_once(USER_MODELS_PATH.'OrderMakeList_Model.php');
 require_once(USER_MODELS_PATH.'ConcreteType_Model.php');
 require_once(USER_MODELS_PATH.'Lang_Model.php');
+require_once(USER_MODELS_PATH.'OrderForTranspNaklList_Model.php');
+require_once(USER_MODELS_PATH.'ShipmentForTranspNaklList_Model.php');
 
 require_once(FUNC_PATH.'EventSrv.php');
+
+require_once(ABSOLUTE_PATH.'functions/ExtProg.php');
 
 require_once('common/MyDate.php');
 
@@ -898,6 +902,54 @@ class Order_Controller extends ControllerSQL{
 	
 		$opts['required']=TRUE;				
 		$pm->addParam(new FieldExtFloat('quant',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_transp_nakl_list');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_transp_nakl_shipment_list');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_nakl_1c_list');
+		
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtText('shipment_ids',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtText('order_ids',$opts));
 	
 			
 		$this->addPublicMethod($pm);
@@ -2112,6 +2164,117 @@ class Order_Controller extends ControllerSQL{
 		);
 	}
 	
-	
+	function get_transp_nakl_list($pm){
+		$this->modelGetList(new OrderForTranspNaklList_Model($this->getDbLink()),$pm);
+	}
+
+	function get_transp_nakl_shipment_list($pm){
+		$this->modelGetList(new ShipmentForTranspNaklList_Model($this->getDbLink()),$pm);
+	}
+
+	function get_nakl_1c_list($pm){
+		$link = $this->getDbLink();
+		$ordersList = []; //orders
+		$shipmentsList = [];
+
+		//from selected orders
+		if($pm->getParamValue("order_ids")){
+			$ordIds = json_decode("[".$this->getExtVal($pm, 'order_ids')."]", TRUE);
+			foreach ($ordIds as $id) {
+				$oId = intval($id);
+				if($oId){
+					array_push($ordersList, $oId); 
+				}
+			}
+			//all shipments form these orders
+			$shArId = $link->query(sprintf(
+				"SELECT id 
+				FROM shipments WHERE order_id IN (%s)"
+				,implode(",", $ordersList)
+			));
+			while($shAr = $link->fetch_array($shArId)){
+				$key = intval($shAr["id"]);
+				if($key && !array_key_exists($key, $shipmentsList)){
+					array_push($shipmentsList, $key);
+				}
+			}
+		}
+/* throw new Exception($this->getExtVal($pm, "shipment_ids")); */
+		//from selected shipments
+		if($pm->getParamValue("shipment_ids")){
+			$shIds = json_decode("[".$this->getExtVal($pm, 'shipment_ids')."]", TRUE);
+			$ordArId = $link->query(sprintf(
+				"SELECT order_id 
+				FROM shipments WHERE id IN (%s)"
+				,implode(",", $shIds)
+			));
+			while($ordAr = $link->fetch_array($ordArId)){
+				$key = intval($ordAr["order_id"]);
+				if($key && !array_key_exists($key, $ordersList)){
+					array_push($ordersList, $key);
+				}
+			}
+			foreach ($shIds as $id) {
+				$shId = intval($id);
+				if($key && !array_key_exists($key, $shipmentsList)){
+					array_push($shipmentsList, $key);
+				}
+			}
+		}
+		if(!count($ordersList)){
+			throw new Exception("empty order list");
+		}
+
+		//get client ref_1c and order date
+		//must be one client!!!
+		$arId = $link->query(sprintf(
+			"SELECT 
+				cl.ref_1c AS ref_1c,
+				o.date_time::date AS date,
+				count(*) AS cnt
+		   	FROM orders AS o 
+			LEFT JOIN clients AS cl ON cl.id = o.client_id
+			WHERE o.id IN (%s)
+			GROUP BY cl.ref_1c, o.date_time::date",
+			implode(",", $ordersList)
+		));
+		$cnt = 0;
+		$ref1c = NULL;
+		$date = NULL;
+		while($ar = $link->fetch_array($arId)){
+			$ref1c = $ar["ref_1c"];
+			$date = $ar["date"];
+			$cnt++;
+		}
+		if(!$cnt){
+			throw new Exception("docs not found");
+		}
+		if($cnt > 1){
+			throw new Exception("Документы принадлежат разным контрагентам");
+		}
+		$ar = $link->fetch_array($arId);
+		if(!isset($ref1c)){
+			throw new Exception("Контрагент не связан с 1с");
+		}
+		$ref1c = json_decode($ref1c, TRUE);
+		if(!isset($ref1c["keys"]["ref_1c"])){
+			throw new Exception("error parsing ref_1c structure");
+		}
+		$xml = ExtProg::getShipmentsAll($ref1c["keys"]["ref_1c"], $date);
+		/* file_put_contents(OUTPUT_PATH."1c.txt", var_export($xml, TRUE)); */
+
+		$this->addModel(new ModelVars(
+			array('id'=>'ShipmentDoc_Model',
+				'values'=>array(
+					new Field('docs',DT_STRING,
+						array('value'=>json_encode($xml["models"]["ShipmentDoc_Model"]["rows"]))
+					)
+					,new Field('shipment_ids',DT_STRING,
+						array('value'=>implode(",", $shipmentsList))
+					)
+				)
+			)
+		));
+	}
 }
 ?>

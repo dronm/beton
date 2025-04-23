@@ -1538,6 +1538,8 @@ LEFT OLD VERSION!!!
 
 1.00373
 1) ExcelTemplate_Controller, ExceltTemplateImageSQLGrid
+2) OrderForTranspNaklList_View.js, ShipmentForTranspNaklList_View.js
+3) Order_Controller->get_transp_nakl_list()
 
 
 
