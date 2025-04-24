@@ -2561,19 +2561,10 @@ class Shipment_Controller extends ControllerSQL{
 
 		$multiFile = (count($docList) > 1);
 
-		if($multiFile) {
-			//many files: pack to zip
-			$fileList = array();
-			$outFileName = "ТН.zip";
-			$outFile = OUTPUT_PATH. md5(uniqid()).'.zip';
-			$zip = new ZipArchive();
-			if ($zip->open($outFile, ZIPARCHIVE::CREATE)!==TRUE) {
-				throw new Exception("cannot open ".$outFile);
-			}
-		}else{
-			$outFileName = "ТН.xlsx";
-			$outFile = OUTPUT_PATH. md5(uniqid()).'.zip';
-		}
+		//always one file, merged or standalone
+		$outFileName = "ТН.pdf";
+		$fileList = array();
+		$outFile = OUTPUT_PATH. md5(uniqid()).'.pdf';
 
 		$ind = 0;
 		while($shAr = $link->fetch_array($queryId)){
@@ -2596,24 +2587,17 @@ class Shipment_Controller extends ControllerSQL{
 				$fileExt = '.'.$fileExt;
 			}
 
+			array_push($fileList, $tFile);
 			if($multiFile) {
-				$zip->addFile($tFile, $shAr["id"].'.xls');
-				array_push($fileList, $tFile);
-
 				usleep(500000);
-
-			}else{
-				$outFile = $tFile;
 			}
 		}
 
-		if($multiFile) {
-			$zip->close();
+		self::merge_xls_files($fileList, $outFile);
 
-			//delete files, as they are already in a zip
-			foreach($fileList as $fl){
-				unlink($fl);
-			}
+		//delete files, as they are already in a zip
+		foreach($fileList as $fl){
+			unlink($fl);
 		}
 
 		try{
@@ -2628,6 +2612,56 @@ class Shipment_Controller extends ControllerSQL{
 		}finally{
 			unlink($outFile);
 		}
+	}
+
+	public static function merge_xls_files($inputFiles, $outputPdfFile) {
+		// Check if LibreOffice is installed and available
+		$command = 'libreoffice --version';
+		$output = shell_exec($command);
+		
+		if (strpos($output, 'LibreOffice') === false) {
+			throw new Exception('LibreOffice is not installed or not available in the system path.');
+		}
+
+		// Create a temp directory to store PDFs
+		$tempDir = sys_get_temp_dir() . '/xlsx_to_pdf_temp';
+		if (!file_exists($tempDir)) {
+			mkdir($tempDir, 0777, true);
+		}
+
+		// Remove any previous PDFs in the temp folder
+		array_map('unlink', glob("$tempDir/*.pdf"));
+
+		// Loop through each file and convert them to PDF using LibreOffice
+		foreach ($inputFiles as $file) {
+			// Check if the file exists
+			if (!file_exists($file)) {
+				throw new Exception("File $file does not exist.");
+			}
+
+			$outputPdf = $tempDir . '/' . basename($file, '.xlsx') . '.pdf';
+			
+			// Convert the file to PDF
+			$command = "libreoffice --headless --convert-to pdf \"$file\" --outdir \"$tempDir\"";
+			shell_exec($command);
+		}
+
+		// Prepare the command to merge PDFs using pdfunite
+		$pdfFiles = glob("$tempDir/*.pdf");
+		$outputPdf = escapeshellarg($outputPdfFile);
+
+		if (empty($pdfFiles)) {
+			throw new Exception('No PDFs were generated to merge.');
+		}
+
+		// Merge PDFs
+		$command = 'pdfunite ' . implode(' ', array_map('escapeshellarg', $pdfFiles)) . ' ' . $outputPdf;
+		shell_exec($command);
+
+		// Clean up temp directory
+		array_map('unlink', glob("$tempDir/*.pdf"));
+		rmdir($tempDir);
+
 	}
 }
 ?>

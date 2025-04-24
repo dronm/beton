@@ -65,20 +65,20 @@ OrderGridCmdPrintTranspNakl.prototype.onCommandCont = function(model){
 					labelCaption: "УПД:",
 					elements: nakls
 				}));	
-				this.addElement(new ButtonCmd("naklSelect:view:nakl:pringSgn", {
+				this.addElement(new ButtonCmd("naklSelect:view:nakl:printSgn", {
 					caption: "С подписями",
 					onClick: function(){
 						const ctrl = naklView.getElement("nakl");
 						const opt = ctrl.getNode().options[ctrl.getIndex()];
-						self.printWithSgn(opt.getAttribute("doc"), shipmentIds);
+						self.printWithSgn(opt.getAttribute("doc"), shipmentIds, naklView);
 					}
 				}));
-				this.addElement(new ButtonCmd("naklSelect:view:nakl:pringNoSgn", {
+				this.addElement(new ButtonCmd("naklSelect:view:nakl:printNoSgn", {
 					caption: "Без подписей",
 					onClick: function(){
 						const ctrl = naklView.getElement("nakl");
 						const opt = ctrl.getNode().options[ctrl.getIndex()];
-						self.printNoSgn(opt.getAttribute("doc"), shipmentIds);
+						self.printNoSgn(opt.getAttribute("doc"), shipmentIds, naklView);
 					}
 				}))
 			}
@@ -87,28 +87,39 @@ OrderGridCmdPrintTranspNakl.prototype.onCommandCont = function(model){
 	this.m_form.open();
 }
 
-OrderGridCmdPrintTranspNakl.prototype.printWithSgn = function(doc, shipmentIds){
-	this.print(doc, shipmentIds, "1");
+OrderGridCmdPrintTranspNakl.prototype.printWithSgn = function(doc, shipmentIds, naklView){
+	this.print(doc, shipmentIds, "1", naklView);
 }
 
-OrderGridCmdPrintTranspNakl.prototype.printNoSgn = function(doc, shipmentIds){
-	this.print(doc, shipmentIds, "0");
+OrderGridCmdPrintTranspNakl.prototype.printNoSgn = function(doc, shipmentIds, naklView){
+	this.print(doc, shipmentIds, "0", naklView);
 }
 
-OrderGridCmdPrintTranspNakl.prototype.print = function(doc, shipmentIds, faksim){
+OrderGridCmdPrintTranspNakl.prototype.print = function(doc, shipmentIds, faksim, naklView){
 	if(!doc){
 		throw new Error("Документ не выбран");
 	}
+
+	window.setGlobalWait(true);
+	naklView.getElement("printSgn").setEnabled(false);
+	naklView.getElement("printNoSgn").setEnabled(false);
+
 	const self =  this;
 	const pm = (new Shipment_Controller()).getPublicMethod("shipment_transp_nakl_on_list");
 	pm.setFieldValue("shipment_ids", shipmentIds);
 	pm.setFieldValue("faksim", faksim);
 	pm.setFieldValue("buh_doc", doc);
-	pm.download("ViewXML", 0, function(){
-		if(self.m_form){
-			self.m_form.close();
+	pm.download("ViewXML", 0, function(res){
+		window.setGlobalWait(false);
+		naklView.getElement("printSgn").setEnabled(true);
+		naklView.getElement("printNoSgn").setEnabled(true);
+
+		if(res == 0){
+			if(self.m_form){
+				self.m_form.close();
+			}
+			window.showTempNote("Файл загружен", null, 5000);
 		}
-		window.showTempNote("Файл загружен", null, 5000);
 	});
 }
 
