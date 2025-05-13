@@ -61,7 +61,8 @@ function MaterialFactBalanceCorretionList_View(id,options){
 							"columns":[
 								new GridColumnDateTime({
 									"field":model.getField("balance_date_time"),
-									"dateFormat":"d/m/y H:i",									
+									"ctrlClass": EditDateTime,
+									// "dateFormat":"d/m/y H:i",									
 									"searchOptions":{
 										"field":new FieldDate("balance_date_time"),
 										"searchType":"on_beg",

@@ -15,9 +15,12 @@ function CementSiloForOrderList_View(id,options){
 	options = options || {};	
 	
 	this.m_listView = options.listView;
+
+	this.m_connectCheck = new ConnectElkonCheck();
+
 	this.setData(options.model);
 	options.templateOptions = this.getTemplateOptions();
-	
+
 	CementSiloForOrderList_View.superclass.constructor.call(this,id,"TEMPLATE",options);
 	
 	this.fillSilos();
@@ -30,6 +33,7 @@ extend(CementSiloForOrderList_View,Control);
 
 /* private members */
 CementSiloForOrderList_View.prototype.m_silos;
+CementSiloForOrderList_View.prototype.m_connectCheck;
 
 /* protected*/
 
@@ -63,6 +67,9 @@ CementSiloForOrderList_View.prototype.setData = function(modelSilos){
 					this.m_silos["silo_"+silo_id].balance = 0;
 				}
 			}
+			//init connect
+			this.m_connectCheck.addProductionSite(silo_id, modelSilos.getFieldValue("pong"));
+
 			silo_cnt++;
 		}
 		//for(p in this.m_silos)silo_cnt++;

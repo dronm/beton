@@ -56564,3 +56564,351 @@ CREATE OR REPLACE VIEW public.orders_for_transp_nakl_list AS
 	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
 
 	ORDER BY cl.name, o.date_time;
+
+
+
+
+
+-- ******************* update 25/04/2025 06:24:29 ******************
+-- Trigger: doc_material_procurements_before
+
+DROP TRIGGER doc_material_procurements_before ON public.doc_material_procurements;
+/*
+CREATE TRIGGER doc_material_procurements_before
+    BEFORE INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();
+    
+-- Trigger: doc_material_procurements_after
+*/
+DROP TRIGGER doc_material_procurements_after ON public.doc_material_procurements;
+/*
+CREATE TRIGGER doc_material_procurements_after
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();    
+*/
+
+
+-- ******************* update 25/04/2025 06:26:12 ******************
+-- Trigger: doc_material_procurements_before
+
+-- DROP TRIGGER doc_material_procurements_before ON public.doc_material_procurements;
+
+CREATE TRIGGER doc_material_procurements_before
+    BEFORE INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();
+    
+-- Trigger: doc_material_procurements_after
+
+-- DROP TRIGGER doc_material_procurements_after ON public.doc_material_procurements;
+
+CREATE TRIGGER doc_material_procurements_after
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();    
+
+
+
+-- ******************* update 25/04/2025 06:40:18 ******************
+-- Trigger: doc_material_procurements_before
+
+DROP TRIGGER doc_material_procurements_before ON public.doc_material_procurements;
+/*
+CREATE TRIGGER doc_material_procurements_before
+    BEFORE INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();
+    
+-- Trigger: doc_material_procurements_after
+*/
+DROP TRIGGER doc_material_procurements_after ON public.doc_material_procurements;
+/*
+CREATE TRIGGER doc_material_procurements_after
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();    
+*/
+
+
+-- ******************* update 25/04/2025 06:52:21 ******************
+-- Trigger: doc_material_procurements_before
+
+--DROP TRIGGER doc_material_procurements_before ON public.doc_material_procurements;
+
+CREATE TRIGGER doc_material_procurements_before
+    BEFORE INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();
+    
+-- Trigger: doc_material_procurements_after
+
+--DROP TRIGGER doc_material_procurements_after ON public.doc_material_procurements;
+
+CREATE TRIGGER doc_material_procurements_after
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();    
+
+
+
+-- ******************* update 25/04/2025 06:56:11 ******************
+-- Trigger: doc_material_procurements_before
+
+DROP TRIGGER doc_material_procurements_before ON public.doc_material_procurements;
+/*
+CREATE TRIGGER doc_material_procurements_before
+    BEFORE INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();
+    
+-- Trigger: doc_material_procurements_after
+*/
+DROP TRIGGER doc_material_procurements_after ON public.doc_material_procurements;
+/*
+CREATE TRIGGER doc_material_procurements_after
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();    
+*/
+
+
+-- ******************* update 25/04/2025 07:01:01 ******************
+-- Trigger: doc_material_procurements_before
+
+--DROP TRIGGER doc_material_procurements_before ON public.doc_material_procurements;
+
+CREATE TRIGGER doc_material_procurements_before
+    BEFORE INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();
+    
+-- Trigger: doc_material_procurements_after
+
+--DROP TRIGGER doc_material_procurements_after ON public.doc_material_procurements;
+
+CREATE TRIGGER doc_material_procurements_after
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();    
+
+
+
+-- ******************* update 25/04/2025 07:01:18 ******************
+-- Trigger: doc_material_procurements_before
+
+DROP TRIGGER doc_material_procurements_before ON public.doc_material_procurements;
+
+CREATE TRIGGER doc_material_procurements_before
+    BEFORE INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();
+    
+-- Trigger: doc_material_procurements_after
+
+DROP TRIGGER doc_material_procurements_after ON public.doc_material_procurements;
+
+CREATE TRIGGER doc_material_procurements_after
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();    
+
+
+
+-- ******************* update 25/04/2025 07:07:11 ******************
+-- Trigger: doc_material_procurements_before
+
+DROP TRIGGER doc_material_procurements_before ON public.doc_material_procurements;
+DROP TRIGGER doc_material_procurements_after ON public.doc_material_procurements;
+/*
+CREATE TRIGGER doc_material_procurements_before
+    BEFORE INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();
+   
+-- Trigger: doc_material_procurements_after
+
+
+
+CREATE TRIGGER doc_material_procurements_after
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();    
+*/
+
+
+-- ******************* update 25/04/2025 07:20:44 ******************
+-- Trigger: doc_material_procurements_before
+
+--DROP TRIGGER doc_material_procurements_before ON public.doc_material_procurements;
+--DROP TRIGGER doc_material_procurements_after ON public.doc_material_procurements;
+
+CREATE TRIGGER doc_material_procurements_before
+    BEFORE INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();
+   
+-- Trigger: doc_material_procurements_after
+
+
+
+CREATE TRIGGER doc_material_procurements_after
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.doc_material_procurements
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.doc_material_procurements_process();    
+
+
+
+-- ******************* update 13/05/2025 15:33:51 ******************
+-- Function: elkon_connect_err(in_elkon_log_message text, in_elkon_log_date_time timestamp)
+
+-- DROP FUNCTION elkon_connect_err(in_elkon_log_message text, in_elkon_log_date_time timestamp);
+
+CREATE OR REPLACE FUNCTION elkon_connect_err(in_elkon_log_message text, in_elkon_log_date_time timestamp)
+  RETURNS bool AS
+$$
+	SELECT
+		SUBSTRING(in_elkon_log_message from 1 for 28) = 'Ошибка соединения с сервером'
+		AND EXTRACT(EPOCH FROM NOW() - in_elkon_log_date_time) * 1000 > const_ping_elkon_interval_err_val()
+	;
+$$
+  LANGUAGE plpgsql IMMUTABLE
+  COST 100;
+
+
+-- ******************* update 13/05/2025 15:34:19 ******************
+-- Function: elkon_connect_err(in_elkon_log_message text, in_elkon_log_date_time timestamp)
+
+-- DROP FUNCTION elkon_connect_err(in_elkon_log_message text, in_elkon_log_date_time timestamp);
+
+CREATE OR REPLACE FUNCTION elkon_connect_err(in_elkon_log_message text, in_elkon_log_date_time timestamp)
+  RETURNS bool AS
+$$
+	SELECT
+		SUBSTRING(in_elkon_log_message from 1 for 28) = 'Ошибка соединения с сервером'
+		AND EXTRACT(EPOCH FROM NOW() - in_elkon_log_date_time) * 1000 > const_ping_elkon_interval_err_val()
+	;
+$$
+  LANGUAGE sql IMMUTABLE
+  COST 100;
+
+
+-- ******************* update 13/05/2025 15:35:14 ******************
+﻿-- Function: elkon_log_upsert(in_elkon_log elkon_log)
+
+-- DROP FUNCTION elkon_log_upsert(in_elkon_log elkon_log);
+
+CREATE OR REPLACE FUNCTION elkon_log_upsert(in_elkon_log elkon_log)
+  RETURNS void AS
+$$
+DECLARE
+	v_message text;
+	v_id int;
+	v_res boolean;
+BEGIN
+	SELECT
+		id,
+		message
+	INTO
+		v_id,
+		v_message
+	FROM elkon_log	
+	WHERE production_site_id=in_elkon_log.production_site_id
+	ORDER BY date_time desc
+	LIMIT 1;
+	
+	IF v_id IS NOT NULL AND v_message = in_elkon_log.message THEN
+		UPDATE elkon_log
+		SET date_time = now()
+		WHERE id = v_id;
+	ELSE
+		INSERT INTO elkon_log (production_site_id, level, message)
+		values (in_elkon_log.production_site_id, in_elkon_log.level, in_elkon_log.message);
+	END IF;
+
+	IF elkon_connect_err(in_elkon_log.message, in_elkon_log.date_time) 
+	THEN
+		PERFORM pg_notify(
+			'ConnectElkonCheck.update'
+			,json_build_object(
+				'params',json_build_object(
+					'production_site_id', in_elkon_log.production_site_id,
+					'result', false
+				)
+			)::text
+		);			
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+-- ******************* update 13/05/2025 15:40:49 ******************
+﻿-- Function: elkon_log_upsert(in_elkon_log elkon_log)
+
+-- DROP FUNCTION elkon_log_upsert(in_elkon_log elkon_log);
+
+CREATE OR REPLACE FUNCTION elkon_log_upsert(in_elkon_log elkon_log)
+  RETURNS void AS
+$$
+DECLARE
+	v_message text;
+	v_id int;
+	v_res boolean;
+BEGIN
+	SELECT
+		id,
+		message
+	INTO
+		v_id,
+		v_message
+	FROM elkon_log	
+	WHERE production_site_id=in_elkon_log.production_site_id
+	ORDER BY date_time desc
+	LIMIT 1;
+	
+	IF v_id IS NOT NULL AND v_message = in_elkon_log.message THEN
+		UPDATE elkon_log
+		SET date_time = now()
+		WHERE id = v_id;
+	ELSE
+		INSERT INTO elkon_log (production_site_id, level, message)
+		values (in_elkon_log.production_site_id, in_elkon_log.level, in_elkon_log.message);
+	END IF;
+
+	IF elkon_connect_err(in_elkon_log.message, in_elkon_log.date_time) 
+	THEN
+		PERFORM pg_notify(
+			'ConnectElkonCheck.update'
+			,json_build_object(
+				'params',json_build_object(
+					'production_site_id', in_elkon_log.production_site_id,
+					'pong', false
+				)
+			)::text
+		);			
+	END IF;
+END;
+$$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;

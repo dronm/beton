@@ -70,7 +70,7 @@ PlantLoadGraphControl.prototype.setModel = function(model){
 	if (model.getNextRow()){
 		//this.setAttr("src","data:image/png;base64,"+model.getFieldValue("pic"));
 		var chart_data_s = model.getFieldValue("chart_data");
-		if(this.m_chartDataPrevStr&&this.m_chartDataPrevStr==chart_data_s)return;
+		if(this.m_chartDataPrevStr && this.m_chartDataPrevStr==chart_data_s)return;
 		
 		this.m_chartDataPrevStr = chart_data_s;
 		var chart_data = CommonHelper.unserialize(chart_data_s);

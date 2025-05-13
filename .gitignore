@@ -1,4 +1,6 @@
 *~
+.env
+.*
 conn.sh
 konkrid.sh
 proj-deploy.php

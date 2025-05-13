@@ -1633,6 +1633,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/LeasorEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/LeasorEdit.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ClientContract1cEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ClientContract1cEdit.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/AttachmentManager.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/AttachmentManager.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ConnectElkonCheck.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ConnectElkonCheck.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/rs_ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/rs_ru.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/rs_common_ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/rs_common_ru.js')) ));
 		
@@ -2141,6 +2142,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/models/OrderForTranspNaklList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/OrderForTranspNaklList_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/ShipmentBuhDoc_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ShipmentBuhDoc_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/ShipmentForTranspNaklList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ShipmentForTranspNaklList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/controllers/ConnectElkonCheck_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/ConnectElkonCheck_Controller.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

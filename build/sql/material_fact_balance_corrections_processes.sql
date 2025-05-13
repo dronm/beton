@@ -72,7 +72,7 @@ BEGIN
 		END IF;
 		add_quant = add_quant - NEW.required_balance_quant;
 
-		--RAISE EXCEPTION 'BALANCE=%, NEW.material_id=%, v_production_base_id=%',add_quant+NEW.required_balance_quant, NEW.material_id,v_production_base_id;
+		--RAISE EXCEPTION 'BALANCE=%, NEW.material_id=%, v_production_base_id=%, quant=%',add_quant+NEW.required_balance_quant, NEW.material_id,v_production_base_id, add_quant;
 		IF add_quant <> 0 THEN
 			--RAISE EXCEPTION 'add_quant=%',add_quant;
 			--register actions ra_material_facts		

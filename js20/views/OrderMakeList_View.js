@@ -122,10 +122,12 @@ function OrderMakeList_View(id,options){
 				if(!options.models[m_id]){
 					throw new Error("Model " + m_id + " not found!");
 				}				
+
 				this.addElement(new CementSiloForOrderList_View(id+":production_sites" + base_id,{				
 					"model": new CementSiloForOrderList_Model({"data" : options.models[m_id].getData()}),
 					"listView":this
 				}));
+
 				var m_id = "MaterialStoreForOrderList" + base_id + "_Model";
 				if(!options.models[m_id]){
 					throw new Error("Model " + m_id + " not found!");

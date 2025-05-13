@@ -13,7 +13,9 @@ CREATE OR REPLACE VIEW cement_silos_for_order_list AS
 			'vehicles_ref',cs_state.vehicles_ref,
 			'vehicle_state',cs_state.vehicle_state
 		) AS vehicle,
-		pst.production_base_id
+		pst.production_base_id,
+
+		e_log.pong
 		
 	FROM cement_silos AS t	
 	LEFT JOIN production_sites AS pst ON pst.id = t.production_site_id
@@ -34,10 +36,20 @@ CREATE OR REPLACE VIEW cement_silos_for_order_list AS
 		LEFT JOIN vehicles AS vh ON vh.id=cs.vehicle_id
 	) AS cs_state ON cs_state.cement_silo_id = t.id
 	
+
+	LEFT JOIN (
+		SELECT DISTINCT ON (lg.production_site_id) 
+			lg.production_site_id,
+			NOT (substring(lg.message from 1 for 28) = 'Ошибка соединения с сервером'
+			AND EXTRACT(EPOCH FROM NOW() - lg.date_time) * 1000 < const_ping_elkon_interval_err_val()
+			) AS pong
+		FROM elkon_log AS lg
+		ORDER BY lg.production_site_id, lg.date_time DESC
+	) AS e_log ON e_log.production_site_id = t.production_site_id
+
 	WHERE coalesce(t.visible, FALSE)
 	ORDER BY
 		pst.name,
 		t.production_descr
 	;
 	
-ALTER VIEW cement_silos_for_order_list OWNER TO ;

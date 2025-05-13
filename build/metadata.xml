@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-04-23 09:02:19</lastBuild></version>
+		<lastBuild>2025-05-13 16:23:47</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -279,6 +279,7 @@
 		<version dateOpen="2025-04-17 17:50:17" dateClose="2025-04-23 06:21:11">1.00373</version>
 		<version dateOpen="2025-04-23 06:24:46" dateClose="2025-04-23 07:04:43">1.00374</version>
 		<version dateOpen="2025-04-24 06:14:01" dateClose="2025-04-24 06:14:30">1.00375</version>
+		<version dateOpen="2025-04-25 07:03:12" dateClose="2025-05-13 16:23:50">1.00375</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -2406,7 +2407,7 @@
 			<index id="suppliers_name_index">
 				<expression>lower(name)</expression>
 			</index>
-			<index id="suppliers_ext_ref_scales_index">
+			<index id="suppliers_ext_ref_scales_index" unique="TRUE">
 				<field id="ext_ref_scales"/>
 			</index>
 		</model>
@@ -4081,6 +4082,7 @@
 			<field id="name" dataType="String" length="100" required="TRUE"/>
 			<field id="load_capacity" dataType="Float" length="19" precision="4"/>
 			<field id="balance" dataType="Float" length="19" precision="4"/>
+			<field id="pong" dataType="Bool"/>
 		</model>
 		<model id="CementSiloMaterial" parent="ModelSQLBeton" dataTable="cement_silo_materials" virtual="FALSE">
 			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
@@ -5276,6 +5278,7 @@
 		<constant id="reglament_user" name="Пользователь регламент" descr="Пользователь регламент" dataType="JSON" autoload="FALSE"/>
 		<constant id="water" name="Вода" descr="Water" dataType="JSON" autoload="FALSE"/>
 		<constant id="ping1c" name="1C ping" descr="1C ping" dataType="JSON" autoload="FALSE"/>
+		<constant id="ping_elkon_interval_err" name="Elkon error ping interval in ms ping" descr="Elkon ping" dataType="int" autoload="FALSE"/>
 	</constants>
 	<controllers>
 		<controller id="Event" parentId="ControllerSQL">
@@ -6434,6 +6437,9 @@
 			<publicMethod id="get_current" modelId="Weather"/>
 		</controller>
 		<controller id="Connect1cCheck" parentId="ControllerSQL" state="TRUE">
+			<publicMethod id="connected"/>
+		</controller>
+		<controller id="ConnectElkonCheck" parentId="ControllerSQL" state="TRUE">
 			<publicMethod id="connected"/>
 		</controller>
 		<controller id="VehicleDriverForSchedGen" parentIdJS="ControllerObjClient" server="FALSE">
@@ -8447,6 +8453,7 @@
 		<jsScript file="js20/custom_controls/LeasorEdit.js"/>
 		<jsScript file="js20/custom_controls/ClientContract1cEdit.js"/>
 		<jsScript file="js20/custom_controls/AttachmentManager.js"/>
+		<jsScript file="js20/custom_controls/ConnectElkonCheck.js"/>
 		<jsScript file="js20/views/rs_ru.js"/>
 		<jsScript file="js20/views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -8957,6 +8964,7 @@
 		<jsScript file="js20/models/OrderForTranspNaklList_Model.js"/>
 		<jsScript file="js20/models/ShipmentBuhDoc_Model.js"/>
 		<jsScript file="js20/models/ShipmentForTranspNaklList_Model.js"/>
+		<jsScript file="js20/controllers/ConnectElkonCheck_Controller.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

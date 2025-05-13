@@ -26,6 +26,9 @@ require_once('common/downloader.php');
 
 require_once(USER_CONTROLLERS_PATH.'Attachment_Controller.php');
 
+set_time_limit(300);
+ini_set('memory_limit', '-1');
+
 class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@parentId"/>{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
 		parent::__construct($dbLinkMaster,$dbLink);<xsl:apply-templates/>

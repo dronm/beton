@@ -1000,6 +1000,8 @@ $permissions = array();
 				
 					$permissions['Connect1cCheck_Controller_connected']=TRUE;
 				
+					$permissions['ConnectElkonCheck_Controller_connected']=TRUE;
+				
 					$permissions['VehicleDriverForSchedGen_Controller_insert']=TRUE;
 				
 					$permissions['VehicleDriverForSchedGen_Controller_update']=TRUE;

@@ -1548,6 +1548,17 @@ LEFT OLD VERSION!!!
 1)OrderGridCmdPrintTranspNakl.js close form after print.
 	ControllerObjServer callback after download
 
+1.00375
+1) production ping 
+	- ConnectElkonCheck_Controller
+	- new constant const_ping_elkon_interval_err_val()
+	- cement_silos_for_order_list.sql pong field
+	- custom_controls/ConnectElkonCheck.js
+	- elkon_log_upsert() + event
+	- function elkon_connect_err()
+	- CementSiloForOrderList_View.js init connect
+
+
 
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели
 XXX Удаленные элементы справочника: фильтр вверху, пометка спереди, по возможности у всех справочиников. Example: PumpVehicle

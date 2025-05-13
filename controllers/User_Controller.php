@@ -2013,8 +2013,9 @@ class User_Controller extends ControllerSQL{
 			$this->getDbLinkMaster()->query(sprintf(
 				"UPDATE notifications.tm_logins
 				SET tries = tries - 1
-				WHERE tel = %s",
-				$this->getExtDbVal($pm,'tel')
+				WHERE tel = %s AND app_id=%d",
+				$this->getExtDbVal($pm,'tel'),
+				MS_APP_ID
 			));
 		
 			throw new Exception('Неверный код авторизации!');
@@ -2237,7 +2238,14 @@ class User_Controller extends ControllerSQL{
 					now()::timestampTZ+'%d seconds'::interval,
 					now()::timestampTZ+'%d seconds'::interval,
 					%d, %d, %d, '%s'
-				)",
+				) ON CONFILICT (tel) DO UPDATE SET
+					exp_date_time = excluded.ext_date_time, 
+					code_exp_date_time = excluded.code_exp_date_time, 
+					tries = excluded.tries, 
+					ext_user_id = excluded.ext_user_id, 
+					app_id = excluded.app_id, 
+					code = excluded.code",
+
 				$this->getExtDbVal($pm,'tel'),
 				self::TM_REGEN_DURATION_SEC,
 				self::TM_CODE_DURATION_SEC,
