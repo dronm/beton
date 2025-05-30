@@ -39,6 +39,9 @@ checked:(options.defaultValue&&options.defaultValue=="cement_silo_reset")}
 ,{"value":"cement_silo_balance_reset",
 "descr":this.multyLangValues[window.getApp().getLocale()+"_"+"cement_silo_balance_reset"],
 checked:(options.defaultValue&&options.defaultValue=="cement_silo_balance_reset")}
+,{"value":"material_movement",
+"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"material_movement"],
+checked:(options.defaultValue&&options.defaultValue=="material_movement")}
 ];
 	
 	Enum_doc_types.superclass.constructor.call(this,id,options);
@@ -54,6 +57,7 @@ Enum_doc_types.prototype.multyLangValues = {"ru_order":"Заявка"
 ,"ru_material_fact_balance_correction":"Корректировка остатка материала"
 ,"ru_cement_silo_reset":"Обнуление силоса"
 ,"ru_cement_silo_balance_reset":"Обнуление остатка силоса"
+,"ru_material_movement":"Перемещение материалов"
 };
 
 

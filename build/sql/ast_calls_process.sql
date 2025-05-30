@@ -282,12 +282,12 @@ BEGIN
 			u.id
 		INTO
 			NEW.user_id
-		FROM users AS u
-		WHERE u.tel_ext=v_search
+		FROM users_tel_ext_list  AS u
+		WHERE u.tel_ext = v_search
 		AND (
 			SELECT TRUE
 			FROM logins
-			WHERE user_id=u.id and date_time_out IS NULL
+			WHERE user_id = u.id and date_time_out IS NULL
 			ORDER BY date_time_in desc LIMIT 1
 		)
 		LIMIT 1;

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-05-13 16:23:47</lastBuild></version>
+		<lastBuild>2025-05-30 08:12:19</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -280,6 +280,7 @@
 		<version dateOpen="2025-04-23 06:24:46" dateClose="2025-04-23 07:04:43">1.00374</version>
 		<version dateOpen="2025-04-24 06:14:01" dateClose="2025-04-24 06:14:30">1.00375</version>
 		<version dateOpen="2025-04-25 07:03:12" dateClose="2025-05-13 16:23:50">1.00375</version>
+		<version dateOpen="2025-05-23 15:52:22" dateClose="2025-05-30 08:12:36">1.00376</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -327,9 +328,6 @@
 			</value>
 		</enum>
 		<enum id="role_types">
-			<value id="admin">
-				<ru descr="Администратор"/>
-			</value>
 			<value id="owner">
 				<ru descr="Администратор"/>
 			</value>
@@ -504,6 +502,9 @@
 			</value>
 			<value id="cement_silo_balance_reset">
 				<ru descr="Обнуление остатка силоса"/>
+			</value>
+			<value id="material_movement">
+				<ru descr="Перемещение материалов"/>
 			</value>
 		</enum>
 		<enum id="reg_types">
@@ -5218,6 +5219,45 @@
 			<field id="production_sites_ref" dataType="JSON"/>
 			<field id="users_ref" dataType="JSON"/>
 		</model>
+		<model id="UserAllowedMaterialCorrection" parent="ModelSQL" dataTable="user_allowed_material_corrections" virtual="FALSE" alias="Список пользователей, кому разрешено реадктировать материалы заднис числом">
+			<field id="user_id" dataType="Int" refTable="users" refField="id" primaryKey="TRUE"/>
+		</model>
+		<model id="UserAllowedMaterialCorrectionList" parent="ModelSQL" dataTable="user_allowed_material_corrections_list" virtual="TRUE" alias="Список пользователей, кому разрешено реадктировать материалы заднис числом">
+			<field id="user_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="users_ref" dataType="JSON"/>
+		</model>
+		<model id="DOCMaterialMovement" parent="ModelSQLDOC" dataTable="doc_material_movements" virtual="FALSE" modelType="DOC" docTypeId="material_movement">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="date_time" dataType="DateTime" dbRequired="TRUE" alias="Дата"/>
+			<field id="processed" dataType="Bool" alias="Проведен" default="false"/>
+			<field id="number" dataType="String" length="11" alias="Номер"/>
+			<field id="material_id" dataType="Int" refTable="raw_materials" refField="id"/>
+			<field id="production_base_from_id" dataType="Int" refTable="production_bases" refField="id"/>
+			<field id="production_base_to_id" dataType="Int" refTable="production_bases" refField="id"/>
+			<field id="quant" dataType="Float" length="19" alias="Количество" precision="2"/>
+			<field id="user_id" dataType="Int" alias="Автор" refTable="users" refField="id"/>
+		</model>
+		<model id="DOCMaterialMovementList" parent="ModelSQLDOC" dataTable="doc_material_movements_list" virtual="FALSE" modelType="DOC" docTypeId="material_movement">
+			<aggFunctions>
+				<aggFunction alias="total_quant" expr="sum(quant)"/>
+			</aggFunctions>
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="date_time" dataType="DateTime" dbRequired="TRUE" alias="Дата"/>
+			<field id="number" dataType="String" alias="Номер"/>
+			<field id="production_base_from_id" dataType="Int"/>
+			<field id="production_base_to_id" dataType="Int"/>
+			<field id="production_bases_from_ref" dataType="JSON"/>
+			<field id="production_bases_to_ref" dataType="JSON"/>
+			<field id="materials_ref" dataType="JSON"/>
+			<field id="quant" dataType="Float" length="19" alias="Количество" precision="2"/>
+			<field id="users_ref" dataType="JSON"/>
+		</model>
 	</models>
 	<constants>
 		<constant id="doc_per_page_count" name="Количество документов на странице" descr="Количество документов на странице в журнале документов" dataType="Int" defaultValue="60" autoload="TRUE"/>
@@ -7200,6 +7240,20 @@
 			<publicMethod id="get_list" modelId="OperatorForTranspNaklList"/>
 			<publicMethod id="get_object" modelId="OperatorForTranspNaklList"/>
 		</controller>
+		<controller id="UserAllowedMaterialCorrection" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="UserAllowedMaterialCorrection"/>
+			<publicMethod id="update" modelId="UserAllowedMaterialCorrection"/>
+			<publicMethod id="delete" modelId="UserAllowedMaterialCorrection"/>
+			<publicMethod id="get_list" modelId="UserAllowedMaterialCorrectionList"/>
+			<publicMethod id="get_object" modelId="UserAllowedMaterialCorrectionList"/>
+		</controller>
+		<controller id="DOCMaterialMovement" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="DOCMaterialMovement"/>
+			<publicMethod id="update" modelId="DOCMaterialMovement"/>
+			<publicMethod id="delete" modelId="DOCMaterialMovement"/>
+			<publicMethod id="get_list" modelId="DOCMaterialMovementList"/>
+			<publicMethod id="get_object" modelId="DOCMaterialMovementList"/>
+		</controller>
 	</controllers>
 	<permissions>
 		<permission type="allow" controllerId="all" methodId="all" roleId="owner"/>
@@ -7385,6 +7439,7 @@
 		<view id="10054" c="ChatStatus_Controller" t="ChatStatusList" f="get_list" section="Справочники" descr="Статусы чата"/>
 		<view id="10055" c="CementSiloMaterial_Controller" t="CementSiloMaterialList" f="get_list" section="Справочники" descr="Материалы в силосах"/>
 		<view id="10056" c="OperatorForTranspNakl" t="OperatorForTranspNaklList" f="get_list" section="Справочники" descr="Список операторов для трансп.накл."/>
+		<view id="10057" c="UserAllowedMaterialCorrection_Controller" t="UserAllowedMaterialCorrectionList" f="get_list" section="Справочники" descr="Список пользователей с разрешенным правом редактирования данных по материалам"/>
 		<view id="20000" c="Order_Controller" t="OrderList" f="get_list" section="Документы" descr="Заявки"/>
 		<view id="20001" c="OrderPump_Controller" t="OrderPumpList" f="get_list" section="Документы" descr="Заявки (насосы)"/>
 		<view id="20002" c="Shipment_Controller" t="ShipmentList" f="get_list" section="Документы" descr="Отгрузки"/>
@@ -7412,6 +7467,7 @@
 		<view id="20026" c="DOCMaterialProcurement_Controller" t="DOCMaterialProcurementList" f="get_list" section="Документы" descr="Поступление материалов"/>
 		<view id="20027" c="QualityPassport_Controller" t="QualityPassportList" f="get_list" section="Документы" descr="Реестр паспартов качества"/>
 		<view id="20028" c="OrderGarbage_Controller" t="OrderGarbageList" f="get_list" section="Документы" descr="Удаленные заявки"/>
+		<view id="20029" c="DOCMaterialMovement_Controller" t="DOCMaterialMovementList" f="get_list" section="Документы" descr="Перемещение материалов"/>
 		<view id="30001" t="Map" section="Формы" descr="ТС на карте"/>
 		<view id="30002" t="ScheduleGen" section="Формы" descr="Формирование графиков работы"/>
 		<view id="30003" c="Order_Controller" t="OrderMakeList" f="get_make_orders_form" section="Формы" descr="Заявки онлайн"/>
@@ -7614,6 +7670,8 @@
 		<serverTemplate id="VehicleOwnerTotIncomeAllRep"/>
 		<serverTemplate id="VehicleMileageList" class="list"/>
 		<serverTemplate id="OperatorForTranspNaklList" class="list"/>
+		<serverTemplate id="UserAllowedMaterialCorrectionList" class="list"/>
+		<serverTemplate id="DOCMaterialMovementList" class="list"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="js20/tmpl/FatalException.html"/>
@@ -8265,6 +8323,8 @@
 		<jsScript file="js20/views/CementSiloMaterialList_View.js"/>
 		<jsScript file="js20/views/VehicleMileageList_View.js"/>
 		<jsScript file="js20/views/OperatorsForTranspNaklList_View.js"/>
+		<jsScript file="js20/views/UserAllowedMaterialCorrectionList_View.js"/>
+		<jsScript file="js20/views/DOCMaterialMovementList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="js20/forms/ViewList_Form.js"/>
 		<jsScript file="js20/forms/MainMenuConstructor_Form.js"/>
@@ -8965,6 +9025,12 @@
 		<jsScript file="js20/models/ShipmentBuhDoc_Model.js"/>
 		<jsScript file="js20/models/ShipmentForTranspNaklList_Model.js"/>
 		<jsScript file="js20/controllers/ConnectElkonCheck_Controller.js"/>
+		<jsScript file="js20/models/UserAllowedMaterialCorrection_Model.js"/>
+		<jsScript file="js20/controllers/UserAllowedMaterialCorrection_Controller.js"/>
+		<jsScript file="js20/models/UserAllowedMaterialCorrectionList_Model.js"/>
+		<jsScript file="js20/models/DOCMaterialMovement_Model.js"/>
+		<jsScript file="js20/models/DOCMaterialMovementList_Model.js"/>
+		<jsScript file="js20/controllers/DOCMaterialMovement_Controller.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

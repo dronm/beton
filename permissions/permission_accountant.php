@@ -1776,6 +1776,26 @@ $permissions = array();
 				
 					$permissions['OperatorForTranspNakl_Controller_get_object']=TRUE;
 				
+					$permissions['UserAllowedMaterialCorrection_Controller_insert']=TRUE;
+				
+					$permissions['UserAllowedMaterialCorrection_Controller_update']=TRUE;
+				
+					$permissions['UserAllowedMaterialCorrection_Controller_delete']=TRUE;
+				
+					$permissions['UserAllowedMaterialCorrection_Controller_get_list']=TRUE;
+				
+					$permissions['UserAllowedMaterialCorrection_Controller_get_object']=TRUE;
+				
+					$permissions['DOCMaterialMovement_Controller_insert']=TRUE;
+				
+					$permissions['DOCMaterialMovement_Controller_update']=TRUE;
+				
+					$permissions['DOCMaterialMovement_Controller_delete']=TRUE;
+				
+					$permissions['DOCMaterialMovement_Controller_get_list']=TRUE;
+				
+					$permissions['DOCMaterialMovement_Controller_get_object']=TRUE;
+				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }
 ?>

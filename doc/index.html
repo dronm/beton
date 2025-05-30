@@ -47,6 +47,7 @@
 <li><a href="#Contact_Controller">Contact_Controller</a></li>
 <li><a href="#DOCMaterialInventory_Controller">DOCMaterialInventory_Controller</a></li>
 <li><a href="#DOCMaterialInventoryDOCTMaterial_Controller">DOCMaterialInventoryDOCTMaterial_Controller</a></li>
+<li><a href="#DOCMaterialMovement_Controller">DOCMaterialMovement_Controller</a></li>
 <li><a href="#DOCMaterialProcurement_Controller">DOCMaterialProcurement_Controller</a></li>
 <li><a href="#Destination_Controller">Destination_Controller</a></li>
 <li><a href="#DestinationProdBaseDriverPrice_Controller">DestinationProdBaseDriverPrice_Controller</a></li>
@@ -144,6 +145,7 @@
 <li><a href="#TmUser_Controller">TmUser_Controller</a></li>
 <li><a href="#TrackerZoneControl_Controller">TrackerZoneControl_Controller</a></li>
 <li><a href="#User_Controller">User_Controller</a></li>
+<li><a href="#UserAllowedMaterialCorrection_Controller">UserAllowedMaterialCorrection_Controller</a></li>
 <li><a href="#UserChat_Controller">UserChat_Controller</a></li>
 <li><a href="#UserChatLastOpen_Controller">UserChatLastOpen_Controller</a></li>
 <li><a href="#UserChatMessageView_Controller">UserChatMessageView_Controller</a></li>
@@ -514,6 +516,10 @@
 <li><a href="#BuhDoc_Model">BuhDoc_Model</a></li>
 <li><a href="#OperatorForTranspNakl_Model">OperatorForTranspNakl_Model</a></li>
 <li><a href="#OperatorForTranspNaklList_Model">OperatorForTranspNaklList_Model</a></li>
+<li><a href="#UserAllowedMaterialCorrection_Model">UserAllowedMaterialCorrection_Model</a></li>
+<li><a href="#UserAllowedMaterialCorrectionList_Model">UserAllowedMaterialCorrectionList_Model</a></li>
+<li><a href="#DOCMaterialMovement_Model">DOCMaterialMovement_Model</a></li>
+<li><a href="#DOCMaterialMovementList_Model">DOCMaterialMovementList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -1451,6 +1457,19 @@
 <a href="#DOCMaterialInventoryDOCTMaterial_Model">Model: DOCMaterialInventoryDOCTMaterial_Model</a><h2>get_list</h2>
 <a href="#DOCMaterialInventoryDOCTMaterialList_Model">Model: DOCMaterialInventoryDOCTMaterialList_Model</a><h2>get_object</h2>
 <a href="#DOCMaterialInventoryDOCTMaterialList_Model">Model: DOCMaterialInventoryDOCTMaterialList_Model</a>
+</div>
+</div>
+<div id="DOCMaterialMovement_Controller" class="content_box">
+<h1>DOCMaterialMovement_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#DOCMaterialMovement_Model">Model: DOCMaterialMovement_Model</a><h2>update</h2>
+<a href="#DOCMaterialMovement_Model">Model: DOCMaterialMovement_Model</a><h2>delete</h2>
+<a href="#DOCMaterialMovement_Model">Model: DOCMaterialMovement_Model</a><h2>get_list</h2>
+<a href="#DOCMaterialMovementList_Model">Model: DOCMaterialMovementList_Model</a><h2>get_object</h2>
+<a href="#DOCMaterialMovementList_Model">Model: DOCMaterialMovementList_Model</a>
 </div>
 </div>
 <div id="DOCMaterialProcurement_Controller" class="content_box">
@@ -4476,6 +4495,19 @@
 <p>Length:150</p>
 </div>
 </div>
+</div>
+</div>
+<div id="UserAllowedMaterialCorrection_Controller" class="content_box">
+<h1>UserAllowedMaterialCorrection_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#UserAllowedMaterialCorrection_Model">Model: UserAllowedMaterialCorrection_Model</a><h2>update</h2>
+<a href="#UserAllowedMaterialCorrection_Model">Model: UserAllowedMaterialCorrection_Model</a><h2>delete</h2>
+<a href="#UserAllowedMaterialCorrection_Model">Model: UserAllowedMaterialCorrection_Model</a><h2>get_list</h2>
+<a href="#UserAllowedMaterialCorrectionList_Model">Model: UserAllowedMaterialCorrectionList_Model</a><h2>get_object</h2>
+<a href="#UserAllowedMaterialCorrectionList_Model">Model: UserAllowedMaterialCorrectionList_Model</a>
 </div>
 </div>
 <div id="UserChat_Controller" class="content_box">
@@ -8455,6 +8487,132 @@
 <div>Precision:</div>
 <h2>processed</h2>
 <div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="DOCMaterialMovement_Model" class="content_box">
+<h1>DOCMaterialMovement_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>processed</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>number</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:11</div>
+<div>Precision:</div>
+<h2>material_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_base_from_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_base_to_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="DOCMaterialMovementList_Model" class="content_box">
+<h1>DOCMaterialMovementList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>number</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_base_from_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_base_to_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_bases_from_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_bases_to_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>materials_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+<h2>users_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -22550,6 +22708,36 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="UserAllowedMaterialCorrection_Model" class="content_box">
+<h1>UserAllowedMaterialCorrection_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="UserAllowedMaterialCorrectionList_Model" class="content_box">
+<h1>UserAllowedMaterialCorrectionList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>users_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="UserChat_Model" class="content_box">
 <h1>UserChat_Model</h1>
 <div class="content_item">
@@ -24886,6 +25074,8 @@
 <div>Description:</div>
 <h2>cement_silo_balance_reset</h2>
 <div>Description:</div>
+<h2>material_movement</h2>
+<div>Description:</div>
 </div>
 </div>
 <div id="email_types" class="content_box">
@@ -24986,8 +25176,6 @@
 <div class="content_item">
 <p class="big"></p>
 <p>Values:</p>
-<h2>admin</h2>
-<div>Description:</div>
 <h2>owner</h2>
 <div>Description:</div>
 <h2>boss</h2>

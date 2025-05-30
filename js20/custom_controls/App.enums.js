@@ -17,8 +17,7 @@
 ,"ru_drivers":"Водители"
 }
 
-		,"role_types":{"ru_admin":"Администратор"
-,"ru_owner":"Администратор"
+		,"role_types":{"ru_owner":"Администратор"
 ,"ru_boss":"Руководитель"
 ,"ru_operator":"Оператор"
 ,"ru_manager":"Менеджер"
@@ -83,6 +82,7 @@
 ,"ru_material_fact_balance_correction":"Корректировка остатка материала"
 ,"ru_cement_silo_reset":"Обнуление силоса"
 ,"ru_cement_silo_balance_reset":"Обнуление остатка силоса"
+,"ru_material_movement":"Перемещение материалов"
 }
 
 		,"reg_types":{"ru_material":"Учет материалов"

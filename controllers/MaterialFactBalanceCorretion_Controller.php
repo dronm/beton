@@ -23,6 +23,9 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
  */
 
 
+
+require_once(ABSOLUTE_PATH.'functions/material_period_check.php');
+
 class MaterialFactBalanceCorretion_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
 		parent::__construct($dbLinkMaster,$dbLink);
@@ -204,6 +207,26 @@ class MaterialFactBalanceCorretion_Controller extends ControllerSQL{
 		
 	}	
 	
+	public function update($pm){
+		if(!$pm->getParamValue('date_time')){
+			//retrieve date from db
+			$ar = $this->getDbLink()->query_first(
+				sprintf("SELECT date_time FROM material_fact_balance_corrections WHERE id = %d"
+				,$this->getExtDbVal($pm, 'old_id')
+				)
+			);
+			if(!is_array($ar) || !count($ar)){
+				throw new Exception("document not found.");
+			}
+			$date_time = "'".$ar["date_time"]."'";
+		}else{
+			$date_time = $this->getExtDbVal($pm, 'date_time');
+		}
+		material_period_check($this->getDbLink(), $_SESSION["user_id"], $date_time);
+		
+		parent::update($pm);
+	}
+
 	public function insert($pm){
 		if(
 		($_SESSION["role_id"]!="admin" && $_SESSION["role_id"]!="owner")
@@ -211,6 +234,8 @@ class MaterialFactBalanceCorretion_Controller extends ControllerSQL{
 		){
 			$pm->setParamValue('user_id',$_SESSION["user_id"]);
 		}
+
+		material_period_check($this->getDbLink(), $_SESSION["user_id"], $this->getExtDbVal($pm, 'date_time'));
 		
 		parent::insert($pm);
 	}

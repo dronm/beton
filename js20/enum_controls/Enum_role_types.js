@@ -15,10 +15,7 @@
 function Enum_role_types(id,options){
 	options = options || {};
 	options.addNotSelected = (options.addNotSelected!=undefined)? options.addNotSelected:true;
-	options.options = [{"value":"admin",
-"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"admin"],
-checked:(options.defaultValue&&options.defaultValue=="admin")}
-,{"value":"owner",
+	options.options = [{"value":"owner",
 "descr":this.multyLangValues[window.getApp().getLocale()+"_"+"owner"],
 checked:(options.defaultValue&&options.defaultValue=="owner")}
 ,{"value":"boss",
@@ -67,8 +64,7 @@ checked:(options.defaultValue&&options.defaultValue=="weighing")}
 }
 extend(Enum_role_types,EditSelect);
 
-Enum_role_types.prototype.multyLangValues = {"ru_admin":"Администратор"
-,"ru_owner":"Администратор"
+Enum_role_types.prototype.multyLangValues = {"ru_owner":"Администратор"
 ,"ru_boss":"Руководитель"
 ,"ru_operator":"Оператор"
 ,"ru_manager":"Менеджер"

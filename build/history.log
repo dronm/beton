@@ -1559,6 +1559,34 @@ LEFT OLD VERSION!!!
 	- CementSiloForOrderList_View.js init connect
 
 
+1.00376
+1) Ext tel to contact tel
+	users_tel_ext - function to return ext tel
+	users_tel_ext_list view with user_id and ext tel
+	users_dialog changed tel_ext column from new function
+	ast_calls_process user is resolved based on new users_tel_ext_list view, not inner users.tel_ext field
+users.tel_ext is deprecated!!
+2) ViewBase.html 1c is shown for staff only.
+3) UserAllowedMaterialCorrectionList
+	user_allowed_material_corrections_list
+	DOCMaterialProcurement
+user_allowed_material_correction_check.sql
+DonMaterialProcurement.insert
+
+
+1.00377
+1) Check 1cConnect after failuer
+2) 
+	RawMaterial->load_procurement() if date is less then document date - throw error
+	MaterialFactBalanceCorre(T)ion->insert/update/delete - check period && user!
+	MaterialFactConsuptionCorre(T)ion->insert/update/delete - check period && user!
+	DOCMaterialProcurement->insert/update/delete - check period && user!
+	RawMaterialConsRadeDate->recalc_consumption()
+3) DOCMaterialMovement new documnet
+	DOCMaterialMovementList_View.js
+
+- all messages are coming to all clients.
+
 
 Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели
 XXX Удаленные элементы справочника: фильтр вверху, пометка спереди, по возможности у всех справочиников. Example: PumpVehicle

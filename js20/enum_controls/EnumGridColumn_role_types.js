@@ -18,8 +18,6 @@ function EnumGridColumn_role_types(options){
 	
 	options.multyLangValues["ru"] = {};
 
-	options.multyLangValues["ru"]["admin"] = "Администратор";
-
 	options.multyLangValues["ru"]["owner"] = "Администратор";
 
 	options.multyLangValues["ru"]["boss"] = "Руководитель";

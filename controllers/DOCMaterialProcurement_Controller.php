@@ -31,6 +31,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelWhereSQL.php');
 
 require_once(ABSOLUTE_PATH.'functions/checkPmPeriod.php');
+require_once(ABSOLUTE_PATH.'functions/material_period_check.php');
 
 class DOCMaterialProcurement_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
@@ -544,10 +545,32 @@ class DOCMaterialProcurement_Controller extends ControllerSQL{
 		if(!$pm->getParamValue('user_id') || $_SESSION['role_id']!='owner'){
 			$pm->setParamValue('user_id',$_SESSION['user_id']);
 		}
-		
+
+		material_period_check($this->getDbLink(), $_SESSION["user_id"], $this->getExtDbVal('date_time'));
+
 		return parent::insert($pm);		
 	}
 	
+	public function update($pm){
+		if(!$pm->getParamValue('date_time')){
+			//retrieve date from db
+			$ar = $this->getDbLink()->query_first(
+				sprintf("SELECT date_time FROM doc_material_procurements WHERE id = %d"
+				,$this->getExtDbVal($pm, 'old_id')
+				)
+			);
+			if(!is_array($ar) || !count($ar)){
+				throw new Exception("document not found.");
+			}
+			$date_time = "'".$ar["date_time"]."'";
+		}else{
+			$date_time = $this->getExtDbVal($pm, 'date_time');
+		}
+		material_period_check($this->getDbLink(), $_SESSION["user_id"], $date_time);
+		
+		parent::update($pm);
+	}
+
 	public function get_details($pm){		
 		$model = new DOCMaterialProcurementMaterialList_Model($this->getDbLink());	
 		$from = null; $count = null;

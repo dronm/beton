@@ -33,6 +33,9 @@ require_once(ABSOLUTE_PATH.'functions/Beton.php');
 require_once(USER_CONTROLLERS_PATH.'Order_Controller.php');
 
 class RawMaterial_Controller extends ControllerSQL{
+
+	const ERR_UPLOAD_NOT_ALLOWED_FOR_PERIOD = "Запрещена загрузка в данном периоде";
+
 	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
 		parent::__construct($dbLinkMaster, $dbLink);
 			
@@ -113,6 +116,11 @@ class RawMaterial_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Учет по местам хранения';
 			$param = new FieldExtBool('dif_store'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtBool('deleted'
 				,$f_params);
 		$pm->addParam($param);
 		
@@ -213,6 +221,11 @@ class RawMaterial_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Учет по местам хранения';
 			$param = new FieldExtBool('dif_store'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtBool('deleted'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -698,6 +711,15 @@ class RawMaterial_Controller extends ControllerSQL{
 		
 		try{
 			$doc = json_decode($pm->getParamValue('doc'),FALSE);
+
+			//if document date is less then allowed date - throw error
+			$ar = $this->getDbLink()->query_first( "SELECT (const_reglament_user_val()->'keys'->>'id')::int AS user_id");
+			if(!is_array($ar) || !count($ar) || !isset($ar)){
+				throw new Exception("query_first() error");
+			}
+			$d_params = new ParamsSQL($pm,$link);				
+			$d_params->add('date_time', DT_DATETIME, $doc->date_time);
+			material_period_check($link, $ar["user_id"], $d_params->getParamById('date_time'));
 			
 			if(isset($doc->cmd)){
 				$cmd = trim($doc->cmd);

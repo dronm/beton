@@ -791,12 +791,28 @@ AppBeton.prototype.setSelectLoginRoleOnServer = function(roleId){
 		this.closeSelectLoginRole();
 		return;
 	}
-	var self = this;
-	var pm = (new User_Controller()).getPublicMethod("select_login_role");
+	const self = this;
+	const pm = (new User_Controller()).getPublicMethod("select_login_role");
 	pm.setFieldValue("role_id",roleId);
 	pm.run({
-		"ok":function(){
-			document.location.href = document.location.href;			
+		"ok":function(resp){
+			if(resp){
+				// let lsn = "";
+				// const model = resp.getModel("Lsn_Model");
+				// if(model && model.getNextRow()){
+				// 	lsn = model.getFieldValue("lsn");
+				// }
+				// let h = document.location.href;
+				// if(!h.includes("?")){
+				// 	h+= "?";
+				// }else {
+				// 	h+= "&";
+				// }
+				// h+= "lsn=" + lsn;
+				// document.location.href = encodeURI(h);			
+				// document.location.href = document.location.href;
+				console.log("redirecting:"+document.location.href)
+			}
 		}
 	});
 }

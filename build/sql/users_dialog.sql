@@ -1,5 +1,6 @@
 -- View: public.users_dialog
 
+-- DROP VIEW public.users_login;
 -- DROP VIEW public.users_dialog;
 --ALTER VIEW users_dialog RENAME COLUMN chat_status_ref to chat_statuses_ref;
 
@@ -10,7 +11,7 @@ CREATE OR REPLACE VIEW public.users_dialog
 	users.email,
 	users.pwd,
 	users.role_id,
-	users.tel_ext,
+	users_tel_ext(users.id) AS tel_ext,
 	users.phone_cel,
 	users.create_dt,
 	users.banned,
@@ -33,7 +34,6 @@ FROM users
 LEFT JOIN time_zone_locales ON time_zone_locales.id = users.time_zone_locale_id
 LEFT JOIN production_sites ps ON ps.id = users.production_site_id;
 
-ALTER TABLE public.users_dialog
-    OWNER TO ;
+-- ALTER TABLE public.users_dialog OWNER TO ;
 
 

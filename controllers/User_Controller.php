@@ -1259,6 +1259,7 @@ class User_Controller extends ControllerSQL{
 			,intval($ar['id'])
 			,$dif_sess_srv? aprintf(' AND app_id=%d',MS_APP_ID):''
 		));
+		/* file_put_contents(OUTPUT_PATH.'login.txt',var_export($log_ar, true)); */
 		if (!isset($log_ar['pub_key'])){
 			//no user login
 			
@@ -2232,20 +2233,30 @@ class User_Controller extends ControllerSQL{
 			
 			add_notification_from_contact_tm($this->getDbLinkMaster(), $this->getExtVal($pm,'tel'), 'Код авторизации: '.$code, 'tm_auth', NULL, $ar['ext_contact_id']);
 			
+			$tm_logins = $this->getDbLinkMaster()->query_first(sprintf(
+				"SELECT 
+					TRUE AS exists 
+				FROM notifications.tm_logins 
+				WHERE app_id = %d AND tel = %s",
+				MS_APP_ID,
+				$this->getExtDbVal($pm,'tel')
+			));
+			if(is_array($tm_logins) && count($tm_logins) && $tm_logins["exists"] == "t"){
+				 $this->getDbLinkMaster()->query(sprintf(
+					"DELETE FROM notifications.tm_logins 
+					WHERE app_id = %d AND tel = %s",
+					MS_APP_ID,
+					$this->getExtDbVal($pm,'tel')
+				));
+			}
+
 			$this->getDbLinkMaster()->query(sprintf(
 				"INSERT INTO notifications.tm_logins (tel, exp_date_time, code_exp_date_time, tries, ext_user_id, app_id, code)
 				VALUES (%s,
 					now()::timestampTZ+'%d seconds'::interval,
 					now()::timestampTZ+'%d seconds'::interval,
 					%d, %d, %d, '%s'
-				) ON CONFILICT (tel) DO UPDATE SET
-					exp_date_time = excluded.ext_date_time, 
-					code_exp_date_time = excluded.code_exp_date_time, 
-					tries = excluded.tries, 
-					ext_user_id = excluded.ext_user_id, 
-					app_id = excluded.app_id, 
-					code = excluded.code",
-
+				)",
 				$this->getExtDbVal($pm,'tel'),
 				self::TM_REGEN_DURATION_SEC,
 				self::TM_CODE_DURATION_SEC,
@@ -2444,7 +2455,9 @@ class User_Controller extends ControllerSQL{
 			$width_type = $_SESSION['width_type'];
 			$tm_photo = isset($_SESSION['tm_photo'])? $_SESSION['tm_photo'] : NULL;	
 			$photo_url = isset($_SESSION['photo_url'])? $_SESSION['photo_url'] : NULL;		
-			$_SESSION = array();
+
+			//DO NOT KILL OLD SESSSION!!!!
+			//$_SESSION = array(); 
 		
 			$pubKey = '';
 			$this->set_logged($ar, $pubKey);
@@ -2456,6 +2469,17 @@ class User_Controller extends ControllerSQL{
 			$_SESSION['login_contact_id'] = $login_contact_id;
 			
 			$this->add_auth_model($pubKey, session_id(), md5($ar['pwd']), $this->calc_session_expiration_time());
+
+			//add lsn model
+			/* $ar = $this->getDbLinkMaster()->query_first(sprintf("SELECT pg_current_wal_lsn() AS lsn")); */
+			/* if(is_array($ar) && count($ar) && isset($ar["lsn"])) { */
+			/* 	$this->addModel(new ModelVars( */
+			/* 		array('name' => 'Vars', */
+			/* 			'id' => 'Lsn_Model', */
+			/* 			'values' => array(new Field("lsn", DT_STRING, array('value' => $ar["lsn"])))  */
+			/* 		) */
+			/* 	));		 */
+			/* } */
 		}
 	}
 	

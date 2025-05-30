@@ -17,6 +17,9 @@
 
 <xsl:template match="controller"><![CDATA[<?php]]>
 <xsl:call-template name="add_requirements"/>
+
+require_once(ABSOLUTE_PATH.'functions/material_period_check.php');
+
 class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@parentId"/>{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
 		parent::__construct($dbLinkMaster,$dbLink);<xsl:apply-templates/>
@@ -27,6 +30,26 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 </xsl:template>
 
 <xsl:template name="extra_methods">
+	public function update($pm){
+		if(!$pm->getParamValue('date_time')){
+			//retrieve date from db
+			$ar = $this->getDbLink()->query_first(
+				sprintf("SELECT date_time FROM material_fact_balance_corrections WHERE id = %d"
+				,$this->getExtDbVal($pm, 'old_id')
+				)
+			);
+			if(!is_array($ar) || !count($ar)){
+				throw new Exception("document not found.");
+			}
+			$date_time = "'".$ar["date_time"]."'";
+		}else{
+			$date_time = $this->getExtDbVal($pm, 'date_time');
+		}
+		material_period_check($this->getDbLink(), $_SESSION["user_id"], $date_time);
+		
+		parent::update($pm);
+	}
+
 	public function insert($pm){
 		if(
 		($_SESSION["role_id"]!="admin" &amp;&amp; $_SESSION["role_id"]!="owner")
@@ -34,6 +57,8 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		){
 			$pm->setParamValue('user_id',$_SESSION["user_id"]);
 		}
+
+		material_period_check($this->getDbLink(), $_SESSION["user_id"], $this->getExtDbVal($pm, 'date_time'));
 		
 		parent::insert($pm);
 	}

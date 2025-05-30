@@ -13,10 +13,6 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelTextOutput.php');
 
 
 			
-if (file_exists('models/MainMenu_Model_admin.php')){
-require_once('models/MainMenu_Model_admin.php');
-}
-			
 if (file_exists('models/MainMenu_Model_owner.php')){
 require_once('models/MainMenu_Model_owner.php');
 }
@@ -1450,6 +1446,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/views/CementSiloMaterialList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/CementSiloMaterialList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/VehicleMileageList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/VehicleMileageList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/OperatorsForTranspNaklList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/OperatorsForTranspNaklList_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/views/UserAllowedMaterialCorrectionList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/UserAllowedMaterialCorrectionList_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/views/DOCMaterialMovementList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/DOCMaterialMovementList_View.js')) ));
 		
 		$this->addJsModel(new ModelJavaScript('js20/forms/ViewList_Form.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/forms/ViewList_Form.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/forms/MainMenuConstructor_Form.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/forms/MainMenuConstructor_Form.js')) ));
@@ -2143,6 +2141,12 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/models/ShipmentBuhDoc_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ShipmentBuhDoc_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/ShipmentForTranspNaklList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ShipmentForTranspNaklList_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controllers/ConnectElkonCheck_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/ConnectElkonCheck_Controller.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/UserAllowedMaterialCorrection_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/UserAllowedMaterialCorrection_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/controllers/UserAllowedMaterialCorrection_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/UserAllowedMaterialCorrection_Controller.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/UserAllowedMaterialCorrectionList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/UserAllowedMaterialCorrectionList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/DOCMaterialMovement_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/DOCMaterialMovement_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/DOCMaterialMovementList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/DOCMaterialMovementList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/controllers/DOCMaterialMovement_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/DOCMaterialMovement_Controller.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

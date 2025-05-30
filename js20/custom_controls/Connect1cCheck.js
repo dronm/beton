@@ -43,15 +43,17 @@ Connect1cCheck.prototype.PIC_ERR = "./img/dot_red.png";
 Connect1cCheck.prototype.setRefreshInterval = function(newInterval) {
 	var self = this;
 
+	if(this.m_timer !== undefined){
+		clearInterval(this.m_timer);
+		this.m_timer = undefined;
+	}
+
 	this.m_refreshInterval = newInterval;
 	if(newInterval > 0){
 		this.m_timer = setInterval(function(){
 			self.refresh();
-		}, this.m_refreshInterval);	
-
-	}else if(this.m_timer !== undefined){
-		clearInterval(this.m_timer);
-		this.m_timer = undefined;
+		}, this.m_refreshInterval
+		);	
 	}
 }
 

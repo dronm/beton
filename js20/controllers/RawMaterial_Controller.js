@@ -134,6 +134,12 @@ extend(RawMaterial_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldBool("deleted",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -224,6 +230,12 @@ extend(RawMaterial_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldBool("deleted",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -292,6 +304,9 @@ extend(RawMaterial_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Учет по местам хранения";
 	pm.addField(new FieldBool("dif_store",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldBool("deleted",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("ord");
 	
 }

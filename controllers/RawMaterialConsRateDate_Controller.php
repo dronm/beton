@@ -23,6 +23,9 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
  */
 
 
+
+require_once(ABSOLUTE_PATH.'functions/material_period_check.php');
+
 class RawMaterialConsRateDate_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
 		parent::__construct($dbLinkMaster, $dbLink);
@@ -227,13 +230,21 @@ class RawMaterialConsRateDate_Controller extends ControllerSQL{
 		$this->setCompleteModelId('RawMaterialConsRateDateList_Model');
 
 		
-	}	
+	}
 	
 	public function recalc_consumption($pm){
+		$period_id = $this->getExtDbVal('period_id');
 		$link_master = $this->getDbLinkMaster();
+
+		$ar = $link_master->query_first(sprintf("SELECT dt FROM raw_material_cons_rate_dates WHERE id = %d",$period_id));
+		if(!is_array($ar) || !count($ar) || !isset($ar["dt"])){
+			throw new Exception("date not defined");
+		}
+		material_period_check($link_master, $_SESSION["user_id"], $ar["dt"]);
+
 		$link_master->query(sprintf(
 			"CALL recalc_consumption(%d, %d)",
-			$pm->getParamValue('period_id'),
+			$period_id,
 			$pm->getParamValue('production_site_id')
 		));
 	}

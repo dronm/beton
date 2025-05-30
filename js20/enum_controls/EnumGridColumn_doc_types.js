@@ -34,6 +34,8 @@ function EnumGridColumn_doc_types(options){
 
 	options.multyLangValues["ru"]["cement_silo_balance_reset"] = "Обнуление остатка силоса";
 
+	options.multyLangValues["ru"]["material_movement"] = "Перемещение материалов";
+
 	
 	options.ctrlClass = options.ctrlClass || Enum_doc_types;
 	options.searchOptions = options.searchOptions || {};
