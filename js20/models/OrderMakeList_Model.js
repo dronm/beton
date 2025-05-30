@@ -89,6 +89,15 @@ function OrderMakeList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.concrete_type_id = new FieldInt("concrete_type_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'F';
 	filed_options.autoInc = false;	
 	

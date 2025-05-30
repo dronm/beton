@@ -1,3 +1,3 @@
 <?php
-		define('VERSION','1.00376');
+		define('VERSION','1.003767');
 		?>

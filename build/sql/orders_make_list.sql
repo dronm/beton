@@ -76,7 +76,8 @@ CREATE OR REPLACE VIEW public.orders_make_list
          
    o.client_id, --added for filter json column
    o.destination_id,
-   o.user_id
+   o.user_id,
+	o.concrete_type_id
          
    FROM orders o
      LEFT JOIN clients cl ON cl.id = o.client_id
@@ -86,8 +87,4 @@ CREATE OR REPLACE VIEW public.orders_make_list
      LEFT JOIN vehicles vh ON vh.id = pvh.vehicle_id
      LEFT JOIN contacts ct ON ct.id = o.contact_id
   ORDER BY o.date_time;
-
-ALTER TABLE public.orders_make_list
-    OWNER TO ;
-
 

@@ -1574,7 +1574,7 @@ user_allowed_material_correction_check.sql
 DonMaterialProcurement.insert
 
 
-1.00377
+1.00378
 1) Check 1cConnect after failuer
 2) 
 	RawMaterial->load_procurement() if date is less then document date - throw error
@@ -1584,6 +1584,7 @@ DonMaterialProcurement.insert
 	RawMaterialConsRadeDate->recalc_consumption()
 3) DOCMaterialMovement new documnet
 	DOCMaterialMovementList_View.js
+4) OrderMakeList_Model +field concrete_type_id
 
 - all messages are coming to all clients.
 

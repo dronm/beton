@@ -83,6 +83,14 @@ class OrderMakeList_Model extends ModelSQLBeton{
 		$this->addField($f_concrete_types_ref);
 		//********************
 		
+		//*** Field concrete_type_id ***
+		$f_opts = array();
+		$f_opts['id']="concrete_type_id";
+						
+		$f_concrete_type_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"concrete_type_id",$f_opts);
+		$this->addField($f_concrete_type_id);
+		//********************
+		
 		//*** Field f_val ***
 		$f_opts = array();
 		
