@@ -31,6 +31,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ConditionParamsSQL.php');
 require_once('common/MyDate.php');
 require_once(ABSOLUTE_PATH.'functions/Beton.php');
 require_once(USER_CONTROLLERS_PATH.'Order_Controller.php');
+require_once(ABSOLUTE_PATH.'functions/material_period_check.php');
 
 class RawMaterial_Controller extends ControllerSQL{
 

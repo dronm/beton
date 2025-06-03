@@ -546,7 +546,7 @@ class DOCMaterialProcurement_Controller extends ControllerSQL{
 			$pm->setParamValue('user_id',$_SESSION['user_id']);
 		}
 
-		material_period_check($this->getDbLink(), $_SESSION["user_id"], $this->getExtDbVal('date_time'));
+		material_period_check($this->getDbLink(), $_SESSION["user_id"], $this->getExtDbVal($pm,'date_time'));
 
 		return parent::insert($pm);		
 	}

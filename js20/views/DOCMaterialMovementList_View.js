@@ -165,6 +165,34 @@ function DOCMaterialMovementList_View(id,options){
 							],
 							"sortable":true
 						})
+						,new GridCellHead(id+":grid:head:carriers_ref",{
+							"value":"Перевозчик",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("carriers_ref"),
+									"ctrlClass":SupplierEdit,
+									"ctrlOptions": {
+										"labelCaption": ""
+									},
+									"ctrlBindFieldId":"carrier_id",
+									"searchOptions":{
+										"field":new FieldInt("carrier_id"),
+										"searchType":"on_match",
+										"typeChange":false
+									}									
+								})
+							],
+							"sortable":true
+						})
+						,new GridCellHead(id+":grid:head:vehicle_plate",{
+							"value":"Номер ТС",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("vehicle_plate")
+								})
+							],
+							"sortable":true
+						})
 						,new GridCellHead(id+":grid:head:quant",{
 							"value":"Кол-во",
 							"colAttrs":{"align":"right"},
@@ -203,7 +231,7 @@ function DOCMaterialMovementList_View(id,options){
 					"elements":[
 						new GridCell(id+":grid:foot:sp1",{
 							"value":"Итого",
-							"colSpan":"5"
+							"colSpan":"7"
 						})
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
 							"attrs":{"align":"right"},

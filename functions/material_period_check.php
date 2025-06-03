@@ -11,7 +11,7 @@ function material_period_check($dbLink, $userIdDb, $periodDb) {
 		throw new Exception("query_first() error");
 	}
 	if($ar["allowed"] == 'f'){
-		throw new Exception("Запрещена загрузка в данном периоде");
+		throw new Exception("Запрещены изиенения в данном периоде");
 	}
 }
 

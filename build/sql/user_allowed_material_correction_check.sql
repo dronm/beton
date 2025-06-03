@@ -7,10 +7,10 @@ CREATE OR REPLACE FUNCTION public.user_allowed_material_correction_check(in_user
 $BODY$
 	SELECT
 		CASE
-			WHEN get_shift_end(now()::timestamp without time zone) = get_shift_end(in_date_time::timestamp without time zone) THEN TRUE
+			WHEN get_shift_end(now()::timestamp without time zone)::date = get_shift_end(in_date_time::timestamp without time zone)::date THEN TRUE
 			ELSE COALESCE((
 				SELECT 
-					al.user_id IS NOT NULL OR u.role_id IN ('owner'::role_types, 'boss'::role_types)
+					al.user_id IS NOT NULL --OR u.role_id IN ('owner'::role_types, 'boss'::role_types)
 				FROM users AS u
 				LEFT JOIN user_allowed_material_corrections AS al ON al.user_id = u.id
 				WHERE u.id = in_user_id

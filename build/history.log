@@ -1586,6 +1586,13 @@ DonMaterialProcurement.insert
 	DOCMaterialMovementList_View.js
 4) OrderMakeList_Model +field concrete_type_id
 
+1.00379
+1) DOCMaterialMovement +carrier_id, vehicle_plate.
+	DOCMaterialMovementList_View
+	doc_material_movements_list.sql
+
+
+
 - all messages are coming to all clients.
 
 

@@ -109,6 +109,26 @@ class DOCMaterialMovement_Model extends ModelSQLDOC{
 		$f_user_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_id",$f_opts);
 		$this->addField($f_user_id);
 		//********************
+		
+		//*** Field carrier_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Carrier';
+		$f_opts['id']="carrier_id";
+						
+		$f_carrier_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"carrier_id",$f_opts);
+		$this->addField($f_carrier_id);
+		//********************
+		
+		//*** Field vehicle_plate ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Vehicle plate';
+		$f_opts['id']="vehicle_plate";
+						
+		$f_vehicle_plate=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_plate",$f_opts);
+		$this->addField($f_vehicle_plate);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

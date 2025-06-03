@@ -43,6 +43,13 @@ class DOCMaterialMovement_Controller extends ControllerSQL{
 		
 			$f_params = array();
 			
+				$f_params['alias']='Проведен';
+			$param = new FieldExtBool('processed'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
 				$f_params['alias']='Номер';
 			$param = new FieldExtString('number'
 				,$f_params);
@@ -74,6 +81,20 @@ class DOCMaterialMovement_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Автор';
 			$param = new FieldExtInt('user_id'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Carrier';
+			$param = new FieldExtInt('carrier_id'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Vehicle plate';
+			$param = new FieldExtString('vehicle_plate'
 				,$f_params);
 		$pm->addParam($param);
 		
@@ -112,6 +133,13 @@ class DOCMaterialMovement_Controller extends ControllerSQL{
 		
 			$f_params=array();
 			
+				$f_params['alias']='Проведен';
+			$param = new FieldExtBool('processed'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
 				$f_params['alias']='Номер';
 			$param = new FieldExtString('number'
 				,$f_params);
@@ -143,6 +171,20 @@ class DOCMaterialMovement_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Автор';
 			$param = new FieldExtInt('user_id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Carrier';
+			$param = new FieldExtInt('carrier_id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Vehicle plate';
+			$param = new FieldExtString('vehicle_plate'
 				,$f_params);
 			$pm->addParam($param);
 		

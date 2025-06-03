@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-05-30 17:02:12</lastBuild></version>
+		<lastBuild>2025-06-03 06:26:39</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -282,6 +282,7 @@
 		<version dateOpen="2025-04-25 07:03:12" dateClose="2025-05-13 16:23:50">1.00375</version>
 		<version dateOpen="2025-05-23 15:52:22" dateClose="2025-05-30 08:12:36">1.00376</version>
 		<version dateOpen="2025-05-30 16:59:27" dateClose="2025-05-30 17:02:29">1.003767</version>
+		<version dateOpen="2025-06-02 12:56:54" dateClose="2025-06-03 06:26:58">1.003768</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -5241,6 +5242,8 @@
 			<field id="production_base_to_id" dataType="Int" refTable="production_bases" refField="id"/>
 			<field id="quant" dataType="Float" length="19" alias="Количество" precision="2"/>
 			<field id="user_id" dataType="Int" alias="Автор" refTable="users" refField="id"/>
+			<field id="carrier_id" dataType="Int" alias="Carrier" refTable="suppliers" refField="id"/>
+			<field id="vehicle_plate" dataType="String" length="10" alias="Vehicle plate"/>
 		</model>
 		<model id="DOCMaterialMovementList" parent="ModelSQLDOC" dataTable="doc_material_movements_list" virtual="FALSE" modelType="DOC" docTypeId="material_movement">
 			<aggFunctions>
@@ -5259,6 +5262,8 @@
 			<field id="materials_ref" dataType="JSON"/>
 			<field id="quant" dataType="Float" length="19" alias="Количество" precision="2"/>
 			<field id="users_ref" dataType="JSON"/>
+			<field id="carriers_ref" dataType="JSON"/>
+			<field id="vehicle_plate" dataType="String" alias="Vehicle plate"/>
 		</model>
 	</models>
 	<constants>

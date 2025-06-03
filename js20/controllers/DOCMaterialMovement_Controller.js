@@ -51,6 +51,12 @@ extend(DOCMaterialMovement_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
+	options.alias = "Проведен";
+	var field = new FieldBool("processed",options);
+	
+	pm.addField(field);
+	
+	var options = {};
 	options.alias = "Номер";
 	var field = new FieldString("number",options);
 	
@@ -83,6 +89,18 @@ extend(DOCMaterialMovement_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Автор";
 	var field = new FieldInt("user_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Carrier";
+	var field = new FieldInt("carrier_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Vehicle plate";
+	var field = new FieldString("vehicle_plate",options);
 	
 	pm.addField(field);
 	
@@ -111,6 +129,12 @@ extend(DOCMaterialMovement_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
+	options.alias = "Проведен";
+	var field = new FieldBool("processed",options);
+	
+	pm.addField(field);
+	
+	var options = {};
 	options.alias = "Номер";
 	var field = new FieldString("number",options);
 	
@@ -143,6 +167,18 @@ extend(DOCMaterialMovement_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Автор";
 	var field = new FieldInt("user_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Carrier";
+	var field = new FieldInt("carrier_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Vehicle plate";
+	var field = new FieldString("vehicle_plate",options);
 	
 	pm.addField(field);
 	
@@ -205,6 +241,12 @@ extend(DOCMaterialMovement_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldJSON("users_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("carriers_ref",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Vehicle plate";
+	pm.addField(new FieldString("vehicle_plate",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("date_time");
 	
 }

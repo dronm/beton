@@ -108,6 +108,24 @@ function DOCMaterialMovement_Model(options){
 	
 	options.fields.user_id = new FieldInt("user_id",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Carrier';
+	filed_options.autoInc = false;	
+	
+	options.fields.carrier_id = new FieldInt("carrier_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Vehicle plate';
+	filed_options.autoInc = false;	
+	
+	options.fields.vehicle_plate = new FieldString("vehicle_plate",filed_options);
+	
 		DOCMaterialMovement_Model.superclass.constructor.call(this,id,options);
 }
 extend(DOCMaterialMovement_Model,ModelXML);
