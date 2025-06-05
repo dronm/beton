@@ -147,6 +147,19 @@ function DOCMaterialProcurementDialog_View(id,options){
 			"labelCaption":"Вес брутто:",
 			"title":"Вес брутто, общий вес"
 		}));	
+		this.addElement(new EditFloat(id+":doc_quant_net",{
+			"precision":"2",
+			"length":"19",
+			"labelCaption":"Вес нетто по документам:",
+			"title":"Вес нетто по документам, чистый вес по документам"
+		}));	
+		
+		this.addElement(new EditFloat(id+":doc_quant_gross",{
+			"precision":"2",
+			"length":"19",
+			"labelCaption":"Вес брутто по документам:",
+			"title":"Вес брутто по документам, общий вес по документам"
+		}));	
 		
 	}
 		
@@ -166,6 +179,8 @@ function DOCMaterialProcurementDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("vehicle_plate")})
 		,new DataBinding({"control":this.getElement("store")})		
 		,new DataBinding({"control":this.getElement("quant_net")})
+		,new DataBinding({"control":this.getElement("doc_quant_gross")})
+		,new DataBinding({"control":this.getElement("doc_quant_net")})
 		,new DataBinding({"control":this.getElement("quant_gross")})
 	];
 	this.setDataBindings(r_bd);

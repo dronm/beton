@@ -1592,6 +1592,10 @@ DonMaterialProcurement.insert
 	doc_material_movements_list.sql
 
 
+1.00380
+1) DOCMaterialProcurementDialog_View show doc_quant_net
+2) doc_material_movents_process.sql corrected error
+
 
 - all messages are coming to all clients.
 
