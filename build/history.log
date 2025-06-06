@@ -1596,6 +1596,8 @@ DonMaterialProcurement.insert
 1) DOCMaterialProcurementDialog_View show doc_quant_net
 2) doc_material_movents_process.sql corrected error
 
+1.00381 06/06/2025
+1) DOCMaterialProcurementDialog_View  corrected
 
 - all messages are coming to all clients.
 

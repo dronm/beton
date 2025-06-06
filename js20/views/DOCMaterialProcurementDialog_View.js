@@ -179,9 +179,9 @@ function DOCMaterialProcurementDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("vehicle_plate")})
 		,new DataBinding({"control":this.getElement("store")})		
 		,new DataBinding({"control":this.getElement("quant_net")})
+		,new DataBinding({"control":this.getElement("quant_gross")})
 		,new DataBinding({"control":this.getElement("doc_quant_gross")})
 		,new DataBinding({"control":this.getElement("doc_quant_net")})
-		,new DataBinding({"control":this.getElement("quant_gross")})
 	];
 	this.setDataBindings(r_bd);
 	
@@ -200,6 +200,8 @@ function DOCMaterialProcurementDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("store")})
 		,new CommandBinding({"control":this.getElement("quant_net")})
 		,new CommandBinding({"control":this.getElement("quant_gross")})
+		,new CommandBinding({"control":this.getElement("doc_quant_net")})
+		,new CommandBinding({"control":this.getElement("doc_quant_gross")})
 	]);
 	
 }
