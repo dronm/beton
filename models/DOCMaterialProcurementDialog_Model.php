@@ -13,6 +13,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class DOCMaterialProcurementDialog_Model extends ModelSQLDOC{
@@ -217,6 +218,34 @@ class DOCMaterialProcurementDialog_Model extends ModelSQLDOC{
 		$this->addField($f_doc_quant_net);
 		//********************
 		
+		//*** Field comment_text ***
+		$f_opts = array();
+		$f_opts['id']="comment_text";
+						
+		$f_comment_text=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"comment_text",$f_opts);
+		$this->addField($f_comment_text);
+		//********************
+		
+		//*** Field last_modif_user_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Кто последний вносил изменения';
+		$f_opts['id']="last_modif_user_id";
+						
+		$f_last_modif_user_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"last_modif_user_id",$f_opts);
+		$this->addField($f_last_modif_user_id);
+		//********************
+		
+		//*** Field last_modif_date_time ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Время последнего изменения';
+		$f_opts['id']="last_modif_date_time";
+						
+		$f_last_modif_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"last_modif_date_time",$f_opts);
+		$this->addField($f_last_modif_date_time);
+		//********************
+		
 		//*** Field suppliers_ref ***
 		$f_opts = array();
 		
@@ -265,6 +294,26 @@ class DOCMaterialProcurementDialog_Model extends ModelSQLDOC{
 						
 		$f_production_bases_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_bases_ref",$f_opts);
 		$this->addField($f_production_bases_ref);
+		//********************
+		
+		//*** Field users_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Автор';
+		$f_opts['id']="users_ref";
+						
+		$f_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"users_ref",$f_opts);
+		$this->addField($f_users_ref);
+		//********************
+		
+		//*** Field last_modif_users_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Кто последний вносил изменения';
+		$f_opts['id']="last_modif_users_ref";
+						
+		$f_last_modif_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"last_modif_users_ref",$f_opts);
+		$this->addField($f_last_modif_users_ref);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

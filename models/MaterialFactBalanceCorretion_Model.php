@@ -11,6 +11,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
  
 class MaterialFactBalanceCorretion_Model extends ModelSQLBeton{
 	
@@ -88,6 +89,26 @@ class MaterialFactBalanceCorretion_Model extends ModelSQLBeton{
 						
 		$f_comment_text=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"comment_text",$f_opts);
 		$this->addField($f_comment_text);
+		//********************
+		
+		//*** Field last_modif_user_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Кто последний вносил изменения';
+		$f_opts['id']="last_modif_user_id";
+						
+		$f_last_modif_user_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"last_modif_user_id",$f_opts);
+		$this->addField($f_last_modif_user_id);
+		//********************
+		
+		//*** Field last_modif_date_time ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Время последнего изменения';
+		$f_opts['id']="last_modif_date_time";
+						
+		$f_last_modif_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"last_modif_date_time",$f_opts);
+		$this->addField($f_last_modif_date_time);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

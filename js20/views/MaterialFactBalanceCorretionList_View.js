@@ -170,6 +170,32 @@ function MaterialFactBalanceCorretionList_View(id,options){
 							"sortable":true
 						})
 						
+						,new GridCellHead(id+":grid:head:last_modif_users_ref",{
+							"value":"Кто изменил",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("last_modif_users_ref"),
+									"ctrlClass":UserEditRef,
+									"ctrlEdit": false,
+									"searchOptions":{
+										"field":new FieldInt("last_modif_user_id"),
+										"searchType":"on_match",
+										"typeChange":false
+									}									
+									
+								})
+							],
+							"sortable":true
+						})
+						,new GridCellHead(id+":grid:head:last_modif_date_time",{
+							"value":"Дата изменения",
+							"columns":[
+								new GridColumnDateTime({
+									"field":model.getField("last_modif_date_time"),
+									"ctrlEdit": false
+								})
+							]
+						})
 					]
 				})
 			]

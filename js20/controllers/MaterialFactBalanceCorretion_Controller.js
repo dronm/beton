@@ -86,6 +86,18 @@ extend(MaterialFactBalanceCorretion_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Кто последний вносил изменения";
+	var field = new FieldInt("last_modif_user_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Время последнего изменения";
+	var field = new FieldDateTimeTZ("last_modif_date_time",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -146,6 +158,18 @@ extend(MaterialFactBalanceCorretion_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Кто последний вносил изменения";
+	var field = new FieldInt("last_modif_user_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Время последнего изменения";
+	var field = new FieldDateTimeTZ("last_modif_date_time",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -199,6 +223,12 @@ extend(MaterialFactBalanceCorretion_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldText("comment_text",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Кто последний вносил изменения";
+	pm.addField(new FieldInt("last_modif_user_id",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Время последнего изменения";
+	pm.addField(new FieldDateTimeTZ("last_modif_date_time",f_opts));
 }
 
 			MaterialFactBalanceCorretion_Controller.prototype.addGetObject = function(){

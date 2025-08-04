@@ -41,6 +41,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$pm->setParamValue('user_id',$_SESSION['user_id']);
 		}
 
+		$pm->setParamValue('last_modif_user_id',$_SESSION['user_id']);
+		$pm->setParamValue('last_modif_date_time', date("Y-m-d H:i:s"));
+
 		material_period_check($this->getDbLink(), $_SESSION["user_id"], $this->getExtDbVal($pm, 'date_time'));
 
 		return parent::insert($pm);		
@@ -63,6 +66,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		}
 		material_period_check($this->getDbLink(), $_SESSION["user_id"], $date_time);
 		
+		$pm->setParamValue('last_modif_user_id',$_SESSION['user_id']);
+		$pm->setParamValue('last_modif_date_time', date("Y-m-d H:i:s"));
+
 		parent::update($pm);
 	}
 

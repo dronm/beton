@@ -161,6 +161,10 @@ function DOCMaterialProcurementDialog_View(id,options){
 			"title":"Вес брутто по документам, общий вес по документам"
 		}));	
 		
+		this.addElement(new EditText(id+":comment_text",{
+			"labelCaption":"Комментарий:",
+			"title":"Комментарий"
+		}));	
 	}
 		
 	DOCMaterialProcurementDialog_View.superclass.constructor.call(this,id,options);
@@ -181,6 +185,7 @@ function DOCMaterialProcurementDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("quant_net")})
 		,new DataBinding({"control":this.getElement("quant_gross")})
 		,new DataBinding({"control":this.getElement("doc_quant_gross")})
+		,new DataBinding({"control":this.getElement("comment_text")})
 		,new DataBinding({"control":this.getElement("doc_quant_net")})
 	];
 	this.setDataBindings(r_bd);
@@ -202,6 +207,7 @@ function DOCMaterialProcurementDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("quant_gross")})
 		,new CommandBinding({"control":this.getElement("doc_quant_net")})
 		,new CommandBinding({"control":this.getElement("doc_quant_gross")})
+		,new CommandBinding({"control":this.getElement("comment_text")})
 	]);
 	
 }
@@ -223,3 +229,25 @@ DOCMaterialProcurementDialog_View.prototype.toDOM = function(p){
 	console.log("DOCMaterialProcurementDialog_View.prototype.toDOM", this.getElement("date_time").getValue());
 }
 */
+
+DOCMaterialProcurementDialog_View.prototype.onGetData = function(resp,cmd){
+	DOCMaterialProcurementDialog_View.superclass.onGetData.call(this,resp,cmd);
+	
+	const m = this.getModel();
+
+	const id = this.getId();
+
+	//last modif
+	var last_modif_users_ref = m.getFieldValue("last_modif_users_ref");	
+	if(last_modif_users_ref&&!last_modif_users_ref.isNull()){
+		document.getElementById(id+":cmd-cont").style = "float:left;";
+		DOMHelper.setText(document.getElementById(id+":last_modif_user"), last_modif_users_ref.getDescr());
+		DOMHelper.setText(document.getElementById(id+":last_modif_date_time"), DateHelper.format(m.getFieldValue("last_modif_date_time"),"d/m/y H:i"));
+	}
+	//create user
+	var create_users_ref = m.getFieldValue("users_ref");	
+	if(create_users_ref && !create_users_ref.isNull()){
+		document.getElementById(id+":cmd-cont").style = "float:left;";
+		DOMHelper.setText(document.getElementById(id+":create_user"), create_users_ref.getDescr());
+	}
+}

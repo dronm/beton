@@ -137,6 +137,33 @@ function DOCMaterialMovementList_Model(options){
 	
 	options.fields.vehicle_plate = new FieldString("vehicle_plate",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Кто последний вносил изменения';
+	filed_options.autoInc = false;	
+	
+	options.fields.last_modif_users_ref = new FieldJSON("last_modif_users_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Время последнего изменения';
+	filed_options.autoInc = false;	
+	
+	options.fields.last_modif_date_time = new FieldDateTimeTZ("last_modif_date_time",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.comment_text = new FieldText("comment_text",filed_options);
+	
 		DOCMaterialMovementList_Model.superclass.constructor.call(this,id,options);
 }
 extend(DOCMaterialMovementList_Model,ModelXML);

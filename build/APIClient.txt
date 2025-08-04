@@ -1,0 +1,207 @@
+Хост: eurobeton.katren.org
+
+Общие парамтеры:
+c - Контроллер
+f - функция
+v - в каком виде вернуть результат, может быть ViewJSON, ViewXML
+token - токен авторизации
+
+Остальные параметры зависят от конкретного метода, могут быть и без параметров
+
+В ответ приходит объект models, который содержит модели (наборы данных). Модель содержит rows. Каждый row содержит поля.
+Состав моделей зависит от метода, но всегда есть модель ModelServResponse
+	result - результат выполнения, "0" или код ошибки
+	descr - описание ошибки или пусто
+	app_version - вверсия ПО на сервере
+
+----- Авторизация -----
+c=User_Controller f=login
+Параметры
+	<field id="name" dataType="String" alias="Имя пользователя" length="50"/>
+	<field id="pwd" dataType="Password" alias="Пароль" length="20"/>
+Пример
+curl "https://eurobeton.katren.org/?c=User_Controller&f=login&name=USER_NAME&pwd=USER_PASSWORD&v=ViewJSON"
+Ответ
+{"models": {
+	"ModelServResponse":{
+		"rows":[
+			{"result":"0","descr":"","app_version":"1.00381"}
+		]
+	}
+	,"Auth_Model":{
+		"rows":[
+			{"access_token":"TOKEN",
+			"tokenExpires":"TOKEN"}
+		]
+	}
+	}
+}
+
+Далее access_token вставляем во все запросы как поле token.
+
+
+----- Выход -----
+c=User_Controller f=logout
+curl "https://eurobeton.katren.org/?c=User_Controller&f=logout&v=ViewJSON&token=TOKEN"
+
+
+----- Данные пользователя -----
+c=User_Controller f=get_profile
+Ответ- модель
+	<model id="UserProfile" parent="ModelSQLBeton" dataTable="users_dialog" virtual="TRUE">
+		<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+		<field id="name" dataType="String" alias="Имя"/>
+		<field id="email" dataType="String" alias="Эл.почта"/>
+		<field id="phone_cel" dataType="String" length="15" alias="Моб.телефон"/>
+	</model>
+пример
+curl "https://eurobeton.katren.org/?c=User&f=get_profile&v=ViewJSON&token=TOKEN"
+
+
+----- Список марок бетона -----
+c=ConcreteType_Controller&f=get_for_client_list
+Ответ
+	<model id="ConcreteTypeList" parent="ModelSQLBeton" dataTable="concrete_types_list" virtual="FALSE">
+		<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
+		<field id="name" dataType="String" alias="Наименование"/>
+		<field id="code_1c" dataType="String" alias="Код 1С"/>
+		<field id="pres_norm" dataType="Float" alias="Норма давл."/>
+		<field id="mpa_ratio" dataType="Float" alias="Кф.МПА"/>
+		<field id="price" dataType="Float" alias="Цена"/>
+		<field id="material_cons_rates" dataType="Bool" alias="Есть нормы расхода"/>
+		<field id="show_on_site" dataType="Bool" alias="Отображать на сайте"/>
+		<field id="official_name" dataType="String" alias="Официальное наименование для накладной"/>
+		<field id="prochnost" dataType="Int" alias="Прочность для паспорта качества"/>
+		<field id="f_val" dataType="Int" alias="F"/>
+		<field id="w_val" dataType="Int" alias="W"/>
+	</model>
+Пример
+curl "https://eurobeton.katren.org/?c=ConcreteType_Controller&"\
+"f=get_for_client_list&"\
+"v=ViewJSON&"\
+"token=TOKEN"
+
+
+----- Пункты назначения -----
+c=Destination_Controller&f=get_for_client_list
+Ответ
+	<model id="DestinationList" parent="ModelSQLBeton" dataTable="destination_list_view" virtual="TRUE">
+		<defaultOrder>
+			<field id="name"/>
+		</defaultOrder>
+		<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE"/>
+		<field id="name" dataType="String" required="TRUE" length="250"/>
+		<field id="distance" dataType="String"/>
+		<field id="time_route" dataType="Time"/>
+		<field id="special_price" dataType="Bool"/>
+		<field id="price" dataType="String"/>
+		<field id="price_for_driver" dataType="Float"/>
+	</model>
+Пример
+curl "https://eurobeton.katren.org/?c=Destination_Controller&f=get_for_client_list&v=ViewJSON&token=TOKEN"
+
+
+----- Отгрузки -----
+c=Shipment_Controller&f=get_list_for_client
+Ответ
+	<model id="ShipmentForClientList" parent="ModelSQLBeton" dataTable="shipments_for_client_list" virtual="TRUE">
+		<defaultOrder>
+			<field id="ship_date" sortDirect="DESC"/>
+		</defaultOrder>
+		<aggFunctions>
+			<aggFunction alias="total_quant" expr="sum(quant)"/>
+			<aggFunction alias="total_concrete_cost" expr="sum(concrete_cost)"/>
+			<aggFunction alias="total_deliv_cost" expr="sum(deliv_cost)"/>
+			<aggFunction alias="total_pump_cost" expr="sum(pump_cost)"/>
+			<aggFunction alias="total_total_cost" expr="sum(total_cost)"/>
+		</aggFunctions>
+		<field id="order_id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер заявки"/>
+		<field id="client_id" dataType="Int" sysCol="TRUE" alias="Идентификатор клиента"/>
+		<field id="clients_ref" dataType="JSON" alias="Клиент"/>
+		<field id="ship_date" dataType="Date" alias="Дата отгрузки"/>
+		<field id="destinations_ref" dataType="JSON" alias="Объект"/>
+		<field id="destination_id" dataType="Int" sysCol="TRUE"/>
+		<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
+		<field id="concrete_type_id" dataType="Int" sysCol="TRUE"/>
+		<field id="pump_exists" dataType="Bool" alias="Есть насос"/>
+		<field id="quant" dataType="Float" alias="Количество,м3"/>
+		<field id="concrete_cost" dataType="Float" alias="Стоимость бетона,руб"/>
+		<field id="deliv_cost" dataType="Float" alias="Стоимость доставки,руб"/>
+		<field id="pump_cost" dataType="Float" alias="Стоимость насоса,руб"/>
+		<field id="total_cost" dataType="Float" alias="Стоимость всего,руб"/>
+	</model>
+Дополнительные параметры
+	from
+	count
+
+Фильтрация
+	cond_fields=поля фильтра через запятую
+	cond_sgns=операции фильтра в том же порядке, как поля через запятую, возможные значения:
+		e - равно
+		le - меньше равно
+		ge - больше равно
+	cond_vals=Значения фильтра в том же порядке, как поля через запятую
+
+Сортировка
+	ord_fields=поля сортировки через запятую
+	ord_directs=asc/desc в том же порядке,как поля через запятую
+	По-умолчанию: ord_fields=ship_date&ord_directs=desc
+
+Пример запроса: выборка записей с 1, 4 записи с фильтром по марке (61)
+и дате отгрузки за период 2025-06-01T00:00:00 - 2025-06-30T23:59:59
+Сортировка по дате с возрастанием
+curl "https://eurobeton.katren.org/?c=Shipment_Controller&"\
+"f=get_list_for_client&"\
+"v=ViewJSON&"\
+"token=TOKEN&"\
+"count=1&"\
+"from=4&"\
+"ord_fields=ship_date&"\
+"ord_directs=asc&"\
+"cond_fields=concrete_type_id,ship_date,ship_date&"\
+"cond_vals=61,2025-06-01T00:00:00,2025-06-30T23:59:59&"\
+"cond_sgns=e,ge,le"
+
+
+----- Зваявки ------
+c=Order_Controller&f=get_list_for_client
+Модель ответа
+	<model id="OrderForClientList" parent="ModelSQLBeton" dataTable="orders_for_client_list" virtual="TRUE">
+		<defaultOrder>
+			<field id="date_time" sortDirect="DESC"/>
+		</defaultOrder>
+		<aggFunctions>
+			<aggFunction alias="total_quant_ordered" expr="sum(quant_ordered)"/>
+			<aggFunction alias="total_quant_shipped" expr="sum(quant_shipped)"/>
+			<aggFunction alias="total_quant_balance" expr="sum(quant_balance)"/>
+		</aggFunctions>
+		<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер заявки"/>
+		<field id="date_time" dataType="DateTime" alias="Дата заявки"/>
+		<field id="number" dataType="String" alias="Номер заявки"/>
+		<field id="client_id" dataType="Int" sysCol="TRUE" alias="Идентификатор клиента"/>
+		<field id="clients_ref" dataType="JSON" sysCol="TRUE" alias="Клиент"/>
+		<field id="destinations_ref" dataType="JSON" alias="Объект"/>
+		<field id="destination_id" dataType="Int" sysCol="TRUE"/>
+		<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
+		<field id="concrete_type_id" dataType="Int" sysCol="TRUE"/>
+		<field id="quant_ordered" dataType="Float" alias="Кол-во в заявке,м3"/>
+		<field id="quant_shipped" dataType="Float" alias="Кол-во отгружено,м3"/>
+		<field id="quant_balance" dataType="Float" alias="Кол-во остаток,м3"/>
+		<field id="no_ship_mark" dataType="Bool" alias="Опоздание отгрузки"/>
+	</model>
+
+Пример запроса:
+	заявки (1) за период 2025-06-01T00:00:00 - 2025-06-30T23:59:59
+	сортировка по дате с возрастанием
+curl "https://eurobeton.katren.org/?c=Order_Controller&"\
+"f=get_list_for_client&"\
+"v=ViewJSON&"\
+"token=TOKEN&"\
+"count=1&"\
+"from=0&"\
+"ord_fields=date_time&"\
+"ord_directs=asc&"\
+"cond_fields=date_time,date_time&"\
+"cond_vals=2025-06-01T00:00:00,2025-06-30T23:59:59&"\
+"cond_sgns=ge,le"
+

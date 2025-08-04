@@ -548,6 +548,7 @@ class Destination_Controller extends ControllerSQL{
 		$addr_h = md5($addr['city']);
 		
 		if(!isset($_SESSION['get_coords_on_name_cash']) || !isset($_SESSION['get_coords_on_name_cash'][$addr_h])){
+		/* throw new Exception("test2"); */
 		
 			//yandex
 			get_inf_on_address(DADATA_KEY, DADATA_SECRET, $addr, $inf);

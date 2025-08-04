@@ -351,9 +351,12 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				material_id,
 				quant_gross,
 				quant_net,
-				doc_quant_net
+				doc_quant_net,
+				user_id,
+				last_modif_user_id,
+				last_modif_date_time
 			)
-			VALUES (%s,%s,%s,%d,%d,%s,%s,%s,%s,%s,%d,%f,%f,%f)
+			VALUES (%s,%s,%s,%d,%d,%s,%s,%s,%s,%s,%d,%f,%f,%f, %d, %d, NOW())
 			RETURNING id",
 			$doc_params->getParamById('date_time'),
 			$doc_params->getParamById('number'),
@@ -368,7 +371,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$material_id,
 			$quant_gross,
 			$quant_net,
-			$doc_quant_net
+			$doc_quant_net,
+			$_SESSION['user_id'],
+			$_SESSION['user_id']
 			));
 		}
 		else{
@@ -605,9 +610,12 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 						vehicle_plate,
 						material_id,
 						quant_gross,
-						quant_net
+						quant_net,
+						user_id,
+						last_modif_user_id,
+						last_modif_date_time
 					)
-					VALUES (%s,%s,%s,%d,%d,%s,%s,%s,%s,%s,%d,%f,%f)
+					VALUES (%s,%s,%s,%d,%d,%s,%s,%s,%s,%s,%d,%f,%f, %d, %d, NOW())
 					RETURNING id",
 					$doc_params->getParamById('date_time'),
 					$doc_params->getParamById('number'),
@@ -621,7 +629,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					$doc_params->getParamById('vehicle_plate'),
 					$material_id,
 					$quant_gross,
-					$quant_net
+					$quant_net,
+					$_SESSION['user_id'],
+					$_SESSION['user_id']
 					));
 				}
 				else{

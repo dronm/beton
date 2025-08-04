@@ -27,7 +27,11 @@ CREATE OR REPLACE VIEW doc_material_procurements_list AS
 	doc.sender_name,
 	doc.doc_ref,
 	doc.user_id,
-	doc.doc_quant_gross
+	doc.doc_quant_gross,
+	users_ref(u) AS users_ref,
+	doc.comment_text,
+	users_ref(u_last) AS last_modif_users_ref,
+	doc.last_modif_date_time
 	
    FROM doc_material_procurements doc
      LEFT JOIN suppliers sup ON sup.id = doc.supplier_id
@@ -35,6 +39,8 @@ CREATE OR REPLACE VIEW doc_material_procurements_list AS
      LEFT JOIN raw_materials mat ON mat.id = doc.material_id
      LEFT JOIN cement_silos silo ON silo.id = doc.cement_silos_id
      LEFT JOIN production_bases bs ON bs.id = doc.production_base_id
+     LEFT JOIN users AS u ON u.id = doc.user_id
+     LEFT JOIN users AS u_last ON u_last.id = doc.last_modif_user_id
      
   ORDER BY doc.date_time DESC;
 

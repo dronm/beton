@@ -9,9 +9,11 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLDOC.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class DOCMaterialMovementList_Model extends ModelSQLDOC{
@@ -130,10 +132,38 @@ class DOCMaterialMovementList_Model extends ModelSQLDOC{
 		$f_vehicle_plate=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_plate",$f_opts);
 		$this->addField($f_vehicle_plate);
 		//********************
+		
+		//*** Field last_modif_users_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Кто последний вносил изменения';
+		$f_opts['id']="last_modif_users_ref";
+						
+		$f_last_modif_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"last_modif_users_ref",$f_opts);
+		$this->addField($f_last_modif_users_ref);
+		//********************
+		
+		//*** Field last_modif_date_time ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Время последнего изменения';
+		$f_opts['id']="last_modif_date_time";
+						
+		$f_last_modif_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"last_modif_date_time",$f_opts);
+		$this->addField($f_last_modif_date_time);
+		//********************
+		
+		//*** Field comment_text ***
+		$f_opts = array();
+		$f_opts['id']="comment_text";
+						
+		$f_comment_text=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"comment_text",$f_opts);
+		$this->addField($f_comment_text);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		
-		$direct = 'ASC';
+		$direct = 'DESC';
 		$order->addField($f_date_time,$direct);
 $this->setLimitConstant('doc_per_page_count');
 	$this->setAggFunctions(

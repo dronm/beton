@@ -207,6 +207,33 @@ function DOCMaterialProcurement_Model(options){
 	options.fields.doc_quant_net = new FieldFloat("doc_quant_net",filed_options);
 	options.fields.doc_quant_net.getValidator().setMaxLength('19');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.comment_text = new FieldText("comment_text",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Кто последний вносил изменения';
+	filed_options.autoInc = false;	
+	
+	options.fields.last_modif_user_id = new FieldInt("last_modif_user_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Время последнего изменения';
+	filed_options.autoInc = false;	
+	
+	options.fields.last_modif_date_time = new FieldDateTimeTZ("last_modif_date_time",filed_options);
+	
 			
 			
 			

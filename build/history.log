@@ -1599,6 +1599,19 @@ DonMaterialProcurement.insert
 1.00381 06/06/2025
 1) DOCMaterialProcurementDialog_View  corrected
 
+
+1.00382
+1) DOCMaterialProcurement new column: comment_text, last_modif_user_id, last_modif_date_time
+2) MaterialFactConsumptionCorretion: comment_text, last_modif_user_id, last_modif_date_time
+3) MaterialFactBalanceCorretion: comment_text, last_modif_user_id, last_modif_date_time
+
+TODO:
+CementSiloBalanceReset: last_modif_user_id, last_modif_date_time
+
+
+
+
+
 - all messages are coming to all clients.
 
 

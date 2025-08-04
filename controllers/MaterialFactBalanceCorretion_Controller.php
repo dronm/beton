@@ -75,6 +75,20 @@ class MaterialFactBalanceCorretion_Controller extends ControllerSQL{
 				,$f_params);
 		$pm->addParam($param);
 		
+			$f_params = array();
+			
+				$f_params['alias']='Кто последний вносил изменения';
+			$param = new FieldExtInt('last_modif_user_id'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Время последнего изменения';
+			$param = new FieldExtDateTimeTZ('last_modif_date_time'
+				,$f_params);
+		$pm->addParam($param);
+		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		//default event
@@ -133,6 +147,20 @@ class MaterialFactBalanceCorretion_Controller extends ControllerSQL{
 		
 			$f_params=array();
 			$param = new FieldExtText('comment_text'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Кто последний вносил изменения';
+			$param = new FieldExtInt('last_modif_user_id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Время последнего изменения';
+			$param = new FieldExtDateTimeTZ('last_modif_date_time'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -224,6 +252,9 @@ class MaterialFactBalanceCorretion_Controller extends ControllerSQL{
 		}
 		material_period_check($this->getDbLink(), $_SESSION["user_id"], $date_time);
 		
+		$pm->setParamValue('last_modif_user_id',$_SESSION['user_id']);
+		$pm->setParamValue('last_modif_date_time',date('Y-m-d H:i:s'));
+
 		parent::update($pm);
 	}
 
@@ -237,6 +268,9 @@ class MaterialFactBalanceCorretion_Controller extends ControllerSQL{
 
 		material_period_check($this->getDbLink(), $_SESSION["user_id"], $this->getExtDbVal($pm, 'date_time'));
 		
+		$pm->setParamValue('last_modif_user_id',$_SESSION['user_id']);
+		$pm->setParamValue('last_modif_date_time',date('Y-m-d H:i:s'));
+
 		parent::insert($pm);
 	}
 

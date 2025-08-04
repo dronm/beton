@@ -203,6 +203,14 @@ function DOCMaterialMovementList_View(id,options){
 								})
 							]
 						})
+						,new GridCellHead(id+":grid:head:comment_text",{
+							"value":"Комментарий",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("comment_text")
+								})
+							]
+						})
 						,new GridCellHead(id+":grid:head:users_ref",{
 							"value":"Кто создал",
 							"columns":[
@@ -219,6 +227,32 @@ function DOCMaterialMovementList_View(id,options){
 								})
 							],
 							"sortable":true
+						})
+						,new GridCellHead(id+":grid:head:last_modif_users_ref",{
+							"value":"Кто изменил",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("last_modif_users_ref"),
+									"ctrlClass":UserEditRef,
+									"ctrlEdit": false,
+									"searchOptions":{
+										"field":new FieldInt("last_modif_user_id"),
+										"searchType":"on_match",
+										"typeChange":false
+									}									
+									
+								})
+							],
+							"sortable":true
+						})
+						,new GridCellHead(id+":grid:head:last_modif_date_time",{
+							"value":"Дата изменения",
+							"columns":[
+								new GridColumnDateTime({
+									"field":model.getField("last_modif_date_time"),
+									"ctrlEdit": false
+								})
+							]
 						})
 					]
 				})

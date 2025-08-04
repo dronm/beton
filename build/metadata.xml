@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-06-03 06:26:39</lastBuild></version>
+		<lastBuild>2025-08-05 04:30:20</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -285,6 +285,7 @@
 		<version dateOpen="2025-06-02 12:56:54" dateClose="2025-06-03 06:26:58">1.003768</version>
 		<version dateOpen="2025-06-05 07:18:30" dateClose="2025-06-05 07:18:57">1.00380</version>
 		<version dateOpen="2025-06-06 06:12:49" dateClose="2025-06-06 06:13:13">1.00381</version>
+		<version dateOpen="2025-08-01 12:10:50" dateClose="2025-08-05 04:30:37">1.00382</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -2446,6 +2447,9 @@
 			<field id="production_base_id" dataType="Int" alias="База" refTable="production_bases" refField="id"/>
 			<field id="doc_quant_gross" dataType="Float" length="19" alias="Брутто по документам" precision="2"/>
 			<field id="doc_quant_net" dataType="Float" length="19" alias="Нетто по документам" precision="2"/>
+			<field id="comment_text" dataType="Text"/>
+			<field id="last_modif_user_id" dataType="Int" refTable="users" refField="id" alias="Кто последний вносил изменения"/>
+			<field id="last_modif_date_time" dataType="DateTimeTZ" alias="Время последнего изменения"/>
 			<index id="doc_material_procurements_date_time_index">
 				<field id="date_time"/>
 			</index>
@@ -2505,7 +2509,10 @@
 			<field id="doc_quant_net" dataType="Float" length="19" precision="4" alias="Вес чистый"/>
 			<field id="doc_ref" dataType="String" length="36"/>
 			<field id="user_id" dataType="Int" alias="Автор"/>
+			<field id="users_ref" dataType="JSON" alias="Автор"/>
 			<field id="doc_quant_gross" dataType="Float" length="19" alias="Брутто по документам" precision="2"/>
+			<field id="last_modif_users_ref" dataType="JSON" alias="Кто последний вносил изменения"/>
+			<field id="last_modif_date_time" dataType="DateTimeTZ" alias="Время последнего изменения"/>
 		</model>
 		<model id="DOCMaterialProcurementDialog" parent="ModelSQLDOC" dataTable="doc_material_procurements_list" virtual="TRUE" baseModelId="DOCMaterialProcurement">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Идентификатор"/>
@@ -2532,6 +2539,10 @@
 			<field id="doc_ref" dataType="String" length="36"/>
 			<field id="user_id" dataType="Int" alias="Автор"/>
 			<field id="doc_quant_gross" dataType="Float" length="19" alias="Брутто по документам" precision="2"/>
+			<field id="users_ref" dataType="JSON" alias="Автор"/>
+			<field id="comment_text" dataType="Text" alias="Автор"/>
+			<field id="last_modif_users_ref" dataType="JSON" alias="Кто последний вносил изменения"/>
+			<field id="last_modif_date_time" dataType="DateTimeTZ" alias="Время последнего изменения"/>
 		</model>
 		<model id="DOCMaterialProcurementDriverList" parent="ModelSQLDOC" dataTable="doc_material_procurements_driver_list" virtual="TRUE">
 			<field id="driver" dataType="String" primaryKey="TRUE" alias="Водитель"/>
@@ -4033,6 +4044,8 @@
 			<field id="material_id" dataType="Int" refTable="raw_materials" refField="id" required="TRUE"/>
 			<field id="required_balance_quant" dataType="Float" length="19" precision="4" required="TRUE"/>
 			<field id="comment_text" dataType="Text"/>
+			<field id="last_modif_user_id" dataType="Int" refTable="users" refField="id" alias="Кто последний вносил изменения"/>
+			<field id="last_modif_date_time" dataType="DateTimeTZ" alias="Время последнего изменения"/>
 			<index id="material_fact_balance_corrections_date_time_idx" unique="FALSE">
 				<field id="date_time"/>
 			</index>
@@ -4063,6 +4076,8 @@
 			<field id="materials_ref" dataType="JSON" alias="Материал"/>
 			<field id="required_balance_quant" dataType="Float" alias="Желаемый остаток"/>
 			<field id="comment_text" dataType="Text" alias="Комментарий"/>
+			<field id="last_modif_users_ref" dataType="JSON" alias="Кто последний вносил изменения"/>
+			<field id="last_modif_date_time" dataType="DateTimeTZ" alias="Время последнего изменения"/>
 		</model>
 		<model id="CementSilo" parent="ModelSQLBeton" dataTable="cement_silos" virtual="FALSE">
 			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
@@ -5246,13 +5261,16 @@
 			<field id="user_id" dataType="Int" alias="Автор" refTable="users" refField="id"/>
 			<field id="carrier_id" dataType="Int" alias="Carrier" refTable="suppliers" refField="id"/>
 			<field id="vehicle_plate" dataType="String" length="10" alias="Vehicle plate"/>
+			<field id="last_modif_user_id" dataType="Int" refTable="users" refField="id" alias="Кто последний вносил изменения"/>
+			<field id="last_modif_date_time" dataType="DateTimeTZ" alias="Время последнего изменения"/>
+			<field id="comment_text" dataType="Text"/>
 		</model>
 		<model id="DOCMaterialMovementList" parent="ModelSQLDOC" dataTable="doc_material_movements_list" virtual="FALSE" modelType="DOC" docTypeId="material_movement">
 			<aggFunctions>
 				<aggFunction alias="total_quant" expr="sum(quant)"/>
 			</aggFunctions>
 			<defaultOrder>
-				<field id="date_time"/>
+				<field id="date_time" sortDirect="DESC"/>
 			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="date_time" dataType="DateTime" dbRequired="TRUE" alias="Дата"/>
@@ -5266,6 +5284,9 @@
 			<field id="users_ref" dataType="JSON"/>
 			<field id="carriers_ref" dataType="JSON"/>
 			<field id="vehicle_plate" dataType="String" alias="Vehicle plate"/>
+			<field id="last_modif_users_ref" dataType="JSON" alias="Кто последний вносил изменения"/>
+			<field id="last_modif_date_time" dataType="DateTimeTZ" alias="Время последнего изменения"/>
+			<field id="comment_text" dataType="Text"/>
 		</model>
 	</models>
 	<constants>

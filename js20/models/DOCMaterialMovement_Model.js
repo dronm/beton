@@ -125,6 +125,34 @@ function DOCMaterialMovement_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.vehicle_plate = new FieldString("vehicle_plate",filed_options);
+	options.fields.vehicle_plate.getValidator().setMaxLength('10');
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Кто последний вносил изменения';
+	filed_options.autoInc = false;	
+	
+	options.fields.last_modif_user_id = new FieldInt("last_modif_user_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Время последнего изменения';
+	filed_options.autoInc = false;	
+	
+	options.fields.last_modif_date_time = new FieldDateTimeTZ("last_modif_date_time",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.comment_text = new FieldText("comment_text",filed_options);
 	
 		DOCMaterialMovement_Model.superclass.constructor.call(this,id,options);
 }
