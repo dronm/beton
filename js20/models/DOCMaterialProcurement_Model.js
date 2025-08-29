@@ -51,7 +51,7 @@ function DOCMaterialProcurement_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.number = new FieldString("number",filed_options);
-	options.fields.number.getValidator().setMaxLength('11');
+	options.fields.number.getValidator().setMaxLength('12');
 	
 				
 	

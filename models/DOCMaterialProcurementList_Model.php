@@ -50,7 +50,7 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		$f_opts = array();
 		
 		$f_opts['alias']='Номер';
-		$f_opts['length']=11;
+		$f_opts['length']=12;
 		$f_opts['id']="number";
 						
 		$f_number=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"number",$f_opts);

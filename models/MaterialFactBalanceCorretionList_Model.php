@@ -151,6 +151,15 @@ class MaterialFactBalanceCorretionList_Model extends ModelSQLBeton{
 		$f_last_modif_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"last_modif_users_ref",$f_opts);
 		$this->addField($f_last_modif_users_ref);
 		//********************
+		
+		//*** Field quant_dif ***
+		$f_opts = array();
+		$f_opts['length']=19;
+		$f_opts['id']="quant_dif";
+						
+		$f_quant_dif=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_dif",$f_opts);
+		$this->addField($f_quant_dif);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

@@ -45,7 +45,7 @@ function DOCMaterialProcurementList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.number = new FieldString("number",filed_options);
-	options.fields.number.getValidator().setMaxLength('11');
+	options.fields.number.getValidator().setMaxLength('12');
 		
 	
 	var filed_options = {};
@@ -296,6 +296,7 @@ function DOCMaterialProcurementList_Model(options){
 	
 	options.fields.last_modif_users_ref = new FieldJSON("last_modif_users_ref",filed_options);
 	
+			
 			
 		DOCMaterialProcurementList_Model.superclass.constructor.call(this,id,options);
 }

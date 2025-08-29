@@ -201,9 +201,14 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$supplier_ref_db = $sup_params->getParamById('supplier_ref');
 		
 		$supplier_ar = $link->query_first(sprintf(
-			"SELECT id,name,name_full
+			"SELECT 
+				id, name, name_full, ext_ref_scales
 			FROM suppliers
-			WHERE ext_ref_scales=%s",
+		WHERE 
+			lower(name) = lower(%s) 
+			OR ext_ref_scales = %s
+		LIMIT 1",
+			$supplier_name_db,
 			$supplier_ref_db
 		));
 	
@@ -217,17 +222,19 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				$supplier_name_full_db,
 				$supplier_ref_db
 			));						
+
 		}
-		else if($supplier_name_db!=$supplier_ar['name'] || $supplier_name_full_db!=$supplier_ar['name_full']){
+		/*else if($supplier_ref_db!=$supplier_ar['ext_ref_scales'] || $supplier_name_full_db!=$supplier_ar['name_full']){
 			$link_master->query(sprintf(
 				"UPDATE suppliers
-				SET name=%s,name_full=%s
-				WHERE ext_ref_scales=%s",
-				$supplier_name_db,
+				SET ext_ref_scales=%s, name_full=%s
+				WHERE lower(name) = lower(%s)",
+				$supplier_ref_db,
 				$supplier_name_full_db,
-				$supplier_ref_db
+				$supplier_name_db
 			));
 		}
+		*/
 		$supplier_id = intval($supplier_ar['id']);
 		
 		//Для Горного: если supplier_id=Горный и дата МЕНЬШЕ= 24/06/21 - Не грузить!
@@ -246,9 +253,11 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$carrier_ref_db = $car_params->getParamById('carrier_ref');
 		
 		$carrier_ar = $link->query_first(sprintf(
-			"SELECT id,name,name_full
+			"SELECT 
+				id, name, name_full, ext_ref_scales
 			FROM suppliers
-			WHERE ext_ref_scales=%s",
+			WHERE lower(name) = lower(%s) OR ext_ref_scales = %s LIMIT 1",
+			$carrier_name_db,
 			$carrier_ref_db
 		));
 	
@@ -256,24 +265,26 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			//new carrier
 			$carrier_ar = $link_master->query_first(sprintf(
 				"INSERT INTO suppliers
-				(name,name_full,ext_ref_scales)
+				(name, name_full, ext_ref_scales)
 				VALUES (%s,%s,%s)
 				RETURNING id",
 				$carrier_name_db,
 				$carrier_name_full_db,
 				$carrier_ref_db
 			));
-		}
-		else if($carrier_name_db!=$carrier_ar['name'] || $carrier_name_full_db!=$carrier_ar['name_full']){
+
+		} 
+		/*else if($carrier_ref_db!=$carrier_ar['ext_ref_scales'] || $carrier_name_full_db!=$carrier_ar['name_full']){
 			$link_master->query(sprintf(
 				"UPDATE suppliers
-				SET name=%s,name_full=%s
-				WHERE ext_ref_scales=%s",
-				$carrier_name_db,
+				SET ext_ref_scales = %s, name_full=%s
+				WHERE lower(name) = lower(%s)",
+				$carrier_ref_db,
 				$carrier_name_full_db,
-				$carrier_ref_db
+				$carrier_name_db
 			));
 		}
+		*/
 		$carrier_id = $carrier_ar['id'];
 						
 		//material
@@ -282,7 +293,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$material_db = $mat_params->getParamById('material');
 		$material_ar = $link->query_first(sprintf(
 			"SELECT id FROM raw_materials
-			WHERE name=%s",
+			WHERE name = %s",
 			$material_db
 		));
 		if (!is_array($material_ar)|| count($material_ar)==0){

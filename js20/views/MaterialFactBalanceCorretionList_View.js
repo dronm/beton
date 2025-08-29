@@ -123,7 +123,21 @@ function MaterialFactBalanceCorretionList_View(id,options){
 								})
 							]
 						})
-						/*
+						,new GridCellHead(id+":grid:head:quant_dif",{
+							"value":"Корр-ка",
+							"columns":[
+								new GridColumnFloat({
+									"field":model.getField("quant_dif"),
+									"length":"19",
+									"precision":"4",
+									"ctrlClass":EditFloat,
+									"ctrlEdit": false,
+									"ctrlOptions":{
+										"precision":"4"
+									}
+								})
+							]
+						})
 						,new GridCellHead(id+":grid:head:comment_text",{
 							"value":"Комментарий",
 							"columns":[
@@ -132,7 +146,6 @@ function MaterialFactBalanceCorretionList_View(id,options){
 								})
 							]
 						})
-						*/
 						,new GridCellHead(id+":grid:head:date_time",{
 							"value":"Дата корректировки",
 							"columns":[

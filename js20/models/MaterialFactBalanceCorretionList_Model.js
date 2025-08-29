@@ -153,6 +153,16 @@ function MaterialFactBalanceCorretionList_Model(options){
 	options.fields.last_modif_users_ref = new FieldJSON("last_modif_users_ref",filed_options);
 	
 			
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.quant_dif = new FieldFloat("quant_dif",filed_options);
+	options.fields.quant_dif.getValidator().setMaxLength('19');
+	
 		MaterialFactBalanceCorretionList_Model.superclass.constructor.call(this,id,options);
 }
 extend(MaterialFactBalanceCorretionList_Model,ModelXML);

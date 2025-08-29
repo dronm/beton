@@ -1591,6 +1591,13 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			}
 
 			$this->getDbLinkMaster()->query(sprintf(
+				"DELETE FROM notifications.tm_logins
+				WHERE app_id = %d AND tel = %s",
+				MS_APP_ID,
+				$this->getExtDbVal($pm,'tel')
+			));
+
+			$this->getDbLinkMaster()->query(sprintf(
 				"INSERT INTO notifications.tm_logins (tel, exp_date_time, code_exp_date_time, tries, ext_user_id, app_id, code)
 				VALUES (%s,
 					now()::timestampTZ+'%d seconds'::interval,

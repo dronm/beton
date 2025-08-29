@@ -1605,6 +1605,19 @@ DonMaterialProcurement.insert
 2) MaterialFactConsumptionCorretion: comment_text, last_modif_user_id, last_modif_date_time
 3) MaterialFactBalanceCorretion: comment_text, last_modif_user_id, last_modif_date_time
 
+1) Поступление материалов коммент в таблицу
+2) Корректировка факт.остатков материалов, коммент в таблицу, Показать разницу +/-
+
+
+1.00383
+1) User_Controller INSERT INTO notifications.tm_logins added ON CONFILICT 
+have not checked!!!
+Update real controller!!!
+
+
+1.00384
+1) RawMaterial_Controller uploadProcurementDocument()
+
 TODO:
 CementSiloBalanceReset: last_modif_user_id, last_modif_date_time
 

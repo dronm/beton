@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-08-05 04:30:20</lastBuild></version>
+		<lastBuild>2025-08-29 16:48:43</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -286,6 +286,7 @@
 		<version dateOpen="2025-06-05 07:18:30" dateClose="2025-06-05 07:18:57">1.00380</version>
 		<version dateOpen="2025-06-06 06:12:49" dateClose="2025-06-06 06:13:13">1.00381</version>
 		<version dateOpen="2025-08-01 12:10:50" dateClose="2025-08-05 04:30:37">1.00382</version>
+		<version dateOpen="2025-08-28 16:01:15" dateClose="2025-08-29 16:49:06">1.00383</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -2430,7 +2431,7 @@
 			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="date_time" dataType="DateTime" dbRequired="TRUE" alias="Дата"/>
-			<field id="number" dataType="String" length="11" alias="Номер"/>
+			<field id="number" dataType="String" length="12" alias="Номер"/>
 			<field id="doc_ref" dataType="String" length="36"/>
 			<field id="processed" dataType="Bool" alias="Проведен" default="false"/>
 			<field id="user_id" dataType="Int" alias="Автор" refTable="users" refField="id"/>
@@ -2513,6 +2514,7 @@
 			<field id="doc_quant_gross" dataType="Float" length="19" alias="Брутто по документам" precision="2"/>
 			<field id="last_modif_users_ref" dataType="JSON" alias="Кто последний вносил изменения"/>
 			<field id="last_modif_date_time" dataType="DateTimeTZ" alias="Время последнего изменения"/>
+			<field id="comment_text" dataType="Text" alias="Автор"/>
 		</model>
 		<model id="DOCMaterialProcurementDialog" parent="ModelSQLDOC" dataTable="doc_material_procurements_list" virtual="TRUE" baseModelId="DOCMaterialProcurement">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Идентификатор"/>
@@ -4078,6 +4080,7 @@
 			<field id="comment_text" dataType="Text" alias="Комментарий"/>
 			<field id="last_modif_users_ref" dataType="JSON" alias="Кто последний вносил изменения"/>
 			<field id="last_modif_date_time" dataType="DateTimeTZ" alias="Время последнего изменения"/>
+			<field id="quant_dif" dataType="Float" length="19" precision="4"/>
 		</model>
 		<model id="CementSilo" parent="ModelSQLBeton" dataTable="cement_silos" virtual="FALSE">
 			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>

@@ -76,7 +76,7 @@ extend(User_Controller,ControllerObjServer);
 	
 	var options = {};
 	options.required = true;	
-	options.enumValues = 'admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner,client,weighing';
+	options.enumValues = 'owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner,client,weighing';
 	var field = new FieldEnum("role_id",options);
 	
 	pm.addField(field);
@@ -173,7 +173,7 @@ extend(User_Controller,ControllerObjServer);
 	
 	var options = {};
 		
-	options.enumValues = 'admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner,client,weighing';
+	options.enumValues = 'owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner,client,weighing';
 	options.enumValues+= (options.enumValues=='')? '':',';
 	options.enumValues+= 'null';
 	

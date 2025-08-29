@@ -118,7 +118,7 @@ class User_Controller extends ControllerSQL{
 			
 				$f_params['required']=TRUE;
 			
-				$param = new FieldExtEnum('role_id',',','admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner,client,weighing'
+				$param = new FieldExtEnum('role_id',',','owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner,client,weighing'
 				,$f_params);
 		$pm->addParam($param);
 		
@@ -218,7 +218,7 @@ class User_Controller extends ControllerSQL{
 		
 			$f_params=array();
 			
-				$param = new FieldExtEnum('role_id',',','admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner,client,weighing'
+				$param = new FieldExtEnum('role_id',',','owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner,client,weighing'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -1259,7 +1259,6 @@ class User_Controller extends ControllerSQL{
 			,intval($ar['id'])
 			,$dif_sess_srv? aprintf(' AND app_id=%d',MS_APP_ID):''
 		));
-		/* file_put_contents(OUTPUT_PATH.'login.txt',var_export($log_ar, true)); */
 		if (!isset($log_ar['pub_key'])){
 			//no user login
 			
@@ -2251,6 +2250,13 @@ class User_Controller extends ControllerSQL{
 			}
 
 			$this->getDbLinkMaster()->query(sprintf(
+				"DELETE FROM notifications.tm_logins
+				WHERE app_id = %d AND tel = %s",
+				MS_APP_ID,
+				$this->getExtDbVal($pm,'tel')
+			));
+
+			$this->getDbLinkMaster()->query(sprintf(
 				"INSERT INTO notifications.tm_logins (tel, exp_date_time, code_exp_date_time, tries, ext_user_id, app_id, code)
 				VALUES (%s,
 					now()::timestampTZ+'%d seconds'::interval,
@@ -2456,9 +2462,10 @@ class User_Controller extends ControllerSQL{
 			$tm_photo = isset($_SESSION['tm_photo'])? $_SESSION['tm_photo'] : NULL;	
 			$photo_url = isset($_SESSION['photo_url'])? $_SESSION['photo_url'] : NULL;		
 
-			//DO NOT KILL OLD SESSSION!!!!
+			//DO NOT set variable to empty array, as it initiatess session_destroy()
+			//and the trigger closes session.	
 			//$_SESSION = array(); 
-		
+
 			$pubKey = '';
 			$this->set_logged($ar, $pubKey);
 			$_SESSION['width_type'] = $width_type;
@@ -2471,15 +2478,15 @@ class User_Controller extends ControllerSQL{
 			$this->add_auth_model($pubKey, session_id(), md5($ar['pwd']), $this->calc_session_expiration_time());
 
 			//add lsn model
-			/* $ar = $this->getDbLinkMaster()->query_first(sprintf("SELECT pg_current_wal_lsn() AS lsn")); */
-			/* if(is_array($ar) && count($ar) && isset($ar["lsn"])) { */
-			/* 	$this->addModel(new ModelVars( */
-			/* 		array('name' => 'Vars', */
-			/* 			'id' => 'Lsn_Model', */
-			/* 			'values' => array(new Field("lsn", DT_STRING, array('value' => $ar["lsn"])))  */
-			/* 		) */
-			/* 	));		 */
-			/* } */
+			$ar = $this->getDbLinkMaster()->query_first(sprintf("SELECT pg_current_wal_lsn() AS lsn"));
+			if(is_array($ar) && count($ar) && isset($ar["lsn"])) {
+				$this->addModel(new ModelVars(
+					array('name'=>'Vars',
+						'id'=>'Lsn_Model',
+						'values' => array(new Field("lsn", DT_STRING, array('value' => $ar["lsn"]))) 
+					)
+				));		
+			}
 		}
 	}
 	

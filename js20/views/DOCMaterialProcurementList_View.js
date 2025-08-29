@@ -255,6 +255,14 @@ function DOCMaterialProcurementList_View(id,options){
 							]
 						})
 						
+						,new GridCellHead(id+":grid:head:comment_text",{
+							"value":"Комментарий",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("comment_text")
+								})
+							]
+						})
 					]
 				})
 			]

@@ -34,7 +34,7 @@ function DOCMaterialProcurementDialog_View(id,options){
 		this.addElement(new EditString(id+":number",{
 			"labelCaption":"Номер:",
 			"placeholder":"Номер накладной",
-			"length":"11"
+			"length":"12"
 		}));	
 
 		this.addElement(new SupplierEdit(id+":suppliers_ref",{
