@@ -1273,3 +1273,61 @@ AppBeton.prototype.openHrefDownload = function(cont, pm, viewId, href){
 
 }
 
+AppBeton.prototype.m_offLineWarnTimer;
+AppBeton.prototype.MSG_ONLINE = "Интернет соединение воосстановлено.";
+AppBeton.prototype.MSG_OFFLINE = "Потеряно соединение. Переключение в оффлайн режим. Некоторые функции не доступны.";
+AppBeton.prototype.m_isOffline = false;
+
+AppBeton.prototype.initWorkers = function(){	
+	const self = this;
+	console.log("AppBeton.initWorkers")
+	if ('serviceWorker' in navigator) {
+		// const path = this.getServVar("basePath");
+		// navigator.serviceWorker.register(path+"js20/sw.js",  { scope: path })
+		// navigator.serviceWorker.register("/js20/sw.js", { scope: "/"})
+		navigator.serviceWorker.register("sw.js")
+		.then(reg => {
+			console.log('Service Worker registered')
+			 // listen for messages from SW
+			navigator.serviceWorker.addEventListener('message', event => {
+				const msg = event.data;
+				if (!msg || !msg.type) return;
+
+				if (msg.type === 'OFFLINE') {
+					self.m_isOffline = true;
+					window.showTempError(self.MSG_OFFLINE, null, 10000);					
+
+				}
+				if (msg.type === 'ONLINE') {
+					self.m_isOffline = false;
+					window.showTempOk(self.MSG_ONLINE, null, 10000);					
+				}
+			});
+		}).catch(
+			err => {
+				window.showTempError('ServiceWorker registration failed:', null, 10000);					
+			}
+		);
+	}
+
+	window.addEventListener('online', () => {
+		window.showTempOk(self.MSG_ONLINE, null, 10000);					
+		if(this.m_offLineWarnTimer){
+			clearInterval(this.m_offLineWarnTimer);
+		}
+	});
+
+	window.addEventListener('offline', () => {
+		window.showTempError(self.MSG_OFFLINE, null, 10000);					
+		if(this.m_offLineWarnTimer){
+			clearInterval(this.m_offLineWarnTimer);
+		}
+
+		this.m_offLineWarnTimer = setInterval(
+			() => {
+				window.showTempWarn(self.MSG_OFFLINE, null, 10000);					
+			},
+			600000
+		);
+	});
+}

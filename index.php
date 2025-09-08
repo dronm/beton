@@ -1,5 +1,6 @@
 <?php
 header('Access-Control-Allow-Origin: *');
+/* header('Service-Worker-Allowed: /'); */
 require_once('Config.php');
 
 //ini_set('session.serialize_handler', 'php_serialize');

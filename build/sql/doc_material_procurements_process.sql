@@ -68,7 +68,8 @@ BEGIN
 			--Определить завод по приходу
 			SELECT production_site_id INTO v_production_site_id FROM store_map_to_production_sites WHERE store = NEW.store;
 			--RAISE EXCEPTION 'v_production_site_id=%',v_production_site_id;
-			IF v_production_site_id IS NULL THEN
+			-- IF v_production_site_id IS NULL THEN
+			IF NOT FOUND THEN
 				-- no match!
 				INSERT INTO store_map_to_production_sites (store) VALUES (NEW.store);
 			END IF;
@@ -165,6 +166,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION public.doc_material_procurements_process()
-  OWNER TO ;
 

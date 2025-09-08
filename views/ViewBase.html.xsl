@@ -139,6 +139,8 @@
 		,"token":'<xsl:value-of select="/document/model[@id='ModelVars']/row[1]/token"/>'
 		,"tokenExpires":'<xsl:value-of select="/document/model[@id='ModelVars']/row[1]/tokenExpires"/>'
 	});	
+	//worker for offline
+	application.initWorkers();
 	</xsl:if>
 	<!-- [@default='FALSE']-->
 	<xsl:variable name="def_menu_item" select="//menuitem[@default='true']"/>
