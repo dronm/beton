@@ -23,5 +23,3 @@ CREATE OR REPLACE VIEW material_store_for_order_list AS
 	WHERE t.load_capacity > 0
 	ORDER BY pst.name, mat.name
 	;
-	
-ALTER VIEW material_store_for_order_list OWNER TO ;

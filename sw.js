@@ -39,11 +39,14 @@ const STATIC_ASSETS = [
 	"js20/assets/js/plugins/forms/styling/uniform.min.js",
 	"js20/ext/bootstrap-datepicker/bootstrap-datepicker.min.js",
 	"js20/ext/bootstrap-datepicker/bootstrap-datepicker.ru.min.js",
+	"js20/ext/OpenLayers/OpenLayers.js",
+	"js20/ext/chart.js-2.8.0/Chart.min.js",
 //
 	"js20/jquery.maskedinput.js",
 	"js20/ext/cleave/cleave.min.js",
 	"js20/ext/cleave/cleave-phone.ru.js",
 	"js20/ext/mustache/mustache.min.js",
+	"js20/ext/jshash-2.2/md5-min.js",
 	"js20/ext/jshash-2.2/md5-min.js",
 	'js20/lib.js',
 ];
@@ -53,12 +56,7 @@ let isLogged = false;
 const ROOT_PATH = "/beton_new/";
 
 self.addEventListener("install", event => {
-  console.log("SW install fired");
-  // self.skipWaiting(); // immediately activate new SW
-	// event.waitUntil(
-	// 	caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS))
-	// );
-	//  
+	console.log("SW install fired");
 	event.waitUntil(
 		caches.open(CACHE_NAME).then(cache => {
 			return Promise.all(
@@ -106,6 +104,8 @@ self.addEventListener('fetch', event => {
 			||(paramC === "ProductionSite_Controller" && paramF === "get_list")
 			||(paramC === "Weather_Controller" )
 			||(paramC === "UserChat_Controller" && paramF === "get_history")
+			||(paramC === "UserChat_Controller" && paramF === "get_user_list")
+			||(paramC === "ChatStatus_Controller" && paramF === "get_list")
 			||(paramC === "Shipment_Controller" && paramF === "get_operator_list")
 		){
 			isCachable = true;
@@ -126,11 +126,24 @@ self.addEventListener('fetch', event => {
                     if (networkResponse && networkResponse.ok) {
                         const cache = await caches.open(CACHE_NAME);
                         cache.put(event.request, networkResponse.clone());
+
+						if (isOffline) {
+							console.log("setting isOffline to FALSE")
+							isOffline = false;
+							notifyClients({ type: 'ONLINE' });
+						}
+
 						console.log("request is cached")
                     }
 
                     return networkResponse;
                 } catch (error) {
+					// if (!isOffline) {
+						isOffline = true;
+						// console.log("error fetching resource, setting isOffline to TRUE")
+						notifyClients({ type: 'OFFLINE' });
+					// }
+
                     // Network failed, try cache
                     const cache = await caches.open(CACHE_NAME);
                     const cachedResponse = await cache.match(event.request);
