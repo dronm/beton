@@ -76,39 +76,6 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	 * устаревший метод чтения XML
 	 */
 	/*public function update_procurement($pm){
-		$docs_str = $pm->getParamValue('docs');
-		
-		$link_master = $this->getDbLinkMaster();
-		$link = $this->getDbLink();
-		
-		$xml = new SimpleXMLElement($docs_str);
-		$doc_cnt = 0;
-		try{
-			foreach ($xml->doc as $doc) {
-				$this->loadProcurementDocument($pm, $doc);
-				
-				$doc_cnt++;
-			}
-			
-			$res = 'true';
-			$descr = 'null';
-		
-		}catch (Exception $e){
-			$res = 'false';			
-			$descr = "'".str_replace("'",'"',$e->getMessage())."'";
-		}
-		
-		$link_master->query("DELETE FROM raw_material_procur_uploads");
-		$link_master->query(sprintf(
-			"INSERT INTO raw_material_procur_uploads
-			(date_time,result,descr,doc_count)
-			VALUES ('%s',%s,%s,%d)",
-			date('Y-m-d H:i:s'),$res,$descr,$doc_cnt
-		));
-		if ($res == 'false'){
-			throw $e;
-		}
-		
 	}*/
 
 	public function load_procurement($pm){
@@ -117,6 +84,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		try{
 			$doc = json_decode($pm->getParamValue('doc'),FALSE);
+			//file_put_contents(OUTPUT_PATH.'procur.txt', var_export($doc, true).PHP_EOL, FILE_APPEND);
 
 			//if document date is less then allowed date - throw error
 			$ar = $this->getDbLink()->query_first( "SELECT (const_reglament_user_val()->'keys'->>'id')::int AS user_id");

@@ -29,21 +29,34 @@ class ConnectElkonCheck_Controller extends ControllerSQL{
 			
 		$pm = new PublicMethod('connected');
 		
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('base_id',$opts));
+	
+			
 		$this->addPublicMethod($pm);
 
 		
 	}	
 	
-		public function connected($pm){
-			$this->addNewModel(
-				"SELECT DISTINCT ON (production_site_id) 
-					production_site_id,
-					elkon_connect_err(message, date_time) AS pong
-				FROM elkon_log
-				ORDER BY production_site_id, date_time DESC;"
-			,'ConnectElkon_Model'		
-			);
-		}
+	public function connected($pm){
+
+		$base_id = $pm->getParamValue('base_id')? $this->getExtDbVal($pm,'base_id'):0;
+		$this->addNewModel(
+			sprintf("SELECT DISTINCT ON (el.production_site_id) 
+				el.production_site_id,
+				elkon_connect_err(el.message, el.date_time) AS pong
+			FROM elkon_log AS el
+			LEFT JOIN production_sites AS ps ON ps.id = el.production_site_id
+			WHERE %d = 0 OR ps.production_base_id = %d
+			ORDER BY 
+				el.production_site_id, 
+				el.date_time DESC"
+		,$base_id, $base_id)
+		,'ConnectElkon_Model'		
+		);
+	}
 
 }
 ?>

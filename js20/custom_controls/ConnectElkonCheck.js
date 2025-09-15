@@ -11,9 +11,10 @@
  * @param {string} id - Object identifier
  * @param {object} options
  */
-function ConnectElkonCheck(){
+function ConnectElkonCheck(baseId){
 	this.m_values = {};
 	this.m_refreshInterval = 0;
+	this.m_baseId = baseId;
 
 	this.activate();
 }
@@ -42,14 +43,15 @@ ConnectElkonCheck.prototype.setRefreshInterval = function(newInterval) {
 	var self = this;
 
 	this.m_refreshInterval = newInterval;
+	if(this.m_timer !== undefined){
+		clearInterval(this.m_timer);
+		this.m_timer = undefined;
+	}
+
 	if(newInterval > 0){
 		this.m_timer = setInterval(function(){
 			self.refresh();
 		}, this.m_refreshInterval);	
-
-	}else if(this.m_timer !== undefined){
-		clearInterval(this.m_timer);
-		this.m_timer = undefined;
 	}
 }
 
@@ -90,7 +92,9 @@ ConnectElkonCheck.prototype.deactivate = function(){
 
 ConnectElkonCheck.prototype.refresh = function(){
 	const self = this;
-	(new ConnectElkonCheck_Controller()).getPublicMethod("connected").run({
+	const pm = new ConnectElkonCheck_Controller().getPublicMethod("connected");
+	pm.setFieldValue("base_id", this.m_baseId);
+	pm.run({
 		"ok":function(resp){
 			const modelData = resp.getModelData("ConnectElkon_Model");
 			const fPong = new FieldBool("pong");

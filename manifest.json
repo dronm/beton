@@ -1,0 +1,13 @@
+{
+  "name": "Bereg",
+  "short_name": "Bereg",
+  "description": "Bereg - eurobeton application",
+  "start_url": "/",
+  "version": "1",
+  "lang": "ru-RU",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay"],
+  "orientation": "portrait"
+}

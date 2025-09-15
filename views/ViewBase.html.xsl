@@ -363,7 +363,8 @@
 	<xsl:apply-templates select="model[@id='ModelVars']"/>
 	<xsl:apply-templates select="model[@id='ModelStyleSheet']/row"/>
 	<link rel="icon" type="image/png" href="img/favicon.ico"/>	
-	
+	<link rel="manifest" href="manifest.json"/>	
+
 	<title><xsl:value-of select="/document/model[@id='Page_Model']/row[1]/PROG_TITLE"/></title>
 </xsl:template>
 
@@ -371,8 +372,14 @@
 <!-- ************** Main Menu ******************** -->
 <xsl:template name="initMenu">
 	<xsl:if test="model[@id='MainMenu_Model'] or /document/model[@id='ModelVars']/row/role_id='owner'">
+
+	<!-- offline mode -->
+	<div id="offline-mode-alert" class="alert alert-danger alert-styled-left alert-bordered hidden">
+		<p>Автономный режим. Ограниченный функционал.</p>
+	</div>
+
 	<!-- Main navigation -->
-	<ul class="nav navbar-nav">
+	<ul class="nav navbar-nav" id="main-menu">
 
 		<!-- Main  -->				
 		<xsl:apply-templates select="/document/model[@id='MainMenu_Model']/menu/*"/>
@@ -663,7 +670,7 @@ throw Error(CommonHelper.longString(function () {/*
 		</div>
 			
 			<xsl:call-template name="initMenu"/>	
-			<ul class="nav navbar-nav navbar-right">			
+			<ul id="user-menu" class="nav navbar-nav navbar-right">			
 			
 				<xsl:if test="/document/model[@id='ModelVars']/row/ping_1c='1'">
 				<li>
@@ -695,7 +702,7 @@ throw Error(CommonHelper.longString(function () {/*
 				</xsl:if>	
 
 				<!-- USER DATA -->
-				<li class="dropdown dropdown-user">
+				<li class="dropdown dropdown-user" >
 					<a class="dropdown-toggle" data-toggle="dropdown">
 						<xsl:variable name="tm_photo" select="/document/model[@id='ModelVars']/row/tm_photo" />
 						<xsl:if test="$tm_photo!=''">

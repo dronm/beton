@@ -31,6 +31,13 @@ extend(ConnectElkonCheck_Controller,ControllerObjServer);
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('connected',opts);
 	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("base_id",options));
+	
+			
 	this.addPublicMethod(pm);
 }
 

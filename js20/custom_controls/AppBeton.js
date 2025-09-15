@@ -1276,9 +1276,8 @@ AppBeton.prototype.openHrefDownload = function(cont, pm, viewId, href){
 //online-offline
 AppBeton.prototype.m_offLineWarnTimer;
 AppBeton.prototype.MSG_ONLINE = "Интернет соединение воосстановлено.";
-AppBeton.prototype.MSG_OFFLINE = "Потеряно соединение. Переключение в оффлайн режим. Некоторые функции не доступны.";
-AppBeton.prototype.m_isOffline = false;
-AppBeton.prototype.MSG_OFFLINE_THROTLE = 0.5*60*1000;
+AppBeton.prototype.MSG_OFFLINE = "Нет соединения, работа в автономном режиме. Некоторые функции не доступны.";
+AppBeton.prototype.MSG_OFFLINE_THROTLE = 5*60*1000;
 AppBeton.prototype.MSG_DURATION = 10*1000;
 
 AppBeton.prototype.initWorkers = function(){	
@@ -1317,28 +1316,71 @@ AppBeton.prototype.initWorkers = function(){
 }
 
 AppBeton.prototype.setOffline = function(){
-	if(this.m_isOffline){
-		return;
-	}
-	this.m_isOffline = true;
-	if(this.m_offLineWarnTimer){
+	const isOffline = !DOMHelper.visible("main-menu");
+
+	if(this.m_offLineWarnTimer && isOffline){
 		return;
 	}
 
+	this.enableControlsForOnline(false);
 	window.showTempError(this.MSG_OFFLINE, null, this.MSG_DURATION);					
 
-	this.m_offLineWarnTimer = setInterval(
-		() => {
-			window.showTempWarn(this.MSG_OFFLINE, null, this.MSG_DURATION);					
-		},
-		this.MSG_OFFLINE_THROTLE
-	);
+	if(!this.m_offLineWarnTimer){
+		this.m_offLineWarnTimer = setInterval(
+			() => {
+				window.showTempWarn(this.MSG_OFFLINE, null, this.MSG_DURATION);					
+			},
+			this.MSG_OFFLINE_THROTLE
+		);
+	}
 }
 
 AppBeton.prototype.setOnline = function(){
-	this.m_isOffline = false;
 	window.showTempOk(this.MSG_ONLINE, null, this.MSG_DURATION);					
 	if(this.m_offLineWarnTimer){
 		clearInterval(this.m_offLineWarnTimer);
+	}
+	this.enableControlsForOnline(true);
+}
+
+AppBeton.prototype.enableControlsForOnline = function(en){
+	if(!en){
+		DOMHelper.hide("main-menu");
+		DOMHelper.hide("user-menu");
+		DOMHelper.disable("OrderMakeList:order_make_filter:downFast");
+		DOMHelper.disable("OrderMakeList:order_make_filter:down");
+		DOMHelper.disable("OrderMakeList:order_make_filter:upFast");
+		DOMHelper.disable("OrderMakeList:order_make_filter:up");
+		DOMHelper.disable("OrderMakeList:order_make_grid:order_make_grid:cmd:insert");
+		DOMHelper.disable("OrderMakeList:order_make_grid:order_make_grid:cmd:allCommands");
+		DOMHelper.show("offline-mode-alert");
+		// const n = document.getElementById("OrderMakeList:order_make_grid:body");
+		// if(n){
+		// 	const sh = DOMHelper.getElementsByAttr("detailToggle", n, "class", false);
+		// 	if(sh && sh.length){
+		// 		sh.forEach(n => {
+		// 			DOMHelper.hide(n);
+		// 		});
+		// 	}
+		// }
+	}else{
+		DOMHelper.hide("offline-mode-alert");
+		DOMHelper.show("main-menu");
+		DOMHelper.show("user-menu");
+		DOMHelper.enable("OrderMakeList:order_make_filter:downFast");
+		DOMHelper.enable("OrderMakeList:order_make_filter:up");
+		DOMHelper.enable("OrderMakeList:order_make_filter:upFast");
+		DOMHelper.enable("OrderMakeList:order_make_filter:up");
+		DOMHelper.enable("OrderMakeList:order_make_grid:order_make_grid:cmd:insert");
+		DOMHelper.enable("OrderMakeList:order_make_grid:order_make_grid:cmd:allCommands");
+		// const n = document.getElementById("OrderMakeList:order_make_grid:body");
+		// if(n){
+		// 	const sh = DOMHelper.getElementsByAttr("detailToggle", n, "class", false);
+		// 	if(sh && sh.length){
+		// 		sh.forEach(n => {
+		// 			DOMHelper.hide(n);
+		// 		});
+		// 	}
+		// }
 	}
 }
