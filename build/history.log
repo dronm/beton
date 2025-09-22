@@ -1630,6 +1630,11 @@ Update real controller!!!
 1.00386
 1) ControllerObjServer offline functionality
 
+1.00388
+1) unregister service worker
+
+
+
 TODO:
 CementSiloBalanceReset: last_modif_user_id, last_modif_date_time
 

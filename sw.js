@@ -1,4 +1,4 @@
-const CACHE_NAME = 'static-cache-v1.0';
+const CACHE_NAME = 'static-cache-v1.1';
 const STATIC_ASSETS = [
 	"/",
 	"img/dot_blue.png",
@@ -103,6 +103,7 @@ async function notifyClients(message) {
 	clients.forEach(client => client.postMessage(message));
 }
 
+/*
 self.addEventListener('fetch', event => {
 	const url = new URL(event.request.url);
 
@@ -240,6 +241,7 @@ self.addEventListener('fetch', event => {
 		);
 	}
 });
+*/
 
 // Make this async function (correct syntax), and use DOMParser (available in workers)
 async function importModels(cache, cacheKey, doc, root) {

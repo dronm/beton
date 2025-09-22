@@ -1282,10 +1282,24 @@ AppBeton.prototype.MSG_DURATION = 10*1000;
 
 AppBeton.prototype.initWorkers = function(){	
 	const self = this;
-	return;
-	/*
 	console.log("AppBeton.initWorkers")
 	if ('serviceWorker' in navigator) {
+		navigator.serviceWorker.getRegistration().then(registration => {
+			if (registration) {
+			  registration.unregister().then(success => {
+				if (success) {
+				  console.log('Service Worker unregistered successfully.');
+				} else {
+				  console.log('No Service Worker registration found to unregister.');
+				}
+			  }).catch(error => {
+				console.error('Error unregistering Service Worker:', error);
+			  });
+			} else {
+			  console.log('No active Service Worker registration found.');
+			}
+		});
+		/*
 		navigator.serviceWorker.register("sw.js")
 		.then(reg => {
 			console.log('Service Worker registered')
@@ -1306,6 +1320,7 @@ AppBeton.prototype.initWorkers = function(){
 				window.showTempError('ServiceWorker registration failed:', null, 10000);					
 			}
 		);
+		*/
 	}
 
 	window.addEventListener('online', () => {
@@ -1315,7 +1330,6 @@ AppBeton.prototype.initWorkers = function(){
 	window.addEventListener('offline', () => {
 		self.setOffline();
 	});
-	*/
 }
 
 AppBeton.prototype.setOffline = function(){
