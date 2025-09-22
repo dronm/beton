@@ -3,6 +3,7 @@
  * Клиентская программа для отображения маршрутов
  * приходит 1 параметр - int ID отгрузки (shipment)
  * разу проверяем: если маршрут завершет или нет такого - ошибка
+ * https://docs.2gis.com/ru/maps/others/rasterjs/overview
  */
  
 require_once(dirname(__FILE__).'/../version.php');
@@ -130,7 +131,7 @@ if(!count($_GET)){
 	exit;
 }
 $id_ar = array_keys($_GET);
-$is_client = (strpos($id_ar[0],'m')===FALSE);
+$is_client = (strpos($id_ar[0],'m')===FALSE); //https://eurobeton.katren.org/route/?m219684
 $shipment_id = intval($is_client? $id_ar[0]:str_replace('m','',$id_ar[0]));
 
 /**

@@ -1627,6 +1627,8 @@ Update real controller!!!
 -2) Date click in MakeOrder_View
 
 
+1.00386
+1) ControllerObjServer offline functionality
 
 TODO:
 CementSiloBalanceReset: last_modif_user_id, last_modif_date_time

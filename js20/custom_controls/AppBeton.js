@@ -1282,6 +1282,8 @@ AppBeton.prototype.MSG_DURATION = 10*1000;
 
 AppBeton.prototype.initWorkers = function(){	
 	const self = this;
+	return;
+	/*
 	console.log("AppBeton.initWorkers")
 	if ('serviceWorker' in navigator) {
 		navigator.serviceWorker.register("sw.js")
@@ -1313,6 +1315,7 @@ AppBeton.prototype.initWorkers = function(){
 	window.addEventListener('offline', () => {
 		self.setOffline();
 	});
+	*/
 }
 
 AppBeton.prototype.setOffline = function(){
