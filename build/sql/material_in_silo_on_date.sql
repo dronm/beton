@@ -29,4 +29,3 @@ $$
 $$
   LANGUAGE sql VOLATILE
   COST 100;
-ALTER FUNCTION material_in_silo_on_date(in_silo_id int, in_date_time timestamp with time zone) OWNER TO ;

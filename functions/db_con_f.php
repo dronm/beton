@@ -8,11 +8,12 @@ function db_con(){
 	$link->technicalemail = TECH_EMAIL;
 	$link->detailedError = defined('DETAILED_ERROR')? DETAILED_ERROR:DEBUG;
 
+	$db_name = (defined('DB_NAME_MASTER'))? DB_NAME_MASTER : DB_NAME;
 	/*conneсtion*/
 	$link->server		= DB_SERVER_MASTER;
-	$link->user		= DB_USER;
+	$link->user			= DB_USER;
 	$link->password		= DB_PASSWORD;
-	$link->database		= DB_NAME;
+	$link->database		= $db_name;
 	$link->connect(DB_SERVER_MASTER, DB_USER, DB_PASSWORD, DB_PORT_MASTER);
 
 	//ВНИМАНИЕ!!! БЕЗ reportError=TRUE исключение не генерится!!!!
@@ -28,7 +29,7 @@ function db_readOnlyCon(){
 
 	/*conneсtion*/
 	$link->server		= DB_SERVER_MASTER;
-	$link->user		= DB_USER;
+	$link->user			= DB_USER;
 	$link->password		= DB_PASSWORD;
 	$link->database		= DB_NAME;
 	$link->connect(DB_SERVER, DB_USER, DB_PASSWORD, DB_PORT);

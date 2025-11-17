@@ -10,6 +10,7 @@
  
  * @param {string} id - Object identifier
  * @param {object} options
+ * @param {number} options.baseId
  */
 function CementSiloForOrderList_View(id,options){
 	options = options || {};	

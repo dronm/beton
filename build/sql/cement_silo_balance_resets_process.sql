@@ -53,11 +53,11 @@ BEGIN
 			
 			--RAISE EXCEPTION 'v_quant=%',v_quant;
 			IF v_quant<>0 THEN			
-				reg_material_facts.date_time		= NEW.date_time;
-				reg_material_facts.deb			= (v_quant>0);
-				reg_material_facts.doc_type  		= 'cement_silo_balance_reset'::doc_types;
-				reg_material_facts.doc_id  		= NEW.id;
-				reg_material_facts.material_id		= v_material_id;
+				reg_material_facts.date_time			= NEW.date_time;
+				reg_material_facts.deb					= (v_quant>0);
+				reg_material_facts.doc_type				= 'cement_silo_balance_reset'::doc_types;
+				reg_material_facts.doc_id		  		= NEW.id;
+				reg_material_facts.material_id			= v_material_id;
 				reg_material_facts.production_base_id	= (
 						SELECT production_base_id
 						FROM production_sites

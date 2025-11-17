@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-09-15 12:24:50</lastBuild></version>
+		<lastBuild>2025-11-18 03:18:06</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -293,6 +293,7 @@
 		<version dateOpen="2025-09-22 08:38:43" dateClose="2025-09-22 08:38:49">1.00387</version>
 		<version dateOpen="2025-09-22 08:39:07" dateClose="2025-09-22 08:39:22">1.00387</version>
 		<version dateOpen="2025-09-22 09:27:33" dateClose="2025-09-22 09:27:39">1.00388</version>
+		<version dateOpen="2025-10-01 08:16:15" dateClose="2025-11-18 03:18:27">1.00389</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -2437,6 +2438,7 @@
 			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="date_time" dataType="DateTime" dbRequired="TRUE" alias="Дата"/>
+			<field id="process_date_time" dataType="DateTime" alias="Дата"/>
 			<field id="number" dataType="String" length="12" alias="Номер"/>
 			<field id="doc_ref" dataType="String" length="36"/>
 			<field id="processed" dataType="Bool" alias="Проведен" default="false"/>
@@ -2457,6 +2459,7 @@
 			<field id="comment_text" dataType="Text"/>
 			<field id="last_modif_user_id" dataType="Int" refTable="users" refField="id" alias="Кто последний вносил изменения"/>
 			<field id="last_modif_date_time" dataType="DateTimeTZ" alias="Время последнего изменения"/>
+			<field id="weigh_app" dataType="Bool" defaultValue="FALSE"/>
 			<index id="doc_material_procurements_date_time_index">
 				<field id="date_time"/>
 			</index>
@@ -2495,6 +2498,7 @@
 			</aggFunctions>
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Идентификатор"/>
 			<field id="date_time" dataType="DateTime" alias="Дата"/>
+			<field id="process_date_time" dataType="DateTime" alias="Дата"/>
 			<field id="number" dataType="String" alias="Номер 1с"/>
 			<field id="processed" dataType="String" sysCol="TRUE"/>
 			<field id="supplier_id" dataType="Int" sysCol="TRUE"/>
@@ -2525,6 +2529,7 @@
 		<model id="DOCMaterialProcurementDialog" parent="ModelSQLDOC" dataTable="doc_material_procurements_list" virtual="TRUE" baseModelId="DOCMaterialProcurement">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Идентификатор"/>
 			<field id="date_time" dataType="DateTime" alias="Дата"/>
+			<field id="process_date_time" dataType="DateTime" alias="Дата"/>
 			<field id="number" dataType="String" alias="Номер 1с"/>
 			<field id="processed" dataType="String" sysCol="TRUE"/>
 			<field id="supplier_id" dataType="Int" sysCol="TRUE"/>
@@ -5296,6 +5301,44 @@
 			<field id="last_modif_users_ref" dataType="JSON" alias="Кто последний вносил изменения"/>
 			<field id="last_modif_date_time" dataType="DateTimeTZ" alias="Время последнего изменения"/>
 			<field id="comment_text" dataType="Text"/>
+		</model>
+		<model id="ExtProduction" parent="ModelSQLDOC" dataTable="ext_productions" virtual="FALSE">
+			<defaultOrder>
+				<field id="id"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="ext_id" dataType="Text" dbRequired="TRUE"/>
+			<field id="production_site_id" dataType="Int" refTable="production_sites" refField="id"/>
+			<field id="production" dataType="JSONB"/>
+			<field id="materials" dataType="JSONB"/>
+			<field id="updated_at" dataType="DateTimeTZ" alias="Время последнего изменения" defaultValue="CURRENT_TIMESTAMP"/>
+			<index id="ext_productions_idx" unique="TRUE">
+				<field id="production_site_id"/>
+				<field id="ext_id"/>
+			</index>
+		</model>
+		<model id="ExtProductionError" parent="ModelSQLDOC" dataTable="ext_production_errors" virtual="FALSE">
+			<defaultOrder>
+				<field id="id"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="production_site_id" dataType="Int" refTable="production_sites" refField="id"/>
+			<field id="message" dataType="Text"/>
+			<field id="updated_at" dataType="DateTimeTZ" alias="Время последнего изменения" defaultValue="CURRENT_TIMESTAMP"/>
+		</model>
+		<model id="ExtProductionPing" parent="ModelSQLDOC" dataTable="ext_production_pings" virtual="FALSE">
+			<defaultOrder>
+				<field id="id"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="production_site_id" dataType="Int" refTable="production_sites" refField="id"/>
+			<field id="updated_at" dataType="DateTimeTZ" alias="Время последнего изменения" defaultValue="CURRENT_TIMESTAMP"/>
+		</model>
+		<model id="ElkonLog" parent="ModelSQLBeton" dataTable="elkon_log" virtual="FALSE">
+			<field id="production_site_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="updated_at" dataType="DateTimeTZ"/>
+			<field id="msg_type" dataType="Text"/>
+			<field id="msg" dataType="Text"/>
 		</model>
 	</models>
 	<constants>
@@ -9072,6 +9115,9 @@
 		<jsScript file="js20/models/DOCMaterialMovement_Model.js"/>
 		<jsScript file="js20/models/DOCMaterialMovementList_Model.js"/>
 		<jsScript file="js20/controllers/DOCMaterialMovement_Controller.js"/>
+		<jsScript file="js20/models/ExtProduction_Model.js"/>
+		<jsScript file="js20/models/ExtProductionError_Model.js"/>
+		<jsScript file="js20/models/ExtProductionPing_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

@@ -115,10 +115,10 @@ function OperatorList_View(id,options){
 		this.addElement(per_select);	
 	}
 		
-	var model = options.models.OperatorList_Model;
+	const model = options.models.OperatorList_Model;
 	this.m_totModel = options.models.OperatorTotals_Model;
 	this.m_prodSiteModel = options.models.OperatorProductionSite_Model;
-	var contr = new Shipment_Controller();
+	const contr = new Shipment_Controller();
 	
 	var self = this;
 	var elements = [
@@ -488,7 +488,7 @@ function OperatorList_View(id,options){
 				)
 			){
 				opts.className+= (opts.className.length? " ":"")+"factQuantViolation";
-				opts.title = "Объем по данным производства: "+m.getFieldValue("production_quant")+"м3";
+				opts.title = "Объем Elkon: "+m.getFieldValue("production_quant")+"м3, объем Берег: "+m.getFieldValue("quant")+"м3";
 			}
 		},
 		"head":new GridHead(id+"-grid:head",{

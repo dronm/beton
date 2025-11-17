@@ -101,6 +101,15 @@ function DOCMaterialProcurementList_View(id,options){
 			"variantStorage":options.variantStorage,
 			"cmdSearch":!options.detailFilters
 		}),
+		"onEventSetCellOptions": function(opts){
+			opts.className = opts.className||"";
+			var col = opts.gridColumn.getId();
+			var m = this.getModel();
+			if (!m.getFieldValue("process_date_time") && (col=="date_time") ){
+				opts.className+= (opts.className.length? " ":"")+"negativeNumber";
+				opts.title = "Не задана дата выезда";
+			}
+		},
 		"filters":(options.detailFilters&&options.detailFilters.DOCMaterialProcurementList_Model)? options.detailFilters.DOCMaterialProcurementList_Model:null,
 		"popUpMenu":popup_menu,
 		"head":new GridHead(id+"-grid:head",{

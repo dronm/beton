@@ -1,12 +1,13 @@
 -- View: doc_material_procurements_list
 
--- DROP VIEW doc_material_procurements_list;
+ DROP VIEW doc_material_procurements_list;
 
 CREATE OR REPLACE VIEW doc_material_procurements_list AS 
  SELECT
  	doc.id,
 	doc.number,
 	doc.date_time,
+	doc.process_date_time,
 	doc.processed,
 	doc.supplier_id,
 	suppliers_ref(sup) AS suppliers_ref,

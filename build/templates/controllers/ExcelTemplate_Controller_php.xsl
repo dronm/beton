@@ -326,8 +326,8 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 						'coord' => $fields->name,
 						'w' => $fields->w,
 						'h' => $fields->h,
-						'offset_y' => $fields->offset_y,
-						'offset_x' => $fields->offset_x,
+						'offset_y' => isset($fields->offset_y)? $fields->offset_y : 0,
+						'offset_x' => isset($fields->offset_x)? $fields->offset_x : 0,
 						'fileName' => $query_results[$fields->sql_query]
 					));
 				}

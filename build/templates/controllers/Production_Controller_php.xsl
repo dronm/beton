@@ -663,7 +663,7 @@ UPDATE public.production_sites
 		//exec($script." > /dev/null 2>&amp;1 &amp;");
 		
 		//Просто добавим номер как пропущенное, оно само загрузится
-		$this->getDbLink()->query(sprintf("UPDATE production_sites
+		$this->getDbLinkMaster()->query(sprintf("UPDATE production_sites
 			SET
 				missing_elkon_production_ids = array_append(missing_elkon_production_ids, %s::int)
 			WHERE id = %d",

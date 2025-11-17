@@ -433,6 +433,14 @@ UPDATE public.production_sites
 	}
 
 	private function log_action($prodSiteId,$mes,$mesLevel,$servLevel){
+		$datetime = new DateTime();
+		file_put_contentes(
+			OUTPUT_PATH.'elkon_prod.txt', 
+			'******************************************************'.PHP_EOL.
+			$datetime->format('c').' '.$prodSiteId.' '.$mes.PHP_EOL. 
+			''.PHP_EOL,
+			FILE_APPEND
+		);
 		if($servLevel >= $mesLevel){
 
 			$mes_db = NULL;		
@@ -976,7 +984,7 @@ UPDATE public.production_sites
 		//exec($script." > /dev/null 2>&1 &");
 		
 		//Просто добавим номер как пропущенное, оно само загрузится
-		$this->getDbLink()->query(sprintf("UPDATE production_sites
+		$this->getDbLinkMaster()->query(sprintf("UPDATE production_sites
 			SET
 				missing_elkon_production_ids = array_append(missing_elkon_production_ids, %s::int)
 			WHERE id = %d",

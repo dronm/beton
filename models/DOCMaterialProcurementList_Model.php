@@ -246,6 +246,16 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		$this->addField($f_last_modif_date_time);
 		//********************
 		
+		//*** Field process_date_time ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Дата';
+		$f_opts['id']="process_date_time";
+						
+		$f_process_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"process_date_time",$f_opts);
+		$this->addField($f_process_date_time);
+		//********************
+		
 		//*** Field suppliers_ref ***
 		$f_opts = array();
 		

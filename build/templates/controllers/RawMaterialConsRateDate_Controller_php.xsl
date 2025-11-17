@@ -31,14 +31,14 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 
 <xsl:template name="extra_methods">
 	public function recalc_consumption($pm){
-		$period_id = $this->getExtDbVal('period_id');
+		$period_id = $this->getExtDbVal($pm, 'period_id');
 		$link_master = $this->getDbLinkMaster();
 
 		$ar = $link_master->query_first(sprintf("SELECT dt FROM raw_material_cons_rate_dates WHERE id = %d",$period_id));
 		if(!is_array($ar) || !count($ar) || !isset($ar["dt"])){
 			throw new Exception("date not defined");
 		}
-		material_period_check($link_master, $_SESSION["user_id"], $ar["dt"]);
+		material_period_check($link_master, $_SESSION["user_id"], "'".$ar["dt"]."T06:00:00'");
 
 		$link_master->query(sprintf(
 			"CALL recalc_consumption(%d, %d)",

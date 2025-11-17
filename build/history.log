@@ -1634,6 +1634,21 @@ Update real controller!!!
 1) unregister service worker
 
 
+1.00389
+1) DOCMaterialProcurement new field process_date_time
+	DOCMaterialProcurement_Controller loadProcurementDocument
+	DOCMaterialProcurement_Model
+	DOCMaterialProcurementList_Model
+	DOCMaterialProcurementDialog_Model
+	doc_material_procurements_process
+
+
+1.00389
+1) DOCMaterialProcurementList_View
+red date_time if no process_date_time value
+2) productions_process after insert/update tolerance_violated
+	not committed, better do in elkon production upload.
+3) ConnectElkonCheck pong value based on last response.
 
 TODO:
 CementSiloBalanceReset: last_modif_user_id, last_modif_date_time

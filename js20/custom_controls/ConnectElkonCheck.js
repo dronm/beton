@@ -9,7 +9,7 @@
  * @classdesc
  
  * @param {string} id - Object identifier
- * @param {object} options
+ * @param {number} baseId
  */
 function ConnectElkonCheck(baseId){
 	this.m_values = {};

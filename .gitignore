@@ -7,6 +7,7 @@ proj-deploy.php
 Config.php
 Config.uniq.php
 page.xml
+mscon.php
 build/build.log
 output
 build/1Secret
@@ -20,6 +21,11 @@ build/ProcurQuery
 build/SAFARI.txt
 build/АвтоДляУдаления.txt
 build/TmWebApp
+elkon/productions/*.json
+elkon/productions/*.sh
+elkon/errors/*.json
+elkon/errors/*.sh
+gorny/*.txt
 js20/custom_controls/rs_common_ru.js
 js20/custom_controls/ViewEditRef.js
 js20/custom_controls/ViewSectionSelect.js

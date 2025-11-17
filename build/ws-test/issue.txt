@@ -1,0 +1,36 @@
+1. When connected from ws_check.js it works fine, never diconnects.
+2. When using a browser, even from localhost with local srv instance it gets errors
+in server after each minute:
+DEBUG: 2025/11/12 04:53:50 wssrv.go:434: Got Ping, sending Pong: 192.168.1.3:39636
+ERROR: 2025/11/12 04:53:50 wssrv.go:421: Read frame error: non-zero rsv bits with no extension negotiated 192.168.1.3:39636
+DEBUG: 2025/11/12 04:53:51 wsClientApp.go:409: Socket closed, count: 0
+DEBUG: 2025/11/12 04:53:51 wssrv.go:369: Connection closed 192.168.1.3:39636
+DEBUG: 2025/11/12 04:53:51 wssrv.go:291: clientURI= /beton/6913cba377233:1ba901089e782831dc070211b6194b15 clientOrigin= http://localhost clientAppId= beton clientToken= 6913cba377233:1
+ba901089e782831dc070211b6194b15
+DEBUG: 2025/11/12 04:53:51 wssrv.go:338: >>> HANDSHAKE RESPONSE START >>>
+HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Accept: HZnJermwBTYwQ6z7+quzR/sMsZw=
+X-AppSrv-Version: 1.0
+<<< RESPONSE END <<<
+
+
+I might get these errors:
+	Read frame error: non-zero rsv bits with no extension negotiated
+	Read frame error: use of reserved op code
+	Read frame error: header error: the most significant bit must be 0
+
+
+the scenario is always the same
+connection:
+DEBUG: 2025/11/12 04:56:53 wssrv.go:374: Incoming ws connection 192.168.1.3:50558
+Ping in 10 seconds
+DEBUG: 2025/11/12 04:57:42 wssrv.go:434: Got Ping, sending Pong: 192.168.1.3:50558
+then in 10 seconds error from client
+ERROR: 2025/11/12 04:57:52 wssrv.go:421: Read frame error: control frame is not final 192.168.1.3:50558
+and disconnection
+DEBUG: 2025/11/12 04:57:53 wsClientApp.go:409: Socket closed, count: 0
+DEBUG: 2025/11/12 04:57:53 wssrv.go:369: Connection closed 192.168.1.3:50558
+
+golang library: github.com/gobwas

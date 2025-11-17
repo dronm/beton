@@ -18,10 +18,11 @@ CREATE OR REPLACE VIEW production_material_list AS
 		sum(coalesce(t.material_quant_req,0)) AS quant_fact_req,
 		
 		--Подбор
-		-- CASE WHEN coalesce(sh.quant,0)=0 OR (coalesce(t.concrete_quant,0)=0 AND coalesce(o.quant,0)=0) THEN 0
-		-- ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, o.quant)
+		--devide by same material count if cement
 		CASE WHEN coalesce(sh.quant,0)=0 THEN 0
-		ELSE coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, sh.quant)
+		ELSE 
+			coalesce(ra_mat.quant,0)/coalesce(sh.quant,0) * coalesce(t.concrete_quant, sh.quant)
+			--/ coalesce(case WHEN cons_cnt.cnt = 0 THEN 1 ELSE cons_cnt.cnt END, 1)
 		END AS quant_consuption,
 		
 		coalesce(t_cor.quant,0) AS quant_corrected,
@@ -106,30 +107,6 @@ CREATE OR REPLACE VIEW production_material_list AS
 		,row_to_json(pr_com.*) AS production_comment
 		,mat.ord AS material_ord
 		
-		--required quant
-		--(Факт + исправление) - подбор, если есть одинаковые материалы - складываем вместе!
-		/*,CASE
-			WHEN (SELECT count(*)
-				FROM material_fact_consumptions AS t_rolled
-				WHERE t_rolled.production_site_id=prod.production_site_id
-					AND t_rolled.production_id=prod.production_id
-					AND t_rolled.raw_material_id=t.raw_material_id
-			)>=2 THEN
-				coalesce((SELECT sum(t_rolled.material_quant)
-				FROM material_fact_consumptions AS t_rolled
-				WHERE t_rolled.production_site_id=prod.production_site_id
-					AND t_rolled.production_id=prod.production_id
-					AND t_rolled.raw_material_id=t.raw_material_id
-				),0) + 
-				coalesce((SELECT sum(cor_rolled.quant)
-				FROM material_fact_consumption_corrections AS cor_rolled
-				WHERE cor_rolled.production_site_id=prod.production_site_id
-					AND cor_rolled.production_id=prod.production_id
-					AND cor_rolled.material_id=t.raw_material_id
-				),0)			
-				
-			ELSE (sum(coalesce(t.material_quant,0)) + coalesce(t_cor.quant,0))
-		END - sum(coalesce(t.material_quant_req,0)) */
 		,(sum(coalesce(t.material_quant,0)) + coalesce(t_cor.quant,0)) - sum(coalesce(t.material_quant_req,0)) AS quant_req_dif
 		
 		,CASE
@@ -190,11 +167,31 @@ CREATE OR REPLACE VIEW production_material_list AS
 		ON pr_com.production_site_id=t.production_site_id AND pr_com.production_id=t.production_id AND pr_com.material_id=t.raw_material_id
 	LEFT JOIN orders AS o ON o.id = sh.order_id
 	
+	/*
+	LEFT JOIN(
+		SELECT 
+			count(*) AS cnt,
+			t_cons.production_site_id,
+			t_cons.production_id,
+			t_cons.raw_material_id
+		FROM material_fact_consumptions AS t_cons
+		WHERE t_cons.cement_silo_id is not null
+		GROUP BY 
+			t_cons.production_site_id,
+			t_cons.production_id,
+			t_cons.raw_material_id
+	) AS cons_cnt ON
+		cons_cnt.production_site_id = prod.production_site_id
+		AND cons_cnt.production_id = prod.production_id
+		AND cons_cnt.raw_material_id = mat.id
+	*/
+		
 	GROUP BY
 		prod.production_dt_start,
 		prod.production_site_id,prod.production_id,t.raw_material_id,mat.max_fact_quant_tolerance_percent,
 		mat.ord,ra_mat.quant,t.raw_material_id,mat.id,t.cement_silo_id,
 		ps.*,mat.*,cem.*,
+		--cons_cnt.cnt,
 		t_cor.elkon_id,cor_u.*,t_cor.date_time_set,t_cor.quant,sh.quant,t.concrete_quant, o.quant
 		,pr_com.*
 	ORDER BY prod.production_site_id,

@@ -97,5 +97,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION public.production_vehicle_corrections_process() OWNER TO ;
-

@@ -17,6 +17,7 @@ CREATE OR REPLACE VIEW production_sites_last_production_list AS
 		WHERE 
 			production_site_id=p_s.id AND production_dt_end IS NULL
 			AND production_id NOT IN (SELECT UNNEST(p_s.unclosed_production_ids))
+			AND production_dt_start >= (now() - '10 day'::interval)
 		) AS production_ids,
 		
 		p_s.missing_elkon_production_ids

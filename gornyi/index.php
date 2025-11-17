@@ -1,9 +1,8 @@
 <?php
 
 require_once(dirname(__FILE__).'/../functions/db_con_f.php');
+require_once(dirname(__FILE__).'/../functions/http_headers.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
-
-define('AUTH_KEY', 'a32544fa-c680-11eb-b8bc-0242ac130003');
 
 /**
  * Прием данных от ТД Горный, POST запрос, поле events - массив структур GO, поле k ключ авторизации
@@ -30,75 +29,11 @@ where material_id=7 AND material_name='Песок Евробетон'
 
 */
 
-function set_headers_status($statusCode) {
-	static $status_codes = null;
-
-	if ($status_codes === null) {
-		$status_codes = array (
-		    100 => 'Continue',
-		    101 => 'Switching Protocols',
-		    102 => 'Processing',
-		    200 => 'OK',
-		    201 => 'Created',
-		    202 => 'Accepted',
-		    203 => 'Non-Authoritative Information',
-		    204 => 'No Content',
-		    205 => 'Reset Content',
-		    206 => 'Partial Content',
-		    207 => 'Multi-Status',
-		    300 => 'Multiple Choices',
-		    301 => 'Moved Permanently',
-		    302 => 'Found',
-		    303 => 'See Other',
-		    304 => 'Not Modified',
-		    305 => 'Use Proxy',
-		    307 => 'Temporary Redirect',
-		    400 => 'Bad Request',
-		    401 => 'Unauthorized',
-		    402 => 'Payment Required',
-		    403 => 'Forbidden',
-		    404 => 'Not Found',
-		    405 => 'Method Not Allowed',
-		    406 => 'Not Acceptable',
-		    407 => 'Proxy Authentication Required',
-		    408 => 'Request Timeout',
-		    409 => 'Conflict',
-		    410 => 'Gone',
-		    411 => 'Length Required',
-		    412 => 'Precondition Failed',
-		    413 => 'Request Entity Too Large',
-		    414 => 'Request-URI Too Long',
-		    415 => 'Unsupported Media Type',
-		    416 => 'Requested Range Not Satisfiable',
-		    417 => 'Expectation Failed',
-		    422 => 'Unprocessable Entity',
-		    423 => 'Locked',
-		    424 => 'Failed Dependency',
-		    426 => 'Upgrade Required',
-		    500 => 'Internal Server Error',
-		    501 => 'Not Implemented',
-		    502 => 'Bad Gateway',
-		    503 => 'Service Unavailable',
-		    504 => 'Gateway Timeout',
-		    505 => 'HTTP Version Not Supported',
-		    506 => 'Variant Also Negotiates',
-		    507 => 'Insufficient Storage',
-		    509 => 'Bandwidth Limit Exceeded',
-		    510 => 'Not Extended'
-		);
-	}
-
-	if ($status_codes[$statusCode] !== null) {
-		$status_string = $statusCode . ' ' . $status_codes[$statusCode];
-		header($_SERVER['SERVER_PROTOCOL'] . ' ' . $status_string, true, $statusCode);
-	}
-}
-
 if(!isset($_REQUEST) || !isset($_REQUEST['k']) || !isset($_REQUEST['events']) ){
 	set_headers_status(400);
 	exit;
 	
-}else if($_REQUEST['k'] != AUTH_KEY){
+}else if($_REQUEST['k'] != AUTH_GORNY_KEY){
 	set_headers_status(403);
 	exit;
 }
@@ -188,7 +123,7 @@ try{
 				$material_id = $materals[$material_name];
 			}else{			
 				$material_name_for_db = NULL;
-                                FieldSQLString::formatForDb($dbLink, $material_name, $material_name_for_db);			
+                FieldSQLString::formatForDb($dbLink, $material_name, $material_name_for_db);			
                                 
 				$material_ar = $dbLink->query_first(sprintf("SELECT id FROM raw_materials WHERE name = %s LIMIT 1", $material_name_for_db));
 				if(is_array($material_ar) && count($material_ar) && isset($material_ar['id'])){

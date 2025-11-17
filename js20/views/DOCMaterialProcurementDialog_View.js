@@ -56,6 +56,14 @@ function DOCMaterialProcurementDialog_View(id,options){
 			"timeValueStr":st_time
 		}));	
 
+		this.addElement(new EditDateTime(id+":process_date_time",{
+			"labelCaption":"Дата выезда с весов:",
+			"placeholder":"Дата проведения",
+			"title":"Дата фактического проведения. Если оставить пустым будет проставлено текущее время",
+			"editMask":"99/99/9999 99:99",
+			"dateFormat":"d/m/Y H:i",
+			"timeValueStr":st_time
+		}));	
 		var ac_model_dr = new DOCMaterialProcurementDriverList_Model();
 		this.addElement(new EditString(id+":driver",{
 			"placeholder":"ФИО водителя",
@@ -172,6 +180,7 @@ function DOCMaterialProcurementDialog_View(id,options){
 	//read
 	var r_bd = [
 		new DataBinding({"control":this.getElement("date_time")})
+		,new DataBinding({"control":this.getElement("process_date_time")})
 		,new DataBinding({"control":this.getElement("production_bases_ref")})
 		,new DataBinding({"control":this.getElement("number")})
 		,new DataBinding({"control":this.getElement("suppliers_ref")})
@@ -193,6 +202,7 @@ function DOCMaterialProcurementDialog_View(id,options){
 	//write
 	this.setWriteBindings([
 		new CommandBinding({"control":this.getElement("date_time")})
+		,new CommandBinding({"control":this.getElement("process_date_time")})
 		,new CommandBinding({"control":this.getElement("number")})
 		,new CommandBinding({"control":this.getElement("production_bases_ref"),"fieldId":"production_base_id"})
 		,new CommandBinding({"control":this.getElement("suppliers_ref"),"fieldId":"supplier_id"})

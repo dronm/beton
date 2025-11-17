@@ -520,6 +520,10 @@
 <li><a href="#UserAllowedMaterialCorrectionList_Model">UserAllowedMaterialCorrectionList_Model</a></li>
 <li><a href="#DOCMaterialMovement_Model">DOCMaterialMovement_Model</a></li>
 <li><a href="#DOCMaterialMovementList_Model">DOCMaterialMovementList_Model</a></li>
+<li><a href="#ExtProduction_Model">ExtProduction_Model</a></li>
+<li><a href="#ExtProductionError_Model">ExtProductionError_Model</a></li>
+<li><a href="#ExtProductionPing_Model">ExtProductionPing_Model</a></li>
+<li><a href="#ElkonLog_Model">ElkonLog_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -8703,6 +8707,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>process_date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>number</h2>
 <div>Type:String</div>
 <div>Primary key:</div>
@@ -8823,6 +8833,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>weigh_app</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="DOCMaterialProcurementDialog_Model" class="content_box">
@@ -8836,6 +8852,12 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>process_date_time</h2>
 <div>Type:DateTime</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -9022,6 +9044,12 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>process_date_time</h2>
 <div>Type:DateTime</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -9893,6 +9921,36 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="ElkonLog_Model" class="content_box">
+<h1>ElkonLog_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>updated_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>msg_type</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>msg</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="EmailTemplate_Model" class="content_box">
 <h1>EmailTemplate_Model</h1>
 <div class="content_item">
@@ -10439,6 +10497,102 @@
 <div>Precision:</div>
 <h2>file_info</h2>
 <div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ExtProduction_Model" class="content_box">
+<h1>ExtProduction_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ext_id</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>materials</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>updated_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ExtProductionError_Model" class="content_box">
+<h1>ExtProductionError_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>message</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>updated_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ExtProductionPing_Model" class="content_box">
+<h1>ExtProductionPing_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>updated_at</h2>
+<div>Type:DateTimeTZ</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

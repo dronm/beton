@@ -16,11 +16,15 @@ BEGIN
 		IF TG_OP='INSERT' OR
 			(TG_OP='UPDATE'
 			AND (
-				OLD.production_vehicle_descr!=NEW.production_vehicle_descr
-				OR OLD.production_dt_start!=NEW.production_dt_start
-			)
+				OLD.production_vehicle_descr IS DISTINCT FROM NEW.production_vehicle_descr
+				OR OLD.production_dt_start IS DISTINCT FROM NEW.production_dt_start
+				OR NEW.vehicle_id IS NULL
+				)
 			)
 		THEN		
+
+-- raise exception 'production_site_id: %, production_id: %, vehicle_descr: %, dt_start: %', 
+	-- NEW.production_id, NEW.production_site_id, NEW.production_vehicle_descr, NEW.production_dt_start::timestamp;
 			SELECT *
 			INTO
 				NEW.vehicle_id,
@@ -37,6 +41,13 @@ BEGIN
 					)
 					,NEW.production_vehicle_descr
 				),
+				-- CASE WHEN NEW.production_id = '19070' THEN
+				-- 	--works
+				-- 	--(NEW.production_dt_start::timestamp AT TIME ZONE 'UTC') AT TIME ZONE '+05'
+				-- 	NEW.production_dt_start
+				-- ELSE
+				-- 	NEW.production_dt_start::timestamp
+				-- END
 				NEW.production_dt_start::timestamp
 			) AS (
 				vehicle_id int,
@@ -45,29 +56,10 @@ BEGIN
 			);		
 		END IF;
 		
-		IF NEW.production_dt_end IS NOT NULL THEN
-			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
-				NEW.production_site_id,
-				NEW.production_id
-			);
-		END IF;
-				
-		/*
-		IF TG_OP='UPDATE'		
-			AND (
-				(OLD.production_dt_end IS NULL AND NEW.production_dt_end IS NOT NULL)
-				OR coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)
-				OR coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0)
-				OR coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
-			)
-		THEN			
-			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
-				NEW.production_site_id,
-				NEW.production_id
-			);			
-		END IF;
-		*/
-		
+-- IF NEW.production_id = '19070' THEN				
+-- 	raise exception 'vehicle_id: %, shipment_id: %, dt: %', NEW.vehicle_id, NEW.shipment_id, NEW.production_dt_start::timestampTZ;
+-- END IF;
+	
 		RETURN NEW;
 		
 	ELSEIF TG_WHEN='AFTER' AND TG_OP='INSERT' THEN
@@ -88,6 +80,13 @@ BEGIN
 			;
 		END IF;
 		
+		IF NEW.production_dt_end IS NOT NULL THEN
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+		END IF;
+
 		PERFORM pg_notify(
 			'Production.insert'
 			,json_build_object(
@@ -100,24 +99,16 @@ BEGIN
 		RETURN NEW;
 		
 	ELSEIF TG_WHEN='AFTER' AND TG_OP='UPDATE' THEN
-		/*
-		IF coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0)
-		THEN
-			UPDATE material_fact_consumptions
-			SET
-				concrete_type_id = NEW.concrete_type_id
-			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
-		END IF;
-		*/
 		/* МЕНЯТЬ ТС ПРИ СМЕНЕ shipment_id*/
-		IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0))
-		OR (coalesce(NEW.vehicle_schedule_state_id,0)<>coalesce(OLD.vehicle_schedule_state_id,0))
-		OR (coalesce(NEW.vehicle_id,0)<>coalesce(OLD.vehicle_id,0))
-		OR (coalesce(NEW.concrete_type_id,0)<>coalesce(OLD.concrete_type_id,0))
-		OR (coalesce(NEW.concrete_quant,0)<>coalesce(OLD.concrete_quant,0))
+		IF 
+			NEW.shipment_id IS DISTINCT FROM OLD.shipment_id
+			OR NEW.vehicle_schedule_state_id IS DISTINCT FROM OLD.vehicle_schedule_state_id
+			OR NEW.vehicle_id IS DISTINCT FROM OLD.vehicle_id
+			OR NEW.concrete_type_id IS DISTINCT FROM OLD.concrete_type_id
+			OR NEW.concrete_quant IS DISTINCT FROM OLD.concrete_quant
 		THEN
 			--сменить shipment_id,vehicle_schedule_state_id
-			IF (coalesce(NEW.shipment_id,0)<>coalesce(OLD.shipment_id,0)) THEN
+			IF NEW.shipment_id IS DISTINCT FROM OLD.shipment_id THEN
 				SELECT
 					vsch.vehicle_id
 					,vschst.id
@@ -140,12 +131,14 @@ BEGIN
 			WHERE production_site_id = NEW.production_site_id AND production_id = NEW.production_id;
 		END IF;
 		
-		
-		--ЭТО ДЕЛАЕТСЯ В КОНТРОЛЛЕРЕ Production_Controller->check_data!!!
-		--IF OLD.production_dt_end IS NULL
-		--AND NEW.production_dt_end IS NOT NULL
-		--AND NEW.shipment_id IS NOT NULL THEN
-		--END IF;
+		-- better do it in elkon production upload
+		-- not committed
+		IF NEW.production_dt_end IS NOT NULL THEN
+			NEW.material_tolerance_violated = productions_get_mat_tolerance_violated(
+				NEW.production_site_id,
+				NEW.production_id
+			);
+		END IF;
 		
 		PERFORM pg_notify(
 			'Production.update'
@@ -181,5 +174,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION public.productions_process() OWNER TO ;
-

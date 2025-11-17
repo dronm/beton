@@ -33,7 +33,12 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		$this->addNewModel(
 			sprintf("SELECT DISTINCT ON (el.production_site_id) 
 				el.production_site_id,
-				elkon_connect_err(el.message, el.date_time) AS pong
+				CASE WHEN ps.active THEN
+						elkon_connect_err(el.message, el.date_time)
+					ELSE
+					( (NOW() - el.date_time) &lt; (const_ping_elkon_interval_err_val()::text || ' milliseconds')::interval )
+				END AS pong
+
 			FROM elkon_log AS el
 			LEFT JOIN production_sites AS ps ON ps.id = el.production_site_id
 			WHERE %d = 0 OR ps.production_base_id = %d

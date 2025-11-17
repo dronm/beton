@@ -94,7 +94,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$d_params = new ParamsSQL($pm,$link);				
 			$d_params->add('date_time', DT_DATETIME, $doc->date_time);
 			material_period_check($link, $ar["user_id"], $d_params->getParamById('date_time'));
-			
+
 			if(isset($doc->cmd)){
 				$cmd = trim($doc->cmd);
 			}else{
@@ -117,18 +117,28 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$doc_cnt = 0;
 		}
 		
+
 		$link_master->query("BEGIN");
-		$link_master->query("DELETE FROM raw_material_procur_uploads");
-		$link_master->query(sprintf(
-			"INSERT INTO raw_material_procur_uploads
-			(date_time, result, descr, doc_count)
-			VALUES ('%s', %s, %s, %d)"
-			,date('Y-m-d H:i:s')
-			,$res
-			,$descr
-			,$doc_cnt
-		));
-		$link_master->query("COMMIT");
+		try{
+			$link_master->query("DELETE FROM raw_material_procur_uploads");
+			$link_master->query(sprintf(
+				"INSERT INTO raw_material_procur_uploads
+				(date_time, result, descr, doc_count)
+				VALUES ('%s', %s, %s, %d)
+				ON CONFLICT (date_time) DO UPDATE SET
+					result = excluded.result,
+					descr = excluded.descr,
+					doc_count = excluded.doc_count"
+				,date('Y-m-d H:i:s')
+				,$res
+				,$descr
+				,$doc_cnt
+			));
+			$link_master->query("COMMIT");
+		}catch (Exception $insE){
+			$link_master->query("ROLLBACK");
+		}
+
 		if ($res == 'false'){
 			throw $e;
 		}
@@ -259,6 +269,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$mat_params = new ParamsSQL($pm,$link);				
 		$mat_params->add('material',DT_STRING,$doc->material);				
 		$material_db = $mat_params->getParamById('material');
+		if($material_db == "''" || strtolower($material_db) == "null"){
+			syslog(LOG_ERR, "RawMaterial_Controller->update_procurement() material is not not");
+			return;
+		}
 		$material_ar = $link->query_first(sprintf(
 			"SELECT id FROM raw_materials
 			WHERE name = %s",
@@ -293,11 +307,19 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			}					
 		}
 		
+		$process_date_time_ex = property_exists($doc, 'process_date_time');
+
 		//doc				
 		$doc_params = new ParamsSQL($pm,$link);				
 		$doc_params->add('number',DT_STRING,$doc->number);
 		$doc_params->add('doc_ref',DT_STRING,$doc->doc_ref);
 		$doc_params->add('date_time',DT_DATETIME,$doc->date_time);
+		if($process_date_time_ex){
+			if($doc->process_date_time == '0001-01-01T00:00:00'){
+				$doc->process_date_time = 'NULL';
+			}
+			$doc_params->add('process_date_time',DT_DATETIME, $doc->process_date_time); //added on 2025-01-10
+		}
 		$doc_params->add('driver',DT_STRING,$doc->driver);
 		$doc_params->add('vehicle_plate',DT_STRING,$doc->vehicle_plate);
 		$doc_params->add('material',DT_STRING,$doc->material);
@@ -305,89 +327,74 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		$quant_gross = ($doc->quant_gross=='0')? 0:$doc->quant_gross/1000;
 		$quant_net = ($doc->quant_net=='0')? 0:$doc->quant_net/1000;
-		$doc_quant_net = (!isset($doc->quant_net_document)||$doc->quant_net_document=='0')? 0:$doc->quant_net_document/1000;
+		$doc_quant_net = (
+			!isset($doc->quant_net_document)||
+			$doc->quant_net_document=='0'||
+			$doc->quant_net_document==''
+		)? 0 : intval($doc->quant_net_document)/1000;
 		
 		$doc_params->add('quant_gross',DT_STRING,$quant_gross);
 		$doc_params->add('quant_net',DT_STRING,$quant_net);
-		$doc_ar = $link->query_first(sprintf(
-			"SELECT id FROM doc_material_procurements WHERE doc_ref=%s",
-			$doc_params->getParamById('doc_ref')
+
+		$link_master->query(sprintf(
+		"INSERT INTO doc_material_procurements
+		(	date_time,
+			process_date_time,
+			number,
+			doc_ref,
+			supplier_id,
+			carrier_id,
+			cement_silos_id,
+			store,
+			driver,
+			sender_name,
+			vehicle_plate,
+			material_id,
+			quant_gross,
+			quant_net,
+			doc_quant_net,
+			user_id,
+			last_modif_user_id,
+			last_modif_date_time,
+			weigh_app
+		)
+		VALUES (%s, %s, %s, %s, %d, %d, %s, %s, %s, %s, %s, %d, %f, %f, %f, %d, %d, NOW(), TRUE)
+		ON CONFLICT (doc_ref) DO UPDATE SET
+			date_time			= excluded.date_time,
+			process_date_time	= excluded.process_date_time,
+			number				= excluded.number,
+			supplier_id			= excluded.supplier_id,
+			carrier_id			= excluded.carrier_id,
+			driver				= excluded.driver,
+			vehicle_plate		= excluded.vehicle_plate,
+			material_id			= excluded.material_id,
+			cement_silos_id		= excluded.cement_silos_id,
+			store				= excluded.store,
+			sender_name			= excluded.sender_name,
+			quant_gross			= excluded.quant_gross,
+			quant_net			= excluded.quant_net,
+			doc_quant_net		= excluded.doc_quant_net,
+			last_modif_user_id	= excluded.last_modif_user_id,
+			last_modif_date_time= excluded.last_modif_date_time,
+			weigh_app			= TRUE",
+		$doc_params->getParamById('date_time'),
+		$process_date_time_ex? $doc_params->getParamById('process_date_time') : $doc_params->getParamById('date_time'),
+		$doc_params->getParamById('number'),
+		$doc_params->getParamById('doc_ref'),
+		$supplier_id,
+		$carrier_id,
+		$cement_silos_id,
+		$store,
+		$doc_params->getParamById('driver'),
+		$doc_params->getParamById('sender_name'),
+		$doc_params->getParamById('vehicle_plate'),
+		$material_id,
+		$quant_gross,
+		$quant_net,
+		$doc_quant_net,
+		$_SESSION['user_id'],
+		$_SESSION['user_id']
 		));
-		if (!is_array($doc_ar)|| count($doc_ar)==0){
-			//new doc
-			$link_master->query_first(sprintf(
-			"INSERT INTO doc_material_procurements
-			(	date_time,
-				number,
-				doc_ref,
-				supplier_id,
-				carrier_id,
-				cement_silos_id,
-				store,
-				driver,
-				sender_name,
-				vehicle_plate,
-				material_id,
-				quant_gross,
-				quant_net,
-				doc_quant_net,
-				user_id,
-				last_modif_user_id,
-				last_modif_date_time
-			)
-			VALUES (%s,%s,%s,%d,%d,%s,%s,%s,%s,%s,%d,%f,%f,%f, %d, %d, NOW())
-			RETURNING id",
-			$doc_params->getParamById('date_time'),
-			$doc_params->getParamById('number'),
-			$doc_params->getParamById('doc_ref'),
-			$supplier_id,
-			$carrier_id,
-			$cement_silos_id,
-			$store,
-			$doc_params->getParamById('driver'),
-			$doc_params->getParamById('sender_name'),
-			$doc_params->getParamById('vehicle_plate'),
-			$material_id,
-			$quant_gross,
-			$quant_net,
-			$doc_quant_net,
-			$_SESSION['user_id'],
-			$_SESSION['user_id']
-			));
-		}
-		else{
-			//update doc
-			$link_master->query_first(sprintf(
-			"UPDATE doc_material_procurements
-			SET
-				date_time=%s,number=%s,
-				supplier_id=%d,carrier_id=%d,driver=%s,
-				vehicle_plate=%s,
-				material_id=%d,
-				cement_silos_id=%s,
-				store=%s,
-				sender_name=%s,
-				quant_gross=%f,
-				quant_net=%f,
-				doc_quant_net=%f
-			WHERE id=%d",
-			$doc_params->getParamById('date_time'),
-			$doc_params->getParamById('number'),
-			$supplier_id,
-			$carrier_id,
-			$doc_params->getParamById('driver'),
-			$doc_params->getParamById('vehicle_plate'),
-			$material_id,
-			$cement_silos_id,
-			$store,
-			$doc_params->getParamById('sender_name'),
-			$quant_gross,
-			$quant_net,
-			$doc_quant_net,
-			$doc_ar['id']
-			));					
-		}
-	
 	}
 	
 	//AS IS
@@ -509,6 +516,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				$mat_params = new ParamsSQL($pm,$link);				
 				$mat_params->add('material',DT_STRING,$doc->material);				
 				$material_db = $mat_params->getParamById('material');
+				if($material_db == "''" || strtolower($material_db) == "null"){
+					syslog(LOG_ERR, "RawMaterial_Controller->update_procurement() material is not not");
+					return;
+				}
 				if(isset($material_ids[$material_db])){
 					$material_id = $material_ids[$material_db];
 				}

@@ -2147,6 +2147,9 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/models/DOCMaterialMovement_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/DOCMaterialMovement_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/DOCMaterialMovementList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/DOCMaterialMovementList_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controllers/DOCMaterialMovement_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/DOCMaterialMovement_Controller.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/ExtProduction_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ExtProduction_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/ExtProductionError_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ExtProductionError_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/ExtProductionPing_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ExtProductionPing_Model.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

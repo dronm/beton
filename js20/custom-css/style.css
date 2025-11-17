@@ -832,6 +832,12 @@ td.factQuantViolation{
 	background-color:#ffcccc !important;	
 }
 
+td.factQuantDoubled {
+	font-weight:bolder !important;	
+	border:3px solid black !important;	
+	background-color:#fc5151 !important;	
+}
+
 td.negativeNumber{
 	background-color:#fc6060 !important;	
 	color: white !important;	

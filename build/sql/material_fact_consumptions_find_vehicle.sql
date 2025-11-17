@@ -2,6 +2,8 @@
 
 -- DROP FUNCTION public.material_fact_consumptions_find_vehicle(integer, text, timestamp without time zone);
 
+-- for old production upload with php5.4!!!
+-- for new golang version sue material_fact_consumptions_find_vehicle_new !!!
 CREATE OR REPLACE FUNCTION public.material_fact_consumptions_find_vehicle(
 	in_production_site_id integer,
 	in_production_vehicle_descr text,
@@ -12,7 +14,7 @@ CREATE OR REPLACE FUNCTION public.material_fact_consumptions_find_vehicle(
     COST 100
     VOLATILE 
 AS $BODY$
--- пытаемся определить авто по описанию элкон
+	-- пытаемся определить авто по описанию элкон
 	-- выбираем из production_descr только числа
 	-- находим авто с маской %in_production_descr% и назначенное в диапазоне получаса
 
@@ -48,7 +50,3 @@ AS $BODY$
 		END
 	LIMIT 1;
 $BODY$;
-
-ALTER FUNCTION public.material_fact_consumptions_find_vehicle(integer, text, timestamp without time zone)
-    OWNER TO beton;
-

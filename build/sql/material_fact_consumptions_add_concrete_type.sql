@@ -19,5 +19,3 @@ BEGIN
 	RETURN v_concrete_type_id;
 END;
 $$ language plpgsql;
-
-ALTER FUNCTION material_fact_consumptions_add_concrete_type(text) OWNER TO ;

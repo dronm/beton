@@ -1521,7 +1521,7 @@ class Order_Controller extends ControllerSQL{
 		}
 		EventSrv::publishAsync('OrderGarbage.insert',$event_par);
 
-		Graph_Controller::clearCacheOnOrderId($this->getDbLink(),$pm->getParamValue('id'));
+		Graph_Controller::clearCacheOnOrderId($this->getDbLink(),$order_id);
 	}
 	
 	public function get_make_orders_list($pm){

@@ -216,6 +216,15 @@ function DOCMaterialProcurementList_Model(options){
 			
 			
 			
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Дата';
+	filed_options.autoInc = false;	
+	
+	options.fields.process_date_time = new FieldDateTime("process_date_time",filed_options);
+	
 			
 			
 			
