@@ -434,13 +434,6 @@ UPDATE public.production_sites
 
 	private function log_action($prodSiteId,$mes,$mesLevel,$servLevel){
 		$datetime = new DateTime();
-		file_put_contentes(
-			OUTPUT_PATH.'elkon_prod.txt', 
-			'******************************************************'.PHP_EOL.
-			$datetime->format('c').' '.$prodSiteId.' '.$mes.PHP_EOL. 
-			''.PHP_EOL,
-			FILE_APPEND
-		);
 		if($servLevel >= $mesLevel){
 
 			$mes_db = NULL;		
