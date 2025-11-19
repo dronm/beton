@@ -1654,6 +1654,11 @@ TODO:
 CementSiloBalanceReset: last_modif_user_id, last_modif_date_time
 
 
+1.00390
+1) RawMaterial_Controller
+loadProcurementDocument skip empty/beton materials.
+2) !!!Check php syntax errors on script generation.
+changed Production_Controller
 
 
 

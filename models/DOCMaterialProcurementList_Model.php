@@ -46,6 +46,16 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		$this->addField($f_date_time);
 		//********************
 		
+		//*** Field process_date_time ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Дата';
+		$f_opts['id']="process_date_time";
+						
+		$f_process_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"process_date_time",$f_opts);
+		$this->addField($f_process_date_time);
+		//********************
+		
 		//*** Field number ***
 		$f_opts = array();
 		
@@ -246,14 +256,13 @@ class DOCMaterialProcurementList_Model extends ModelSQLDOC{
 		$this->addField($f_last_modif_date_time);
 		//********************
 		
-		//*** Field process_date_time ***
+		//*** Field weigh_app ***
 		$f_opts = array();
-		
-		$f_opts['alias']='Дата';
-		$f_opts['id']="process_date_time";
+		$f_opts['defaultValue']='FALSE';
+		$f_opts['id']="weigh_app";
 						
-		$f_process_date_time=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"process_date_time",$f_opts);
-		$this->addField($f_process_date_time);
+		$f_weigh_app=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"weigh_app",$f_opts);
+		$this->addField($f_weigh_app);
 		//********************
 		
 		//*** Field suppliers_ref ***

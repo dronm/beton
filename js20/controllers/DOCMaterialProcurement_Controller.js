@@ -60,6 +60,12 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
+	options.alias = "Дата";
+	var field = new FieldDateTime("process_date_time",options);
+	
+	pm.addField(field);
+	
+	var options = {};
 	options.alias = "Номер";
 	var field = new FieldString("number",options);
 	
@@ -179,6 +185,12 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldBool("weigh_app",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -200,6 +212,12 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Дата";
 	var field = new FieldDateTime("date_time",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Дата";
+	var field = new FieldDateTime("process_date_time",options);
 	
 	pm.addField(field);
 	
@@ -323,6 +341,12 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldBool("weigh_app",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -358,6 +382,9 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Дата";
 	pm.addField(new FieldDateTime("date_time",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Дата";
+	pm.addField(new FieldDateTime("process_date_time",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Номер";
 	pm.addField(new FieldString("number",f_opts));
@@ -418,6 +445,9 @@ extend(DOCMaterialProcurement_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Время последнего изменения";
 	pm.addField(new FieldDateTimeTZ("last_modif_date_time",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldBool("weigh_app",f_opts));
 }
 
 			DOCMaterialProcurement_Controller.prototype.addGetObject = function(){

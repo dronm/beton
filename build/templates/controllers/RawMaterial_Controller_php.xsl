@@ -161,7 +161,11 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	
 	public function loadProcurementDocument($pm, $doc){
 	
-		if(!isset($doc->material)){
+		if(
+		!isset($doc->material) 
+		|| strtolower(trim($doc->material))=='бетон'
+		|| trim($doc->material)==''
+		){
 			return;
 		}
 		

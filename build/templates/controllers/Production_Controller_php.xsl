@@ -576,7 +576,7 @@ UPDATE public.production_sites
 		<!-- } -->
 	}
 
-	public fuction execute_query_from_elkon($params){
+	public function execute_query_from_elkon($params){
 		$q_head = $params["q_head"];
 		$q_body = $params["q_body"];
 		$elkonLogLevel = $params["elkonLogLevel"];

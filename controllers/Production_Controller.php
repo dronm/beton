@@ -433,7 +433,6 @@ UPDATE public.production_sites
 	}
 
 	private function log_action($prodSiteId,$mes,$mesLevel,$servLevel){
-		$datetime = new DateTime();
 		if($servLevel >= $mesLevel){
 
 			$mes_db = NULL;		
@@ -886,7 +885,6 @@ UPDATE public.production_sites
 			];
 			$this->execute_query_from_elkon($params);
 		}
-
 		
 	}
 
@@ -1418,7 +1416,7 @@ UPDATE public.production_sites
 								}
 							}
 						}
-						usleep(100000); //
+						sleep(100000); //
 					}
 				}
 				

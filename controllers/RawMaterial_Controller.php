@@ -756,7 +756,11 @@ class RawMaterial_Controller extends ControllerSQL{
 	
 	public function loadProcurementDocument($pm, $doc){
 	
-		if(!isset($doc->material)){
+		if(
+		!isset($doc->material) 
+		|| strtolower(trim($doc->material))=='бетон'
+		|| trim($doc->material)==''
+		){
 			return;
 		}
 		
@@ -864,6 +868,10 @@ class RawMaterial_Controller extends ControllerSQL{
 		$mat_params = new ParamsSQL($pm,$link);				
 		$mat_params->add('material',DT_STRING,$doc->material);				
 		$material_db = $mat_params->getParamById('material');
+		if($material_db == "''" || strtolower($material_db) == "null"){
+			syslog(LOG_ERR, "RawMaterial_Controller->update_procurement() material is not not");
+			return;
+		}
 		$material_ar = $link->query_first(sprintf(
 			"SELECT id FROM raw_materials
 			WHERE name = %s",
@@ -897,8 +905,9 @@ class RawMaterial_Controller extends ControllerSQL{
 				$cement_silos_id = $silo_ar['id'];
 			}					
 		}
-		$process_date_time_ex = property_exists($doc, 'process_date_time');
 		
+		$process_date_time_ex = property_exists($doc, 'process_date_time');
+
 		//doc				
 		$doc_params = new ParamsSQL($pm,$link);				
 		$doc_params->add('number',DT_STRING,$doc->number);
@@ -919,8 +928,8 @@ class RawMaterial_Controller extends ControllerSQL{
 		$quant_net = ($doc->quant_net=='0')? 0:$doc->quant_net/1000;
 		$doc_quant_net = (
 			!isset($doc->quant_net_document)||
-				$doc->quant_net_document=='0'||
-				$doc->quant_net_document==''
+			$doc->quant_net_document=='0'||
+			$doc->quant_net_document==''
 		)? 0 : intval($doc->quant_net_document)/1000;
 		
 		$doc_params->add('quant_gross',DT_STRING,$quant_gross);
@@ -948,7 +957,7 @@ class RawMaterial_Controller extends ControllerSQL{
 			last_modif_date_time,
 			weigh_app
 		)
-		VALUES (%s, %s, %s ,%s ,%d ,%d ,%s ,%s ,%s ,%s ,%s ,%d ,%f ,%f ,%f , %d, %d, NOW(), TRUE)
+		VALUES (%s, %s, %s, %s, %d, %d, %s, %s, %s, %s, %s, %d, %f, %f, %f, %d, %d, NOW(), TRUE)
 		ON CONFLICT (doc_ref) DO UPDATE SET
 			date_time			= excluded.date_time,
 			process_date_time	= excluded.process_date_time,
@@ -1106,7 +1115,7 @@ class RawMaterial_Controller extends ControllerSQL{
 				$mat_params = new ParamsSQL($pm,$link);				
 				$mat_params->add('material',DT_STRING,$doc->material);				
 				$material_db = $mat_params->getParamById('material');
-				if($material_db == "''"){
+				if($material_db == "''" || strtolower($material_db) == "null"){
 					syslog(LOG_ERR, "RawMaterial_Controller->update_procurement() material is not not");
 					return;
 				}

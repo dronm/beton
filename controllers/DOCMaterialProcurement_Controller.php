@@ -50,6 +50,13 @@ class DOCMaterialProcurement_Controller extends ControllerSQL{
 		
 			$f_params = array();
 			
+				$f_params['alias']='Дата';
+			$param = new FieldExtDateTime('process_date_time'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
 				$f_params['alias']='Номер';
 			$param = new FieldExtString('number'
 				,$f_params);
@@ -183,6 +190,11 @@ class DOCMaterialProcurement_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Время последнего изменения';
 			$param = new FieldExtDateTimeTZ('last_modif_date_time'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtBool('weigh_app'
 				,$f_params);
 		$pm->addParam($param);
 		
@@ -221,6 +233,13 @@ class DOCMaterialProcurement_Controller extends ControllerSQL{
 		
 			$f_params=array();
 			
+				$f_params['alias']='Дата';
+			$param = new FieldExtDateTime('process_date_time'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
 				$f_params['alias']='Номер';
 			$param = new FieldExtString('number'
 				,$f_params);
@@ -348,6 +367,11 @@ class DOCMaterialProcurement_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Время последнего изменения';
 			$param = new FieldExtDateTimeTZ('last_modif_date_time'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtBool('weigh_app'
 				,$f_params);
 			$pm->addParam($param);
 		

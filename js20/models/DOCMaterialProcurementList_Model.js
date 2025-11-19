@@ -41,6 +41,14 @@ function DOCMaterialProcurementList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Дата';
+	filed_options.autoInc = false;	
+	
+	options.fields.process_date_time = new FieldDateTime("process_date_time",filed_options);
+		
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Номер';
 	filed_options.autoInc = false;	
 	
@@ -208,23 +216,24 @@ function DOCMaterialProcurementList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.last_modif_date_time = new FieldDateTimeTZ("last_modif_date_time",filed_options);
-	
-			
-				
-				
-				
-			
-			
-			
-				
+		
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Дата';
+	filed_options.defValue = true;
+	
 	filed_options.autoInc = false;	
 	
-	options.fields.process_date_time = new FieldDateTime("process_date_time",filed_options);
+	options.fields.weigh_app = new FieldBool("weigh_app",filed_options);
 	
+			
+				
+				
+				
+			
+			
+			
+			
 			
 			
 			
