@@ -30,6 +30,7 @@ BEGIN
 	
 	--Проверяем данные контакта
 	IF coalesce(NEW.phone_cel, '') <> '' THEN
+-- RAISE exception 'phone_cel:%',new.phone_cel;
 		--поиск по телефону
 		SELECT
 			ct.id,
@@ -51,10 +52,18 @@ BEGIN
 			--нет такого телефона в контактах
 			v_contact_name = coalesce(NEW.descr, '');
 			IF v_contact_name = '' THEN
-				SELECT cl.name INTO v_contact_name FROM clients AS cl
+				SELECT SUBSTRING(TRIM(cl.name), 1, 250) INTO v_contact_name FROM clients AS cl
 				WHERE cl.id = NEW.client_id;
 			END IF;
 		
+
+			IF length(NEW.phone_cel)>11 THEN
+				NEW.phone_cel = REPLACE(NEW.phone_cel, '-', '');
+				IF SUBSTRING(NEW.phone_cel, 1, 1) = '8' THEN
+					NEW.phone_cel = SUBSTRING(NEW.phone_cel, 2);
+				END IF;
+			END IF;
+-- RAISE exception 'tel:%',new.phone_cel;
 			INSERT INTO contacts (name, tel)
 			VALUES (v_contact_name, NEW.phone_cel)
 			ON CONFLICT (tel) DO UPDATE SET name = v_contact_name
@@ -85,6 +94,3 @@ BEGIN
 	RETURN NEW;
 END;
 $BODY$;
-
-ALTER FUNCTION public.order_process() OWNER TO ;
-

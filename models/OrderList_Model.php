@@ -13,6 +13,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
  
 class OrderList_Model extends ModelSQLBeton{
 	
@@ -196,6 +197,16 @@ class OrderList_Model extends ModelSQLBeton{
 						
 		$f_contacts_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"contacts_ref",$f_opts);
 		$this->addField($f_contacts_ref);
+		//********************
+		
+		//*** Field ref_1c ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Ссылка на справочник 1с';
+		$f_opts['id']="ref_1c";
+						
+		$f_ref_1c=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ref_1c",$f_opts);
+		$this->addField($f_ref_1c);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	$this->setAggFunctions(

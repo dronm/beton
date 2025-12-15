@@ -54,7 +54,7 @@ function User_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.role_id = new FieldEnum("role_id",filed_options);
-	filed_options.enumValues = 'admin,owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner,client,weighing';
+	filed_options.enumValues = 'owner,boss,operator,manager,dispatcher,accountant,lab_worker,supplies,sales,plant_director,supervisor,vehicle_owner,client,weighing';
 	options.fields.role_id.getValidator().setRequired(true);
 	
 				
@@ -163,6 +163,15 @@ function User_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.params = new FieldJSONB("params",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Ссылка на справочник 1с';
+	filed_options.autoInc = false;	
+	
+	options.fields.ref_1c = new FieldJSONB("ref_1c",filed_options);
 	
 			
 		User_Model.superclass.constructor.call(this,id,options);

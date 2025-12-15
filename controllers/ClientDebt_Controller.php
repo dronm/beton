@@ -150,7 +150,12 @@ class ClientDebt_Controller extends ControllerSQL{
 
 				$ar = $link->query_first(sprintf(
 					"INSERT INTO client_contracts_1c (ref_1c, client_id)
-					VALUES (jsonb_build_object('ref_1c', %s, 'descr', %s), %d)
+					VALUES (
+						jsonb_build_object(
+							'ref_1c', %s,
+							'descr', %s
+						), %d
+					)
 					RETURNING id"
 					,$par->getDbVal('contract_ref')
 					,$par->getDbVal('contract')

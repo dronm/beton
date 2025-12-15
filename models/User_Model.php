@@ -154,6 +154,16 @@ class User_Model extends ModelSQLBeton{
 		$f_params=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"params",$f_opts);
 		$this->addField($f_params);
 		//********************
+		
+		//*** Field ref_1c ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Ссылка на справочник 1с';
+		$f_opts['id']="ref_1c";
+						
+		$f_ref_1c=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ref_1c",$f_opts);
+		$this->addField($f_ref_1c);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

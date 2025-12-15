@@ -173,6 +173,14 @@ function DOCMaterialProcurementDialog_View(id,options){
 			"labelCaption":"Комментарий:",
 			"title":"Комментарий"
 		}));	
+
+		this.addElement(new ButtonHistory(id+":cmdHistory",{
+			tableName: "doc_material_procurements",
+			visible: false, //disabled at start
+			getRecordId: () => {
+				return self.getElement("id").getValue();
+			}
+		}));				
 	}
 		
 	DOCMaterialProcurementDialog_View.superclass.constructor.call(this,id,options);
@@ -259,5 +267,9 @@ DOCMaterialProcurementDialog_View.prototype.onGetData = function(resp,cmd){
 	if(create_users_ref && !create_users_ref.isNull()){
 		document.getElementById(id+":cmd-cont").style = "float:left;";
 		DOMHelper.setText(document.getElementById(id+":create_user"), create_users_ref.getDescr());
+	}
+
+	if(cmd == "edit"){
+		this.getElement("cmdHistory").setVisible(true);
 	}
 }

@@ -19,7 +19,7 @@ function OrderDialog_View(id,options){
 	var bool_bs_cl = "control-label "+window.getBsCol(5);
 	var obj_bs_cl = ("control-label "+window.getBsCol(2));
 	
-	var self = this;
+	const self = this;
 	
 	options.addElement = function(){
 		this.addElement(new AvailOrderTimeControl(id+":avail_time",{
@@ -111,7 +111,6 @@ function OrderDialog_View(id,options){
 		}));	
 
 		this.addElement(new EditNum(id+":f_val",{
-			"focus": true,
 			"labelCaption": "Значение F:",
 			"title": "Значение F смеси"
 		}));	
@@ -133,7 +132,7 @@ function OrderDialog_View(id,options){
 					calc_ctrl.setClientSpec();
 				}				
 			},
-			"focused":true,
+			// "focused":true,
 			"required":true,
 			"onClear":function(){
 				self.getElement("client").getErrorControl().setValue("","info");
@@ -286,6 +285,14 @@ function OrderDialog_View(id,options){
 		this.addElement(new ShipmentMediaList_View(id+":media",{
 			"detail":true
 		}));				
+
+		this.addElement(new ButtonHistory(id+":cmdHistory",{
+			tableName: "orders",
+			visible: false, //disabled at start
+			getRecordId: () => {
+				return self.getElement("id").getValue();
+			}
+		}));				
 	}
 	
 	OrderDialog_View.superclass.constructor.call(this,id,options);
@@ -392,6 +399,9 @@ OrderDialog_View.prototype.m_selectedContactId;
 OrderDialog_View.prototype.m_onChangeDate;
 OrderDialog_View.prototype.m_onChangeTime;
 
+OrderDialog_View.prototype.m_ref1c; //initialized from db, then changed
+OrderDialog_View.prototype.m_clientRef1c; 
+
 OrderDialog_View.prototype.showTMInvite = function(){
 	var tm_ctrl = this.getElement("descr").getErrorControl();
 	tm_ctrl.setValue("Пригласить в Telegram","info");
@@ -496,6 +506,64 @@ OrderDialog_View.prototype.onTMInviteClick = function(){
 	});
 }
 
+OrderDialog_View.prototype.updateOrder1cInfo = function(){
+	//if ref_1c exists - show print info
+	//otherwise - show create order 
+	const ref_1c = this.m_ref1c; //order ref
+	console.log("OrderDialog_View, ref_1c:",ref_1c)
+	const self = this;
+
+	const ctrl = this.getElement('calc').getElement("client_specification").getErrorControl();
+	if(this.m_onOrderInfoClick){
+		EventHelper.del(ctrl.getNode(), "click", this.m_onOrderInfoClick);
+	}
+	let txt, txtType, txtTitle;
+	if(!ref_1c?.m_keys?.ref_1c){
+		txt = "Новый счет";
+		txtTitle = "Создать новый счет в 1с";
+		txtType = "info";
+		this.m_onOrderInfoClick = function(event) {
+			self.createNewOrder();
+		};
+	}else{
+		txt = ref_1c.m_descr;
+		txtTitle = "Открыть печатную форму счета";
+		txtType = "warn";
+		this.m_onOrderInfoClick = function(event) {
+			self.printOrder();
+		};
+	}
+	ctrl.setValue(txt, txtType);
+	ctrl.getNode().setAttribute("title", txtTitle);
+	DOMHelper.addClass(ctrl.getNode(), "tmInvite");
+	EventHelper.add(ctrl.getNode(), "click", this.m_onOrderInfoClick);
+}
+// Updates gui info on this.m_clientRef1c
+OrderDialog_View.prototype.updateClientRef1cInfo = function(){
+	DOMHelper.delNode("order_client_ref_1c");
+
+	if (!this.m_clientRef1c?.m_keys?.ref_1c) {
+		const self = this;
+		const inf_cont = this.getElement("client").getErrorControl().getNode();
+		const no_ref_tag = document.createElement("DIV");
+		no_ref_tag.textContent = "Связать с 1с для выписки счетов и взаиморасчетов";
+		no_ref_tag.setAttribute("id", "order_client_ref_1c");
+		no_ref_tag.setAttribute("class", "text-danger");
+		no_ref_tag.setAttribute("style", "cursor: pointer;");
+		no_ref_tag.addEventListener("click", function(event) {
+			event.preventDefault(); // Prevent default anchor behavior
+			//f.id.getValue()
+			const clientRef = self.getElement("client").getValue();
+			if(clientRef && !clientRef.isNull()){
+				self.setRef1cForClient(clientRef.getKey("id")); //OrderClient model
+			}
+		});
+		inf_cont.appendChild(no_ref_tag);
+		// DOMHelper.show(inf_cont);
+	}
+}
+
+// onSelectClient is called when a client is selected, it shows client previous shipment quants.
 OrderDialog_View.prototype.onSelectClient = function(f){
 	var ctrl;
 	ctrl = this.getElement("descr");
@@ -513,14 +581,20 @@ OrderDialog_View.prototype.onSelectClient = function(f){
 	else{
 		inf = "Еще не брал";
 	}
-console.log(f)	
+ // console.log("onSelectClient",f)	
 	var debt = f.client_debt.getValue();
 	if(debt != undefined && debt!=0){
 		inf = inf + ", " + this.getClientDebtText(debt);
 		this.setClientDebt(debt);
 	}
 	this.getElement("client").getErrorControl().setValue(inf,"info");
-	
+
+	this.m_clientRef1c = f.ref_1c.getValue(); //client reference to 1c
+	// if(typeof this.m_clientRef1c === "string"){
+	// 	this.m_clientRef1c = JSON.parse(this.m_clientRef1c);
+	// }
+	this.updateClientRef1cInfo();
+
 	this.setClientId(f.id.getValue());
 }
 
@@ -587,8 +661,11 @@ OrderDialog_View.prototype.setClientId = function(clientId){
 
 OrderDialog_View.prototype.getClientDebtText = function(client_debt){
 	var client_debt_pref = "";
-	if(client_debt){
+	if(client_debt > 0){
 		client_debt_pref = "Долг: ";		
+	}else if (client_debt < 0) {
+		client_debt_pref = "Мы должны: ";		
+		client_debt = -1 * client_debt;
 	}
 	var client_debt_s = CommonHelper.numberFormat(client_debt, 2, ",", " " );	
 	return client_debt_pref + client_debt_s + " руб.";
@@ -597,13 +674,13 @@ OrderDialog_View.prototype.getClientDebtText = function(client_debt){
 OrderDialog_View.prototype.setClientDebt = function(client_debt){
 	var debt_n = document.getElementById(this.getId()+":client_debt");
 	if(client_debt != undefined && client_debt != 0){		
-		if(client_debt){
+		if(client_debt > 0){
 			DOMHelper.addClass(debt_n, "text-danger");
 			
 		}else if (client_debt < 0){
 			DOMHelper.addClass(debt_n, "text-success");
 		}
-		var client_debt_s = CommonHelper.numberFormat(client_debt, 2, ",", " " );
+		// var client_debt_s = CommonHelper.numberFormat(client_debt, 2, ",", " " );
 		DOMHelper.setText(debt_n, this.getClientDebtText(client_debt));	
 		DOMHelper.show(debt_n);
 	}else{
@@ -617,8 +694,11 @@ OrderDialog_View.prototype.onGetData = function(resp,cmd){
 	
 	var m = this.getModel();
 
+	this.m_ref1c = m.getFieldValue("ref_1c");
+	this.m_clientRef1c = m.getFieldValue("client_ref_1c");
+
 	var f = m.getField("clients_ref");
-	if(!f.isNull()&&f.getValue()){
+	if(!f.isNull() && f.getValue()){
 		this.setClientId(f.getValue().getKey());
 	}
 	
@@ -669,6 +749,22 @@ OrderDialog_View.prototype.onGetData = function(resp,cmd){
 		this.getElement("comment_text").setEnabled(true);
 		this.getControlOK().setEnabled(true);
 	}
+
+
+	if(cmd == "edit"){
+		this.getElement("cmdHistory").setVisible(true);
+
+		this.getElement("client").getErrorControl().setLevel("info");
+		this.getElement("calc").getElement("client_specification").getErrorControl().setLevel("info");
+		this.updateClientRef1cInfo();
+		this.updateOrder1cInfo();
+	}
+
+	if(cmd=="insert" || cmd=="copy"){
+		this.getElement("client").focus();
+	}else{
+		this.getElement("calc").getElement("quant").focus();
+	}
 }
 
 OrderDialog_View.prototype.getContactRef = function(callBack){
@@ -709,3 +805,74 @@ OrderDialog_View.prototype.getContactRef = function(callBack){
 }
 
 
+//model is ClientModel from complete_for_order method.
+OrderDialog_View.prototype.setRef1cForClient = function(clientId){
+	(new ClientSetRef1c(clientId, function(){
+		DOMHelper.delNode("order_client_ref_1c");
+	}).open());
+}
+
+//returns current ref 1c: from database or newly selected
+OrderDialog_View.prototype.getRef1c = function(){
+
+}
+
+
+OrderDialog_View.prototype.createNewOrderFinish = function(model){
+	model.getNextRow();
+	const ref_1c = model.getFieldValue("ref_1c");
+	if(typeof ref_1c == "string"){
+		this.m_ref1c = new RefType(JSON.parse(ref_1c));
+	}else{
+		this.m_ref1c = ref_1c;
+	}
+	console.log("finish model",this.m_ref1c)
+	this.updateOrder1cInfo();
+	window.showTempNote("Сформирован счет в 1с",null,5000);
+}
+
+OrderDialog_View.prototype.createNewOrderCont = function(){
+	const pm = (new Order_Controller()).getPublicMethod("new_order_1c");
+	pm.setFieldValue("id", this.getElement("id").getValue());
+	const self = this;
+	pm.run({
+		ok:function(resp){
+			self.createNewOrderFinish(resp.getModel("Order1c_Model"));
+		}
+	});
+}
+
+OrderDialog_View.prototype.createNewOrder = function(){
+	//save if modified
+	if(this.getModified()){
+		const self = this;
+		this.onSave(function(){
+			self.createNewOrderCont();
+		})
+	}else{
+		this.createNewOrderCont();
+	}
+}
+
+OrderDialog_View.prototype.printOrderCont = function(){
+	const pm = (new Order_Controller()).getPublicMethod("print_order_1c");
+	pm.setFieldValue("id", this.getElement("id").getValue());
+	// pm.download();
+	const offset = 0;
+	const h = $( window ).width()/3*2;
+	const left = $( window ).width()/2;
+	const w = left - 20;
+	pm.openHref("ViewPDF","location=0,menubar=0,status=0,titlebar=0,top="+(50+offset)+",left="+(left+offset)+",width="+w+",height="+h);
+}
+
+OrderDialog_View.prototype.printOrder = function(){
+	//downdload file and show
+	if(this.getModified()){
+		const self = this;
+		this.onSave(function(){
+			self.printOrderCont();
+		})
+	}else{
+		this.printOrderCont();
+	}
+}

@@ -6,10 +6,31 @@ function ClientSpecificationList_View(id,options){
 	options = options || {};
 	options.HEAD_TITLE = "Договоры";
 
-	ClientSpecificationList_View.superclass.constructor.call(this,id,options);
-	
 	var model = (options.models && options.models.ClientSpecificationList_Model)? options.models.ClientSpecificationList_Model : new ClientSpecificationList_Model();
 	var contr = new ClientSpecification_Controller();
+
+	this.m_getRef1c = options.getRef1c;
+
+	let filters = undefined;
+	let fromOrder = false;
+
+	let clientId = getClientIdFromURL();
+	if(clientId){
+		const filter = {
+			field: "client_id",
+			sign: "e",
+			val: clientId
+		}
+		filters = [ filter ];
+		fromOrder = true;
+	}
+
+	if(options.detailFilters&&options.detailFilters.ClientSpecificationList_Model){
+		filters = options.detailFilters.ClientSpecificationList_Model;
+	} 
+
+	ClientSpecificationList_View.superclass.constructor.call(this,id,options);
+	
 	
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
@@ -21,21 +42,28 @@ function ClientSpecificationList_View(id,options){
 		"controller":contr,
 		"editInline": true,
 		"editWinClass": null,
-		"filters":(options.detailFilters&&options.detailFilters.ClientSpecificationList_Model)? options.detailFilters.ClientSpecificationList_Model:null,
+		"filters":filters,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd"),		
 		"popUpMenu":popup_menu,
 		"editViewClass": ClientSpecificationListEdit_View,
+		"editViewOptions": {
+			"clientId": clientId,
+			"getRef1c": this.m_getRef1c
+		},
 		"head":new GridHead(id+"-grid:head",{
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
-						options.detailFilters||options.detail? null : new GridCellHead(id+":grid:head:clients_ref",{
+						fromOrder||options.detailFilters||options.detail? null : new GridCellHead(id+":grid:head:clients_ref",{
 							"value":"Контрагент",
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("clients_ref"),
-									"ctrlClass":DestinationEdit,
+									"ctrlClass":ClientEdit,
 									"ctrlBindFieldId":"client_id",
+									"ctrlOptions": {
+										"labelCaption": ""
+									},
 									"searchOptions":{
 										"field":new FieldInt("client_id"),
 										"searchType":"on_match",
@@ -45,9 +73,28 @@ function ClientSpecificationList_View(id,options){
 							],
 							"sortable":true
 						})
+						,new GridCellHead(id+":grid:head:destinations_ref",{
+							"value":"Объект",
+							"columns":[
+								new GridColumnRef({
+									"field":model.getField("destinations_ref"),
+									"ctrlClass":DestinationEdit,
+									"ctrlOptions": {
+										"labelCaption": ""
+									},
+									"ctrlBindFieldId":"destination_id",
+									"searchOptions":{
+										"field":new FieldInt("destination_id"),
+										"searchType":"on_match",
+										"typeChange":false
+									}
+								})
+							],
+							"sortable":true
+						})
 					
 						,new GridCellHead(id+":grid:head:client_contracts_1c_ref",{
-							"value":"Contract",
+							"value":"Договор 1с",
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("client_contracts_1c_ref"),
@@ -241,17 +288,73 @@ ClientSpecificationList_View.prototype.calcTotal = function(){
 
 //***********************
 function ClientSpecificationListEdit_View(id,options){	
+	this.m_clientId = options.clientId;
+	this.m_getRef1c = options.getRef1c;
+
 	ClientSpecificationListEdit_View.superclass.constructor.call(this,id,options);
 }
 extend(ClientSpecificationListEdit_View, ViewGridEditInlineAjx);
 
+ClientSpecificationListEdit_View.prototype.setClientRef1c = function(clientRef1c){
+	if(!clientRef1c){
+		throw new Error("Нет ссылки 1с");
+	}
+	this.getElement("client_contracts_1c_ref").setClientRef1c(clientRef1c);
+}
+
 ClientSpecificationListEdit_View.prototype.onGetData = function(resp, cmd){
 	ClientSpecificationListEdit_View.superclass.onGetData.call(this, resp, cmd);
 
-	if(resp){
+	debugger
+	let clientRef1c = undefined;
+	if(this.m_getRef1c){
+		clientRef1c = this.m_getRef1c();
+		clientRef1c = clientRef1c.keys?.ref_1c || clientRef1c.m_keys?.ref_1c;
+		this.setClientRef1c(clientRef1c);
+
+	} else if(resp){
 		const model = resp.getModel("ClientSpecificationList_Model");
 		model.getRow(0);
-		const clientRef1c = model.getFieldValue("client_ref_1c");
-		this.getElement("client_contracts_1c_ref").setClientRef1c(clientRef1c);
+		clientRef1c = model.getFieldValue("client_ref_1c");
+		this.setClientRef1c(clientRef1c);
+
+	}else {
+		const clientId = getClientIdFromURL();
+		if(clientId){
+			const pm = (new Client_Controller()).getPublicMethod("get_object");
+			pm.setFieldValue("id", clientId);
+			const self = this;
+			pm.run({
+				async: false,
+				ok: function(resp){
+					const m = resp.getModel("ClientDialog_Model");
+					m.getRow(0);
+					clientRef1c = m.getFieldValue("ref_1c");
+					if(typeof clientRef1c === "string"){
+						clientRef1c = JSON.parse(clientRef1c);
+					}
+					clientRef1c = clientRef1c.keys?.ref_1c;
+					self.setClientRef1c(clientRef1c);
+				}
+			});
+		}
 	}
+}
+
+function getClientIdFromURL(){
+	let clientId = undefined;
+	const params = new URLSearchParams(window.location.search);
+	const fields = params.get("cond_fields");
+	if(fields?.length){
+		const fieldSep = params.get("field_set");
+		const clientIdInd = fields.split(fieldSep).indexOf("client_id");
+		if(clientIdInd >= 0){
+			const condVals = params.get("cond_vals");
+			const valsAr = condVals?.split(fieldSep);
+			if(valsAr.length > clientIdInd){
+				clientId = valsAr[clientIdInd];
+			}
+		}
+	}
+	return clientId;
 }

@@ -64,6 +64,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		parent::get_list($pm);
 	}
 
+
 /*
 
 UPDATE public.production_sites
@@ -85,6 +86,7 @@ UPDATE public.production_sites
 	}
 
 	private function log_action($prodSiteId,$mes,$mesLevel,$servLevel){
+		$datetime = new DateTime();
 		if($servLevel >= $mesLevel){
 
 			$mes_db = NULL;		
@@ -118,7 +120,7 @@ UPDATE public.production_sites
 				Uretim.Olusturan AS user_descr
 			FROM Uretim
 			LEFT JOIN Recete ON Recete.Id=Uretim.ReceteId
-			WHERE Uretim.Id %s %d AND Uretim.BasTarih IS NOT NULL AND Uretim.BasTarih&lt;>''".
+			WHERE Uretim.Id %s %d AND Uretim.BasTarih IS NOT NULL AND Uretim.BasTarih &lt;&gt; ''".
 				( ($sign=='=')? "":" AND (Uretim.Statu=0 OR Uretim.Statu=2)" ).
 			"ORDER BY Uretim.Id",
 			$sign,
@@ -199,7 +201,7 @@ UPDATE public.production_sites
 						ManuelKayit.*,
 						(SELECT TOP 1 Uretim.id
 						FROM Uretim
-						WHERE Uretim.BasTarih &gt; ManuelKayit.M_Tarih
+						WHERE Uretim.BasTarih > ManuelKayit.M_Tarih
 						ORDER BY Uretim.BasTarih ASC						
 						) AS for_prod_id						
 					FROM ManuelKayit
@@ -418,7 +420,7 @@ UPDATE public.production_sites
 		}	
 	}
 
-	private function insert_elkon_productions($productionSiteId,&amp;$productionsData,$elkonLogLevel,$updateLastProduction){		
+	private function insert_elkon_productions($productionSiteId,&$productionsData,$elkonLogLevel,$updateLastProduction){		
 		$q_head = "INSERT INTO productions (
 			production_id,
 			production_dt_start,
@@ -537,43 +539,8 @@ UPDATE public.production_sites
 			];
 			$this->execute_query_from_elkon($params);
 		}
-		<!-- if(strlen($q_body)){ -->
-		<!-- 	//pg settings for bot -->
-		<!---->
-		<!-- 	$this->getDbLinkMaster()->query("SET work_mem = '16MB'");						 -->
-		<!---->
-		<!-- 	//increase these values to make PostgreSQL prefer less CPU-intensive plans -->
-		<!-- 	$this->getDbLinkMaster()->query("SET cpu_tuple_cost = 0.1");						 -->
-		<!-- 	$this->getDbLinkMaster()->query("SET cpu_index_tuple_cost = 0.1");						 -->
-		<!---->
-		<!-- 	$this->getDbLinkMaster()->query("SET statement_timeout = '10min'");						 -->
-		<!---->
-		<!-- 	try{ -->
-		<!-- 		$this->log_action($productionSiteId,'Выполнение запроса по вставке нового производства: '.$q_head.' '.$q_body,self::LOG_LEVEL_DEBUG,$elkonLogLevel);	 -->
-		<!-- 		$this->getDbLinkMaster()->query('BEGIN');						 -->
-		<!-- 		$this->getDbLinkMaster()->query($q_del_head.' '.$q_del_body); -->
-		<!-- 		$this->getDbLinkMaster()->query($q_head.' '.$q_body);				 -->
-		<!---->
-		<!-- 		if($updateLastProduction){			 -->
-		<!-- 			$this->getDbLinkMaster()->query(sprintf( -->
-		<!-- 				'UPDATE production_sites -->
-		<!-- 				SET last_elkon_production_id=%d -->
-		<!-- 				WHERE id=%d', -->
-		<!-- 				$max_production_id, -->
-		<!-- 				$productionSiteId -->
-		<!-- 			)); -->
-		<!-- 		} -->
-		<!-- 		$this->getDbLinkMaster()->query('COMMIT'); -->
-		<!-- 	} -->
-		<!-- 	catch(Exception $e){ -->
-		<!-- 		$this->getDbLinkMaster()->query('ROLLBACK'); -->
-		<!---->
-		<!-- 		throw $e; -->
-		<!-- 	} -->
-		<!-- 	$q_body = ''; -->
-		<!-- 	$q_del_body = ''; -->
-		<!-- 	$queryCount = 0; -->
-		<!-- } -->
+
+		
 	}
 
 	public function execute_query_from_elkon($params){
@@ -660,7 +627,7 @@ UPDATE public.production_sites
 		);
 		*/
 		//$script = 'php5.6 '.FUNC_PATH.'elkon_check_production.php '.$this->getExtDbVal($pm,'production_site_id').' '.$this->getExtDbVal($pm,'production_id');
-		//exec($script." > /dev/null 2>&amp;1 &amp;");
+		//exec($script." > /dev/null 2>&1 &");
 		
 		//Просто добавим номер как пропущенное, оно само загрузится
 		$this->getDbLinkMaster()->query(sprintf("UPDATE production_sites
@@ -714,7 +681,7 @@ UPDATE public.production_sites
 			try{
 				$this->connect_to_elkon_server($serv['id'],$elkon_con);
 				$max_production_id = isset($serv['last_production_id'])? intval($serv['last_production_id']):0;
-				if(isset($serv['production_ids']) &amp;&amp; strlen($serv['production_ids'])){
+				if(isset($serv['production_ids']) && strlen($serv['production_ids'])){
 					$production_ids_s = substr($serv['production_ids'],1,strlen($serv['production_ids'])-2);
 					$production_ids = explode(',',$production_ids_s);
 					foreach($production_ids as $production_id){
@@ -724,7 +691,7 @@ UPDATE public.production_sites
 						}
 						
 						$material_data = $this->elkon_get_materials_on_closed_production($serv['id'],$elkon_con,$production_id);
-						if(is_array($material_data) &amp;&amp; count($material_data)){
+						if(is_array($material_data) && count($material_data)){
 							echo "closing production ".$production_id.PHP_EOL;
 							$this->log_action($serv['id'],'Закрываем производство: '.$production_id,self::LOG_LEVEL_DEBUG,$elkon_con->logLevel);	
 						
@@ -793,14 +760,14 @@ UPDATE public.production_sites
 							
 							$concrete_quant = 0;
 							//По каждому материалу
-							for($m_ind=1;$m_ind&lt;=$MT_FIELD_CNT;$m_ind++){
+							for($m_ind=1;$m_ind &lt;= $MT_FIELD_CNT;$m_ind++){
 								$m_id_pref = 'mat'.$m_ind;
 								if(
-								 (isset($material_data[$m_id_pref.'_quant']) &amp;&amp; ($qt=intval($material_data[$m_id_pref.'_quant'])) )
+								 (isset($material_data[$m_id_pref.'_quant']) && ($qt=intval($material_data[$m_id_pref.'_quant'])) )
 								 ||
-								 (isset($material_data[$m_id_pref.'_quant_req']) &amp;&amp; ($qt=intval($material_data[$m_id_pref.'_quant_req'])) )
+								 (isset($material_data[$m_id_pref.'_quant_req']) && ($qt=intval($material_data[$m_id_pref.'_quant_req'])) )
 								 ||
-								 (isset($material_data[$m_id_pref.'_quant_corrected']) &amp;&amp; (intval($material_data[$m_id_pref.'_quant_corrected'])) )
+								 (isset($material_data[$m_id_pref.'_quant_corrected']) && (intval($material_data[$m_id_pref.'_quant_corrected'])) )
 								){
 
 									//******* Силос (только у цемента!) **********
@@ -892,7 +859,7 @@ UPDATE public.production_sites
 											$serv['id'],
 											$production_id
 										));
-										if(is_array($ar) &amp;&amp; count($ar) ){
+										if(is_array($ar) && count($ar) ){
 											$vehicle_id = isset($ar['vehicle_id'])? $ar['vehicle_id']:'NULL';
 											$shipment_id =  isset($ar['shipment_id'])? $ar['shipment_id']:'NULL';
 											$operator_user_id = isset($ar['operator_user_id'])? intval($ar['operator_user_id']):0;
@@ -977,7 +944,7 @@ UPDATE public.production_sites
 										
 										//correction
 										$q_cor = floatval($material_data[$m_id_pref.'_quant_corrected']);
-										if($q_cor &amp;&amp; $mat_id!='NULL'
+										if($q_cor && $mat_id!='NULL'
 										){
 											/*
 											production_site_id,
@@ -1011,7 +978,7 @@ UPDATE public.production_sites
 											);
 										}
 										if($shipment_id != 'NULL'
-										&amp;&amp; !array_key_exists('id_'.$production_id,$productions_for_close)
+										&& !array_key_exists('id_'.$production_id,$productions_for_close)
 										){
 											$productions_for_close['id_'.$production_id] = array(
 												'production_id'=>$production_id,
@@ -1083,7 +1050,7 @@ UPDATE public.production_sites
 											WHERE id=%d",
 											$production_for_close['shipment_id']
 										));
-										if(is_array($ar) &amp;&amp; count($ar) &amp;&amp; $ar['shipped']=='f'){
+										if(is_array($ar) && count($ar) && $ar['shipped']=='f'){
 											Shipment_Controller::setShipped(
 												$this->getDbLinkMaster(),
 												$this->getDbLink(),
@@ -1104,7 +1071,7 @@ UPDATE public.production_sites
 								}
 							}
 						}
-						sleep(100000); //
+						usleep(100000); //
 					}
 				}
 				
@@ -1119,7 +1086,7 @@ UPDATE public.production_sites
 				$this->insert_elkon_productions($serv['id'],$productions_data,$elkon_con->logLevel,TRUE);
 				
 				//Дырки в производствах
-				if(isset($serv['missing_elkon_production_ids']) &amp;&amp; strlen($serv['missing_elkon_production_ids'])){
+				if(isset($serv['missing_elkon_production_ids']) && strlen($serv['missing_elkon_production_ids'])){
 					$missing_elkon_production_ids_s = substr($serv['missing_elkon_production_ids'],1,strlen($serv['missing_elkon_production_ids'])-2);
 					$missing_elkon_production_ids = explode(',',$missing_elkon_production_ids_s);
 					foreach($missing_elkon_production_ids as $missing_elkon_production_id){
@@ -1164,7 +1131,6 @@ UPDATE public.production_sites
 		);
 	}	
 	
-
 </xsl:template>
 
 </xsl:stylesheet>

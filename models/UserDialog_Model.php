@@ -11,6 +11,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
  
 class UserDialog_Model extends ModelSQLBeton{
 	
@@ -89,7 +90,7 @@ class UserDialog_Model extends ModelSQLBeton{
 		$f_opts = array();
 		$f_opts['id']="user_time_locale";
 						
-		$f_user_time_locale=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_time_locale",$f_opts);
+		$f_user_time_locale=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"user_time_locale",$f_opts);
 		$this->addField($f_user_time_locale);
 		//********************
 		
@@ -107,6 +108,24 @@ class UserDialog_Model extends ModelSQLBeton{
 						
 		$f_elkon_user_name=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"elkon_user_name",$f_opts);
 		$this->addField($f_elkon_user_name);
+		//********************
+		
+		//*** Field chat_statuses_ref ***
+		$f_opts = array();
+		$f_opts['id']="chat_statuses_ref";
+						
+		$f_chat_statuses_ref=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"chat_statuses_ref",$f_opts);
+		$this->addField($f_chat_statuses_ref);
+		//********************
+		
+		//*** Field ref_1c ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Ссылка на справочник 1с';
+		$f_opts['id']="ref_1c";
+						
+		$f_ref_1c=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ref_1c",$f_opts);
+		$this->addField($f_ref_1c);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

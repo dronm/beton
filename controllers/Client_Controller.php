@@ -593,6 +593,7 @@ class Client_Controller extends ControllerSQL{
 			"SELECT
 				clients.id,
 				clients.name,
+				clients.ref_1c,
 				clients.inn AS inn,
 				o_last.descr,
 				o_last.phone_cel,
@@ -619,9 +620,11 @@ class Client_Controller extends ControllerSQL{
 				FROM client_debts AS d		
 				GROUP BY d.client_id
 			) AS debts ON debts.client_id = clients.id			
-			WHERE lower(clients.name) LIKE lower(%s)||'%%'
+			WHERE lower(clients.name) LIKE '%%'||lower(%s)||'%%'
+			ORDER BY POSITION(lower(%s) IN lower(clients.name) )
 			LIMIT 5",
 			$this->getExtDbVal($pm,'name')
+			,$this->getExtDbVal($pm,'name')
 			),
 			'OrderClient_Model'
 		);	

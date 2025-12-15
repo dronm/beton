@@ -102,6 +102,14 @@ class OrderClient_Model extends {
 		$f_client_debt=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_debt",$f_opts);
 		$this->addField($f_client_debt);
 		//********************
+		
+		//*** Field ref_1c ***
+		$f_opts = array();
+		$f_opts['id']="ref_1c";
+						
+		$f_ref_1c=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ref_1c",$f_opts);
+		$this->addField($f_ref_1c);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

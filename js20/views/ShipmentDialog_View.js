@@ -126,6 +126,14 @@ function ShipmentDialog_View(id,options){
 			"detail":true
 		}));				
 
+		this.addElement(new ButtonHistory(id+":cmdHistory",{
+			tableName: "shipments",
+			visible: false, //disabled at start
+			getRecordId: () => {
+				return self.getElement("id").getValue();
+			}
+		}));				
+
 	}
 	
 	ShipmentDialog_View.superclass.constructor.call(this,id,options);
@@ -264,4 +272,7 @@ ShipmentDialog_View.prototype.onGetData = function(resp,cmd){
 	this.getElement("ship_cost").setVisible(true);
 	this.getElement("ship_cost").setEditAllowed(m.getFieldValue("ship_cost_edit"));
 	
+	if(cmd == "edit"){
+		this.getElement("cmdHistory").setVisible(true);
+	}
 }

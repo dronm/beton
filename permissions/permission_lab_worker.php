@@ -192,6 +192,10 @@ $permissions = array();
 				
 					$permissions['Order_Controller_get_nakl_1c_list']=TRUE;
 				
+					$permissions['Order_Controller_new_order_1c']=TRUE;
+				
+					$permissions['Order_Controller_print_order_1c']=TRUE;
+				
 					$permissions['Driver_Controller_insert']=TRUE;
 				
 					$permissions['Driver_Controller_update']=TRUE;
@@ -1795,6 +1799,16 @@ $permissions = array();
 					$permissions['DOCMaterialMovement_Controller_get_list']=TRUE;
 				
 					$permissions['DOCMaterialMovement_Controller_get_object']=TRUE;
+				
+					$permissions['AuditLog_Controller_get_list']=TRUE;
+				
+					$permissions['AuditLog_Controller_get_object']=TRUE;
+				
+					$permissions['AuditLogChange_Controller_get_list']=TRUE;
+				
+					$permissions['AuditLogChange_Controller_get_object']=TRUE;
+				
+					$permissions['Connect1c_Controller_complete_user']=TRUE;
 				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

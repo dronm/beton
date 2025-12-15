@@ -112,6 +112,15 @@ function OrderClient_Model(options){
 	
 	options.fields.client_debt = new FieldFloat("client_debt",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.ref_1c = new FieldJSON("ref_1c",filed_options);
+	
 		OrderClient_Model.superclass.constructor.call(this,id,options);
 }
 extend(OrderClient_Model,ModelXML);

@@ -38,6 +38,14 @@ function DriverDialog_View(id,options){
 		this.addElement(new EntityContactList_View(id+":contacts_list",{
 			"detail":true
 		}));		
+
+		this.addElement(new ButtonHistory(id+":cmdHistory",{
+			tableName: "drivers",
+			visible: false, //disabled at start
+			getRecordId: () => {
+				return self.getElement("id").getValue();
+			}
+		}));				
 	}	
 	
 	DriverDialog_View.superclass.constructor.call(this,id,options);	
@@ -73,3 +81,11 @@ function DriverDialog_View(id,options){
 	
 }
 extend(DriverDialog_View,ViewObjectAjx);
+
+DriverDialog_View.prototype.onGetData = function(resp,cmd){
+	DriverDialog_View.superclass.onGetData.call(this,resp,cmd);
+
+	if(cmd == "edit"){
+		this.getElement("cmdHistory").setVisible(true);
+	}
+}

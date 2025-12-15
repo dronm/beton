@@ -1370,6 +1370,113 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			)
 		));
 	}
+
+	function new_order_1c($pm){
+		$order_id = $this->getExtVal($pm, 'id');
+		$link = $this->getDbLink();
+		$ar = $link->query_first(
+			sprintf(
+				"SELECT 
+					o.date_time,
+					o.ref_1c->'keys'->>'id' AS order_ref,
+					cl.ref_1c->'keys'->>'id' AS client_ref,
+					sp.client_contract_1c_ref AS dogovor_ref,
+					ct.code_1c AS item_code_1c,
+					o.quant,
+					sp.price,
+					o.quant * sp.price AS total,
+					ol.number AS num
+				FROM orders AS o
+				LEFT JOIN clients AS cl ON cl.id = o.client_id
+				LEFT JOIN client_specifications AS sp ON sp.id = o.client_specification_id
+				LEFT JOIN concrete_types AS ct ON ct.id = o.concrete_type_id
+				LEFT JOIN orders_list AS ol ON ol.id = o.id
+				WHERE o.id = %d", $order_id
+			)
+		);
+		if(!isset($ar["quant"])){
+			throw new Exception("не установлено количество");
+		}
+		if(!is_array($ar) || !count($ar)){
+			throw new Exception("Документ не найден");
+		}
+		//checkings
+		if(!isset($ar["client_ref"])){
+			throw new Exception("Клиент не связан с 1с");
+		}
+		if(!isset($ar["dogovor_ref"])){
+			throw new Exception("Договор не связан с 1с");
+		}
+		$items = [];
+		array_push($items, [
+			"code_1c" => $ar["item_code_1c"],
+			"quant" => $ar["quant"],
+			"price" => $ar["price"],
+			"total" => $ar["price"] * $ar["quant"]
+		]);
+		$params = [
+			"date" => $ar["date_time"],
+			"num" => $ar["num"],
+			"order_ref" => $ar["order_ref"],
+			"client_ref" => $ar["client_ref"],
+			"dogovor_ref" => $ar["dogovor_ref"],
+			"items" => $items
+		];
+		$xml = ExtProg::newOrder($params);
+		if(!isset($xml["models"])){
+			throw new Exception("tag 'models' not found");
+		}
+		if(!isset($xml["models"]["Order1c_Model"])){
+			throw new Exception("tag 'Order1c_Model' not found");
+		}
+		if(!isset($xml["models"]["Order1c_Model"]["rows"])){
+			throw new Exception("tag 'rows' not found");
+		}
+		$rows = $xml["models"]["Order1c_Model"]["rows"];
+		if(!count($rows)){
+			throw new Exception("tag 'rows' length is 0");
+		}
+		$ref1c = json_encode($rows[0]["ref_1c"]);
+		$this->getDbLinkMaster()->query(sprintf("UPDATE orders SET ref_1c = '%s' WHERE id = %d", $ref1c, $order_id));
+
+		$this->addModel(new ModelVars(
+			array('id'=>'Order1c_Model',
+				'values'=>array(
+					new Field('ref_1c',DT_STRING,
+						array('value'=>$ref1c)
+					)
+				)
+			)
+		));
+	}
+
+	function print_order_1c($pm){
+		$link = $this->getDbLink();
+		$order_id = $this->getExtVal($pm, 'id');
+		$ar = $link->query_first(
+			sprintf(
+				"SELECT 
+					o.ref_1c->'keys'->>'ref_1c' AS order_ref,
+					o.ref_1c->>'descr' AS order_descr,
+					(SELECT
+						users.ref_1c->>'descr'
+					FROM users
+					WHERE users.id = %d
+					) AS user_descr
+
+				FROM orders AS o
+				WHERE o.id = %d", $_SESSION["user_id"], $order_id
+			)
+		);
+		if(!is_array($ar) || !count($ar)){
+			throw new Exception("Документ не найден");
+		}
+		if(!isset($ar['user_descr']) || $ar["user_descr"] == ""){
+			throw new Exception("Пользователь не связан с 1с");
+		}
+		$file_opts = array('name'=>$ar["order_descr"].'.pdf','disposition'=>'inline');
+		$xml = ExtProg::printOrder($ar["order_ref"], $ar["user_descr"], $file_opts);
+	}
 }
 <![CDATA[?>]]>
 </xsl:template>

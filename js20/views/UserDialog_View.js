@@ -78,6 +78,15 @@ function UserDialog_View(id,options){
 			"detail":true
 		}));		
 			
+		this.addElement(new ButtonHistory(id+":cmdHistory",{
+			tableName: "users",
+			visible: false, //disabled at start
+			getRecordId: () => {
+				return self.getElement("id").getValue();
+			}
+		}));				
+
+		this.addElement(new User1cEdit(id+":ref_1c"));		
 	}
 	
 	//****************************************************	
@@ -92,6 +101,7 @@ function UserDialog_View(id,options){
 		//,new DataBinding({"control":this.getElement("phone_cel")})
 		,new DataBinding({"control":this.getElement("banned")})
 		,new DataBinding({"control":this.getElement("production_sites_ref")})
+		,new DataBinding({"control":this.getElement("ref_1c"),"fieldId":"ref_1c"})
 	];
 	this.setDataBindings(r_bd);
 	
@@ -104,6 +114,7 @@ function UserDialog_View(id,options){
 		//,new CommandBinding({"control":this.getElement("tel_ext")})
 		,new CommandBinding({"control":this.getElement("banned")})
 		,new CommandBinding({"control":this.getElement("production_sites_ref"),"fieldId":"production_site_id"})
+		,new CommandBinding({"control":this.getElement("ref_1c"),"fieldId":"ref_1c"})
 	]);
 	
 	this.addDetailDataSet({
@@ -158,3 +169,10 @@ UserDialog_View.prototype.resetPwd = function(){
 	});
 }
 
+UserDialog_View.prototype.onGetData = function(resp,cmd){
+	UserDialog_View.superclass.onGetData.call(this,resp,cmd);
+
+	if(cmd == "edit"){
+		this.getElement("cmdHistory").setVisible(true);
+	}
+}

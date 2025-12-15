@@ -185,6 +185,13 @@ class User_Controller extends ControllerSQL{
 				,$f_params);
 		$pm->addParam($param);
 		
+			$f_params = array();
+			
+				$f_params['alias']='Ссылка на справочник 1с';
+			$param = new FieldExtJSONB('ref_1c'
+				,$f_params);
+		$pm->addParam($param);
+		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		//default event
@@ -280,6 +287,13 @@ class User_Controller extends ControllerSQL{
 		
 			$f_params=array();
 			$param = new FieldExtJSONB('params'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Ссылка на справочник 1с';
+			$param = new FieldExtJSONB('ref_1c'
 				,$f_params);
 			$pm->addParam($param);
 		

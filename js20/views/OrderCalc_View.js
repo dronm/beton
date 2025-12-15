@@ -114,6 +114,12 @@ function OrderCalc_View(id,options){
 		}));	
 
 		this.addElement(new ClientSpecificationEdit(id+":client_specification",{
+			"onSelect":function(f){
+				self.onSelectSpecification(f);
+			},
+			"onClear":function(){
+				self.onSelectSpecification(undefined);
+			}
 		}));	
 
 		this.addElement(new EditMoney(id+":concrete_cost",{
@@ -502,45 +508,77 @@ OrderCalc_View.prototype.setPayCash = function(){
 }
 
 OrderCalc_View.prototype.setClientSpec = function(){
-//console.log("OrderCalc_View.prototype.setClientSpec")	
-	//context
-	var cl = this.m_dialogContext.getElement("client").getValue();
+	const cl = this.m_dialogContext.getElement("client").getValue();
 	
-	//direct access
-	var dest = this.getElement("destination").getValue();	
-	var ct = this.getElement("concrete_type").getValue();
 	var spec_ctrl = this.getElement("client_specification");
-//console.log("spec_ctrl=",spec_ctrl.getValue().getKey());
 	var pm = spec_ctrl.getAutoComplete().getPublicMethod();
 	var en = false;	
-	if((!cl || cl.isNull()) || (!dest||dest.isNull()) || (!ct||ct.isNull())){
+	if(
+		(!cl || cl.isNull()) 
+	){
 		pm.unsetFieldValue("client_id");
-		pm.unsetFieldValue("destination_id");
-		pm.unsetFieldValue("concrete_type_id");		
 		spec_ctrl.reset();
+		this.onSelectSpecification(undefined);
 	}else{
 		var cl_id = cl.getKey();
-		var dest_id = dest.getKey();
-		var ct_id = ct.getKey();
 		if(
 			(this.m_specClId && this.m_specClId != cl_id)
-			||(this.m_specDestId && this.m_specDestId != dest_id)
-			||(this.m_specCtId && this.m_specCtId != ct_id)
 		){
 			spec_ctrl.reset();
 		}
 		
 		this.m_specClId = cl_id;
-		this.m_specDestId = dest_id;
-		this.m_specCtId = ct_id;
 		
 		pm.setFieldValue("client_id", cl_id);
-		pm.setFieldValue("destination_id", dest_id);
-		pm.setFieldValue("concrete_type_id", ct_id);
 		en = true;
 	}
+
 	spec_ctrl.setEnabled(en);
-	if(en && $(spec_ctrl.getNode()).is(":focus") ){
-		spec_ctrl.getAutoComplete().fillArrayOnPattern(spec_ctrl.getNode());
+
+	//???
+	// if(en && $(spec_ctrl.getNode()).is(":focus") ){
+	// 	spec_ctrl.getAutoComplete().fillArrayOnPattern(spec_ctrl.getNode());
+	// }
+}
+
+// OrderCalc_View.prototype.updateOrder1cInf = function(){
+// 	//if ref_1c exists - show print info
+// 	//otherwise - show create order 
+// 	const ref_1c = this.m_dialogContext.m_ref1c; //order ref
+// 	console.log("OrderCalc_View, ref_1c:",ref_1c)
+// 	const self = this;
+//
+// 	const ctrl = this.getElement("client_specification").getErrorControl();
+// 	if(this.m_onOrderInfoClick){
+// 		EventHelper.remove(ctrl.getNode(), "click", this.m_onOrderInfoClick);
+// 	}
+// 	let txt, txtType, txtTitle;
+// 	if(!ref_1c?.m_keys?.ref_1c){
+// 		txt = "Новый счет";
+// 		txtTitle = "Создать новый счет в 1с";
+// 		txtType = "info";
+// 		this.m_onOrderInfoClick = function(event) {
+// 			self.createNewOrder();
+// 		};
+// 	}else{
+// 		txt = ref_1c.descr;
+// 		txtTitle = "Открыть печатную форму счета";
+// 		txtType = "warn";
+// 		this.m_onOrderInfoClick = function(event) {
+// 			self.printOrder();
+// 		};
+// 	}
+// 	ctrl.setValue(txt, txtType);
+// 	ctrl.getNode().setAttribute("title", txtTitle);
+// 	DOMHelper.addClass(ctrl.getNode(), "tmInvite");
+// 	EventHelper.add(ctrl.getNode(), "click", this.m_onOrderInfoClick);
+// }
+
+OrderCalc_View.prototype.onSelectSpecification = function(f){
+	var spec_ctrl = this.getElement("client_specification");
+	if(!f){
+		spec_ctrl.getErrorControl().clear();
+		return;
 	}
+	this.m_dialogContext.updateOrder1cInfo();
 }

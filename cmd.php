@@ -1,4 +1,5 @@
 <?php
+
 require_once('Config.php');
 require_once(FRAME_WORK_PATH.'Constants.php');
 require_once(ABSOLUTE_PATH.'db/SessManager.php');
@@ -196,6 +197,22 @@ try{
 			}
 		}
 		
+	}
+
+	//if logged, set user for database
+	if (isset($_SESSION['LOGGED'])){
+		$dbLinkMaster->query_first(
+			sprintf("SET app.user_name = '%s'", $_SESSION['user_name'])
+		);
+		$dbLinkMaster->query_first(
+			sprintf("SET app.user_id = '%s'", $_SESSION['user_id'])
+		);
+		$dbLinkMaster->query_first(
+			sprintf("SET app.user_role = '%s'", $_SESSION['role_id'])
+		);
+		$ar = $dbLinkMaster->query_first(
+			"select current_setting('app.user_role', true) as user_name"
+		);
 	}
 
 	/* including controller */	

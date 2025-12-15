@@ -52,9 +52,10 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 				$resp = ExtProg::getClientContract($this->getExtVal($pm, "client_contract_1c_ref"));
 				/* $name = $resp["models"]["Contract1cList_Model"]["rows"][0]["name"]; */
 				$name = $resp["models"]["Contract1cList_Model"]["rows"][0]["name"];
-				$ar = $this->getDbLinkMaster()->query(sprintf(
+				$ar = $this->getDbLinkMaster()->query_first(sprintf(
 					"INSERT INTO client_contracts_1c (ref_1c, client_id)
 					VALUES (jsonb_build_object('ref_1c', %s, 'descr', '%s'), %d)
+					ON CONFLICT ((ref_1c ->> 'ref_1c'::text)) DO UPDATE NOTHING
 					RETURNING id"
 					,$this->getExtDbVal($pm, 'client_contract_1c_ref')
 					,$name
@@ -82,8 +83,8 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 
 	public function complete_for_client($pm){
 		$client_id = $this->getExtDbVal($pm, 'client_id');
-		$concrete_type_id = $this->getExtDbVal($pm, 'concrete_type_id');
-		$destination_id = $this->getExtDbVal($pm, 'destination_id');
+		//$concrete_type_id = $this->getExtDbVal($pm, 'concrete_type_id');
+		//$destination_id = $this->getExtDbVal($pm, 'destination_id');
 		$cond = '';
 		if($this->getExtVal($pm, 'search')){
 			$search = $this->getExtDbVal($pm, 'search');
@@ -93,9 +94,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		$this->addNewModel(sprintf(
 			"SELECT * FROM client_specifications_list
 			WHERE
-				client_id = %d
-				AND destination_id = %d
-				AND concrete_type_id = %d".$cond."
+				client_id = %d".$cond."
 				ORDER BY specification_date DESC"
 			,$client_id
 			,$destination_id

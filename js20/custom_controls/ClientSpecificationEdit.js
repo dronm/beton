@@ -34,10 +34,11 @@ function ClientSpecificationEdit(id,options){
 	
 	options.selectWinParams = (function(pm){
 		return function(){
-			var s = "cond_fields=client_id@@destination_id@@concrete_type_id&cond_sgns=e@@e@@e&cond_vals="+
-				pm.getFieldValue("client_id") + "@@" +
-				pm.getFieldValue("destination_id") + "@@" +
-				pm.getFieldValue("concrete_type_id") +
+			//@@destination_id@@concrete_type_id
+			var s = "cond_fields=client_id&cond_sgns=e&cond_vals="+
+				pm.getFieldValue("client_id") + 
+				// "@@" + pm.getFieldValue("destination_id") + 
+				//"@@" + pm.getFieldValue("concrete_type_id") +
 				"&field_sep=@@";
 			return s;
 		}
@@ -50,8 +51,9 @@ function ClientSpecificationEdit(id,options){
 	options.acOnBeforeSendQuery = function(){
 		var pm = this.getPublicMethod()
 		return (pm.getField("client_id").isSet()
-			&&pm.getField("concrete_type_id").isSet()
-			&&pm.getField("destination_id").isSet());
+			// &&pm.getField("concrete_type_id").isSet()
+			// &&pm.getField("destination_id").isSet()
+		);
 	}
 	options.acICase = options.acICase || "1";
 	options.acMid = options.acMid || "1";

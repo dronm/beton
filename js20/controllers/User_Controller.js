@@ -147,6 +147,12 @@ extend(User_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Ссылка на справочник 1с";
+	var field = new FieldJSONB("ref_1c",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -244,6 +250,12 @@ extend(User_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldJSONB("params",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Ссылка на справочник 1с";
+	var field = new FieldJSONB("ref_1c",options);
 	
 	pm.addField(field);
 	

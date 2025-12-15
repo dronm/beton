@@ -380,6 +380,24 @@ class OrderDialog_Model extends ModelSQLBeton{
 		$f_client_debt=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_debt",$f_opts);
 		$this->addField($f_client_debt);
 		//********************
+		
+		//*** Field client_ref_1c ***
+		$f_opts = array();
+		$f_opts['id']="client_ref_1c";
+						
+		$f_client_ref_1c=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_ref_1c",$f_opts);
+		$this->addField($f_client_ref_1c);
+		//********************
+		
+		//*** Field ref_1c ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Ссылка на справочник 1с';
+		$f_opts['id']="ref_1c";
+						
+		$f_ref_1c=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ref_1c",$f_opts);
+		$this->addField($f_ref_1c);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

@@ -52,6 +52,8 @@ function Order_Controller(options){
 	this.add_get_transp_nakl_list();
 	this.add_get_transp_nakl_shipment_list();
 	this.add_get_nakl_1c_list();
+	this.add_new_order_1c();
+	this.add_print_order_1c();
 		
 }
 extend(Order_Controller,ControllerObjServer);
@@ -245,6 +247,12 @@ extend(Order_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "W";
 	var field = new FieldInt("w_val",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Ссылка на справочник 1с";
+	var field = new FieldJSONB("ref_1c",options);
 	
 	pm.addField(field);
 	
@@ -448,6 +456,12 @@ extend(Order_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Ссылка на справочник 1с";
+	var field = new FieldJSONB("ref_1c",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -531,6 +545,9 @@ extend(Order_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldJSON("contacts_ref",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Ссылка на справочник 1с";
+	pm.addField(new FieldJSONB("ref_1c",f_opts));
 }
 
 			Order_Controller.prototype.addGetObject = function(){
@@ -991,6 +1008,38 @@ extend(Order_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldText("order_ids",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Order_Controller.prototype.add_new_order_1c = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('new_order_1c',opts);
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("id",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Order_Controller.prototype.add_print_order_1c = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('print_order_1c',opts);
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("id",options));
 	
 			
 	this.addPublicMethod(pm);

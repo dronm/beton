@@ -16,11 +16,15 @@ CREATE OR REPLACE VIEW client_specifications_list AS
 		,concrete_types_ref(ct) AS concrete_types_ref
 		,destinations_ref(dest) AS destinations_ref
 		,coalesce(t.quant,0) AS quant
-		,coalesce(t.quant,0) - coalesce((SELECT
-			sum(fl.quant)
-		FROM client_specification_flows AS fl
-		WHERE fl.client_specification_id = t.id
+
+		,coalesce(t.quant,0) 
+		- coalesce(
+			(SELECT
+					sum(fl.quant)
+				FROM client_specification_flows AS fl
+				WHERE fl.client_specification_id = t.id
 		),0) AS quant_balance
+
 		,t.price
 		,t.total
 		,cl.ref_1c->'keys'->>'ref_1c' AS client_ref_1c

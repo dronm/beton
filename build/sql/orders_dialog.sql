@@ -109,6 +109,9 @@ CREATE OR REPLACE VIEW public.orders_dialog AS
 					)
 			END
 		, 0) AS client_debt
+
+		,cl.ref_1c AS client_ref_1c
+		,o.ref_1c
 		
 	FROM orders o
 	LEFT JOIN clients cl ON cl.id = o.client_id

@@ -15,6 +15,8 @@
 <li><a href="#About_Controller">About_Controller</a></li>
 <li><a href="#AstCall_Controller">AstCall_Controller</a></li>
 <li><a href="#Attachment_Controller">Attachment_Controller</a></li>
+<li><a href="#AuditLog_Controller">AuditLog_Controller</a></li>
+<li><a href="#AuditLogChange_Controller">AuditLogChange_Controller</a></li>
 <li><a href="#Bank_Controller">Bank_Controller</a></li>
 <li><a href="#BuhRBP1c_Controller">BuhRBP1c_Controller</a></li>
 <li><a href="#Caller_Controller">Caller_Controller</a></li>
@@ -41,6 +43,7 @@
 <li><a href="#ConcreteCostHeader_Controller">ConcreteCostHeader_Controller</a></li>
 <li><a href="#ConcreteType_Controller">ConcreteType_Controller</a></li>
 <li><a href="#ConcreteTypeMapToProduction_Controller">ConcreteTypeMapToProduction_Controller</a></li>
+<li><a href="#Connect1c_Controller">Connect1c_Controller</a></li>
 <li><a href="#Connect1cCheck_Controller">Connect1cCheck_Controller</a></li>
 <li><a href="#ConnectElkonCheck_Controller">ConnectElkonCheck_Controller</a></li>
 <li><a href="#Constant_Controller">Constant_Controller</a></li>
@@ -494,6 +497,7 @@
 <li><a href="#QualityPassport_Model">QualityPassport_Model</a></li>
 <li><a href="#QualityPassportList_Model">QualityPassportList_Model</a></li>
 <li><a href="#Client1cList_Model">Client1cList_Model</a></li>
+<li><a href="#User1cList_Model">User1cList_Model</a></li>
 <li><a href="#BuhRBP1cList_Model">BuhRBP1cList_Model</a></li>
 <li><a href="#Firm1c_Model">Firm1c_Model</a></li>
 <li><a href="#Firm1cList_Model">Firm1cList_Model</a></li>
@@ -524,6 +528,10 @@
 <li><a href="#ExtProductionError_Model">ExtProductionError_Model</a></li>
 <li><a href="#ExtProductionPing_Model">ExtProductionPing_Model</a></li>
 <li><a href="#ElkonLog_Model">ElkonLog_Model</a></li>
+<li><a href="#AuditLog_Model">AuditLog_Model</a></li>
+<li><a href="#AuditLogList_Model">AuditLogList_Model</a></li>
+<li><a href="#AuditLogForObject_Model">AuditLogForObject_Model</a></li>
+<li><a href="#AuditLogChange_Model">AuditLogChange_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -812,6 +820,26 @@
 <p>Length:500</p>
 </div>
 </div>
+</div>
+</div>
+<div id="AuditLog_Controller" class="content_box">
+<h1>AuditLog_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>get_list</h2>
+<a href="#AuditLogList_Model">Model: AuditLogList_Model</a><h2>get_object</h2>
+<a href="#AuditLogForObject_Model">Model: AuditLogForObject_Model</a>
+</div>
+</div>
+<div id="AuditLogChange_Controller" class="content_box">
+<h1>AuditLogChange_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>get_list</h2>
+<a href="#AuditLogChange_Model">Model: AuditLogChange_Model</a><h2>get_object</h2>
+<a href="#AuditLogChange_Model">Model: AuditLogChange_Model</a>
 </div>
 </div>
 <div id="Bank_Controller" class="content_box">
@@ -1285,6 +1313,15 @@
 <a href="#ConcreteTypeMapToProduction_Model">Model: ConcreteTypeMapToProduction_Model</a><h2>get_list</h2>
 <a href="#ConcreteTypeMapToProductionList_Model">Model: ConcreteTypeMapToProductionList_Model</a><h2>get_object</h2>
 <a href="#ConcreteTypeMapToProductionList_Model">Model: ConcreteTypeMapToProductionList_Model</a>
+</div>
+</div>
+<div id="Connect1c_Controller" class="content_box">
+<h1>Connect1c_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>complete_user</h2>
+<a href="#User1cList_Model">Model: User1cList_Model</a>
 </div>
 </div>
 <div id="Connect1cCheck_Controller" class="content_box">
@@ -2723,6 +2760,28 @@
 <p>Type:Text</p>
 <p>Required:
 								Нет</p>
+</div>
+</div>
+<h2>new_order_1c</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Да</p>
+</div>
+</div>
+<h2>print_order_1c</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Да</p>
 </div>
 </div>
 </div>
@@ -5996,6 +6055,228 @@
 <div>Precision:</div>
 <h2>content_preview</h2>
 <div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="AuditLog_Model" class="content_box">
+<h1>AuditLog_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>table_name</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>record_id</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>operation</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:1</div>
+<div>Precision:</div>
+<h2>changes</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>changed_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>changed_by</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="AuditLogChange_Model" class="content_box">
+<h1>AuditLogChange_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>col</h2>
+<div>Type:String</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>alias</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>new</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>new_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>old</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>old_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="AuditLogForObject_Model" class="content_box">
+<h1>AuditLogForObject_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>table_name</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>record_id</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>operation</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:1</div>
+<div>Precision:</div>
+<h2>operation_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>changes</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>changed_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>changed_by</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>object_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>type_descr</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="AuditLogList_Model" class="content_box">
+<h1>AuditLogList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>object_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>table_name</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>record_id</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>operation</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:1</div>
+<div>Precision:</div>
+<h2>operation_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>changed_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>changed_by</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>type_descr</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>changes</h2>
+<div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -12581,7 +12862,7 @@
 <h2>date_time</h2>
 <div>Type:DateTimeTZ</div>
 <div>Primary key:</div>
-<div>Required:</div>
+<div>Required:TRUE</div>
 <div>Length:</div>
 <div>Precision:</div>
 <h2>date_time_set</h2>
@@ -13222,7 +13503,7 @@
 <div>Precision:</div>
 <h2>production_site_id</h2>
 <div>Type:Int</div>
-<div>Primary key:</div>
+<div>Primary key:TRUE</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
@@ -13574,6 +13855,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="OrderAvailSpots_Model" class="content_box">
@@ -13654,6 +13941,12 @@
 <div>Precision:</div>
 <h2>client_debt</h2>
 <div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -13976,6 +14269,18 @@
 <div>Required:</div>
 <div>Length:15</div>
 <div>Precision:2</div>
+<h2>client_ref_1c</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="OrderForClientList_Model" class="content_box">
@@ -14968,6 +15273,12 @@
 <div>Precision:</div>
 <h2>contacts_ref</h2>
 <div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -23030,6 +23341,36 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="User1cList_Model" class="content_box">
+<h1>User1cList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>name</h2>
+<div>Type:String</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>search</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="UserAllowedMaterialCorrection_Model" class="content_box">
@@ -23368,6 +23709,12 @@
 <div>Precision:</div>
 <h2>chat_statuses_ref</h2>
 <div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

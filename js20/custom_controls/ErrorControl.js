@@ -22,6 +22,17 @@ extend(ErrorControl,Control);
 /* constants */
 ErrorControl.prototype.DEF_TAG = "SPAN";
 
+ErrorControl.prototype.setLevel = function(level){
+	this.setAttr("class","help-block text-"+level);
+	var ic = DOMHelper.getElementsByAttr("icon-cancel-circle2", this.m_node, "class", true,"I");
+	if(level!="danger"){		
+		DOMHelper.addClass(ic[0],"hidden");
+	}
+	else{
+		DOMHelper.delClass(ic[0],"hidden");
+	}
+}
+
 ErrorControl.prototype.setValue = function(val,level){
 	level = level? level:"danger";
 	if (!val || val.trim()==""){

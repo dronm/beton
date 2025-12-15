@@ -319,6 +319,15 @@ function Order_Model(options){
 	
 	options.fields.w_val = new FieldInt("w_val",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Ссылка на справочник 1с';
+	filed_options.autoInc = false;	
+	
+	options.fields.ref_1c = new FieldJSONB("ref_1c",filed_options);
+	
 			
 			
 			

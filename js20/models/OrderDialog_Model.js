@@ -410,6 +410,24 @@ function OrderDialog_Model(options){
 	options.fields.client_debt = new FieldFloat("client_debt",filed_options);
 	options.fields.client_debt.getValidator().setMaxLength('15');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.client_ref_1c = new FieldJSON("client_ref_1c",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Ссылка на справочник 1с';
+	filed_options.autoInc = false;	
+	
+	options.fields.ref_1c = new FieldJSON("ref_1c",filed_options);
+	
 		OrderDialog_Model.superclass.constructor.call(this,id,options);
 }
 extend(OrderDialog_Model,ModelXML);

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-11-20 02:54:07</lastBuild></version>
+		<lastBuild>2025-12-15 07:07:22</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -296,6 +296,7 @@
 		<version dateOpen="2025-10-01 08:16:15" dateClose="2025-11-18 03:19:20">1.00389</version>
 		<version dateOpen="2025-11-19 16:02:41" dateClose="2025-11-19 16:03:22">1.00390</version>
 		<version dateOpen="2025-11-20 02:53:11" dateClose="2025-11-20 02:54:10">1.00390</version>
+		<version dateOpen="2025-11-25 11:02:34" dateClose="2025-12-15 07:07:45">1.00391</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -747,6 +748,7 @@
 			<field id="elkon_user_name" dataType="String" length="80" alias="Не используется, используется справочник user_map_to_production"/>
 			<field id="domru_user_name" dataType="String" length="80" alias="Для облачной АТС"/>
 			<field id="params" dataType="JSONB"/>
+			<field id="ref_1c" dataType="JSONB" alias="Ссылка на справочник 1с"/>
 			<index id="users_name_index">
 				<field id="name" unique="TRUE"/>
 			</index>
@@ -774,6 +776,7 @@
 			<field id="production_sites_ref" dataType="JSON"/>
 			<field id="elkon_user_name" dataType="String"/>
 			<field id="chat_statuses_ref" dataType="String"/>
+			<field id="ref_1c" dataType="JSONB" alias="Ссылка на справочник 1с"/>
 		</model>
 		<model id="UserProfile" parent="ModelSQLBeton" dataTable="users_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
@@ -1436,6 +1439,7 @@
 			<field id="client_specification_id" dataType="Int" refTable="client_specifications" refField="id" alias="Спецификация"/>
 			<field id="f_val" dataType="Int" alias="F"/>
 			<field id="w_val" dataType="Int" alias="W"/>
+			<field id="ref_1c" dataType="JSONB" alias="Ссылка на справочник 1с"/>
 			<index id="date_time_index">
 				<field id="date_time"/>
 			</index>
@@ -1516,6 +1520,7 @@
 			<field id="user_id" dataType="Int" sysCol="TRUE"/>
 			<field id="orders_ref" dataType="JSON" sysCol="TRUE"/>
 			<field id="contacts_ref" dataType="JSON" sysCol="TRUE"/>
+			<field id="ref_1c" dataType="JSONB" alias="Ссылка на справочник 1с"/>
 		</model>
 		<model id="OrderGarbageList" parent="ModelSQLBeton" dataTable="order_garbage_list" virtual="TRUE">
 			<aggFunctions>
@@ -1674,6 +1679,8 @@
 			<field id="f_val" dataType="Int" alias="F"/>
 			<field id="w_val" dataType="Int" alias="W"/>
 			<field id="client_debt" dataType="Float" length="15" precision="2" alias="Взаиморасчеты"/>
+			<field id="client_ref_1c" dataType="JSON"/>
+			<field id="ref_1c" dataType="JSON" alias="Ссылка на справочник 1с"/>
 		</model>
 		<model id="OrderGarbageDialog" parent="ModelSQLBeton" dataTable="order_garbage_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -3657,6 +3664,7 @@
 			<field id="quant" dataType="Float"/>
 			<field id="date_time" dataType="DateTime"/>
 			<field id="client_debt" dataType="Float"/>
+			<field id="ref_1c" dataType="JSON"/>
 		</model>
 		<model id="OrderAvailSpots" virtual="TRUE" server="FALSE">
 			<field id="avail_date_time" dataType="DateTime"/>
@@ -4004,7 +4012,7 @@
 		<model id="MaterialFactConsumptionCorretion" parent="ModelSQLBeton" dataTable="material_fact_consumption_corrections" virtual="FALSE">
 			<field id="id" dataType="Int" required="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="production_site_id" dataType="Int" refTable="production_sites" refField="id" required="TRUE"/>
-			<field id="date_time" dataType="DateTimeTZ" equired="TRUE"/>
+			<field id="date_time" dataType="DateTimeTZ" required="TRUE"/>
 			<field id="date_time_set" dataType="DateTimeTZ" required="TRUE" defaultValue="CURRENT_TIMESTAMP"/>
 			<field id="user_id" dataType="Int" refTable="users" refField="id"/>
 			<field id="material_id" dataType="Int" refTable="raw_materials" refField="id"/>
@@ -5071,6 +5079,11 @@
 			<field id="search" dataType="Text"/>
 			<field id="ref" dataType="JSON"/>
 		</model>
+		<model id="User1cList" parent="ModelJSON" virtual="TRUE" alias="Модель user 1с">
+			<field id="name" dataType="String" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="search" dataType="Text"/>
+			<field id="ref" dataType="JSON"/>
+		</model>
 		<model id="BuhRBP1cList" parent="ModelJSON" virtual="TRUE" alias="Модель RBP 1с">
 			<field id="name" dataType="Text" primaryKey="TRUE"/>
 			<field id="date_from" dataType="Text"/>
@@ -5104,7 +5117,7 @@
 			<field id="client_id" dataType="Int" refTable="clients" refField="id"/>
 			<field id="ref_1c" dataType="JSONB" alias="Ссылка на справочник 1с"/>
 			<index id="client_contracts_1c_ref_idx" unique="TRUE">
-				<expression>(ref_1c-&gt;'keys'-&gt;&gt;'ref_1c')</expression>
+				<expression>(ref_1c-&gt;&gt;'ref_1c')</expression>
 			</index>
 			<index id="client_contracts_1c_client_idx">
 				<field id="client_id"/>
@@ -5247,7 +5260,7 @@
 		</model>
 		<model id="OperatorForTranspNakl" parent="ModelSQL" dataTable="operators_for_transp_nakl" virtual="FALSE" alias="Список операторов">
 			<field id="user_id" dataType="Int" refTable="users" refField="id" primaryKey="TRUE"/>
-			<field id="production_site_id" dataType="Int" refTable="production_sites" refField="id"/>
+			<field id="production_site_id" dataType="Int" refTable="production_sites" refField="id" primaryKey="TRUE"/>
 		</model>
 		<model id="OperatorForTranspNaklList" parent="ModelSQL" dataTable="operators_for_transp_nakls_list" virtual="FALSE" alias="Список операторов">
 			<field id="user_id" dataType="Int" refTable="users" refField="id" primaryKey="TRUE"/>
@@ -5341,6 +5354,47 @@
 			<field id="updated_at" dataType="DateTimeTZ"/>
 			<field id="msg_type" dataType="Text"/>
 			<field id="msg" dataType="Text"/>
+		</model>
+		<model id="AuditLog" parent="ModelSQLBeton" dataTable="audit_log" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="table_name" dataType="Text" required="TRUE"/>
+			<field id="record_id" dataType="Text" required="TRUE"/>
+			<field id="operation" dataType="String" length="1" required="TRUE"/>
+			<field id="changes" dataType="JSONB"/>
+			<field id="changed_at" dataType="DateTimeTZ" defaultValue="CURRENT_TIMESTAMP"/>
+			<field id="changed_by" dataType="Text"/>
+		</model>
+		<model id="AuditLogList" parent="ModelSQLBeton" dataTable="audit_log_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="object_ref" dataType="JSON"/>
+			<field id="table_name" dataType="Text" required="TRUE"/>
+			<field id="record_id" dataType="Text" required="TRUE"/>
+			<field id="operation" dataType="String" length="1" required="TRUE"/>
+			<field id="operation_descr" dataType="String"/>
+			<field id="changed_at" dataType="DateTimeTZ" defaultValue="CURRENT_TIMESTAMP"/>
+			<field id="changed_by" dataType="Text"/>
+			<field id="type_descr" dataType="Text"/>
+			<field id="changes" dataType="JSONB"/>
+		</model>
+		<model id="AuditLogForObject" parent="ModelSQLBeton" dataTable="audit_log_dialog" virtual="TRUE" alias="for one object only, have referece joins">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="table_name" dataType="Text" required="TRUE"/>
+			<field id="record_id" dataType="Text" required="TRUE"/>
+			<field id="operation" dataType="String" length="1" required="TRUE"/>
+			<field id="operation_descr" dataType="String"/>
+			<field id="changes" dataType="JSONB"/>
+			<field id="changed_at" dataType="DateTimeTZ" defaultValue="CURRENT_TIMESTAMP"/>
+			<field id="changed_by" dataType="Text"/>
+			<field id="object_ref" dataType="JSON"/>
+			<field id="type_descr" dataType="Text"/>
+		</model>
+		<model id="AuditLogChange" virtual="TRUE" parentJS="ModelJSON" server="FALSE">
+			<field id="col" dataType="String" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="alias" dataType="String"/>
+			<field id="new" dataType="String"/>
+			<field id="new_descr" dataType="String"/>
+			<field id="old" dataType="String"/>
+			<field id="old_descr" dataType="String"/>
 		</model>
 	</models>
 	<constants>
@@ -5647,6 +5701,12 @@
 			<publicMethod id="get_nakl_1c_list">
 				<field id="shipment_ids" dataType="Text"/>
 				<field id="order_ids" dataType="Text"/>
+			</publicMethod>
+			<publicMethod id="new_order_1c">
+				<field id="id" dataType="Int" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="print_order_1c">
+				<field id="id" dataType="Int" required="TRUE"/>
 			</publicMethod>
 		</controller>
 		<controller id="Driver" parentId="ControllerSQL" state="TRUE" noState="FALSE">
@@ -7340,6 +7400,21 @@
 			<publicMethod id="get_list" modelId="DOCMaterialMovementList"/>
 			<publicMethod id="get_object" modelId="DOCMaterialMovementList"/>
 		</controller>
+		<controller id="AuditLog" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="get_list" modelId="AuditLogList"/>
+			<publicMethod id="get_object" modelId="AuditLogForObject"/>
+		</controller>
+		<controller id="AuditLogChange" parentId="ControllerObjClient" server="FALSE">
+			<publicMethod id="get_list" modelId="AuditLogChange"/>
+			<publicMethod id="get_object" modelId="AuditLogChange"/>
+		</controller>
+		<controller id="Connect1c" parentId="ControllerSQL" state="TRUE" alias="common controller for all objects">
+			<publicMethod id="complete_user" patternFieldId="search" modelId="User1cList">
+				<field id="search" dataType="String" length="500"/>
+				<field id="ic" dataType="Int"/>
+				<field id="mid" dataType="Int"/>
+			</publicMethod>
+		</controller>
 	</controllers>
 	<permissions>
 		<permission type="allow" controllerId="all" methodId="all" roleId="owner"/>
@@ -7592,6 +7667,7 @@
 		<view id="30038" c="ClientDebt_Controller" t="ClientDebtList" f="get_list" section="Формы" descr="Остатки взаиморасчетов 1с с контрагентами"/>
 		<view id="30039" c="ShipmentMedia_Controller" t="ShipmentMediaList" f="get_list" section="Формы" descr="Медиа файлы водителей"/>
 		<view id="30040" t="OrderForTranspNaklList" section="Формы" descr="Заявки для печати трансп.накладных"/>
+		<view id="30041" c="AuditLog_Controller" f="get_list" t="AuditLogList" section="Формы" descr="История изменений объектов"/>
 		<view id="50001" t="VehicleStopsReport" section="Отчеты" descr="Стоянки ТС"/>
 		<view id="50002" t="VehicleScheduleReportAll" section="Отчеты" descr="Печать графиков"/>
 		<view id="50003" t="RouteToDestAvgTimeRep" section="Отчеты" descr="Среднее время до объектов"/>
@@ -7758,6 +7834,7 @@
 		<serverTemplate id="OperatorForTranspNaklList" class="list"/>
 		<serverTemplate id="UserAllowedMaterialCorrectionList" class="list"/>
 		<serverTemplate id="DOCMaterialMovementList" class="list"/>
+		<serverTemplate id="AuditLogList" class="list"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="js20/tmpl/FatalException.html"/>
@@ -7932,6 +8009,7 @@
 		<jsScript file="js20/controls/rs/ButtonEditPeriodValues.rs_ru.js" resource="ru"/>
 		<!--<jsScript file="js20/controls/ButtonCmd.js"/>-->
 		<jsScript file="js20/custom_controls/ButtonCmd.js"/>
+		<jsScript file="js20/custom_controls/ButtonHistory.js"/>
 		<jsScript file="js20/controls/ButtonExpToExcel.js"/>
 		<jsScript file="js20/controls/rs/ButtonExpToExcel.rs_ru.js" resource="ru"/>
 		<jsScript file="js20/controls/ButtonExpToPDF.js"/>
@@ -8411,6 +8489,8 @@
 		<jsScript file="js20/views/OperatorsForTranspNaklList_View.js"/>
 		<jsScript file="js20/views/UserAllowedMaterialCorrectionList_View.js"/>
 		<jsScript file="js20/views/DOCMaterialMovementList_View.js"/>
+		<jsScript file="js20/views/AuditLogList_View.js"/>
+		<jsScript file="js20/views/AuditLogDialog_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="js20/forms/ViewList_Form.js"/>
 		<jsScript file="js20/forms/MainMenuConstructor_Form.js"/>
@@ -8566,6 +8646,7 @@
 		<jsScript file="js20/custom_controls/RawMaterialConsRateDateEdit.js"/>
 		<jsScript file="js20/custom_controls/ExcelTemplateFieldMatchGrid.js"/>
 		<jsScript file="js20/custom_controls/ExcelTemplateImageSQLGrid.js"/>
+		<jsScript file="js20/custom_controls/AuditLogChangeGrid.js"/>
 		<jsScript file="js20/custom_controls/EditBankAcc.js"/>
 		<jsScript file="js20/custom_controls/BankEditRef.js"/>
 		<jsScript file="js20/custom_controls/Chat_View.js"/>
@@ -8591,6 +8672,7 @@
 		<jsScript file="js20/custom_controls/VehicleOwnerTotIncomeRep_View.js"/>
 		<jsScript file="js20/custom_controls/TaskImportanceLevelEdit.js"/>
 		<jsScript file="js20/custom_controls/Client1cEdit.js"/>
+		<jsScript file="js20/custom_controls/User1cEdit.js"/>
 		<jsScript file="js20/custom_controls/BuhRBP1cEdit.js"/>
 		<jsScript file="js20/custom_controls/Firm1cEdit.js"/>
 		<jsScript file="js20/custom_controls/ChatStatusEdit.js"/>
@@ -8600,6 +8682,7 @@
 		<jsScript file="js20/custom_controls/ClientContract1cEdit.js"/>
 		<jsScript file="js20/custom_controls/AttachmentManager.js"/>
 		<jsScript file="js20/custom_controls/ConnectElkonCheck.js"/>
+		<jsScript file="js20/custom_controls/ClientSetRef1c.js"/>
 		<jsScript file="js20/views/rs_ru.js"/>
 		<jsScript file="js20/views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -9120,6 +9203,14 @@
 		<jsScript file="js20/models/ExtProduction_Model.js"/>
 		<jsScript file="js20/models/ExtProductionError_Model.js"/>
 		<jsScript file="js20/models/ExtProductionPing_Model.js"/>
+		<jsScript file="js20/models/AuditLog_Model.js"/>
+		<jsScript file="js20/models/AuditLogForObject_Model.js"/>
+		<jsScript file="js20/controllers/AuditLog_Controller.js"/>
+		<jsScript file="js20/models/AuditLogList_Model.js"/>
+		<jsScript file="js20/models/AuditLogChange_Model.js"/>
+		<jsScript file="js20/controllers/AuditLogChange_Controller.js"/>
+		<jsScript file="js20/controllers/Connect1c_Controller.js"/>
+		<jsScript file="js20/models/User1cList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

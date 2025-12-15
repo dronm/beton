@@ -28,7 +28,9 @@ CREATE OR REPLACE VIEW public.users_dialog
 	WHERE t.user_id = users.id
 	) AS chat_statuses_ref,
 	
-	null as contact_ids
+	null as contact_ids,
+
+	users.ref_1c
 	
 FROM users
 LEFT JOIN time_zone_locales ON time_zone_locales.id = users.time_zone_locale_id

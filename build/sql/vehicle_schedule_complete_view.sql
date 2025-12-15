@@ -18,11 +18,12 @@ CREATE OR REPLACE VIEW public.vehicle_schedule_complete_view AS
 		FROM vehicle_schedule_states
 		WHERE vehicle_schedule_states.schedule_id = vs.id
 	)
-	WHERE st.state = 'free'::vehicle_states AND vs.schedule_date =
-		CASE
-		WHEN now()::time without time zone < const_first_shift_start_time_val() THEN now()::date - 1
-		ELSE now()::date
-		END;
-
-ALTER TABLE public.vehicle_schedule_complete_view OWNER TO ;
-
+	WHERE 
+		st.state = 'free'::vehicle_states 
+		AND vs.schedule_date =
+			CASE
+			WHEN now()::time without time zone < const_first_shift_start_time_val() THEN now()::date - 1
+			ELSE now()::date
+				---'1 day'::interval
+			END
+		;

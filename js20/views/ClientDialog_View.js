@@ -76,7 +76,14 @@ function ClientDialog_View(id,options){
 		}));		
 
 		this.addElement(new ClientSpecificationList_View(id+":specification_list",{
-			"detail":true
+			"detail":true,
+			"getRef1c": function(){
+				let ref1c = self.getElement("ref_1c").getValue();
+				if(typeof ref1c === "string"){
+					ref1c = JSON.parse(ref1c);
+				}
+				return ref1c;
+			}
 		}));		
 
 		this.addElement(new EditNum(id+":inn",{
@@ -130,6 +137,14 @@ function ClientDialog_View(id,options){
 			"precision":2,
 			"labelCaption":"Минмальное количество для доставки:"
 		}));		
+
+		this.addElement(new ButtonHistory(id+":cmdHistory",{
+			tableName: "clients",
+			visible: false, //disabled at start
+			getRecordId: () => {
+				return self.getElement("id").getValue();
+			}
+		}));				
 	}
 	
 	ClientDialog_View.superclass.constructor.call(this,id,options);
@@ -201,6 +216,13 @@ function ClientDialog_View(id,options){
 }
 extend(ClientDialog_View, ViewObjectAjx);
 
+ClientDialog_View.prototype.onGetData = function(resp,cmd){
+	ClientDialog_View.superclass.onGetData.call(this,resp,cmd);
+
+	if(cmd == "edit"){
+		this.getElement("cmdHistory").setVisible(true);
+	}
+}
 //ref 1c
 /*
 ClientDialog_View.prototype.getModified = function(){

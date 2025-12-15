@@ -63,6 +63,18 @@ class ExtProg{
 				return OUTPUT_PATH.$fileOpts['name'];
 			}
 			else{
+				//inline file view
+				if(strlen($contents) < 500){
+					$contents = @iconv('Windows-1251','UTF-8',$contents);
+					try{
+						$xml = new SimpleXMLElement($contents);
+					}catch(Exception $e){
+					}
+					if ($xml['status']=='false'){
+						$err = (string) $xml->error;
+						throw new Exception($err);
+					}							
+				}
 				if (!array_key_exists('contentType',$fileOpts)){
 					$p = strpos($fileOpts['name'],'.');
 					if ($p !== FALSE){
@@ -155,6 +167,20 @@ class ExtProg{
 		return (array)ExtProg::send_query('get_shipments_all', array('client_ref_1c'=>$clientRef1c, "date"=>$date), TRUE);
 	}
 
+	public static function newOrder($params){
+		return (array)ExtProg::send_query('new_order', $params, TRUE);
+	}
+
+	public static function printOrder($orderRef, $user1c, $fileOpts){
+		$xml=null;
+		return ExtProg::send_query(
+			'print_order', 
+			array('order_ref'=>$orderRef, 'user'=> $user1c), 
+			$xml, 
+			$fileOpts
+		);
+	}
+
 	public static function ping(){
 		try{
 			$respModel = ExtProg::send_query('ping', array(), TRUE);
@@ -173,6 +199,10 @@ class ExtProg{
 			return FALSE;
 		}
 		return TRUE;
+	}
+
+	public static function getUserList(string $search){
+		return (array)ExtProg::send_query('get_catalog_by_attr', array('catalog'=>'users','search'=>$search), TRUE);
 	}
 }
 ?>

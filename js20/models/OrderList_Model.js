@@ -187,6 +187,15 @@ function OrderList_Model(options){
 	
 	options.fields.contacts_ref = new FieldJSON("contacts_ref",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Ссылка на справочник 1с';
+	filed_options.autoInc = false;	
+	
+	options.fields.ref_1c = new FieldJSONB("ref_1c",filed_options);
+	
 		OrderList_Model.superclass.constructor.call(this,id,options);
 }
 extend(OrderList_Model,ModelXML);

@@ -92,7 +92,7 @@ function UserDialog_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.user_time_locale = new FieldInt("user_time_locale",filed_options);
+	options.fields.user_time_locale = new FieldString("user_time_locale",filed_options);
 	
 				
 	
@@ -111,6 +111,24 @@ function UserDialog_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.elkon_user_name = new FieldString("elkon_user_name",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.chat_statuses_ref = new FieldString("chat_statuses_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Ссылка на справочник 1с';
+	filed_options.autoInc = false;	
+	
+	options.fields.ref_1c = new FieldJSONB("ref_1c",filed_options);
 	
 		UserDialog_Model.superclass.constructor.call(this,id,options);
 }

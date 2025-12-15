@@ -1,6 +1,6 @@
 -- View: doc_material_procurements_list
 
- DROP VIEW doc_material_procurements_list;
+ --DROP VIEW doc_material_procurements_list;
 
 CREATE OR REPLACE VIEW doc_material_procurements_list AS 
  SELECT
@@ -13,7 +13,7 @@ CREATE OR REPLACE VIEW doc_material_procurements_list AS
 	suppliers_ref(sup) AS suppliers_ref,
 	doc.carrier_id,
 	suppliers_ref(car) AS carriers_ref,
-	doc.material_id,
+	coalesce(doc.material_id, 0) AS material_id,
 	materials_ref(mat) AS materials_ref,
 	doc.cement_silos_id,
 	cement_silos_ref(silo) AS cement_silos_ref,
