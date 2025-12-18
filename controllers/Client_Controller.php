@@ -601,7 +601,8 @@ class Client_Controller extends ControllerSQL{
 				destinations_ref(dest) AS destinations_ref,
 				o_last.quant,
 				o_last.date_time,
-				debts.debt_total AS client_debt
+				debts.debt_total AS client_debt,
+				debts.update_date AS client_debt_date
 			FROM clients
 			LEFT JOIN (
 				SELECT
@@ -616,9 +617,12 @@ class Client_Controller extends ControllerSQL{
 			LEFT JOIN (
 				SELECT
 					d.client_id,
+					d.update_date,
 					sum(d.debt_total) AS debt_total
 				FROM client_debts AS d		
-				GROUP BY d.client_id
+				GROUP BY
+					d.client_id,
+					d.update_date
 			) AS debts ON debts.client_id = clients.id			
 			WHERE lower(clients.name) LIKE '%%'||lower(%s)||'%%'
 			ORDER BY POSITION(lower(%s) IN lower(clients.name) )

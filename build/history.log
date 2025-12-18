@@ -1684,6 +1684,11 @@ Instruction how to add new table to audit:
 	ClientSpecificationList_View.js
 
 
+1.00393
+1) orders_dialog new field client_debt_date
+2) OrderDialog_View
+3) OrderClient_Model client_debt_date
+	Client_Controller-complete_for_order()
 
 
 

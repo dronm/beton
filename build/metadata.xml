@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-12-18 06:31:50</lastBuild></version>
+		<lastBuild>2025-12-18 07:33:15</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -298,6 +298,7 @@
 		<version dateOpen="2025-11-20 02:53:11" dateClose="2025-11-20 02:54:10">1.00390</version>
 		<version dateOpen="2025-11-25 11:02:34" dateClose="2025-12-15 07:07:45">1.00391</version>
 		<version dateOpen="2025-12-17 15:43:07" dateClose="2025-12-18 06:32:00">1.00392</version>
+		<version dateOpen="2025-12-18 06:54:34" dateClose="2025-12-18 07:33:18">1.00393</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1682,6 +1683,7 @@
 			<field id="client_debt" dataType="Float" length="15" precision="2" alias="Взаиморасчеты"/>
 			<field id="client_ref_1c" dataType="JSON"/>
 			<field id="ref_1c" dataType="JSON" alias="Ссылка на справочник 1с"/>
+			<field id="client_debt_date" dataType="DateTime"/>
 		</model>
 		<model id="OrderGarbageDialog" parent="ModelSQLBeton" dataTable="order_garbage_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -3665,6 +3667,7 @@
 			<field id="quant" dataType="Float"/>
 			<field id="date_time" dataType="DateTime"/>
 			<field id="client_debt" dataType="Float"/>
+			<field id="client_debt_date" dataType="DateTime"/>
 			<field id="ref_1c" dataType="JSON"/>
 		</model>
 		<model id="OrderAvailSpots" virtual="TRUE" server="FALSE">

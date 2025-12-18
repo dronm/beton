@@ -148,7 +148,7 @@ function OrderDialog_View(id,options){
 		client_ctrl.resetKeys = function(){
 			self.m_clientResetKeys.call(self.getElement("client"));
 			self.setClientId(null);
-			self.setClientDebt(0);
+			self.setClientDebt(0, undefined);
 		}
 		this.addElement(client_ctrl);		
 		
@@ -584,8 +584,8 @@ OrderDialog_View.prototype.onSelectClient = function(f){
  // console.log("onSelectClient",f)	
 	var debt = f.client_debt.getValue();
 	if(debt != undefined && debt!=0){
-		inf = inf + ", " + this.getClientDebtText(debt);
-		this.setClientDebt(debt);
+		inf = inf + ", " + this.getClientDebtText(debt, f.client_debt_date.getValue());
+		this.setClientDebt(debt, f.client_debt_date.getValue());
 	}
 	this.getElement("client").getErrorControl().setValue(inf,"info");
 
@@ -659,29 +659,34 @@ OrderDialog_View.prototype.setClientId = function(clientId){
 	descr_ac.setEnabled((clientId!==null));
 }
 
-OrderDialog_View.prototype.getClientDebtText = function(client_debt){
-	var client_debt_pref = "";
-	if(client_debt > 0){
-		client_debt_pref = "Долг: ";		
-	}else if (client_debt < 0) {
-		client_debt_pref = "Мы должны: ";		
-		client_debt = -1 * client_debt;
+OrderDialog_View.prototype.getClientDebtText = function(clientDebt, clientDebtDate){
+	let clientDebtPref = "";
+	if(clientDebt > 0){
+		clientDebtPref = "Долг: ";		
+	}else if (clientDebt < 0) {
+		clientDebtPref = "Мы должны: ";		
+		clientDebt = -1 * clientDebt;
 	}
-	var client_debt_s = CommonHelper.numberFormat(client_debt, 2, ",", " " );	
-	return client_debt_pref + client_debt_s + " руб.";
+	let clientDebtText = CommonHelper.numberFormat(clientDebt, 2, ",", " " );	
+	let clientDebtDateText = "";
+	if(clientDebtDate){
+		clientDebtDateText = " на " + DateHelper.format(clientDebtDate,"d/m/y H:i");
+	}
+
+	return clientDebtPref + clientDebtText + " руб." + clientDebtDateText;
 }
 
-OrderDialog_View.prototype.setClientDebt = function(client_debt){
+OrderDialog_View.prototype.setClientDebt = function(clientDebt, clientDebtDate){
 	var debt_n = document.getElementById(this.getId()+":client_debt");
-	if(client_debt != undefined && client_debt != 0){		
-		if(client_debt > 0){
+	if(clientDebt != undefined && clientDebt != 0){		
+		if(clientDebt > 0){
 			DOMHelper.addClass(debt_n, "text-danger");
 			
-		}else if (client_debt < 0){
+		}else if (clientDebt < 0){
 			DOMHelper.addClass(debt_n, "text-success");
 		}
-		// var client_debt_s = CommonHelper.numberFormat(client_debt, 2, ",", " " );
-		DOMHelper.setText(debt_n, this.getClientDebtText(client_debt));	
+		// var client_debt_s = CommonHelper.numberFormat(clientDebt, 2, ",", " " );
+		DOMHelper.setText(debt_n, this.getClientDebtText(clientDebt, clientDebtDate));	
 		DOMHelper.show(debt_n);
 	}else{
 		DOMHelper.setText(debt_n, "");	
@@ -721,7 +726,7 @@ OrderDialog_View.prototype.onGetData = function(resp,cmd){
 	}
 
 	//debts
-	this.setClientDebt(m.getFieldValue("client_debt"));
+	this.setClientDebt(m.getFieldValue("client_debt"), m.getFieldValue("client_debt_date"));
 	
 	//create
 	/*

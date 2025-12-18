@@ -119,6 +119,15 @@ function OrderClient_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.client_debt_date = new FieldDateTime("client_debt_date",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.ref_1c = new FieldJSON("ref_1c",filed_options);
 	
 		OrderClient_Model.superclass.constructor.call(this,id,options);

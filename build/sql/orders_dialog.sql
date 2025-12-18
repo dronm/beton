@@ -92,26 +92,30 @@ CREATE OR REPLACE VIEW public.orders_dialog AS
 			CASE
 				WHEN o.client_specification_id IS NOT NULL THEN
 					(SELECT 
-						d.debt_total
+						sum(d.debt_total)
 					FROM client_contracts_1c AS cl_ct 
 					LEFT JOIN client_debts AS d ON d.client_id=spec.client_id
 						AND d.client_contract_id = cl_ct.id 
-					WHERE cl_ct.ref_1c->>'ref_1c'=spec.client_contract_1c_ref
-					LIMIT 1
+					WHERE cl_ct.ref_1c->>'ref_1c' = spec.client_contract_1c_ref
 					)
 				ELSE
 					--no specificaton
 					(SELECT 
-						d.debt_total
+						sum(d.debt_total)
 					FROM client_debts AS d 
 					WHERE d.client_id = o.client_id
-					LIMIT 1
 					)
 			END
 		, 0) AS client_debt
 
 		,cl.ref_1c AS client_ref_1c
-		,o.ref_1c
+		,o.ref_1c,
+		
+		(SELECT 
+			DATE_TRUNC('minute', dbt.update_date)
+		FROM client_debts AS dbt 
+		WHERE dbt.client_id = o.client_id
+		) AS client_debt_date
 		
 	FROM orders o
 	LEFT JOIN clients cl ON cl.id = o.client_id
@@ -129,13 +133,16 @@ CREATE OR REPLACE VIEW public.orders_dialog AS
 	LEFT JOIN contacts AS ct ON ct.id = o.contact_id
 	LEFT JOIN notifications.ext_users_photo_list AS e_user ON e_user.ext_contact_id = o.contact_id
 	LEFT JOIN client_specifications AS spec ON spec.id = o.client_specification_id
-	LEFT JOIN (
-		SELECT
-			d.client_id,
-			sum(d.debt_total) AS debt_total
-		FROM client_debts AS d		
-		GROUP BY d.client_id
-	) AS debts ON debts.client_id = o.client_id
+	-- LEFT JOIN (
+	-- 	SELECT
+	-- 		d.client_id,
+	-- 		d.update_date
+	-- 		sum(d.debt_total) AS debt_total
+	-- 	FROM client_debts AS d		
+	-- 	GROUP BY 
+	-- 		d.client_id,
+	-- 		d.update_date
+	-- ) AS debts ON debts.client_id = o.client_id
 	
 	ORDER BY o.date_time;
 

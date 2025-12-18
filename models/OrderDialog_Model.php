@@ -398,6 +398,14 @@ class OrderDialog_Model extends ModelSQLBeton{
 		$f_ref_1c=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ref_1c",$f_opts);
 		$this->addField($f_ref_1c);
 		//********************
+		
+		//*** Field client_debt_date ***
+		$f_opts = array();
+		$f_opts['id']="client_debt_date";
+						
+		$f_client_debt_date=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_debt_date",$f_opts);
+		$this->addField($f_client_debt_date);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

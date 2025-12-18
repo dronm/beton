@@ -79,7 +79,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 				$par->add('firm_ref', DT_STRING, $rec['firm_ref']);
 				
 				$ar = $link->query_first(sprintf(
-						"SELECT t.id FROM firms_1c AS t WHERE t.ref_1c->'keys'->>'ref_1c' = %s",
+					"SELECT t.id FROM firms_1c AS t WHERE t.ref_1c->>'ref_1c' = %s",
 						$par->getDbVal('firm_ref')					
 					)
 				);
@@ -87,6 +87,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 					//нет такой фирмы - добавим
 					$par->add('firm', DT_STRING, $rec['firm']);
 					$par->add('firm_inn', DT_STRING, $rec['firm_inn']);
+
 					$firm_ar = $link->query_first(sprintf(
 						"INSERT INTO firms_1c (ref_1c, inn)
 						VALUES (jsonb_build_object('ref_1c', %s, 'descr', %s), %s)
@@ -101,7 +102,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 
 			//contract
 			$contract_ar = $link->query_first(sprintf(
-					"SELECT t.id FROM client_contracts_1c AS t WHERE t.ref_1c->'keys'->>'ref_1c' = %s",
+					"SELECT t.id FROM client_contracts_1c AS t WHERE t.ref_1c->>'ref_1c' = %s",
 					$par->getDbVal('contract_ref')					
 				)
 			);
