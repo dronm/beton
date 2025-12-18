@@ -218,12 +218,13 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 					END
 				ELSE 0	
 			END
-		) AS pump_for_client_cost
+		) AS pump_for_client_cost,
 		
 		/*,prod.production_id
 		,concrete_types_ref(prod_concr) AS production_concrete_types_ref
 		,prod.concrete_quant AS production_concrete_quant
 		*/
+		sh.order_id
 		
 	FROM shipments sh
 	LEFT JOIN orders o ON o.id = sh.order_id

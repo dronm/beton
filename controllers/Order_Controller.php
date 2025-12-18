@@ -2328,16 +2328,59 @@ class Order_Controller extends ControllerSQL{
 					ct.code_1c AS item_code_1c,
 					o.quant,
 					sp.price,
-					o.quant * sp.price AS total,
-					ol.number AS num
+					ol.number AS num,
+
+					o.pump_vehicle_id IS NOT NULL AS pump_exists,
+
+					coalesce(ship.demurrage_cost,0) AS demurrage_cost,
+
+					CASE 
+						--all shipped
+						WHEN coalesce(ship.quant, 0) = o.quant THEN
+							ship.cost 
+						ELSE
+							round(coalesce(o_dlg.destination_price::numeric, 0::numeric) * o.quant::numeric, 2) --virtual
+					END AS ship_cost,
+
+					CASE
+							--no pump
+						WHEN o.pump_vehicle_id IS NULL THEN 
+							0
+
+							--all shipped
+						WHEN coalesce(ship.quant, 0) = o.quant THEN
+							ship.pump_cost 
+						ELSE
+							--virtual price
+							0
+					END AS pump_cost
+
 				FROM orders AS o
+				LEFT JOIN orders_dialog AS o_dlg ON o_dlg.id = o.id
+				LEFT JOIN pump_prices_values AS ppr ON ppr.pump_price_id = (o_dlg.pump_prices_ref->'keys'->>'id')::int
 				LEFT JOIN clients AS cl ON cl.id = o.client_id
-				LEFT JOIN orders_list AS ol ON ol.id = o.id
 				LEFT JOIN client_specifications AS sp ON sp.id = o.client_specification_id
 				LEFT JOIN concrete_types AS ct ON ct.id = o.concrete_type_id
+				LEFT JOIN orders_list AS ol ON ol.id = o.id
+
+				LEFT JOIN (
+				SELECT 
+					sh.order_id,
+					sum(sh.quant) AS quant,
+					sum(sh.cost) AS cost,
+					sum(sh.demurrage_cost) AS demurrage_cost,
+					sum(sh.pump_for_client_cost) AS pump_cost
+				FROM shipments_list AS sh
+				GROUP BY 
+					sh.order_id
+				) AS ship ON ship.order_id = o.id
+
 				WHERE o.id = %d", $order_id
 			)
 		);
+		if(!isset($ar["quant"])){
+			throw new Exception("не установлено количество");
+		}
 		if(!is_array($ar) || !count($ar)){
 			throw new Exception("Документ не найден");
 		}
@@ -2348,16 +2391,43 @@ class Order_Controller extends ControllerSQL{
 		if(!isset($ar["dogovor_ref"])){
 			throw new Exception("Договор не связан с 1с");
 		}
-		if(!isset($ar["quant"])){
-			throw new Exception("не установлено количество");
-		}
 		$items = [];
+
+		//concrete
 		array_push($items, [
 			"code_1c" => $ar["item_code_1c"],
 			"quant" => $ar["quant"],
 			"price" => $ar["price"],
 			"total" => $ar["price"] * $ar["quant"]
 		]);
+
+		//shipment 
+		array_push($items, [
+			"code_1c" => '00000000011',
+			"quant" => 1,
+			"price" => floatval($ar["ship_cost"]),
+			"total" => floatval($ar["ship_cost"])
+		]);
+
+		if($ar["pump_exists"] == 't'){
+			//pump 
+			array_push($items, [
+				"code_1c" => '00000000012',
+				"quant" => 1,
+				"price" => floatval($ar["pump_cost"]),
+				"total" => floatval($ar["pump_cost"])
+			]);
+		}
+		if(isset($ar["demurrage_cost"]) && floatval($ar["demurrage_cost"])>0){
+			//demurrage_cost
+			array_push($items, [
+				"code_1c" => '00000000005',
+				"quant" => 1,
+				"price" => floatval($ar["demurrage_cost"]),
+				"total" => floatval($ar["demurrage_cost"])
+			]);
+		}
+
 		$params = [
 			"date" => $ar["date_time"],
 			"num" => $ar["num"],
@@ -2407,6 +2477,7 @@ class Order_Controller extends ControllerSQL{
 					FROM users
 					WHERE users.id = %d
 					) AS user_descr
+
 				FROM orders AS o
 				WHERE o.id = %d", $_SESSION["user_id"], $order_id
 			)

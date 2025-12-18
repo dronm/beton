@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-12-15 07:07:22</lastBuild></version>
+		<lastBuild>2025-12-18 06:31:50</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -297,6 +297,7 @@
 		<version dateOpen="2025-11-19 16:02:41" dateClose="2025-11-19 16:03:22">1.00390</version>
 		<version dateOpen="2025-11-20 02:53:11" dateClose="2025-11-20 02:54:10">1.00390</version>
 		<version dateOpen="2025-11-25 11:02:34" dateClose="2025-12-15 07:07:45">1.00391</version>
+		<version dateOpen="2025-12-17 15:43:07" dateClose="2025-12-18 06:32:00">1.00392</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -4729,7 +4730,7 @@
 			<field id="client_id" dataType="Int" alias="Контрагент" refTable="clients" refField="id"/>
 			<field id="client_contract_1c_ref" dataType="String" length="36"/>
 			<field id="client_contract_id" dataType="Int" alias="Объект" refTable="client_contracts_1c" refField="id"/>
-			<field id="specification_date" dataType="Date" required="TRUE"/>
+			<field id="specification_date" dataType="Date"/>
 			<field id="contract" dataType="Text" alias="Договор"/>
 			<field id="specification" dataType="Text" alias="Спецификация"/>
 			<field id="concrete_type_id" dataType="Int" alias="Марка" refTable="concrete_types" refField="id"/>
@@ -4759,7 +4760,7 @@
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="client_id" dataType="Int" sysCol="TRUE"/>
 			<field id="client_ref_1c" dataType="String" sysCol="TRUE"/>
-			<field id="specification_date" dataType="Date" required="TRUE"/>
+			<field id="specification_date" dataType="Date"/>
 			<field id="contract" dataType="Text" alias="Договор"/>
 			<field id="specification" dataType="Text" alias="Спецификация"/>
 			<field id="concrete_type_id" dataType="Int" sysCol="TRUE"/>

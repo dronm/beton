@@ -688,6 +688,7 @@ class RawMaterial_Controller extends ControllerSQL{
 			}
 			$d_params = new ParamsSQL($pm,$link);				
 			$d_params->add('date_time', DT_DATETIME, $doc->date_time);
+
 			material_period_check($link, $ar["user_id"], $d_params->getParamById('date_time'));
 
 			if(isset($doc->cmd)){
@@ -735,7 +736,8 @@ class RawMaterial_Controller extends ControllerSQL{
 		}
 
 		if ($res == 'false'){
-			throw $e;
+			/* throw $e; */
+			syslog(LOG_ERR, "RawMaterial_Controller->load_procurement() material_period_check():".$descr);
 		}
 		
 	}

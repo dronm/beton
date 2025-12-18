@@ -1678,6 +1678,15 @@ Instruction how to add new table to audit:
 3) OrderCalc_View 
 
 
+1.00392
+1) client_specifications_process 
+	removed contract,date, specification
+	ClientSpecificationList_View.js
+
+
+
+
+
 - all messages are coming to all clients.
 
 

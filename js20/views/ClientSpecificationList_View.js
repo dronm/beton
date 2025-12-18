@@ -106,34 +106,34 @@ function ClientSpecificationList_View(id,options){
 								})
 							]
 						})
-						,new GridCellHead(id+":grid:head:specification_date",{
-							"value":"Дата",
-							"columns":[
-								new GridColumnDate({
-									"field":model.getField("specification_date")
-								})
-							],
-							"sortable":true,
-							"sort":"desc"
-						})
-						,new GridCellHead(id+":grid:head:contract",{
-							"value":"Договор",
-							"columns":[
-								new GridColumn({
-									"field":model.getField("contract")
-								})
-							],
-							"sortable":true
-						})
-						,new GridCellHead(id+":grid:head:specification",{
-							"value":"Спецификация",
-							"columns":[
-								new GridColumn({
-									"field":model.getField("specification")
-								})
-							],
-							"sortable":true
-						})
+						// ,new GridCellHead(id+":grid:head:specification_date",{
+						// 	"value":"Дата",
+						// 	"columns":[
+						// 		new GridColumnDate({
+						// 			"field":model.getField("specification_date")
+						// 		})
+						// 	],
+						// 	"sortable":true,
+						// 	"sort":"desc"
+						// })
+						// ,new GridCellHead(id+":grid:head:contract",{
+						// 	"value":"Договор",
+						// 	"columns":[
+						// 		new GridColumn({
+						// 			"field":model.getField("contract")
+						// 		})
+						// 	],
+						// 	"sortable":true
+						// })
+						// ,new GridCellHead(id+":grid:head:specification",{
+						// 	"value":"Спецификация",
+						// 	"columns":[
+						// 		new GridColumn({
+						// 			"field":model.getField("specification")
+						// 		})
+						// 	],
+						// 	"sortable":true
+						// })
 						,new GridCellHead(id+":grid:head:concrete_types_ref",{
 							"value":"Марка",
 							"columns":[

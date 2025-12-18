@@ -64,7 +64,7 @@ extend(ClientSpecification_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.required = true;
+	
 	var field = new FieldDate("specification_date",options);
 	
 	pm.addField(field);

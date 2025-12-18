@@ -28,6 +28,7 @@ CREATE OR REPLACE VIEW client_specifications_list AS
 		,t.price
 		,t.total
 		,cl.ref_1c->'keys'->>'ref_1c' AS client_ref_1c
+
 	FROM client_specifications AS t
 	LEFT JOIN concrete_types AS ct ON ct.id = t.concrete_type_id
 	LEFT JOIN destinations AS dest ON dest.id = t.destination_id

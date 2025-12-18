@@ -60,7 +60,6 @@ function ClientSpecificationList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.specification_date = new FieldDate("specification_date",filed_options);
-	options.fields.specification_date.getValidator().setRequired(true);
 	
 				
 	

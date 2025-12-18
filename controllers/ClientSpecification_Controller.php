@@ -54,8 +54,6 @@ class ClientSpecification_Controller extends ControllerSQL{
 		$pm->addParam($param);
 		
 			$f_params = array();
-			
-				$f_params['required']=TRUE;
 			$param = new FieldExtDate('specification_date'
 				,$f_params);
 		$pm->addParam($param);
@@ -374,6 +372,8 @@ class ClientSpecification_Controller extends ControllerSQL{
 
 	public function complete_for_client($pm){
 		$client_id = $this->getExtDbVal($pm, 'client_id');
+		//$concrete_type_id = $this->getExtDbVal($pm, 'concrete_type_id');
+		//$destination_id = $this->getExtDbVal($pm, 'destination_id');
 		$cond = '';
 		if($this->getExtVal($pm, 'search')){
 			$search = $this->getExtDbVal($pm, 'search');
