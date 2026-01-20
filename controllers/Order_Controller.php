@@ -40,7 +40,7 @@ require_once(USER_MODELS_PATH.'ShipmentForTranspNaklList_Model.php');
 
 require_once(FUNC_PATH.'EventSrv.php');
 
-require_once(ABSOLUTE_PATH.'functions/ExtProg.php');
+require_once(ABSOLUTE_PATH.'functions/exch1c.php');
 
 require_once('common/MyDate.php');
 
@@ -2298,14 +2298,15 @@ class Order_Controller extends ControllerSQL{
 		if(!isset($ref1c["keys"]["ref_1c"])){
 			throw new Exception("error parsing ref_1c structure");
 		}
-		$xml = ExtProg::getShipmentsAll($ref1c["keys"]["ref_1c"], $date);
-		/* file_put_contents(OUTPUT_PATH."1c.txt", var_export($xml, TRUE)); */
+		$clients = Exch1c::shipments($ref1c["keys"]["ref_1c"], $date, TRUE);
+		/* file_put_contents(OUTPUT_PATH."1c.txt", var_export($clients, TRUE)); */
 
 		$this->addModel(new ModelVars(
 			array('id'=>'ShipmentDoc_Model',
 				'values'=>array(
 					new Field('docs',DT_STRING,
-						array('value'=>json_encode($xml["models"]["ShipmentDoc_Model"]["rows"]))
+						
+						array('value'=>json_encode($clients))
 					)
 					,new Field('shipment_ids',DT_STRING,
 						array('value'=>implode(",", $shipmentsList))
@@ -2436,21 +2437,17 @@ class Order_Controller extends ControllerSQL{
 			"dogovor_ref" => $ar["dogovor_ref"],
 			"items" => $items
 		];
-		$xml = ExtProg::newOrder($params);
-		if(!isset($xml["models"])){
-			throw new Exception("tag 'models' not found");
-		}
-		if(!isset($xml["models"]["Order1c_Model"])){
-			throw new Exception("tag 'Order1c_Model' not found");
-		}
-		if(!isset($xml["models"]["Order1c_Model"]["rows"])){
-			throw new Exception("tag 'rows' not found");
-		}
-		$rows = $xml["models"]["Order1c_Model"]["rows"];
+		$newOrder = ExtProg::newOrder($params);
 		if(!count($rows)){
 			throw new Exception("tag 'rows' length is 0");
 		}
-		$ref1c = json_encode($rows[0]["ref_1c"]);
+		$ref1c = json_encode(
+			[
+				"keys" => array("ref_1c" => $newOrder["id"]),
+				"descr" => $newOrder["descr"],
+				"num" => $newOrder["num"]
+			]
+		);
 		$this->getDbLinkMaster()->query(sprintf("UPDATE orders SET ref_1c = '%s' WHERE id = %d", $ref1c, $order_id));
 
 		$this->addModel(new ModelVars(
@@ -2473,10 +2470,10 @@ class Order_Controller extends ControllerSQL{
 					o.ref_1c->'keys'->>'ref_1c' AS order_ref,
 					o.ref_1c->>'descr' AS order_descr,
 					(SELECT
-						users.ref_1c->>'descr'
+						users.ref_1c->'keys'->>'ref_1c'
 					FROM users
 					WHERE users.id = %d
-					) AS user_descr
+					) AS user_ref
 
 				FROM orders AS o
 				WHERE o.id = %d", $_SESSION["user_id"], $order_id
@@ -2485,11 +2482,24 @@ class Order_Controller extends ControllerSQL{
 		if(!is_array($ar) || !count($ar)){
 			throw new Exception("Документ не найден");
 		}
-		if(!isset($ar['user_descr']) || $ar["user_descr"] == ""){
+		if(!isset($ar['user_ref']) || $ar["user_ref"] == ""){
 			throw new Exception("Пользователь не связан с 1с");
 		}
-		$file_opts = array('name'=>$ar["order_descr"].'.pdf','disposition'=>'inline');
-		$xml = ExtProg::printOrder($ar["order_ref"], $ar["user_descr"], $file_opts);
+		$out_file = OUTPUT_PATH.uniqid."_order_print.pdf";
+		Exch1c::printOrder($ar["order_ref"], $ar["user_ref"], $out_file);
+
+		$file_name = $ar["order_descr"].".pdf";
+		$file_mime = getMimeTypeOnExt($file_name);
+
+		ob_clean();
+		downloadFile(
+			$out_file,
+			$file_mime,
+			'inline;',
+			$file_name
+		);
+		
+		return TRUE;
 	}
 }
 ?>

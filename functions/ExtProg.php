@@ -171,11 +171,11 @@ class ExtProg{
 		return (array)ExtProg::send_query('new_order', $params, TRUE);
 	}
 
-	public static function printOrder($orderRef, $user1c, $fileOpts){
+	public static function printOrder($orderRef, $userRef, $fileOpts){
 		$xml=null;
 		return ExtProg::send_query(
 			'print_order', 
-			array('order_ref'=>$orderRef, 'user'=> $user1c), 
+			array('order_ref'=>$orderRef, 'user_ref'=> $userRef), 
 			$xml, 
 			$fileOpts
 		);

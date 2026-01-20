@@ -28,7 +28,7 @@ function Client1cEdit(id,options){
 	options.acMinLengthForQuery = (options.acMinLengthForQuery!=undefined)? options.acMinLengthForQuery:1;
 	options.acController = new Client1c_Controller();
 	options.acPublicMethod = options.acController.getPublicMethod("complete");
-	options.acModel = new ModelJSON("Client1cList_Model", {
+	options.acModel = new ModelXML("Client1cList_Model", {
 		"fields":["name", "inn", "ref"]
 	});
 	options.acPatternFieldId = options.acPatternFieldId || "search";

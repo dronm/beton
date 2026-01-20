@@ -1724,6 +1724,8 @@ $permissions = array();
 				
 					$permissions['ClientContract1c_Controller_get_object']=TRUE;
 				
+					$permissions['ClientContract1c_Controller_get_dog_all']=TRUE;
+				
 					$permissions['ClientContract1c_Controller_complete_from_1c']=TRUE;
 				
 					$permissions['ShipmentMedia_Controller_get_list']=TRUE;
@@ -1809,6 +1811,18 @@ $permissions = array();
 					$permissions['AuditLogChange_Controller_get_object']=TRUE;
 				
 					$permissions['Connect1c_Controller_complete_user']=TRUE;
+				
+					$permissions['FuelTransaction_Controller_insert']=TRUE;
+				
+					$permissions['FuelTransaction_Controller_update']=TRUE;
+				
+					$permissions['FuelTransaction_Controller_delete']=TRUE;
+				
+					$permissions['FuelTransaction_Controller_get_list']=TRUE;
+				
+					$permissions['FuelTransaction_Controller_get_object']=TRUE;
+				
+					$permissions['FuelTransaction_Controller_import_date']=TRUE;
 				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

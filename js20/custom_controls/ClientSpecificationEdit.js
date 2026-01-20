@@ -73,5 +73,10 @@ extend(ClientSpecificationEdit,EditRef);
 /* public methods */
 
 ClientSpecificationEdit.prototype.getSelectDescr = function(f){
-	return f.contract.getValue() + "/" + f.specification.getValue() + " (" +f.concrete_types_ref.getValue().getDescr() +": " + f.quant_balance.getValue() + " м3)";
+	const ct = f.concrete_types_ref.getValue();
+	let ctDescr = "";
+	if(ct && !ct.isNull()){
+		ctDescr = ct.getDescr()+": ";
+	}
+	return f.contract.getValue() + "/" + f.specification.getValue() + " (" +ctDescr + f.quant_balance.getValue() + " м3)";
 }

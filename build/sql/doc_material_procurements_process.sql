@@ -107,7 +107,20 @@ BEGIN
 				)::text
 			);
 		END IF;
-				
+
+		IF TG_OP='UPDATE' THEN
+			--Event support
+			PERFORM pg_notify(
+				'DOCMaterialProcurement.update',
+				NULL
+			);
+		ELSE
+			PERFORM pg_notify(
+				'DOCMaterialProcurement.insert',
+				NULL
+			);
+		END IF;
+
 		RETURN NEW;
 		
 	ELSIF (TG_WHEN='BEFORE' AND TG_OP='UPDATE') THEN

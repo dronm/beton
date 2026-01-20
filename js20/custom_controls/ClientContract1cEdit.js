@@ -28,7 +28,7 @@ function ClientContract1cEdit(id,options){
 	options.acMinLengthForQuery = (options.acMinLengthForQuery!=undefined)? options.acMinLengthForQuery:1;
 	options.acController = new ClientContract1c_Controller();
 	options.acPublicMethod = options.acController.getPublicMethod("complete_from_1c");
-	options.acModel = new ModelJSON("Contract1cList_Model", {
+	options.acModel = new ModelXML("ClientContract1cList_Model", {
 		"fields":["name", "ref"]
 	});
 	// const self = this;

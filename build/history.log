@@ -1663,34 +1663,12 @@ changed Production_Controller
 
 1.00391
 1) OrderDialog +field client_ref_1c
-
-
-1.00392
-1) AuditLog
-Instruction how to add new table to audit:
-	- create trigger for a table in audit_log_trigger
-	add column descriptions:
-	please, make sql query for all fields, where possible take alias for column_alias, otherwise 
-	try to translate to russian or just leave id.
-		INSERT INTO audit_column_aliases (table_name, column_name, column_alias) VALUES
-		('clients', 'id', 'Код'),
-2) Client_Controller-complete_for_order() search: %name% order by position
-3) OrderCalc_View 
-
-
-1.00392
-1) client_specifications_process 
-	removed contract,date, specification
-	ClientSpecificationList_View.js
-
-
-1.00393
-1) orders_dialog new field client_debt_date
-2) OrderDialog_View
-3) OrderClient_Model client_debt_date
-	Client_Controller-complete_for_order()
-
-
+2) Client1cEdit.js, User1cEdit, BuhRBP1cEdit, ClientContract1cEdit
+3) functions/Exch1c
+4) FuelTransaction_Controller
+5) Client_Controller, ClientDebt_Controller, BuhRBP1c_Controller, 
+	Connect1cCheck_Controller, Client1c_Controller, Client1c_Controller,
+	Order_Controller, Shipment_Controller, ClientContract_Controller
 
 - all messages are coming to all clients.
 

@@ -18,7 +18,7 @@
 <xsl:template match="controller"><![CDATA[<?php]]>
 <xsl:call-template name="add_requirements"/>
 
-require_once(FUNC_PATH.'ExtProg.php');
+require_once(FUNC_PATH.'exch1c.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ParamsSQL.php');
 
 class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@parentId"/>{
@@ -33,14 +33,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 <xsl:template name="extra_methods">
 	
 	public function update_from_1c($pm){		
-		$debt_list = ExtProg::getClientDebtList();
-		if(!isset($debt_list['models']['ClientDebt1cList_Model'])){
-			throw new Exception('model ClientDebt1cList_Model not found');
-		}
-		if(!isset($debt_list['models']['ClientDebt1cList_Model']['rows'])){
-			throw new Exception('rows of model ClientDebt1cList_Model not found');
-		}
-		$rows = $debt_list['models']['ClientDebt1cList_Model']['rows'];
+		$rows = Exch1c::clientDebtList();
 		$link = $this->getDbLinkMaster();		
 		$par = new ParamsSQL(NULL, $link);
 		
@@ -88,7 +81,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 					$par->add('firm', DT_STRING, $rec['firm']);
 					$par->add('firm_inn', DT_STRING, $rec['firm_inn']);
 
-					$firm_ar = $link->query_first(sprintf(
+					$ar = $link->query_first(sprintf(
 						"INSERT INTO firms_1c (ref_1c, inn)
 						VALUES (jsonb_build_object('ref_1c', %s, 'descr', %s), %s)
 						RETURNING id"
@@ -96,8 +89,8 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 						,$par->getDbVal('firm')
 						,$par->getDbVal('firm_inn')
 					));
-					$firm_ids[$rec['firm_ref']] = $firm_ar['id']; //add id for farther ref
 				}				
+				$firm_ids[$rec['firm_ref']] = $ar['id']; //add id for farther ref
 			}
 
 			//contract

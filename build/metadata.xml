@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2025-12-18 07:33:15</lastBuild></version>
+		<lastBuild>2026-01-20 06:20:12</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -299,6 +299,7 @@
 		<version dateOpen="2025-11-25 11:02:34" dateClose="2025-12-15 07:07:45">1.00391</version>
 		<version dateOpen="2025-12-17 15:43:07" dateClose="2025-12-18 06:32:00">1.00392</version>
 		<version dateOpen="2025-12-18 06:54:34" dateClose="2025-12-18 07:33:18">1.00393</version>
+		<version dateOpen="2026-01-16 13:02:01" dateClose="2026-01-20 06:20:33">1.00394</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -4749,6 +4750,10 @@
 			<index id="client_specifications_date_idx">
 				<field id="specification_date"/>
 			</index>
+			<index id="client_specifications_contract_unq_idx" unique="TRUE">
+				<field id="client_id"/>
+				<field id="client_contract_id"/>
+			</index>
 			<index id="client_specifications_contract_idx">
 				<expression>client_id,lower(contract)</expression>
 			</index>
@@ -5399,6 +5404,41 @@
 			<field id="new_descr" dataType="String"/>
 			<field id="old" dataType="String"/>
 			<field id="old_descr" dataType="String"/>
+		</model>
+		<model id="FuelTransaction" parent="ModelSQLBeton" dataTable="fuel_transactions" virtual="FALSE">
+			<field id="id" dataType="Text" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="date_time" dataType="DateTime" required="TRUE"/>
+			<field id="card_id" dataType="Text" required="TRUE"/>
+			<field id="vehicle_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="attrs" dataType="JSON"/>
+			<field id="quant" dataType="Int" defaultValue="0"/>
+			<field id="total" dataType="Float" length="15" precision="2" defaultValue="0"/>
+			<index id="fuel_transactions_period_idx">
+				<field id="date_time"/>
+			</index>
+			<index id="fuel_transactions_card_idx">
+				<field id="card_id"/>
+			</index>
+			<index id="fuel_transactions_vehicle_idx">
+				<field id="vehicle_id"/>
+			</index>
+		</model>
+		<model id="FuelTransactionList" parent="ModelSQLBeton" dataTable="fuel_transactions_list" virtual="TRUE">
+			<aggFunctions>
+				<aggFunction alias="total_quant" expr="sum(quant)"/>
+				<aggFunction alias="total_total" expr="sum(total)"/>
+			</aggFunctions>
+			<defaultOrder>
+				<field id="id" sortDirect="DESC"/>
+			</defaultOrder>
+			<field id="id" dataType="Text" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="date_time" dataType="DateTime" required="TRUE"/>
+			<field id="card_id" dataType="Text" required="TRUE"/>
+			<field id="vehicle_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="vehicles_ref" dataType="JSON"/>
+			<field id="attrs" dataType="JSON"/>
+			<field id="quant" dataType="Int" defaultValue="0"/>
+			<field id="total" dataType="Float" length="15" precision="2" defaultValue="0"/>
 		</model>
 	</models>
 	<constants>
@@ -7325,6 +7365,9 @@
 		<controller id="ClientContract1c" parentId="ControllerSQL" noState="FALSE">
 			<publicMethod id="get_list" modelId="ClientDebtList"/>
 			<publicMethod id="get_object" modelId="ClientDebtList"/>
+			<publicMethod id="get_dog_all">
+				<field id="client_id" dataType="Int"/>
+			</publicMethod>
 			<publicMethod id="complete_from_1c" patternFieldId="search" modelId="ClientContract1cList">
 				<field id="ic" dataType="Int"/>
 				<field id="mid" dataType="Int"/>
@@ -7417,6 +7460,16 @@
 				<field id="search" dataType="String" length="500"/>
 				<field id="ic" dataType="Int"/>
 				<field id="mid" dataType="Int"/>
+			</publicMethod>
+		</controller>
+		<controller id="FuelTransaction" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="FuelTransaction"/>
+			<publicMethod id="update" modelId="FuelTransaction"/>
+			<publicMethod id="delete" modelId="FuelTransaction"/>
+			<publicMethod id="get_list" modelId="FuelTransactionList"/>
+			<publicMethod id="get_object" modelId="FuelTransactionList"/>
+			<publicMethod id="import_date" encType="multipart" requestType="post">
+				<field id="file_excel" dataType="Text"/>
 			</publicMethod>
 		</controller>
 	</controllers>
@@ -7672,6 +7725,7 @@
 		<view id="30039" c="ShipmentMedia_Controller" t="ShipmentMediaList" f="get_list" section="Формы" descr="Медиа файлы водителей"/>
 		<view id="30040" t="OrderForTranspNaklList" section="Формы" descr="Заявки для печати трансп.накладных"/>
 		<view id="30041" c="AuditLog_Controller" f="get_list" t="AuditLogList" section="Формы" descr="История изменений объектов"/>
+		<view id="30042" c="FuelTransaction_Controller" f="get_list" t="FuelTransactionList" section="Формы" descr="Транзакции по топливным картам"/>
 		<view id="50001" t="VehicleStopsReport" section="Отчеты" descr="Стоянки ТС"/>
 		<view id="50002" t="VehicleScheduleReportAll" section="Отчеты" descr="Печать графиков"/>
 		<view id="50003" t="RouteToDestAvgTimeRep" section="Отчеты" descr="Среднее время до объектов"/>
@@ -7839,6 +7893,7 @@
 		<serverTemplate id="UserAllowedMaterialCorrectionList" class="list"/>
 		<serverTemplate id="DOCMaterialMovementList" class="list"/>
 		<serverTemplate id="AuditLogList" class="list"/>
+		<serverTemplate id="FuelTransactionList" class="list"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="js20/tmpl/FatalException.html"/>
@@ -8495,6 +8550,7 @@
 		<jsScript file="js20/views/DOCMaterialMovementList_View.js"/>
 		<jsScript file="js20/views/AuditLogList_View.js"/>
 		<jsScript file="js20/views/AuditLogDialog_View.js"/>
+		<jsScript file="js20/views/FuelTransactionList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="js20/forms/ViewList_Form.js"/>
 		<jsScript file="js20/forms/MainMenuConstructor_Form.js"/>
@@ -8670,6 +8726,8 @@
 		<jsScript file="js20/custom_controls/Enum_entity_types.js"/>
 		<jsScript file="js20/custom_controls/EnumGridColumn_entity_types.js"/>
 		<jsScript file="js20/custom_controls/RawMaterialTicketGridCmdIssue.js"/>
+		<jsScript file="js20/custom_controls/ClientSpecificationGridCmdAllDog.js"/>
+		<jsScript file="js20/custom_controls/FuelTransactionGridCmdImport.js"/>
 		<jsScript file="js20/custom_controls/RawMaterialTicketIssueBtn.js"/>
 		<jsScript file="js20/custom_controls/ClientSpecificationEdit.js"/>
 		<jsScript file="js20/custom_controls/VehicleScheduleEdit_View.js"/>
@@ -9215,6 +9273,9 @@
 		<jsScript file="js20/controllers/AuditLogChange_Controller.js"/>
 		<jsScript file="js20/controllers/Connect1c_Controller.js"/>
 		<jsScript file="js20/models/User1cList_Model.js"/>
+		<jsScript file="js20/models/FuelTransaction_Model.js"/>
+		<jsScript file="js20/models/FuelTransactionList_Model.js"/>
+		<jsScript file="js20/controllers/FuelTransaction_Controller.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

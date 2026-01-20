@@ -28,7 +28,7 @@ function BuhRBP1cEdit(id,options){
 	options.acMinLengthForQuery = (options.acMinLengthForQuery!=undefined)? options.acMinLengthForQuery:1;
 	options.acController = new BuhRBP1c_Controller();
 	options.acPublicMethod = options.acController.getPublicMethod("complete");
-	options.acModel = new ModelJSON("BuhRBP1cList_Model", {
+	options.acModel = new ModelXML("BuhRBP1cList_Model", {
 		"fields":["name", "date_to", "date_from", "total"]
 	});
 	const self = this;

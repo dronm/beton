@@ -115,6 +115,7 @@ CREATE OR REPLACE VIEW public.orders_dialog AS
 			DATE_TRUNC('minute', dbt.update_date)
 		FROM client_debts AS dbt 
 		WHERE dbt.client_id = o.client_id
+		LIMIT 1
 		) AS client_debt_date
 		
 	FROM orders o

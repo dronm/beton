@@ -138,6 +138,7 @@ function ClientSpecification_Model(options){
 			
 			
 			
+			
 		ClientSpecification_Model.superclass.constructor.call(this,id,options);
 }
 extend(ClientSpecification_Model,ModelXML);

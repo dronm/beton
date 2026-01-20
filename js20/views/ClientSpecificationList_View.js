@@ -14,12 +14,12 @@ function ClientSpecificationList_View(id,options){
 	let filters = undefined;
 	let fromOrder = false;
 
-	let clientId = getClientIdFromURL();
-	if(clientId){
+	this.m_clientId = getClientIdFromURL();
+	if(this.m_clientId){
 		const filter = {
 			field: "client_id",
 			sign: "e",
-			val: clientId
+			val: this.m_clientId
 		}
 		filters = [ filter ];
 		fromOrder = true;
@@ -43,11 +43,19 @@ function ClientSpecificationList_View(id,options){
 		"editInline": true,
 		"editWinClass": null,
 		"filters":filters,
-		"commands":new GridCmdContainerAjx(id+":grid:cmd"),		
+		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
+			"addCustomCommandsAfter":function(commands){
+				commands.push(new ClientSpecificationGridCmdAllDog(id+":grid:cmd:getDogAll", {
+					getClientId: function(){
+						return self.m_clientId;
+					}
+				}));				
+			}
+		}),		
 		"popUpMenu":popup_menu,
 		"editViewClass": ClientSpecificationListEdit_View,
 		"editViewOptions": {
-			"clientId": clientId,
+			"clientId": this.m_clientId,
 			"getRef1c": this.m_getRef1c
 		},
 		"head":new GridHead(id+"-grid:head",{
@@ -305,7 +313,7 @@ ClientSpecificationListEdit_View.prototype.setClientRef1c = function(clientRef1c
 ClientSpecificationListEdit_View.prototype.onGetData = function(resp, cmd){
 	ClientSpecificationListEdit_View.superclass.onGetData.call(this, resp, cmd);
 
-	debugger
+	// debugger
 	let clientRef1c = undefined;
 	if(this.m_getRef1c){
 		clientRef1c = this.m_getRef1c();

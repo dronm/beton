@@ -18,7 +18,7 @@
 <xsl:template match="controller"><![CDATA[<?php]]>
 <xsl:call-template name="add_requirements"/>
 
-require_once(ABSOLUTE_PATH.'functions/ExtProg.php');
+require_once(ABSOLUTE_PATH.'functions/exch1c.php');
 
 class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@parentId"/>{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
@@ -31,11 +31,21 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 
 <xsl:template name="extra_methods">
 	public function complete_user($pm){		
-		$resp = ExtProg::getUserList($this->getExtVal($pm, "search"));
-		ob_clean();
-		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode($resp, JSON_UNESCAPED_UNICODE);
-		return true;
+		$search = $this->getExtVal($pm, "search");
+		$users = Exch1c::catalogByAttr('users', $search);
+		$model = new Model(array("id"=>"User1cList_Model"));
+		foreach($users as $user){
+			$fields = array();
+			array_push($fields, new Field('ref',DT_STRING,array('value'=>(string) $user["ref"])));
+			array_push($fields, new Field('name',DT_STRING,array('value'=>(string) $user["name"])));
+			array_push($fields, new Field('search',DT_STRING,array('value'=>(string) $search)));
+			$model->insert($fields);
+		}
+		$this->addModel($model);
+		<!-- ob_clean(); -->
+		<!-- header('Content-Type: application/json; charset=utf-8'); -->
+		<!-- echo json_encode($resp, JSON_UNESCAPED_UNICODE); -->
+		<!-- return true; -->
 	}
 </xsl:template>
 

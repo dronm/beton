@@ -8,6 +8,10 @@ BEGIN
 	SELECT concrete_type_id INTO v_concrete_type_id FROM concrete_type_map_to_production WHERE production_descr = $1;
 	IF NOT FOUND THEN
 		SELECT id FROM concrete_types INTO v_concrete_type_id WHERE name=$1;
+		
+		IF v_concrete_type_id IS NULL THEN
+			v_concrete_type_id = 198;
+		END IF;
 	
 		INSERT INTO concrete_type_map_to_production
 		(production_descr,concrete_type_id)

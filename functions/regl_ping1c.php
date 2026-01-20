@@ -1,5 +1,5 @@
 <?php
-require_once('ExtProg.php');
+require_once('exch1c.php');
 require_once('db_con_f.php');
 
 function hasFileExpired(string $filePath, int $interval = 150): bool {
@@ -29,9 +29,9 @@ if($sigFileExists && hasFileExpired($sigFile)){
 //$sigFile does not exist
 file_put_contents($sigFile, date("Y-m-d H:i:s"));
 try{
-	$res = ExtProg::ping();
+	$res = Exch1c::ping();
 	$link = db_con();
-	$dbResult = sprintf('{"result": %s, "date": "%s"}', ($res===TRUE? "true" : "false"), date("Y-m-d H:i:s"));
+	$dbResult = sprintf('{"result": %s, "date": "%s"}', ($res==="pong"? "true" : "false"), date("Y-m-d H:i:s"));
 	$link->query(sprintf("SELECT const_ping1c_set_val('%s'::JSON)", $dbResult));
 }finally{
 	unlink($sigFile);

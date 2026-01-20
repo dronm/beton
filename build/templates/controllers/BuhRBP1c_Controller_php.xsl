@@ -18,7 +18,7 @@
 <xsl:template match="controller"><![CDATA[<?php]]>
 <xsl:call-template name="add_requirements"/>
 
-require_once(ABSOLUTE_PATH.'functions/ExtProg.php');
+require_once(ABSOLUTE_PATH.'functions/exch1c.php');
 
 class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@parentId"/>{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
@@ -31,13 +31,25 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 
 <xsl:template name="extra_methods">
 	public function complete($pm){		
-		$resp = ExtProg::getBuhRBPList($this->getExtVal($pm, "search"));
-		//file_put_contents('output/qres.txt', $resp);
-		//return as is
-		ob_clean();
-		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode($resp, JSON_UNESCAPED_UNICODE);
-		return true;
+		$search = $this->getExtVal($pm, "search");
+		$rbpList = Exch1c::catalogByAttr('rbp', $search);
+		$model = new Model(array("id"=>"BuhRBP1cList_Model"));
+		foreach($rbpList as $rbp){
+			$fields = array();
+			array_push($fields, new Field('ref',DT_STRING,array('value'=>(string) $rbp["ref"])));
+			array_push($fields, new Field('name',DT_STRING,array('value'=>(string) $rbp["name"])));
+			array_push($fields, new Field('date_from',DT_STRING,array('value'=>(string) $rbp["date_from"])));
+			array_push($fields, new Field('date_to',DT_STRING,array('value'=>(string) $rbp["date_to"])));
+			array_push($fields, new Field('total',DT_STRING,array('value'=>(string) $rbp["total"])));
+			array_push($fields, new Field('search',DT_STRING,array('value'=>(string) $search)));
+			$model->insert($fields);
+		}
+		$this->addModel($model);
+		<!-- //return as is -->
+		<!-- ob_clean(); -->
+		<!-- header('Content-Type: application/json; charset=utf-8'); -->
+		<!-- echo json_encode($resp, JSON_UNESCAPED_UNICODE); -->
+		<!-- return true; -->
 	}
 </xsl:template>
 

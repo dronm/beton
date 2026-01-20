@@ -26,6 +26,7 @@ function ClientContract1c_Controller(options){
 	//methods
 	this.addGetList();
 	this.addGetObject();
+	this.add_get_dog_all();
 	this.add_complete_from_1c();
 		
 }
@@ -88,6 +89,20 @@ extend(ClientContract1c_Controller,ControllerObjServer);
 	
 	pm.addField(new FieldString("mode"));
 	pm.addField(new FieldString("lsn"));
+}
+
+			ClientContract1c_Controller.prototype.add_get_dog_all = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_dog_all',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("client_id",options));
+	
+			
+	this.addPublicMethod(pm);
 }
 
 			ClientContract1c_Controller.prototype.add_complete_from_1c = function(){

@@ -21,7 +21,7 @@ function ProductionSiteCmdLoadProduction(id,options){
 		"glyph":"glyphicon-refresh",
 		"title":"Загрузить данные производства из Elkon",
 		"onClick":function(){
-			self.doanloadProduction();
+			self.downloadProduction();
 		}
 	});
 	
@@ -50,7 +50,7 @@ ProductionSiteCmdLoadProduction.prototype.setGrid = function(v){
 	this.m_grid = v;
 }
 
-ProductionSiteCmdLoadProduction.prototype.doanloadProduction = function(){
+ProductionSiteCmdLoadProduction.prototype.downloadProduction = function(){
 	this.m_grid.setModelToCurrentRow();
 	var f = this.m_grid.getModel().getFields();
 	var id = f.id.getValue();

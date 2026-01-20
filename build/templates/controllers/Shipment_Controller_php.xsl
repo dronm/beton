@@ -43,7 +43,7 @@ require_once(USER_CONTROLLERS_PATH.'ExcelTemplate_Controller.php');
 require_once(USER_CONTROLLERS_PATH.'Order_Controller.php');
 
 require_once(ABSOLUTE_PATH.'functions/checkPmPeriod.php');
-require_once(ABSOLUTE_PATH.'functions/ExtProg.php');
+require_once(ABSOLUTE_PATH.'functions/exch1c.php');
 
 //for zip archiving
 set_time_limit(120);
@@ -1225,8 +1225,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			}else {
 				$ref1c = $cl["ref_1c"];
 			}
-			$resp = ExtProg::getClient($ref1c["keys"]["ref_1c"]);
-			$rows = $resp["models"]["Client1c_Model"]["rows"];
+			$rows = Exch1c::client($ref1c["keys"]["ref_1c"]);
 			/* file_put_contents(OUTPUT_PATH."getClient.data", var_export($rows, true)); */
 			$this->getDbLinkMaster()->query(
 				sprintf(
@@ -1438,11 +1437,11 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		if(!isset($cl["doc_ref_1c"]) ){
 			//retrieve data from 1c
 			$ref1c = json_decode($cl["ref_1c"], TRUE);
-			$resp = ExtProg::getShipment($ref1c["keys"]["ref_1c"], $cl["ship_date"]);
-			$rows = $resp["models"]["ShipmentDoc_Model"]["rows"];
-			if(!isset($rows["ref"]) || !strlen($rows["ref"])){
+			$rows = Exch1c::shipments($ref1c["keys"]["ref_1c"], $cl["ship_date"], false);
+			if(!count($rows)){
 				throw new Exception("УПД не найдена в 1с");
 			}
+			$row = $rows[0];
 			$this->getDbLinkMaster()->query(
 				sprintf(
 					"INSERT INTO buh_docs (order_id, nomer, data, faktura_nomer, faktura_data, ref_1c) 
@@ -1450,11 +1449,11 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 						%d, '%s', '%s', '%s', '%s', '%s' 
 					)"
 					,$cl["order_id"]
-					,$rows["nomer"]
-					,$rows["data"]
-					,$rows["faktura_nomer"]
-					,$rows["faktura_data"]
-					,$rows["ref"]
+					,$row["nomer"]
+					,$row["data"]
+					,$row["faktura_nomer"]
+					,$row["faktura_data"]
+					,$row["ref"]
 				)
 			);
 		}

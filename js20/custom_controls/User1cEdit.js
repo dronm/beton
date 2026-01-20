@@ -28,7 +28,7 @@ function User1cEdit(id,options){
 	options.acMinLengthForQuery = (options.acMinLengthForQuery!=undefined)? options.acMinLengthForQuery:1;
 	options.acController = new Connect1c_Controller();
 	options.acPublicMethod = options.acController.getPublicMethod("complete_user");
-	options.acModel = new ModelJSON("User1cList_Model", {
+	options.acModel = new ModelXML("User1cList_Model", {
 		"fields":["name", "ref"]
 	});
 	options.acPatternFieldId = options.acPatternFieldId || "search";

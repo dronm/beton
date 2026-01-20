@@ -67,6 +67,7 @@
 <li><a href="#ExcelTemplateFieldMatch_Controller">ExcelTemplateFieldMatch_Controller</a></li>
 <li><a href="#ExcelTemplateImageSQL_Controller">ExcelTemplateImageSQL_Controller</a></li>
 <li><a href="#Firm1c_Controller">Firm1c_Controller</a></li>
+<li><a href="#FuelTransaction_Controller">FuelTransaction_Controller</a></li>
 <li><a href="#GPSTracker_Controller">GPSTracker_Controller</a></li>
 <li><a href="#GornyiCarrierMatch_Controller">GornyiCarrierMatch_Controller</a></li>
 <li><a href="#Graph_Controller">Graph_Controller</a></li>
@@ -532,6 +533,8 @@
 <li><a href="#AuditLogList_Model">AuditLogList_Model</a></li>
 <li><a href="#AuditLogForObject_Model">AuditLogForObject_Model</a></li>
 <li><a href="#AuditLogChange_Model">AuditLogChange_Model</a></li>
+<li><a href="#FuelTransaction_Model">FuelTransaction_Model</a></li>
+<li><a href="#FuelTransactionList_Model">FuelTransactionList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -1104,7 +1107,18 @@
 <p>Методы:</p>
 <h2>get_list</h2>
 <a href="#ClientDebtList_Model">Model: ClientDebtList_Model</a><h2>get_object</h2>
-<a href="#ClientDebtList_Model">Model: ClientDebtList_Model</a><h2>complete_from_1c</h2>
+<a href="#ClientDebtList_Model">Model: ClientDebtList_Model</a><h2>get_dog_all</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>client_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
+<h2>complete_from_1c</h2>
 <a href="#ClientContract1cList_Model">Model: ClientContract1cList_Model</a>
 </div>
 </div>
@@ -1907,6 +1921,29 @@
 <h2>get_list</h2>
 <a href="#Firm1cList_Model">Model: Firm1cList_Model</a><h2>get_object</h2>
 <a href="#Firm1cList_Model">Model: Firm1cList_Model</a>
+</div>
+</div>
+<div id="FuelTransaction_Controller" class="content_box">
+<h1>FuelTransaction_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#FuelTransaction_Model">Model: FuelTransaction_Model</a><h2>update</h2>
+<a href="#FuelTransaction_Model">Model: FuelTransaction_Model</a><h2>delete</h2>
+<a href="#FuelTransaction_Model">Model: FuelTransaction_Model</a><h2>get_list</h2>
+<a href="#FuelTransactionList_Model">Model: FuelTransactionList_Model</a><h2>get_object</h2>
+<a href="#FuelTransactionList_Model">Model: FuelTransactionList_Model</a><h2>import_date</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>file_excel</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Text</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
 </div>
 </div>
 <div id="GPSTracker_Controller" class="content_box">
@@ -10950,6 +10987,108 @@
 <div>Required:</div>
 <div>Length:12</div>
 <div>Precision:</div>
+</div>
+</div>
+<div id="FuelTransaction_Model" class="content_box">
+<h1>FuelTransaction_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Text</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>card_id</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>attrs</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>total</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+</div>
+</div>
+<div id="FuelTransactionList_Model" class="content_box">
+<h1>FuelTransactionList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Text</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>card_id</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicles_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>attrs</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>total</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
 </div>
 </div>
 <div id="GPSTracker_Model" class="content_box">

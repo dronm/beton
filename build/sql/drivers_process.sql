@@ -22,6 +22,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION public.drivers_process()
-  OWNER TO ;
-

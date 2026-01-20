@@ -24,7 +24,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
 
 
 
-require_once(ABSOLUTE_PATH.'functions/ExtProg.php');
+require_once(ABSOLUTE_PATH.'functions/exch1c.php');
 
 class Client1c_Controller extends ControllerSQL{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
@@ -56,22 +56,24 @@ class Client1c_Controller extends ControllerSQL{
 	}	
 	
 	public function complete($pm){		
-		$resp = ExtProg::getClientList($this->getExtVal($pm, "search"));
-		//file_put_contents('output/qres.txt', $resp);
-		//return as is
-		ob_clean();
-		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode($resp, JSON_UNESCAPED_UNICODE);
-		return true;
+		$search = $this->getExtVal($pm, "search");
+		$clients = Exch1c::catalogByAttr('clients', $search);
+		$model = new Model(array("id"=>"Client1cList_Model"));
+		foreach($clients as $client){
+			$fields = array();
+			array_push($fields, new Field('ref',DT_STRING,array('value'=>(string) $client["ref"])));
+			array_push($fields, new Field('name',DT_STRING,array('value'=>(string) $client["name"])));
+			array_push($fields, new Field('inn',DT_STRING,array('value'=>(string) $client["inn"])));
+			array_push($fields, new Field('search',DT_STRING,array('value'=>(string) $search)));
+			$model->insert($fields);
+		}
+		$this->addModel($model);
+		
 	}
 
 	public function get_leasor_on_pp($pm){
-		$resp = ExtProg::getClientOnPP($this->getExtVal($pm, "pp_num"));
-		file_put_contents('output/qres.txt', $resp);
-		ob_clean();
-		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode($resp, JSON_UNESCAPED_UNICODE);
-		return true;
+		throw new Exception("Not implemented");
+		
 	}
 
 }
