@@ -51,8 +51,6 @@ class FuelTransaction_Model extends ModelSQLBeton{
 		
 		//*** Field vehicle_id ***
 		$f_opts = array();
-		$f_opts['primaryKey'] = TRUE;
-		$f_opts['autoInc']=FALSE;
 		$f_opts['id']="vehicle_id";
 						
 		$f_vehicle_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"vehicle_id",$f_opts);

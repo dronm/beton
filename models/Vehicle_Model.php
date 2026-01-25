@@ -262,6 +262,16 @@ class Vehicle_Model extends ModelSQLBeton{
 		$f_official_vehicle_owner_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"official_vehicle_owner_id",$f_opts);
 		$this->addField($f_official_vehicle_owner_id);
 		//********************
+		
+		//*** Field fuel_card_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Номер топливной карты';
+		$f_opts['id']="fuel_card_id";
+						
+		$f_fuel_card_id=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"fuel_card_id",$f_opts);
+		$this->addField($f_fuel_card_id);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

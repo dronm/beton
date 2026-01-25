@@ -54,7 +54,7 @@ function FuelTransaction_Model(options){
 				
 	
 	var filed_options = {};
-	filed_options.primaryKey = true;	
+	filed_options.primaryKey = false;	
 	
 	filed_options.autoInc = false;	
 	

@@ -1661,7 +1661,7 @@ loadProcurementDocument skip empty/beton materials.
 changed Production_Controller
 
 
-1.00391
+1.00394, 
 1) OrderDialog +field client_ref_1c
 2) Client1cEdit.js, User1cEdit, BuhRBP1cEdit, ClientContract1cEdit
 3) functions/Exch1c
@@ -1669,6 +1669,22 @@ changed Production_Controller
 5) Client_Controller, ClientDebt_Controller, BuhRBP1c_Controller, 
 	Connect1cCheck_Controller, Client1c_Controller, Client1c_Controller,
 	Order_Controller, Shipment_Controller, ClientContract_Controller
+
+
+1.00395, 
+1) Materials to 1c connections
+	RawMaterial +ref_1c
+	Connect1c_Controller +method complete_item
+	Item1cEdit.js
+	RawMaterialDialog_View, RawMaterialDialog_View.html
+2) Connect1c_View.js
+3)Connect1c_Controller->production_report_export() +
+	ProductionReportDialog_View.js
+	ProductionReportList_View.js
+	ProductionReportTo1cBtn.js
+	regl_production.php
+
+
 
 - all messages are coming to all clients.
 

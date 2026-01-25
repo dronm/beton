@@ -251,6 +251,15 @@ function Vehicle_Model(options){
 	
 	options.fields.official_vehicle_owner_id = new FieldInt("official_vehicle_owner_id",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Номер топливной карты';
+	filed_options.autoInc = false;	
+	
+	options.fields.fuel_card_id = new FieldText("fuel_card_id",filed_options);
+	
 			
 			
 			

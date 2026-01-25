@@ -67,7 +67,7 @@ function RawMaterialDialog_View(id,options){
 			"labelCaption":"Количество дней завоза:"
 		}));	
 		
-		
+		this.addElement(new Item1cEdit(id+":ref_1c"));		
 		
 		this.addElement(new RawMaterialPriceList_View(id+":price_list",{
 			"detail":true
@@ -98,6 +98,7 @@ function RawMaterialDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("store_days")})
 		,new DataBinding({"control":this.getElement("supply_volume")})
 		,new DataBinding({"control":this.getElement("supply_days_count")})
+		,new DataBinding({"control":this.getElement("ref_1c"),"fieldId":"ref_1c"})
 	]);
 	
 	//write
@@ -112,6 +113,7 @@ function RawMaterialDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("store_days")})
 		,new CommandBinding({"control":this.getElement("supply_volume")})
 		,new CommandBinding({"control":this.getElement("supply_days_count")})
+		,new CommandBinding({"control":this.getElement("ref_1c"),"fieldId":"ref_1c"})
 	]);
 	
 	this.addDetailDataSet({

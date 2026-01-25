@@ -140,6 +140,12 @@ extend(RawMaterial_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Ссылка на справочник 1с";
+	var field = new FieldJSONB("ref_1c",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -236,6 +242,12 @@ extend(RawMaterial_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Ссылка на справочник 1с";
+	var field = new FieldJSONB("ref_1c",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -307,6 +319,9 @@ extend(RawMaterial_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldBool("deleted",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Ссылка на справочник 1с";
+	pm.addField(new FieldJSONB("ref_1c",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("ord");
 	
 }

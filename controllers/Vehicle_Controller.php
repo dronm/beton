@@ -198,6 +198,13 @@ class Vehicle_Controller extends ControllerSQL{
 				,$f_params);
 		$pm->addParam($param);
 		
+			$f_params = array();
+			
+				$f_params['alias']='Номер топливной карты';
+			$param = new FieldExtText('fuel_card_id'
+				,$f_params);
+		$pm->addParam($param);
+		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		//default event
@@ -370,6 +377,13 @@ class Vehicle_Controller extends ControllerSQL{
 			
 				$f_params['alias']='УДАЛИТЬ Владелец';
 			$param = new FieldExtInt('official_vehicle_owner_id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Номер топливной карты';
+			$param = new FieldExtText('fuel_card_id'
 				,$f_params);
 			$pm->addParam($param);
 		

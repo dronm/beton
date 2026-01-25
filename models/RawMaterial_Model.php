@@ -12,6 +12,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
  
 class RawMaterial_Model extends ModelSQLBeton{
 	
@@ -158,6 +159,16 @@ class RawMaterial_Model extends ModelSQLBeton{
 						
 		$f_deleted=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"deleted",$f_opts);
 		$this->addField($f_deleted);
+		//********************
+		
+		//*** Field ref_1c ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Ссылка на справочник 1с';
+		$f_opts['id']="ref_1c";
+						
+		$f_ref_1c=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ref_1c",$f_opts);
+		$this->addField($f_ref_1c);
 		//********************
 	
 		$order = new ModelOrderSQL();		

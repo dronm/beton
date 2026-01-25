@@ -264,6 +264,15 @@ function VehicleDialog_Model(options){
 	
 	options.fields.official_vehicle_owners_ref = new FieldJSON("official_vehicle_owners_ref",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Номер топливной карты';
+	filed_options.autoInc = false;	
+	
+	options.fields.fuel_card_id = new FieldText("fuel_card_id",filed_options);
+	
 			
 		VehicleDialog_Model.superclass.constructor.call(this,id,options);
 }

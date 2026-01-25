@@ -10,5 +10,3 @@ CREATE OR REPLACE VIEW production_sites_list AS
 	FROM production_sites
 	ORDER BY name
 	;
-	
-ALTER VIEW production_sites_list OWNER TO ;

@@ -307,20 +307,49 @@ class Exch1c{
 		);
 	}
 
-	public static function status(): array {
-		return self::httpExecute("status");
+	public static function complete_item(string $search): array {
+		$res = self::httpExecute("catalog_by_attr", ["catalog" => "items", "search" => $search]);
+		return $res["payload"];
 	}
 
-	public static function health(): array {
-		return self::httpExecute("health");
+	public static function status(): array {
+		$res = self::httpExecute("status");
+		return $res["payload"];
+	}
+
+	public static function health(): string {
+		$res = self::httpExecute("health");
+		return $res["payload"];
 	}
 
 	public static function stop(): array {
-		return self::httpExecute("stop");
+		$res = self::httpExecute("stop");
+		return $res["payload"];
 	}
 
 	public static function start(): array {
-		return self::httpExecute("start");
+		$res = self::httpExecute("start");
+		return $res["payload"];
+	}
+
+	/** 
+	 * @param $params
+	* ref_1c,
+	* date,
+	* items:
+	*		code_1c
+	*		quant
+	*
+	* materials:
+	*		ref_1c
+	*		quant
+	*
+	* returns
+	*	{ id, num, descr }
+	 */
+	public static function newProductionReport(array $params): array {
+		$res = self::httpExecute("new_production", $params);
+		return $res["payload"];
 	}
 }
 ?>

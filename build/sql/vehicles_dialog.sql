@@ -1,6 +1,6 @@
 -- View: public.vehicles_dialog
 
-DROP VIEW public.vehicles_dialog;
+--DROP VIEW public.vehicles_dialog;
  
 CREATE OR REPLACE VIEW public.vehicles_dialog AS 
 	SELECT
@@ -62,7 +62,9 @@ CREATE OR REPLACE VIEW public.vehicles_dialog AS
 		v.insurance_osago,
 		v.insurance_kasko,
 		
-		vehicle_owners_ref(of_v_own) AS official_vehicle_owners_ref
+		vehicle_owners_ref(of_v_own) AS official_vehicle_owners_ref,
+
+		v.fuel_card_id
 		
 	FROM vehicles v
 	LEFT JOIN drivers dr ON dr.id = v.driver_id

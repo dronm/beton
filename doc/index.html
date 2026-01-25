@@ -97,6 +97,7 @@
 <li><a href="#Production_Controller">Production_Controller</a></li>
 <li><a href="#ProductionBase_Controller">ProductionBase_Controller</a></li>
 <li><a href="#ProductionComment_Controller">ProductionComment_Controller</a></li>
+<li><a href="#ProductionReport_Controller">ProductionReport_Controller</a></li>
 <li><a href="#ProductionSite_Controller">ProductionSite_Controller</a></li>
 <li><a href="#ProductionVehicleCorrection_Controller">ProductionVehicleCorrection_Controller</a></li>
 <li><a href="#ProgUpdate_Controller">ProgUpdate_Controller</a></li>
@@ -499,6 +500,7 @@
 <li><a href="#QualityPassportList_Model">QualityPassportList_Model</a></li>
 <li><a href="#Client1cList_Model">Client1cList_Model</a></li>
 <li><a href="#User1cList_Model">User1cList_Model</a></li>
+<li><a href="#Item1cList_Model">Item1cList_Model</a></li>
 <li><a href="#BuhRBP1cList_Model">BuhRBP1cList_Model</a></li>
 <li><a href="#Firm1c_Model">Firm1c_Model</a></li>
 <li><a href="#Firm1cList_Model">Firm1cList_Model</a></li>
@@ -535,6 +537,9 @@
 <li><a href="#AuditLogChange_Model">AuditLogChange_Model</a></li>
 <li><a href="#FuelTransaction_Model">FuelTransaction_Model</a></li>
 <li><a href="#FuelTransactionList_Model">FuelTransactionList_Model</a></li>
+<li><a href="#ProductionReport_Model">ProductionReport_Model</a></li>
+<li><a href="#ProductionReportList_Model">ProductionReportList_Model</a></li>
+<li><a href="#ProductionReportDialog_Model">ProductionReportDialog_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -1335,7 +1340,30 @@
 <p class="big"></p>
 <p>Методы:</p>
 <h2>complete_user</h2>
-<a href="#User1cList_Model">Model: User1cList_Model</a>
+<a href="#User1cList_Model">Model: User1cList_Model</a><h2>complete_item</h2>
+<a href="#Item1cList_Model">Model: Item1cList_Model</a><h2>service_stop</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2"></div>
+<h2>service_start</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2"></div>
+<h2>service_health</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2"></div>
+<h2>service_status</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2"></div>
+<h2>production_report_export</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
 </div>
 </div>
 <div id="Connect1cCheck_Controller" class="content_box">
@@ -1933,7 +1961,7 @@
 <a href="#FuelTransaction_Model">Model: FuelTransaction_Model</a><h2>delete</h2>
 <a href="#FuelTransaction_Model">Model: FuelTransaction_Model</a><h2>get_list</h2>
 <a href="#FuelTransactionList_Model">Model: FuelTransactionList_Model</a><h2>get_object</h2>
-<a href="#FuelTransactionList_Model">Model: FuelTransactionList_Model</a><h2>import_date</h2>
+<a href="#FuelTransactionList_Model">Model: FuelTransactionList_Model</a><h2>import_data</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
 <h3>file_excel</h3>
@@ -2969,6 +2997,36 @@
 <a href="#ProductionComment_Model">Model: ProductionComment_Model</a><h2>get_list</h2>
 <a href="#ProductionComment_Model">Model: ProductionComment_Model</a><h2>get_object</h2>
 <a href="#ProductionComment_Model">Model: ProductionComment_Model</a>
+</div>
+</div>
+<div id="ProductionReport_Controller" class="content_box">
+<h1>ProductionReport_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#ProductionReport_Model">Model: ProductionReport_Model</a><h2>update</h2>
+<a href="#ProductionReport_Model">Model: ProductionReport_Model</a><h2>delete</h2>
+<a href="#ProductionReport_Model">Model: ProductionReport_Model</a><h2>get_list</h2>
+<a href="#ProductionReportList_Model">Model: ProductionReportList_Model</a><h2>get_object</h2>
+<a href="#ProductionReportDialog_Model">Model: ProductionReportDialog_Model</a><h2>generate_docs</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>shift_from</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:DateTime</p>
+<p>Required:
+								Да</p>
+</div>
+<h3>shift_to</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:DateTime</p>
+<p>Required:
+								Да</p>
+</div>
+</div>
 </div>
 </div>
 <div id="ProductionSite_Controller" class="content_box">
@@ -11013,7 +11071,7 @@
 <div>Precision:</div>
 <h2>vehicle_id</h2>
 <div>Type:Int</div>
-<div>Primary key:TRUE</div>
+<div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
@@ -11061,7 +11119,7 @@
 <div>Precision:</div>
 <h2>vehicle_id</h2>
 <div>Type:Int</div>
-<div>Primary key:TRUE</div>
+<div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
@@ -11227,6 +11285,30 @@
 <div>Required:</div>
 <div>Length:15</div>
 <div>Precision:2</div>
+</div>
+</div>
+<div id="Item1cList_Model" class="content_box">
+<h1>Item1cList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>name</h2>
+<div>Type:String</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>search</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="LabData_Model" class="content_box">
@@ -16588,6 +16670,126 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="ProductionReport_Model" class="content_box">
+<h1>ProductionReport_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>shift_from</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>shift_to</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>data_for_1c</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ProductionReportDialog_Model" class="content_box">
+<h1>ProductionReportDialog_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>shift_from</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>shift_to</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>items</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>materials</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_for_1c</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_for_1c_current</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ProductionReportList_Model" class="content_box">
+<h1>ProductionReportList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>shift_from</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>shift_to</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="ProductionSite_Model" class="content_box">
 <h1>ProductionSite_Model</h1>
 <div class="content_item">
@@ -18286,6 +18488,12 @@
 <div>Precision:</div>
 <h2>deleted</h2>
 <div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -24446,6 +24654,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>fuel_card_id</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="VehicleDialog_Model" class="content_box">
@@ -24604,6 +24818,12 @@
 <div>Precision:</div>
 <h2>official_vehicle_owners_ref</h2>
 <div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>fuel_card_id</h2>
+<div>Type:Text</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-01-20 06:26:51</lastBuild></version>
+		<lastBuild>2026-01-25 12:21:13</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -301,6 +301,7 @@
 		<version dateOpen="2025-12-18 06:54:34" dateClose="2025-12-18 07:33:18">1.00393</version>
 		<version dateOpen="2026-01-16 13:02:01" dateClose="2026-01-20 06:20:33">1.00394</version>
 		<version dateOpen="2026-01-20 06:24:31" dateClose="2026-01-20 06:26:55">1.00395</version>
+		<version dateOpen="2026-01-20 06:38:42" dateClose="2026-01-25 12:21:35">1.00396</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1081,6 +1082,7 @@
 			<field id="insurance_osago" dataType="JSONB" alias="Insurance osago data"/>
 			<field id="insurance_kasko" dataType="JSONB" alias="Insurance kasko data"/>
 			<field id="official_vehicle_owner_id" dataType="Int" refTable="vehicle_owners" refField="id" alias="УДАЛИТЬ Владелец"/>
+			<field id="fuel_card_id" dataType="Text" alias="Номер топливной карты"/>
 			<index id="vehicles_plate_idx" unique="TRUE">
 				<expression>lower(plate)</expression>
 			</index>
@@ -1122,6 +1124,7 @@
 			<field id="insurance_osago" dataType="JSONB" alias="Insurance osago data"/>
 			<field id="insurance_kasko" dataType="JSONB" alias="Insurance kasko data"/>
 			<field id="official_vehicle_owners_ref" dataType="JSON"/>
+			<field id="fuel_card_id" dataType="Text" alias="Номер топливной карты"/>
 			<globalFilter id="vehicle_owner_list" fieldId="vehicle_owners_ar"/>
 		</model>
 		<model id="VehicleMileage" parent="ModelSQLBeton" dataTable="vehicle_mileages" virtual="FALSE">
@@ -1187,6 +1190,7 @@
 			<field id="is_cement" dataType="Bool" alias="Цемент,учет в силосе" defaultValue="FALSE"/>
 			<field id="dif_store" dataType="Bool" alias="Учет по местам хранения" defaultValue="FALSE"/>
 			<field id="deleted" dataType="Bool" defaultValue="FALSE"/>
+			<field id="ref_1c" dataType="JSONB" alias="Ссылка на справочник 1с"/>
 			<index id="raw_materials_name_index" unique="TRUE">
 				<expression>lower(name)</expression>
 			</index>
@@ -5094,6 +5098,11 @@
 			<field id="search" dataType="Text"/>
 			<field id="ref" dataType="JSON"/>
 		</model>
+		<model id="Item1cList" parent="ModelJSON" virtual="TRUE" alias="Модель номенклатура 1с">
+			<field id="name" dataType="String" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="search" dataType="Text"/>
+			<field id="ref" dataType="JSON"/>
+		</model>
 		<model id="BuhRBP1cList" parent="ModelJSON" virtual="TRUE" alias="Модель RBP 1с">
 			<field id="name" dataType="Text" primaryKey="TRUE"/>
 			<field id="date_from" dataType="Text"/>
@@ -5410,7 +5419,7 @@
 			<field id="id" dataType="Text" primaryKey="TRUE" autoInc="FALSE"/>
 			<field id="date_time" dataType="DateTime" required="TRUE"/>
 			<field id="card_id" dataType="Text" required="TRUE"/>
-			<field id="vehicle_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="vehicle_id" dataType="Int"/>
 			<field id="attrs" dataType="JSON"/>
 			<field id="quant" dataType="Int" defaultValue="0"/>
 			<field id="total" dataType="Float" length="15" precision="2" defaultValue="0"/>
@@ -5435,11 +5444,37 @@
 			<field id="id" dataType="Text" primaryKey="TRUE" autoInc="FALSE"/>
 			<field id="date_time" dataType="DateTime" required="TRUE"/>
 			<field id="card_id" dataType="Text" required="TRUE"/>
-			<field id="vehicle_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="vehicle_id" dataType="Int"/>
 			<field id="vehicles_ref" dataType="JSON"/>
 			<field id="attrs" dataType="JSON"/>
 			<field id="quant" dataType="Int" defaultValue="0"/>
 			<field id="total" dataType="Float" length="15" precision="2" defaultValue="0"/>
+		</model>
+		<model id="ProductionReport" parent="ModelSQLBeton" dataTable="production_reports" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="shift_from" dataType="DateTime" required="TRUE"/>
+			<field id="shift_to" dataType="DateTime" required="TRUE"/>
+			<field id="ref_1c" dataType="JSONB" alias="Ссылка на документ 1с"/>
+			<field id="data_for_1c" dataType="JSON"/>
+			<index id="production_reports_period_idx">
+				<field id="shift_to"/>
+			</index>
+		</model>
+		<model id="ProductionReportList" parent="ModelSQLBeton" dataTable="production_reports_list" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="shift_from" dataType="DateTime" required="TRUE"/>
+			<field id="shift_to" dataType="DateTime" required="TRUE"/>
+			<field id="ref_1c" dataType="JSONB" alias="Ссылка на документ 1с"/>
+		</model>
+		<model id="ProductionReportDialog" parent="ModelSQLBeton" dataTable="production_reports_dialog" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="shift_from" dataType="DateTime" required="TRUE"/>
+			<field id="shift_to" dataType="DateTime" required="TRUE"/>
+			<field id="ref_1c" dataType="JSONB" alias="Ссылка на документ 1с"/>
+			<field id="items" dataType="JSON"/>
+			<field id="materials" dataType="JSON"/>
+			<field id="date_for_1c" dataType="JSON"/>
+			<field id="date_for_1c_current" dataType="JSON"/>
 		</model>
 	</models>
 	<constants>
@@ -7462,6 +7497,18 @@
 				<field id="ic" dataType="Int"/>
 				<field id="mid" dataType="Int"/>
 			</publicMethod>
+			<publicMethod id="complete_item" patternFieldId="search" modelId="Item1cList">
+				<field id="search" dataType="String" length="500"/>
+				<field id="ic" dataType="Int"/>
+				<field id="mid" dataType="Int"/>
+			</publicMethod>
+			<publicMethod id="service_stop"/>
+			<publicMethod id="service_start"/>
+			<publicMethod id="service_health"/>
+			<publicMethod id="service_status"/>
+			<publicMethod id="production_report_export">
+				<field id="id" dataType="Int"/>
+			</publicMethod>
 		</controller>
 		<controller id="FuelTransaction" parentId="ControllerSQL" noState="FALSE">
 			<publicMethod id="insert" modelId="FuelTransaction"/>
@@ -7469,8 +7516,19 @@
 			<publicMethod id="delete" modelId="FuelTransaction"/>
 			<publicMethod id="get_list" modelId="FuelTransactionList"/>
 			<publicMethod id="get_object" modelId="FuelTransactionList"/>
-			<publicMethod id="import_date" encType="multipart" requestType="post">
+			<publicMethod id="import_data" encType="multipart" requestType="post">
 				<field id="file_excel" dataType="Text"/>
+			</publicMethod>
+		</controller>
+		<controller id="ProductionReport" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="ProductionReport"/>
+			<publicMethod id="update" modelId="ProductionReport"/>
+			<publicMethod id="delete" modelId="ProductionReport"/>
+			<publicMethod id="get_list" modelId="ProductionReportList"/>
+			<publicMethod id="get_object" modelId="ProductionReportDialog"/>
+			<publicMethod id="generate_docs">
+				<field id="shift_from" dataType="DateTime" required="TRUE"/>
+				<field id="shift_to" dataType="DateTime" required="TRUE"/>
 			</publicMethod>
 		</controller>
 	</controllers>
@@ -7687,6 +7745,7 @@
 		<view id="20027" c="QualityPassport_Controller" t="QualityPassportList" f="get_list" section="Документы" descr="Реестр паспартов качества"/>
 		<view id="20028" c="OrderGarbage_Controller" t="OrderGarbageList" f="get_list" section="Документы" descr="Удаленные заявки"/>
 		<view id="20029" c="DOCMaterialMovement_Controller" t="DOCMaterialMovementList" f="get_list" section="Документы" descr="Перемещение материалов"/>
+		<view id="20030" c="ProductionReport_Controller" t="ProductionReportList" f="get_list" section="Документы" descr="Отчет производства за смену"/>
 		<view id="30001" t="Map" section="Формы" descr="ТС на карте"/>
 		<view id="30002" t="ScheduleGen" section="Формы" descr="Формирование графиков работы"/>
 		<view id="30003" c="Order_Controller" t="OrderMakeList" f="get_make_orders_form" section="Формы" descr="Заявки онлайн"/>
@@ -7727,6 +7786,7 @@
 		<view id="30040" t="OrderForTranspNaklList" section="Формы" descr="Заявки для печати трансп.накладных"/>
 		<view id="30041" c="AuditLog_Controller" f="get_list" t="AuditLogList" section="Формы" descr="История изменений объектов"/>
 		<view id="30042" c="FuelTransaction_Controller" f="get_list" t="FuelTransactionList" section="Формы" descr="Транзакции по топливным картам"/>
+		<view id="30043" t="Connect1c" section="Формы" descr="Управление состоянием коннектора 1с"/>
 		<view id="50001" t="VehicleStopsReport" section="Отчеты" descr="Стоянки ТС"/>
 		<view id="50002" t="VehicleScheduleReportAll" section="Отчеты" descr="Печать графиков"/>
 		<view id="50003" t="RouteToDestAvgTimeRep" section="Отчеты" descr="Среднее время до объектов"/>
@@ -7895,6 +7955,7 @@
 		<serverTemplate id="DOCMaterialMovementList" class="list"/>
 		<serverTemplate id="AuditLogList" class="list"/>
 		<serverTemplate id="FuelTransactionList" class="list"/>
+		<serverTemplate id="ProductionReportList" class="list"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="js20/tmpl/FatalException.html"/>
@@ -8552,6 +8613,9 @@
 		<jsScript file="js20/views/AuditLogList_View.js"/>
 		<jsScript file="js20/views/AuditLogDialog_View.js"/>
 		<jsScript file="js20/views/FuelTransactionList_View.js"/>
+		<jsScript file="js20/views/Connect1c_View.js"/>
+		<jsScript file="js20/views/ProductionReportList_View.js"/>
+		<jsScript file="js20/views/ProductionReportDialog_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="js20/forms/ViewList_Form.js"/>
 		<jsScript file="js20/forms/MainMenuConstructor_Form.js"/>
@@ -8595,6 +8659,7 @@
 		<jsScript file="js20/forms/ContactList_Form.js"/>
 		<jsScript file="js20/forms/ClientSpecificationList_Form.js"/>
 		<jsScript file="js20/forms/VehicleTotRepItem_Form.js"/>
+		<jsScript file="js20/forms/ProductionReportDialog_Form.js"/>
 		<!--custom controls-->
 		<jsScript file="js20/tmpl/App.templates.js" compressed="FALSE" standalone="FALSE"/>
 		<jsScript file="js20/custom_controls/EditDateInlineValidation.js"/>
@@ -8736,6 +8801,7 @@
 		<jsScript file="js20/custom_controls/TaskImportanceLevelEdit.js"/>
 		<jsScript file="js20/custom_controls/Client1cEdit.js"/>
 		<jsScript file="js20/custom_controls/User1cEdit.js"/>
+		<jsScript file="js20/custom_controls/Item1cEdit.js"/>
 		<jsScript file="js20/custom_controls/BuhRBP1cEdit.js"/>
 		<jsScript file="js20/custom_controls/Firm1cEdit.js"/>
 		<jsScript file="js20/custom_controls/ChatStatusEdit.js"/>
@@ -8746,6 +8812,7 @@
 		<jsScript file="js20/custom_controls/AttachmentManager.js"/>
 		<jsScript file="js20/custom_controls/ConnectElkonCheck.js"/>
 		<jsScript file="js20/custom_controls/ClientSetRef1c.js"/>
+		<jsScript file="js20/custom_controls/ProductionReportTo1cBtn.js"/>
 		<jsScript file="js20/views/rs_ru.js"/>
 		<jsScript file="js20/views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -9277,6 +9344,10 @@
 		<jsScript file="js20/models/FuelTransaction_Model.js"/>
 		<jsScript file="js20/models/FuelTransactionList_Model.js"/>
 		<jsScript file="js20/controllers/FuelTransaction_Controller.js"/>
+		<jsScript file="js20/models/ProductionReport_Model.js"/>
+		<jsScript file="js20/controllers/ProductionReport_Controller.js"/>
+		<jsScript file="js20/models/ProductionReportList_Model.js"/>
+		<jsScript file="js20/models/ProductionReportDialog_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

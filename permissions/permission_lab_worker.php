@@ -1812,6 +1812,18 @@ $permissions = array();
 				
 					$permissions['Connect1c_Controller_complete_user']=TRUE;
 				
+					$permissions['Connect1c_Controller_complete_item']=TRUE;
+				
+					$permissions['Connect1c_Controller_service_stop']=TRUE;
+				
+					$permissions['Connect1c_Controller_service_start']=TRUE;
+				
+					$permissions['Connect1c_Controller_service_health']=TRUE;
+				
+					$permissions['Connect1c_Controller_service_status']=TRUE;
+				
+					$permissions['Connect1c_Controller_production_report_export']=TRUE;
+				
 					$permissions['FuelTransaction_Controller_insert']=TRUE;
 				
 					$permissions['FuelTransaction_Controller_update']=TRUE;
@@ -1822,7 +1834,19 @@ $permissions = array();
 				
 					$permissions['FuelTransaction_Controller_get_object']=TRUE;
 				
-					$permissions['FuelTransaction_Controller_import_date']=TRUE;
+					$permissions['FuelTransaction_Controller_import_data']=TRUE;
+				
+					$permissions['ProductionReport_Controller_insert']=TRUE;
+				
+					$permissions['ProductionReport_Controller_update']=TRUE;
+				
+					$permissions['ProductionReport_Controller_delete']=TRUE;
+				
+					$permissions['ProductionReport_Controller_get_list']=TRUE;
+				
+					$permissions['ProductionReport_Controller_get_object']=TRUE;
+				
+					$permissions['ProductionReport_Controller_generate_docs']=TRUE;
 				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

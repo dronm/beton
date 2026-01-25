@@ -41,5 +41,3 @@ CREATE OR REPLACE VIEW quality_passports_list AS
 	LEFT JOIN clients AS cl ON cl.id = o.client_id
 	ORDER BY t.vidan DESC
 	;
-	
-ALTER VIEW quality_passports_list OWNER TO ;

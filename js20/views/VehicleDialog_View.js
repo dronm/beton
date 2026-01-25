@@ -43,6 +43,10 @@ function VehicleDialog_View(id,options){
 		"enabled":false
 	}));	
 
+	this.addElement(new EditString(id+":fuel_card_id",{
+		"labelCaption":"Топливная карта:",
+	}));	
+
 	this.addElement(new EditPhone(id+":sim_number",{
 		"labelCaption":"Номер телефона СИМ карты:",
 		"enabled":false
@@ -146,6 +150,7 @@ function VehicleDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("feature")})
 		,new DataBinding({"control":this.getElement("tracker_id")})
 		,new DataBinding({"control":this.getElement("sim_id")})
+		,new DataBinding({"control":this.getElement("fuel_card_id")})
 		,new DataBinding({"control":this.getElement("sim_number")})
 		,new DataBinding({"control":this.getElement("tracker_last_dt")})
 		,new DataBinding({"control":this.getElement("tracker_sat_num")})
@@ -175,6 +180,7 @@ function VehicleDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("tracker_id")})
 		,new CommandBinding({"control":this.getElement("ord_num")})
 		,new CommandBinding({"control":this.getElement("weight_t")})		
+		,new CommandBinding({"control":this.getElement("fuel_card_id")})		
 		//,new CommandBinding({"control":this.getElement("sim_id")})
 		//,new CommandBinding({"control":this.getElement("sim_number")})
 	]);

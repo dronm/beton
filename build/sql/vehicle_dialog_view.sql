@@ -28,11 +28,9 @@ CREATE OR REPLACE VIEW public.vehicle_dialog_view AS
 		)
 		END AS tracker_last_dt,
 		
-		drivers_ref(dr) AS drivers_ref
+		drivers_ref(dr) AS drivers_ref,
+
+		v.fuel_card_id
 		
 	FROM vehicles v
 	LEFT JOIN drivers dr ON dr.id = v.driver_id;
-
-ALTER TABLE public.vehicle_dialog_view
-  OWNER TO ;
-

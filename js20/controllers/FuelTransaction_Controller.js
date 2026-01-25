@@ -29,7 +29,7 @@ function FuelTransaction_Controller(options){
 	this.addDelete();
 	this.addGetList();
 	this.addGetObject();
-	this.add_import_date();
+	this.add_import_data();
 		
 }
 extend(FuelTransaction_Controller,ControllerObjServer);
@@ -58,7 +58,7 @@ extend(FuelTransaction_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.primaryKey = true;
+	
 	var field = new FieldInt("vehicle_id",options);
 	
 	pm.addField(field);
@@ -110,12 +110,9 @@ extend(FuelTransaction_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.primaryKey = true;
+	
 	var field = new FieldInt("vehicle_id",options);
 	
-	pm.addField(field);
-	
-	field = new FieldInt("old_vehicle_id",{});
 	pm.addField(field);
 	
 	var options = {};
@@ -145,9 +142,6 @@ extend(FuelTransaction_Controller,ControllerObjServer);
 	var options = {"required":true};
 		
 	pm.addField(new FieldText("id",options));
-	var options = {"required":true};
-		
-	pm.addField(new FieldInt("vehicle_id",options));
 }
 
 			FuelTransaction_Controller.prototype.addGetList = function(){
@@ -203,17 +197,14 @@ extend(FuelTransaction_Controller,ControllerObjServer);
 	var f_opts = {};
 		
 	pm.addField(new FieldText("id",f_opts));
-	var f_opts = {};
-		
-	pm.addField(new FieldInt("vehicle_id",f_opts));
 	
 	pm.addField(new FieldString("mode"));
 	pm.addField(new FieldString("lsn"));
 }
 
-			FuelTransaction_Controller.prototype.add_import_date = function(){
+			FuelTransaction_Controller.prototype.add_import_data = function(){
 	var opts = {"controller":this};	
-	var pm = new PublicMethodServer('import_date',opts);
+	var pm = new PublicMethodServer('import_data',opts);
 	
 	pm.setRequestType('post');
 	

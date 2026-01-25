@@ -41,32 +41,34 @@ extend(FuelTransactionGridCmdImport, GridCmd);
 
 /* protected*/
 FuelTransactionGridCmdImport.prototype.importDataCont = function(fileExcel){
-	console.log(fileExcel)
+	if(!fileExcel || !fileExcel.length){
+		throw new Error("file not found");
+	}
 	//execute command and refresh list
-	// const pm = (new FuelTransaction_Controller()).getPublicMethod("import_data");
-	// pm.setFieldValue("file_excel", file);
-	//
-	// const self = this;
-	// window.setGlobalWait(true);
-	// pm.run({
-	// 	"ok": function(){
-	// 		self.getGrid().onRefresh(function(){
-	// 			window.showTempNote("Обновлен список транзакций",null,5000);
-	// 		});
-	// 	}
-	// 	,"all":function(){
-	// 		window.setGlobalWait(false);
-	// 	}
-	// });
+	const pm = (new FuelTransaction_Controller()).getPublicMethod("import_data");
+	pm.setFieldValue("file_excel", fileExcel);
+
+	const self = this;
+	window.setGlobalWait(true);
+	pm.run({
+		"ok": function(){
+			self.getGrid().onRefresh(function(){
+				window.showTempNote("Обновлен список транзакций",null,5000);
+			});
+		}
+		,"all":function(){
+			window.setGlobalWait(false);
+		}
+	});
 }
 
-FuelTransactionGridCmdLoad.prototype.importData = function(){
+FuelTransactionGridCmdImport.prototype.importData = function(){
 	const self = this;
 	this.m_form = new WindowFormModalBS("selectFile",{
 		"dialogWidth":"30%",
 		"cmdOk":true,		
 		"onClickOk":function(){
-			self.importDataCont(this.getElement("file_excel").getValue());
+			self.importDataCont(this.getContent().getElement("file_excel").getValue());
 			this.close();
 		},
 		"cmdCancel":true,

@@ -27,8 +27,12 @@ function FuelTransactionList_View(id,options){
 		"editWinClass":null,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
 			"cmdInsert":false,
-			"cmdEdit":false,
-			"exportFileName" :"ТранзакцииПоТопливнымКартам"
+			"cmdEdit":true,
+			"cmdDelete":true,
+			"exportFileName" :"ТранзакцииПоТопливнымКартам",
+			"addCustomCommandsAfter":function(commands){
+				commands.push(new FuelTransactionGridCmdImport(id+":grid:cmd:importData" ));				
+			}
 		}),		
 		"popUpMenu":popup_menu,
 		"filters":(options.detailFilters&&options.detailFilters.FuelTransactionList_Model)? options.detailFilters.FuelTransactionList_Model:null,	
@@ -65,6 +69,10 @@ function FuelTransactionList_View(id,options){
 								new GridColumnRef({
 									"field":model.getField("vehicles_ref"),
 									"ctrlClass":VehicleEdit,
+									"ctrlOptions": {
+										"labelCaption": ""
+									},
+									"ctrlBindFieldId":"vehicle_id",
 									"searchOptions":{
 										"field":new FieldInt("vehicle_id"),
 										"searchType":"on_match"

@@ -125,6 +125,13 @@ class RawMaterial_Controller extends ControllerSQL{
 				,$f_params);
 		$pm->addParam($param);
 		
+			$f_params = array();
+			
+				$f_params['alias']='Ссылка на справочник 1с';
+			$param = new FieldExtJSONB('ref_1c'
+				,$f_params);
+		$pm->addParam($param);
+		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		//default event
@@ -227,6 +234,13 @@ class RawMaterial_Controller extends ControllerSQL{
 		
 			$f_params=array();
 			$param = new FieldExtBool('deleted'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Ссылка на справочник 1с';
+			$param = new FieldExtJSONB('ref_1c'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -688,7 +702,6 @@ class RawMaterial_Controller extends ControllerSQL{
 			}
 			$d_params = new ParamsSQL($pm,$link);				
 			$d_params->add('date_time', DT_DATETIME, $doc->date_time);
-
 			material_period_check($link, $ar["user_id"], $d_params->getParamById('date_time'));
 
 			if(isset($doc->cmd)){
@@ -736,8 +749,7 @@ class RawMaterial_Controller extends ControllerSQL{
 		}
 
 		if ($res == 'false'){
-			/* throw $e; */
-			syslog(LOG_ERR, "RawMaterial_Controller->load_procurement() material_period_check():".$descr);
+			throw $e;
 		}
 		
 	}
