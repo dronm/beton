@@ -352,9 +352,15 @@ class Exch1c{
 		return $res["payload"];
 	}
 
-	public static function newProductionMatReport(array $params) {
+	public static function newProductionReportMat(array $params) {
 		$res = self::httpExecute("new_production_mat", $params);
 		return $res["payload"];
+	}
+
+	public static function newShipment(array $params) {
+		throw new Exception("newShipment not implemented");
+		/* $res = self::httpExecute("new_production_mat", $params); */
+		/* return $res["payload"]; */
 	}
 }
 ?>

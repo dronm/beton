@@ -211,24 +211,24 @@ class Connect1c_Controller extends ControllerSQL{
 	public function production_report_export($pm){
 		$id = $this->getExtDbVal($pm, 'id');
 		$link = $this->getDbLinkMaster();
-		$res = self::exportProductionReport($link, $id);
+		$res = self::exportProductionReport($link, $id, $_SESSION["user_id"]);
 		$this->add_result_model($res);
 	}
 
 	public function production_report_mat_export($pm){
 		$id = $this->getExtDbVal($pm, 'id');
 		$link = $this->getDbLinkMaster();
-		$res = self::exportProductionReportMat($link, $id);
+		$res = self::exportProductionReportMat($link, $id, $_SESSION["user_id"]);
 		$this->add_result_model($res);
 	}
 
-	public static function exportProductionReport($dbLink, $id){		
+	public static function exportProductionReport($dbLink, $id, $userId){		
 		$ar = $dbLink->query_first(
 			"SELECT 
 				t.data_for_1c_current AS params,
 				(SELECT ref_1c->'keys'->>'ref_1c' FROM users WHERE id = $1) AS user_ref
 			FROM production_reports_dialog AS t
-			WHERE t.id = $2", [ $_SESSION['user_id'], $id ]
+			WHERE t.id = $2", [ $userId, $id ]
 		);
 		if(!is_array($ar) || !count($ar)){
 			throw new Exception("document not found");
@@ -250,13 +250,13 @@ class Connect1c_Controller extends ControllerSQL{
 		return $res;
 	}
 
-	public static function exportProductionReportMat($dbLink, $id){		
+	public static function exportProductionReportMat($dbLink, $id, $userId){		
 		$ar = $dbLink->query_first(
 			"SELECT 
 				t.data_for_1c_current AS params,
 				(SELECT ref_1c->'keys'->>'ref_1c' FROM users WHERE id = $1) AS user_ref
 			FROM production_reports_dialog AS t
-			WHERE t.id = $2", [ $_SESSION['user_id'], $id ]
+			WHERE t.id = $2", [ $userId, $id ]
 		);
 		if(!is_array($ar) || !count($ar)){
 			throw new Exception("document not found");

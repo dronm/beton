@@ -1691,6 +1691,9 @@ transp_nakl_print.sql
 shipments_for_transp_nakl_list.sql
 
 
+1.00397
+1) minor gleaches
+
 - all messages are coming to all clients.
 
 
