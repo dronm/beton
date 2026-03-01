@@ -1684,6 +1684,11 @@ changed Production_Controller
 	ProductionReportTo1cBtn.js
 	regl_production.php
 
+1.00396
+1) transp_nakl_print operator 
+Фоменко
+transp_nakl_print.sql
+shipments_for_transp_nakl_list.sql
 
 
 - all messages are coming to all clients.

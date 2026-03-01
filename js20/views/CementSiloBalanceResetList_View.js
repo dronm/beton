@@ -97,16 +97,6 @@ function CementSiloBalanceResetList_View(id,options){
 							],
 							"sortable":true
 						})
-						/*
-						,new GridCellHead(id+":grid:head:comment_text",{
-							"value":"Комментарий",
-							"columns":[
-								new GridColumn({
-									"field":model.getField("comment_text")
-								})
-							]
-						})
-						*/
 						,new GridCellHead(id+":grid:head:quant_required",{
 							"value":"Кол-во фактич.",
 							"columns":[
@@ -154,7 +144,14 @@ function CementSiloBalanceResetList_View(id,options){
 							],
 							"sortable":true
 						})
-						
+						,new GridCellHead(id+":grid:head:comment_text",{
+							"value":"Комментарий",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("comment_text")
+								})
+							]
+						})
 					]
 				})
 			]

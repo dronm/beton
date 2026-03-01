@@ -7,7 +7,7 @@ class Exch1c{
 	 * @param $params
 	 * @param $options
 	 */
-	private static function httpExecute(string $command, array $params = NULL, array $options = []): array {
+	private static function httpExecute($command, $params = NULL, $options = []) {
 
 		static $status_codes = null;
 
@@ -130,8 +130,8 @@ class Exch1c{
 
 		$curlOptions = [
 			CURLOPT_RETURNTRANSFER  => true,
-			CURLOPT_TIMEOUT         => $options['timeout'] ?? 120,
-			CURLOPT_CONNECTTIMEOUT  => $options['connect_timeout'] ?? 10,
+			CURLOPT_TIMEOUT         => $options['timeout']? $options['timeout']: 120,
+			CURLOPT_CONNECTTIMEOUT  => $options['connect_timeout']? $options['connect_timeout']: 10,
 		];
 
 		if ($postCommand) {
@@ -203,7 +203,7 @@ class Exch1c{
 	/*
 	 * returns pong
 	 */
-	public static function ping(): string {
+	public static function ping() {
 		$res = self::httpExecute("ping", NULL);
 		return $res["payload"];
 	}
@@ -219,7 +219,7 @@ class Exch1c{
 		contract_ref,
         debt_total ]
 	 */
-	public static function clientDebtList(): array {
+	public static function clientDebtList() {
 		$res = self::httpExecute("get_client_debt_list", NULL);
 		return $res["payload"];
 	}
@@ -228,7 +228,7 @@ class Exch1c{
 	 * catId: clients, users, rbp
 	 * returns specifig catalog attributes
 	 */
-	public static function catalogByAttr(string $catId, string $search): array {
+	public static function catalogByAttr($catId, $search) {
 		$res = self::httpExecute("catalog_by_attr", ["catalog" => $catId, "search" => $search]);
 		/* file_put_contents(OUTPUT_PATH.'resp.txt', var_export($res, true)); */
 		return $res["payload"];
@@ -238,7 +238,7 @@ class Exch1c{
 	 * returns
 	 * [ ref, data, faktura_nomer, faktura_data ]
 	 */
-	public static function shipments(string $clientRef, string $date, bool $multiple): array {
+	public static function shipments($clientRef, $date,  $multiple) {
 		$res = self::httpExecute("get_shipments", [
 			"client_ref" => $clientRef, 
 			"date" => $date,
@@ -252,7 +252,7 @@ class Exch1c{
 	 * returns
 	 * ref, name, name_full,inn, kpp,  email_edo, address_legal, address_fact, tels
 	 */
-	public static function client(string $ref): array {
+	public static function client($ref) {
 		$res = self::httpExecute("get_client", ["ref" => $ref]);
 		return $res["payload"];
 	}
@@ -261,7 +261,7 @@ class Exch1c{
 	 * returns
 	 * [ ref, name ]
 	 */
-	public static function completeClientDogovor(string $ref, string $search): array {
+	public static function completeClientDogovor($ref, $search) {
 		$res = self::httpExecute("complete_client_dog", ["ref" => $ref, "search" => $search]);
 		return $res["payload"];
 	}
@@ -270,7 +270,7 @@ class Exch1c{
 	 * returns
 	 * [ ref, name ]
 	 */
-	public static function clientDogovorList(string $ref): array {
+	public static function clientDogovorList( $ref) {
 		$res = self::httpExecute("get_client_dog", ["ref" => $ref]);
 		return $res["payload"];
 	}
@@ -290,7 +290,7 @@ class Exch1c{
 	* returns
 	*	{ id, num, descr }
 	 */
-	public static function newOrder(array $params): array {
+	public static function newOrder($params) {
 		$res = self::httpExecute("new_order", $params);
 		return $res["payload"];
 	}
@@ -298,7 +298,7 @@ class Exch1c{
 	/*
 	 * returns saves file to $fileName
 	*/
-	public static function printOrder(string $ref, string $userDescr, string $fileName): string {
+	public static function printOrder($ref, $userDescr, $fileName) {
 		self::httpExecute(
 			"print_order", 
 			["order_ref" => $ref], 
@@ -307,27 +307,27 @@ class Exch1c{
 		);
 	}
 
-	public static function complete_item(string $search): array {
+	public static function complete_item($search) {
 		$res = self::httpExecute("catalog_by_attr", ["catalog" => "items", "search" => $search]);
 		return $res["payload"];
 	}
 
-	public static function status(): array {
+	public static function status() {
 		$res = self::httpExecute("status");
 		return $res["payload"];
 	}
 
-	public static function health(): string {
+	public static function health() {
 		$res = self::httpExecute("health");
 		return $res["payload"];
 	}
 
-	public static function stop(): array {
+	public static function stop() {
 		$res = self::httpExecute("stop");
 		return $res["payload"];
 	}
 
-	public static function start(): array {
+	public static function start() {
 		$res = self::httpExecute("start");
 		return $res["payload"];
 	}
@@ -347,8 +347,13 @@ class Exch1c{
 	* returns
 	*	{ id, num, descr }
 	 */
-	public static function newProductionReport(array $params): array {
+	public static function newProductionReport(array $params) {
 		$res = self::httpExecute("new_production", $params);
+		return $res["payload"];
+	}
+
+	public static function newProductionMatReport(array $params) {
+		$res = self::httpExecute("new_production_mat", $params);
 		return $res["payload"];
 	}
 }

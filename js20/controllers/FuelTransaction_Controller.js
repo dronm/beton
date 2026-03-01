@@ -40,8 +40,14 @@ extend(FuelTransaction_Controller,ControllerObjServer);
 	var pm = this.getInsert();
 	
 	var options = {};
-	options.primaryKey = true;
-	var field = new FieldText("id",options);
+	options.primaryKey = true;options.autoInc = true;
+	var field = new FieldInt("id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldText("transaction_id",options);
 	
 	pm.addField(field);
 	
@@ -81,6 +87,8 @@ extend(FuelTransaction_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	pm.addField(new FieldInt("ret_id",{}));
+	
 	
 }
 
@@ -89,12 +97,18 @@ extend(FuelTransaction_Controller,ControllerObjServer);
 	var pm = this.getUpdate();
 	
 	var options = {};
-	options.primaryKey = true;
-	var field = new FieldText("id",options);
+	options.primaryKey = true;options.autoInc = true;
+	var field = new FieldInt("id",options);
 	
 	pm.addField(field);
 	
-	field = new FieldText("old_id",{});
+	field = new FieldInt("old_id",{});
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldText("transaction_id",options);
+	
 	pm.addField(field);
 	
 	var options = {};
@@ -141,7 +155,7 @@ extend(FuelTransaction_Controller,ControllerObjServer);
 	var pm = this.getDelete();
 	var options = {"required":true};
 		
-	pm.addField(new FieldText("id",options));
+	pm.addField(new FieldInt("id",options));
 }
 
 			FuelTransaction_Controller.prototype.addGetList = function(){
@@ -164,7 +178,10 @@ extend(FuelTransaction_Controller,ControllerObjServer);
 
 	var f_opts = {};
 	
-	pm.addField(new FieldText("id",f_opts));
+	pm.addField(new FieldInt("id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldText("transaction_id",f_opts));
 	var f_opts = {};
 	
 	pm.addField(new FieldDateTime("date_time",f_opts));
@@ -196,7 +213,7 @@ extend(FuelTransaction_Controller,ControllerObjServer);
 	var pm = this.getGetObject();
 	var f_opts = {};
 		
-	pm.addField(new FieldText("id",f_opts));
+	pm.addField(new FieldInt("id",f_opts));
 	
 	pm.addField(new FieldString("mode"));
 	pm.addField(new FieldString("lsn"));

@@ -1573,6 +1573,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			
 			add_notification_from_contact_tm($this->getDbLinkMaster(), $this->getExtVal($pm,'tel'), 'Код авторизации: '.$code, 'tm_auth', NULL, $ar['ext_contact_id']);
 			
+			/* remove the whole block
 			$tm_logins = $this->getDbLinkMaster()->query_first(sprintf(
 				"SELECT 
 					TRUE AS exists 
@@ -1589,21 +1590,28 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					$this->getExtDbVal($pm,'tel')
 				));
 			}
-
 			$this->getDbLinkMaster()->query(sprintf(
 				"DELETE FROM notifications.tm_logins
 				WHERE app_id = %d AND tel = %s",
 				MS_APP_ID,
 				$this->getExtDbVal($pm,'tel')
 			));
+			*/
 
+			//sometimes there is an error: duplicate key??
 			$this->getDbLinkMaster()->query(sprintf(
 				"INSERT INTO notifications.tm_logins (tel, exp_date_time, code_exp_date_time, tries, ext_user_id, app_id, code)
 				VALUES (%s,
 					now()::timestampTZ+'%d seconds'::interval,
 					now()::timestampTZ+'%d seconds'::interval,
 					%d, %d, %d, '%s'
-				)",
+				) ON CONFLICT (app_id, tel) DO UPDATE SET 
+					exp_date_time = EXCLUDED.exp_date_time, 
+					code_exp_date_time = EXCLUDED.code_exp_date_time, 
+					tries = EXCLUDED.tries, 
+					ext_user_id = EXCLUDED.ext_user_id,
+					code = EXCLUDED.code
+				",
 				$this->getExtDbVal($pm,'tel'),
 				self::TM_REGEN_DURATION_SEC,
 				self::TM_CODE_DURATION_SEC,

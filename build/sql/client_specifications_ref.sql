@@ -6,11 +6,11 @@ $$
 		'keys',json_build_object(
 			'id',$1.id    
 			),	
-		'descr',$1.contract||'/'||$1.specification,
+		'descr',$1.contract ||
+			CASE WHEN coalesce($1.specification, '') ='' THEN '' 
+			ELSE '/' ||$1.specification 
+			END,
 		'dataType','client_specifications'
 	);
 $$
   LANGUAGE sql VOLATILE COST 100;
-
-ALTER FUNCTION client_specifications_ref(client_specifications) OWNER TO beton;	
-

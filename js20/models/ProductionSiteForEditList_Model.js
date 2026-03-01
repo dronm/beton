@@ -107,6 +107,15 @@ function ProductionSiteForEditList_Model(options){
 	
 	options.fields.production_bases_ref = new FieldJSON("production_bases_ref",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Ссылка на склад 1с';
+	filed_options.autoInc = false;	
+	
+	options.fields.ref_1c = new FieldJSONB("ref_1c",filed_options);
+	
 		ProductionSiteForEditList_Model.superclass.constructor.call(this,id,options);
 }
 extend(ProductionSiteForEditList_Model,ModelXML);

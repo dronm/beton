@@ -67,6 +67,9 @@
 <li><a href="#ExcelTemplateFieldMatch_Controller">ExcelTemplateFieldMatch_Controller</a></li>
 <li><a href="#ExcelTemplateImageSQL_Controller">ExcelTemplateImageSQL_Controller</a></li>
 <li><a href="#Firm1c_Controller">Firm1c_Controller</a></li>
+<li><a href="#FuelConsumption_Controller">FuelConsumption_Controller</a></li>
+<li><a href="#FuelConsumptionSchema_Controller">FuelConsumptionSchema_Controller</a></li>
+<li><a href="#FuelConsumptionSchemaDetail_Controller">FuelConsumptionSchemaDetail_Controller</a></li>
 <li><a href="#FuelTransaction_Controller">FuelTransaction_Controller</a></li>
 <li><a href="#GPSTracker_Controller">GPSTracker_Controller</a></li>
 <li><a href="#GornyiCarrierMatch_Controller">GornyiCarrierMatch_Controller</a></li>
@@ -108,6 +111,7 @@
 <li><a href="#PumpVehiclePriceList_Controller">PumpVehiclePriceList_Controller</a></li>
 <li><a href="#QualityPassport_Controller">QualityPassport_Controller</a></li>
 <li><a href="#Quarry_Controller">Quarry_Controller</a></li>
+<li><a href="#RAFuelFlow_Controller">RAFuelFlow_Controller</a></li>
 <li><a href="#RAMaterialConsumption_Controller">RAMaterialConsumption_Controller</a></li>
 <li><a href="#RawMaterial_Controller">RawMaterial_Controller</a></li>
 <li><a href="#RawMaterialConsRate_Controller">RawMaterialConsRate_Controller</a></li>
@@ -500,6 +504,7 @@
 <li><a href="#QualityPassportList_Model">QualityPassportList_Model</a></li>
 <li><a href="#Client1cList_Model">Client1cList_Model</a></li>
 <li><a href="#User1cList_Model">User1cList_Model</a></li>
+<li><a href="#Warehouse1cList_Model">Warehouse1cList_Model</a></li>
 <li><a href="#Item1cList_Model">Item1cList_Model</a></li>
 <li><a href="#BuhRBP1cList_Model">BuhRBP1cList_Model</a></li>
 <li><a href="#Firm1c_Model">Firm1c_Model</a></li>
@@ -540,6 +545,13 @@
 <li><a href="#ProductionReport_Model">ProductionReport_Model</a></li>
 <li><a href="#ProductionReportList_Model">ProductionReportList_Model</a></li>
 <li><a href="#ProductionReportDialog_Model">ProductionReportDialog_Model</a></li>
+<li><a href="#RGFuelFlow_Model">RGFuelFlow_Model</a></li>
+<li><a href="#RAFuelFlow_Model">RAFuelFlow_Model</a></li>
+<li><a href="#RAFuelFlowList_Model">RAFuelFlowList_Model</a></li>
+<li><a href="#FuelConsumptionSchema_Model">FuelConsumptionSchema_Model</a></li>
+<li><a href="#FuelConsumptionSchemaDetail_Model">FuelConsumptionSchemaDetail_Model</a></li>
+<li><a href="#FuelConsumptionSchemaDetailList_Model">FuelConsumptionSchemaDetailList_Model</a></li>
+<li><a href="#FuelConsumption_Model">FuelConsumption_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -558,6 +570,7 @@
 <li><a href="#production_plant_types">production_plant_types</a></li>
 <li><a href="#period_value_types">period_value_types</a></li>
 <li><a href="#inform_types">inform_types</a></li>
+<li><a href="#ownership_types">ownership_types</a></li>
 </ul>
 </div>
 <div class="content">
@@ -1340,7 +1353,8 @@
 <p class="big"></p>
 <p>Методы:</p>
 <h2>complete_user</h2>
-<a href="#User1cList_Model">Model: User1cList_Model</a><h2>complete_item</h2>
+<a href="#User1cList_Model">Model: User1cList_Model</a><h2>complete_warehouse</h2>
+<a href="#Warehouse1cList_Model">Model: Warehouse1cList_Model</a><h2>complete_item</h2>
 <a href="#Item1cList_Model">Model: Item1cList_Model</a><h2>service_stop</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2"></div>
@@ -1360,6 +1374,17 @@
 <p></p>
 <div class="content_item content_item3">
 <p>Type:Int</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
+<h2>export_shipments</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>ids</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Text</p>
 <p>Required:
 								Нет</p>
 </div>
@@ -1949,6 +1974,46 @@
 <h2>get_list</h2>
 <a href="#Firm1cList_Model">Model: Firm1cList_Model</a><h2>get_object</h2>
 <a href="#Firm1cList_Model">Model: Firm1cList_Model</a>
+</div>
+</div>
+<div id="FuelConsumption_Controller" class="content_box">
+<h1>FuelConsumption_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#FuelConsumption_Model">Model: FuelConsumption_Model</a><h2>update</h2>
+<a href="#FuelConsumption_Model">Model: FuelConsumption_Model</a><h2>delete</h2>
+<a href="#FuelConsumption_Model">Model: FuelConsumption_Model</a><h2>get_list</h2>
+<a href="#FuelConsumption_Model">Model: FuelConsumption_Model</a><h2>get_object</h2>
+<a href="#FuelConsumption_Model">Model: FuelConsumption_Model</a>
+</div>
+</div>
+<div id="FuelConsumptionSchema_Controller" class="content_box">
+<h1>FuelConsumptionSchema_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#FuelConsumptionSchema_Model">Model: FuelConsumptionSchema_Model</a><h2>update</h2>
+<a href="#FuelConsumptionSchema_Model">Model: FuelConsumptionSchema_Model</a><h2>delete</h2>
+<a href="#FuelConsumptionSchema_Model">Model: FuelConsumptionSchema_Model</a><h2>get_list</h2>
+<a href="#FuelConsumptionSchema_Model">Model: FuelConsumptionSchema_Model</a><h2>get_object</h2>
+<a href="#FuelConsumptionSchema_Model">Model: FuelConsumptionSchema_Model</a><h2>complete</h2>
+<a href="#FuelConsumptionSchema_Model">Model: FuelConsumptionSchema_Model</a>
+</div>
+</div>
+<div id="FuelConsumptionSchemaDetail_Controller" class="content_box">
+<h1>FuelConsumptionSchemaDetail_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#FuelConsumptionSchemaDetail_Model">Model: FuelConsumptionSchemaDetail_Model</a><h2>update</h2>
+<a href="#FuelConsumptionSchemaDetail_Model">Model: FuelConsumptionSchemaDetail_Model</a><h2>delete</h2>
+<a href="#FuelConsumptionSchemaDetail_Model">Model: FuelConsumptionSchemaDetail_Model</a><h2>get_list</h2>
+<a href="#FuelConsumptionSchemaDetailList_Model">Model: FuelConsumptionSchemaDetailList_Model</a><h2>get_object</h2>
+<a href="#FuelConsumptionSchemaDetailList_Model">Model: FuelConsumptionSchemaDetailList_Model</a>
 </div>
 </div>
 <div id="FuelTransaction_Controller" class="content_box">
@@ -3246,6 +3311,16 @@
 <a href="#Quarry_Model">Model: Quarry_Model</a><h2>get_object</h2>
 <a href="#Quarry_Model">Model: Quarry_Model</a><h2>complete</h2>
 <a href="#Quarry_Model">Model: Quarry_Model</a>
+</div>
+</div>
+<div id="RAFuelFlow_Controller" class="content_box">
+<h1>RAFuelFlow_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>get_list</h2>
+<a href="#RAFuelFlowList_Model">Model: RAFuelFlowList_Model</a><h2>get_object</h2>
+<a href="#RAFuelFlowList_Model">Model: RAFuelFlowList_Model</a>
 </div>
 </div>
 <div id="RAMaterialConsumption_Controller" class="content_box">
@@ -11047,13 +11122,157 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="FuelConsumption_Model" class="content_box">
+<h1>FuelConsumption_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="FuelConsumptionSchema_Model" class="content_box">
+<h1>FuelConsumptionSchema_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>name</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="FuelConsumptionSchemaDetail_Model" class="content_box">
+<h1>FuelConsumptionSchemaDetail_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>fuel_consumption_schema_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>month_from</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>month_to</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_distance</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_time</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="FuelConsumptionSchemaDetailList_Model" class="content_box">
+<h1>FuelConsumptionSchemaDetailList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>schema_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>schemas_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>month_from</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>month_to</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_distance</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_time</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="FuelTransaction_Model" class="content_box">
 <h1>FuelTransaction_Model</h1>
 <div class="content_item">
 <p>Поля:</p>
 <h2>id</h2>
-<div>Type:Text</div>
+<div>Type:Int</div>
 <div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>transaction_id</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
@@ -11100,8 +11319,14 @@
 <div class="content_item">
 <p>Поля:</p>
 <h2>id</h2>
-<div>Type:Text</div>
+<div>Type:Int</div>
 <div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>transaction_id</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
@@ -16698,6 +16923,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>material_ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>data_for_1c</h2>
 <div>Type:JSON</div>
 <div>Primary key:</div>
@@ -16729,6 +16960,12 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>material_ref_1c</h2>
 <div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -16783,6 +17020,12 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>material_ref_1c</h2>
 <div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -16866,6 +17109,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="ProductionSiteDialog_Model" class="content_box">
@@ -16938,6 +17187,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="ProductionSiteForEditList_Model" class="content_box">
@@ -16994,6 +17249,12 @@
 <div>Precision:</div>
 <h2>production_bases_ref</h2>
 <div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -17882,6 +18143,102 @@
 <div>Precision:3</div>
 </div>
 </div>
+<div id="RAFuelFlow_Model" class="content_box">
+<h1>RAFuelFlow_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:FALSE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>deb</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>doc_type</h2>
+<div>Type:Enum</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>doc_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="RAFuelFlowList_Model" class="content_box">
+<h1>RAFuelFlowList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:FALSE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>deb</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>docs_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicles_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="RAMaterial_Model" class="content_box">
 <h1>RAMaterial_Model</h1>
 <div class="content_item">
@@ -18270,6 +18627,36 @@
 <div>Required:</div>
 <div>Length:19</div>
 <div>Precision:3</div>
+</div>
+</div>
+<div id="RGFuelFlow_Model" class="content_box">
+<h1>RGFuelFlow_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:FALSE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="RGMaterial_Model" class="content_box">
@@ -20274,6 +20661,24 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>client_specification_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>upd_ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>faktura_ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="ShipmentBuhDoc_Model" class="content_box">
@@ -20708,6 +21113,12 @@
 <div>Precision:</div>
 <h2>vs_state</h2>
 <div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_specifications_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -21638,6 +22049,24 @@
 <div>Precision:2</div>
 <h2>pump_for_client_cost_edit</h2>
 <div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>upd_ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>faktura_ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_specifications_ref</h2>
+<div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -24660,6 +25089,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>ownership_type</h2>
+<div>Type:Enum</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="VehicleDialog_Model" class="content_box">
@@ -24824,6 +25259,12 @@
 <div>Precision:</div>
 <h2>fuel_card_id</h2>
 <div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ownership_type</h2>
+<div>Type:Enum</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -26006,6 +26447,30 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="Warehouse1cList_Model" class="content_box">
+<h1>Warehouse1cList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>name</h2>
+<div>Type:String</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>search</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="WaterShipCostPeriodValueList_Model" class="content_box">
 <h1>WaterShipCostPeriodValueList_Model</h1>
 <div class="content_item">
@@ -26118,6 +26583,10 @@
 <div>Description:</div>
 <h2>material_movement</h2>
 <div>Description:</div>
+<h2>fuel_transactions</h2>
+<div>Description:</div>
+<h2>fuel_consumptions</h2>
+<div>Description:</div>
 </div>
 </div>
 <div id="email_types" class="content_box">
@@ -26167,6 +26636,19 @@
 <h2>will_think</h2>
 <div>Description:</div>
 <h2>make_order</h2>
+<div>Description:</div>
+</div>
+</div>
+<div id="ownership_types" class="content_box">
+<h1>ownership_types</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Values:</p>
+<h2>preperty</h2>
+<div>Description:</div>
+<h2>leasing</h2>
+<div>Description:</div>
+<h2>rent</h2>
 <div>Description:</div>
 </div>
 </div>

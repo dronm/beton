@@ -112,6 +112,7 @@ CREATE OR REPLACE VIEW public.shipments_dialog AS
 		,orders_ref(o) AS orders_ref
 		,null as vs_state
 		
+		,client_specifications_ref(spec) AS client_specifications_ref
 		
 	FROM shipments sh
 	LEFT JOIN orders o ON o.id = sh.order_id
@@ -123,6 +124,9 @@ CREATE OR REPLACE VIEW public.shipments_dialog AS
 	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
 	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
 	LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
+
+	LEFT JOIN client_specifications AS spec ON spec.id = coalesce(sh.client_specification_id, o.client_specification_id)
+
 	LEFT JOIN (
 		SELECT
 			max(sh.ship_date_time) AS ship_date_time,
@@ -140,7 +144,3 @@ CREATE OR REPLACE VIEW public.shipments_dialog AS
 	) AS sh_last ON sh_last.order_id = sh_t.order_id AND sh_last.ship_date_time = sh_t.ship_date_time
 	
 	ORDER BY sh.date_time;
-
-ALTER TABLE public.shipments_dialog
-  OWNER TO ;
-

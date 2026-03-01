@@ -64,6 +64,15 @@ function ProductionReport_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Требование накладная';
+	filed_options.autoInc = false;	
+	
+	options.fields.material_ref_1c = new FieldJSONB("material_ref_1c",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	
 	filed_options.autoInc = false;	
 	

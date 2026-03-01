@@ -20,7 +20,7 @@ function ShipmentDialog_View(id,options){
 	options.controller = new Shipment_Controller();
 	options.model = (options.models&&options.models.ShipmentDialog_Model)? options.models.ShipmentDialog_Model : new ShipmentDialog_Model();
 	
-	var self = this;
+	const self = this;
 	
 	options.addElement = function(){
 		this.addElement(new EditInt(id+":id",{
@@ -39,7 +39,13 @@ function ShipmentDialog_View(id,options){
 		}));	
 
 		this.addElement(new ClientEdit(id+":client",{
-			"enabled":false
+			"enabled":false,
+			"onSelect":function(f){
+				self.setClientSpec();
+			},
+			"onClear":function(){
+				self.setClientSpec();
+			}			
 		}));	
 			
 		this.addElement(new DestinationEdit(id+":destination",{
@@ -118,6 +124,10 @@ function ShipmentDialog_View(id,options){
 			}
 		}));
 			
+		this.addElement(new ClientSpecificationEdit(id+":client_specification", {
+			"labelClassName":("control-label "+window.getBsCol(4))
+		}));	
+
 		this.addElement(new OrderEdit(id+":orders_ref",{
 			"labelCaption":"Заявка:"
 		}));
@@ -147,6 +157,7 @@ function ShipmentDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("client"),"fieldId":"clients_ref"})
 		,new DataBinding({"control":this.getElement("destination"),"fieldId":"destinations_ref"})
 		,new DataBinding({"control":this.getElement("vehicle_schedule"),"fieldId":"vehicle_schedules_ref"})
+		,new DataBinding({"control":this.getElement("client_specification"),"fieldId":"client_specifications_ref"})
 		,new DataBinding({"control":this.getElement("quant")})
 		,new DataBinding({"control":this.getElement("client_mark")})
 		,new DataBinding({"control":this.getElement("blanks_exist")})
@@ -217,6 +228,7 @@ function ShipmentDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("pump_for_client_cost")})
 		,new CommandBinding({"control":this.getElement("ship_cost")})
 		,new CommandBinding({"control":this.getElement("orders_ref"),"fieldId":"order_id"})
+		,new CommandBinding({"control":this.getElement("client_specification"),"fieldId":"client_specifications_ref"})
 	]);
 	
 	this.addDetailDataSet({
@@ -275,4 +287,39 @@ ShipmentDialog_View.prototype.onGetData = function(resp,cmd){
 	if(cmd == "edit"){
 		this.getElement("cmdHistory").setVisible(true);
 	}
+}
+
+ShipmentDialog_View.prototype.setClientSpec = function(){
+	const cl = this.getElement("client").getValue();
+	
+	var spec_ctrl = this.getElement("client_specification");
+	var pm = spec_ctrl.getAutoComplete().getPublicMethod();
+	var en = false;	
+	if(
+		(!cl || cl.isNull()) 
+	){
+		pm.unsetFieldValue("client_id");
+		spec_ctrl.reset();
+		// this.onSelectSpecification(undefined);
+	}else{
+		var cl_id = cl.getKey();
+		if(
+			(this.m_specClId && this.m_specClId != cl_id)
+		){
+			spec_ctrl.reset();
+		}
+		
+		this.m_specClId = cl_id;
+		
+		pm.setFieldValue("client_id", cl_id);
+		en = true;
+	}
+
+	spec_ctrl.setEnabled(en);
+}
+
+ShipmentDialog_View.prototype.onGetData = function(resp,cmd){
+	ShipmentDialog_View.superclass.onGetData.call(this,resp,cmd);
+
+	this.setClientSpec();
 }

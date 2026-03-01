@@ -11,6 +11,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLEnum.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
@@ -282,6 +283,16 @@ class VehicleDialog_Model extends ModelSQLBeton{
 						
 		$f_fuel_card_id=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"fuel_card_id",$f_opts);
 		$this->addField($f_fuel_card_id);
+		//********************
+		
+		//*** Field ownership_type ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Тип владения';
+		$f_opts['id']="ownership_type";
+						
+		$f_ownership_type=new FieldSQLEnum($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ownership_type",$f_opts);
+		$this->addField($f_ownership_type);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

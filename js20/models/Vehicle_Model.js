@@ -260,6 +260,16 @@ function Vehicle_Model(options){
 	
 	options.fields.fuel_card_id = new FieldText("fuel_card_id",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Тип владения';
+	filed_options.autoInc = false;	
+	
+	options.fields.ownership_type = new FieldEnum("ownership_type",filed_options);
+	filed_options.enumValues = 'preperty,leasing,rent';
+	
 			
 			
 			

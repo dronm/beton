@@ -224,7 +224,11 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 		,concrete_types_ref(prod_concr) AS production_concrete_types_ref
 		,prod.concrete_quant AS production_concrete_quant
 		*/
-		sh.order_id
+		sh.order_id,
+
+		sh.upd_ref,
+		-- sh.faktura_ref
+		client_specifications_ref(spec) AS client_specifications_ref
 		
 	FROM shipments sh
 	LEFT JOIN orders o ON o.id = sh.order_id
@@ -240,6 +244,7 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 	LEFT JOIN pump_vehicles pvh ON pvh.id = o.pump_vehicle_id
 	LEFT JOIN vehicles pvh_v ON pvh_v.id = pvh.vehicle_id
 	LEFT JOIN vehicle_owners pvh_own ON pvh_own.id = pvh_v.vehicle_owner_id
+	LEFT JOIN client_specifications AS spec ON spec.id = coalesce(sh.client_specification_id, o.client_specification_id)
 	
 	/*LEFT JOIN (
 		SELECT

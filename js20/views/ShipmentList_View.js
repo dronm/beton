@@ -143,7 +143,10 @@ function ShipmentList_View(id,options){
 			"cmdDelete":false,
 			"cmdFilter":true,
 			"filters":filters,
-			"variantStorage":options.variantStorage
+			"variantStorage":options.variantStorage,
+			"addCustomCommandsAfter":function(commands){
+				commands.push(new ShipmentGridCmdToBuh(id+":grid:cmd:toBuh", {"grid": self.getElement("grid")}));
+			}
 			//"cmdExport":!is_v_owner
 		}),
 		"filters":options.forSelect? [
@@ -208,7 +211,8 @@ function ShipmentList_View(id,options){
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
-						new GridCellHead(id+":grid:head:ship_date_time",{
+						new GridCellHeadMark(id+":grid:head:mark")
+						,new GridCellHead(id+":grid:head:ship_date_time",{
 							"value":"Дата",
 							"colAttrs":{"align":"center"},
 							"columns":[
@@ -461,40 +465,68 @@ function ShipmentList_View(id,options){
 							],
 							"sortable":true
 						})
-						,options.forSelect? null:new GridCellHead(id+":grid:head:users_ref",{
-							"value":"Автор",
+						,options.forSelect? null:new GridCellHead(id+":grid:head:client_specifications_ref",{
+							"value":"Договор",
 							"columns":[
 								new GridColumnRef({
-									"field":model.getField("users_ref"),
-									"ctrlClass":UserEditRef,
+									"field":model.getField("client_specifications_ref"),
+									"ctrlClass":ClientSpecificationEdit,
 									"searchOptions":{
-										"field":new FieldInt("user_id"),
+										"field":new FieldInt("client_specification_id"),
 										"searchType":"on_match"
 									}																										
 								})
-							],
-							"sortable":true
-						})
-						,options.forSelect? null:new GridCellHead(id+":grid:head:owner_pump_agreed_date_time",{
-							"value":"Согл.насос",
-							"colAttrs":{"align":"center"},
-							"columns":[
-								new GridColumnDate({
-									"field":model.getField("owner_pump_agreed_date_time"),
-									"dateFormat":"d/m/y"
-								})
-								]
-						})
-						,options.forSelect? null:new GridCellHead(id+":grid:head:owner_agreed_date_time",{
-						"value":"Согл.миксер",
-						"colAttrs":{"align":"center"},
-						"columns":[
-							new GridColumnDate({
-								"field":model.getField("owner_agreed_date_time"),
-								"dateFormat":"d/m/y"
-							})
 							]
 						})
+						,options.forSelect? null:new GridCellHead(id+":grid:head:buh_doc",{
+							"value":"Документы 1с",
+							"columns":[
+								new GridColumn({
+									"formatFunction": function(f){
+										console.log(f.upd_ref_1c)
+										return "";
+										// if(f.upd_ref_1c === undefined || !("descr" in f.upd_ref_1c.descr)){
+										// 	return "";
+										// }
+										// return f.upd_ref_1c.descr;
+									}
+								})
+							]
+						})
+						// ,options.forSelect? null:new GridCellHead(id+":grid:head:users_ref",{
+						// 	"value":"Автор",
+						// 	"columns":[
+						// 		new GridColumnRef({
+						// 			"field":model.getField("users_ref"),
+						// 			"ctrlClass":UserEditRef,
+						// 			"searchOptions":{
+						// 				"field":new FieldInt("user_id"),
+						// 				"searchType":"on_match"
+						// 			}																										
+						// 		})
+						// 	],
+						// 	"sortable":true
+						// })
+						// ,options.forSelect? null:new GridCellHead(id+":grid:head:owner_pump_agreed_date_time",{
+						// 	"value":"Согл.насос",
+						// 	"colAttrs":{"align":"center"},
+						// 	"columns":[
+						// 		new GridColumnDate({
+						// 			"field":model.getField("owner_pump_agreed_date_time"),
+						// 			"dateFormat":"d/m/y"
+						// 		})
+						// 		]
+						// })
+						// ,options.forSelect? null:new GridCellHead(id+":grid:head:owner_agreed_date_time",{
+						// "value":"Согл.миксер",
+						// "colAttrs":{"align":"center"},
+						// "columns":[
+						// 	new GridColumnDate({
+						// 		"field":model.getField("owner_agreed_date_time"),
+						// 		"dateFormat":"d/m/y"
+						// 	})
+						// 	]
+						// })
 						
 						/*,options.forSelect? null:new GridCellHead(id+":grid:head:production_id",{
 							"value":"Номер, пр-во",
@@ -541,7 +573,7 @@ function ShipmentList_View(id,options){
 				new GridRow(id+":grid:foot:row0",{
 					"elements":[
 						new GridCell(id+":grid:foot:total_sp1",{
-							"colSpan":"6"
+							"colSpan":"7"
 						})											
 						,new GridCellFoot(id+":grid:foot:tot_quant",{
 							"attrs":{"align":"right", "nowrap":"nowrap"},

@@ -106,6 +106,18 @@ extend(ProductionSite_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldArray("unclosed_production_ids",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Ссылка на склад 1с";
+	var field = new FieldJSONB("ref_1c",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -186,6 +198,18 @@ extend(ProductionSite_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldArray("unclosed_production_ids",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Ссылка на склад 1с";
+	var field = new FieldJSONB("ref_1c",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -248,6 +272,12 @@ extend(ProductionSite_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Диспетчер (ТТН)";
 	pm.addField(new FieldInt("dispatcher_id",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldArray("unclosed_production_ids",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Ссылка на склад 1с";
+	pm.addField(new FieldJSONB("ref_1c",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");
 	
 }

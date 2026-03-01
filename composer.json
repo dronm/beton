@@ -1,5 +1,10 @@
 {
     "require": {
         "phpoffice/phpspreadsheet": "^1.29"
-    }
+    },
+	"autoload": {
+		"classmap": [
+			"/home/andrey/www/includes/osbe"
+		]
+	}
 }

@@ -13,7 +13,8 @@ CREATE OR REPLACE VIEW public.shipments_for_transp_nakl_list AS
 		drivers_ref(dr) AS drivers_ref,
 		att_drv.id IS NOT NULL AS driver_sig_exists,
 
-		op.users_ref AS operators_ref,
+		-- op.users_ref AS operators_ref,
+		users_ref(u) AS operators_ref,
 		att_op.id IS NOT NULL AS operator_sig_exists,
 
 		clients_ref(vh_cl) AS carriers_ref,		
@@ -37,11 +38,14 @@ CREATE OR REPLACE VIEW public.shipments_for_transp_nakl_list AS
 			AND att_drv.ref->>'dataType' = 'contacts'
 
 	--operator sig
-	LEFT JOIN operators_for_transp_nakls_list op ON 
-			(op.production_sites_ref->'keys'->>'id')::int = sh.production_site_id
+	-- LEFT JOIN operators_for_transp_nakls_list op ON 
+	-- 		(op.production_sites_ref->'keys'->>'id')::int = sh.production_site_id
+	LEFT JOIN users AS u ON u.id = 563--sh.operator_user_id
+	LEFT JOIN employees AS emp ON emp.user_id = sh.operator_user_id
 	LEFT JOIN entity_contacts ect_op ON 
 			ect_op.entity_type = 'users' 
-			AND ect_op.entity_id = (op.users_ref->'keys'->>'id')::int
+			AND ect_op.entity_id = sh.operator_user_id
+			--(op.users_ref->'keys'->>'id')::int
 	LEFT JOIN contacts ct_op ON ct_op.id = ect_op.contact_id
 	LEFT JOIN attachments att_op ON 
 			(att_op.ref->'keys'->>'id')::int = ct_op.id 

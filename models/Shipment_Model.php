@@ -232,6 +232,16 @@ class Shipment_Model extends ModelSQLBeton{
 		$f_pump_for_client_cost_edit=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_for_client_cost_edit",$f_opts);
 		$this->addField($f_pump_for_client_cost_edit);
 		//********************
+		
+		//*** Field client_specification_id ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Спецификация';
+		$f_opts['id']="client_specification_id";
+						
+		$f_client_specification_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_specification_id",$f_opts);
+		$this->addField($f_client_specification_id);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

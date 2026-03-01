@@ -64,13 +64,19 @@ CREATE OR REPLACE VIEW public.vehicles_dialog AS
 		
 		vehicle_owners_ref(of_v_own) AS official_vehicle_owners_ref,
 
-		v.fuel_card_id
+		v.fuel_card_id,
+		v.reg_doc,
+		attachments_for_key(v.id, 'vehicles') AS attachments_list,
+		fuel_consumption_schema_ref(fc) AS fuel_consumption_schema_ref,
+
+		v.ownership_type
 		
 	FROM vehicles v
 	LEFT JOIN drivers dr ON dr.id = v.driver_id
 	LEFT JOIN vehicle_owners v_own ON v_own.id = v.vehicle_owner_id
 	LEFT JOIN vehicle_owners of_v_own ON of_v_own.id = v.official_vehicle_owner_id
 	LEFT JOIN gps_trackers AS gps_tr ON gps_tr.id = v.tracker_id
+	LEFT JOIN fuel_consumption_schema AS fc ON fc.id = v.fuel_consumption_schema_id
 	/*
 	LEFT JOIN (
 		SELECT

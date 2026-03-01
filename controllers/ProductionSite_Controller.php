@@ -93,6 +93,18 @@ class ProductionSite_Controller extends ControllerSQL{
 				,$f_params);
 		$pm->addParam($param);
 		
+			$f_params = array();
+			$param = new FieldExtArray('unclosed_production_ids'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Ссылка на склад 1с';
+			$param = new FieldExtJSONB('ref_1c'
+				,$f_params);
+		$pm->addParam($param);
+		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		//default event
@@ -177,6 +189,18 @@ class ProductionSite_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Диспетчер (ТТН)';
 			$param = new FieldExtInt('dispatcher_id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtArray('unclosed_production_ids'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Ссылка на склад 1с';
+			$param = new FieldExtJSONB('ref_1c'
 				,$f_params);
 			$pm->addParam($param);
 		

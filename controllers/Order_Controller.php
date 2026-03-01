@@ -282,7 +282,7 @@ class Order_Controller extends ControllerSQL{
 		
 			$f_params = array();
 			
-				$f_params['alias']='Ссылка на справочник 1с';
+				$f_params['alias']='Ссылка на объект 1с';
 			$param = new FieldExtJSONB('ref_1c'
 				,$f_params);
 		$pm->addParam($param);
@@ -520,7 +520,7 @@ class Order_Controller extends ControllerSQL{
 		
 			$f_params=array();
 			
-				$f_params['alias']='Ссылка на справочник 1с';
+				$f_params['alias']='Ссылка на объект 1с';
 			$param = new FieldExtJSONB('ref_1c'
 				,$f_params);
 			$pm->addParam($param);
@@ -964,6 +964,11 @@ class Order_Controller extends ControllerSQL{
 	$opts=array();
 					
 		$pm->addParam(new FieldExtText('order_ids',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtBool('rollup_runs',$opts));
 	
 			
 		$this->addPublicMethod($pm);

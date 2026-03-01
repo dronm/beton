@@ -20,7 +20,8 @@ SELECT
     (SELECT
         json_build_object(
             'ref_1c', t.ref_1c->>'id',
-            'date', t.shift_to,
+            'material_ref_1c', t.material_ref_1c, --array
+            'date', t.shift_from::date,
             'comment', 'Отчет за смену ' ||
                       to_char(t.shift_from, 'DD/MM/YY') || ' - ' ||
                       to_char(t.shift_to, 'DD/MM/YY'),

@@ -7,15 +7,16 @@ $dbLink = db_con();
 
 $currentDate = new DateTime();
 
+$shiftFrom = "2026-02-27T06:00:00";
+//$shiftTo = "2026-03-02T05:59:59";
+$shiftTo = "2026-03-01T05:59:59";
+/*
 $shiftFrom = (clone $currentDate)
     ->modify('-1 day')
     ->format('Y-m-d') . 'T06:00:00';
 $shiftTo = $currentDate->format('Y-m-d') . 'T05:59:59';
-
+*/
 ProductionReport_Controller::generateDocs($dbLink, $shiftFrom, $shiftTo);
-
-/* $shiftFrom = "2026-01-03T06:00:00"; */
-/* $shiftTo = "2026-01-04T05:59:59"; */
 $ar = $dbLink->query_first(
 	"SELECT id FROM production_reports
 	WHERE shift_from = $1 AND shift_to = $2",

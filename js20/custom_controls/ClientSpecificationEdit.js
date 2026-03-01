@@ -22,7 +22,7 @@ function ClientSpecificationEdit(id,options){
 	//форма редактирования элемента
 	options.editWinClass = null;
 	
-	options.labelClassName = "control-label "+window.getBsCol(2);
+	options.labelClassName = options.labelClassName || "control-label "+window.getBsCol(2);
 	
 	options.acMinLengthForQuery = 1;
 	options.acController = new ClientSpecification_Controller(options.app);
@@ -78,5 +78,6 @@ ClientSpecificationEdit.prototype.getSelectDescr = function(f){
 	if(ct && !ct.isNull()){
 		ctDescr = ct.getDescr()+": ";
 	}
-	return f.contract.getValue() + "/" + f.specification.getValue() + " (" +ctDescr + f.quant_balance.getValue() + " м3)";
+	const spec = f.specification.getValue();
+	return f.contract.getValue() + (spec? "/" + spec : "") + " (" +ctDescr + f.quant_balance.getValue() + " м3)";
 }

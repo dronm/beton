@@ -10,5 +10,3 @@ CREATE OR REPLACE VIEW production_sites_for_edit_list AS
 	LEFT JOIN production_bases AS b ON b.id = s.production_base_id
 	ORDER BY name
 	;
-	
-ALTER VIEW production_sites_for_edit_list OWNER TO ;

@@ -192,6 +192,27 @@ class Shipment_Controller extends ControllerSQL{
 				,$f_params);
 		$pm->addParam($param);
 		
+			$f_params = array();
+			
+				$f_params['alias']='Спецификация';
+			$param = new FieldExtInt('client_specification_id'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Ссылка на Документ 1с';
+			$param = new FieldExtJSONB('upd_ref_1c'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Ссылка на Документ 1с';
+			$param = new FieldExtJSONB('faktura_ref_1c'
+				,$f_params);
+		$pm->addParam($param);
+		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		//default event
@@ -340,6 +361,27 @@ class Shipment_Controller extends ControllerSQL{
 		
 			$f_params=array();
 			$param = new FieldExtBool('pump_for_client_cost_edit'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Спецификация';
+			$param = new FieldExtInt('client_specification_id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Ссылка на Документ 1с';
+			$param = new FieldExtJSONB('upd_ref_1c'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Ссылка на Документ 1с';
+			$param = new FieldExtJSONB('faktura_ref_1c'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -702,6 +744,16 @@ class Shipment_Controller extends ControllerSQL{
 	
 		$opts['required']=TRUE;				
 		$pm->addParam(new FieldExtText('buh_doc',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtBool('rollup_runs',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('consignee',$opts));
 	
 			
 		$this->addPublicMethod($pm);
@@ -2542,18 +2594,27 @@ class Shipment_Controller extends ControllerSQL{
 
 		$faksim = ($pm->getParamValue("faksim") == "1");
 		$buhDoc = $this->getExtDbVal($pm, "buh_doc");
-
-		//all shipments on order
-		$queryId = $link->query(
-			sprintf(
-				"SELECT
-					sh.id
-				FROM shipments AS sh
-				WHERE sh.id IN (%s)
-				ORDER BY sh.date_time"
-				,implode(",", $docList)
-			)
-		);
+		$rollupRuns = $this->getExtDbVal($pm, "rollup_runs");
+		$consignee = $this->getExtDbVal($pm, "consignee");
+		if(isset($consignee) && $consignee != "null"){
+			//check 1c ref
+			$consAr = $link->query_first(
+				vsprintf(
+					"SELECT ref_1c->'keys'->>'ref_1c' AS ref_1c 
+					FROM clients 
+					WHERE id = %d", 
+					[$consignee]
+				)
+			);
+			if(!is_array($consAr)){
+				throw new Exception("consignee not found");
+			}
+			if(!isset($consAr["ref_1c"])){
+				throw new Exception("Грузополучатель не связан с 1с");
+			}
+		}else{
+			$consignee = 0;
+		}
 
 		$templateName = $faksim? "Транспортная накладная (факсимиле)" : "Транспортная накладная";
 		$erEmpty = 'Отгрузка не найдена!';
@@ -2565,14 +2626,66 @@ class Shipment_Controller extends ControllerSQL{
 		$fileList = array();
 		$outFile = OUTPUT_PATH. md5(uniqid()).'.pdf';
 
+		//all shipments on order
+		$queryId = NULL;
+		if($rollupRuns){
+			//rollup on vehicle
+			$queryId = $link->query(
+				sprintf(
+					"SELECT
+						array_agg(sh.id) AS ids
+					FROM shipments AS sh
+					WHERE sh.id IN (%s)
+					GROUP BY sh.vehicle_schedule_id"
+					,implode(",", $docList)
+				)
+			);
+		}else{
+			$queryId = $link->query(
+				sprintf(
+					"SELECT
+						sh.id
+					FROM shipments AS sh
+					WHERE sh.id IN (%s)
+					ORDER BY sh.date_time"
+					,implode(",", $docList)
+				)
+			);
+		}
 		$ind = 0;
 		while($shAr = $link->fetch_array($queryId)){
-			$ind++;
-			$this->check_shipment_for_tn($shAr["id"], $faksim? TRUE:FALSE);
-
 			$tFile = '';
 			$fileName = '';
-			ExcelTemplate_Controller::genFilledTemplate($link, $templateName, array($shAr["id"], $ind, $buhDoc), $erEmpty, $tFile, $fileName);		
+
+			if($rollupRuns){
+				if(strlen($shAr["ids"]) < 2){
+					continue;
+				}
+				$ids_str = substr($shAr["ids"], 1,  strlen($shAr["ids"])-2);
+				$ids = explode(",", $ids_str);
+				foreach($ids as $sh_id){
+					$this->check_shipment_for_tn($sh_id, $faksim? TRUE:FALSE);
+				}
+				ExcelTemplate_Controller::genFilledTemplate(
+					$link, $templateName, 
+					array( 'array['.implode(",",$ids).']', $buhDoc, $consignee ), 
+					$erEmpty, $tFile, $fileName,
+					"SELECT * FROM transp_nakl_print_agg(%s, %s::jsonb, %d)"
+				);		
+				$ind++;
+				/* if($ind ==2){ */
+				/* throw new Exception("stop"); */
+				/* } */
+			}else{
+				$ind++;
+				ExcelTemplate_Controller::genFilledTemplate(
+					$link, $templateName, 
+					array( $shAr["id"], $ind, $buhDoc, $consignee ), 
+					$erEmpty, $tFile, $fileName,
+					"SELECT * FROM transp_nakl_print(%s, %s::jsonb, %d)"
+				);		
+			}
+
 			$fileNameParts = pathinfo($fileName,  PATHINFO_EXTENSION);
 			$fileExt = '';
 			if(is_array($fileNameParts) && isset($fileNameParts['extension'])){

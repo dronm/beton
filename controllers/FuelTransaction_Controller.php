@@ -32,7 +32,7 @@ class FuelTransaction_Controller extends ControllerSQL{
 		$pm = new PublicMethod('insert');
 		
 			$f_params = array();
-			$param = new FieldExtText('id'
+			$param = new FieldExtText('transaction_id'
 				,$f_params);
 		$pm->addParam($param);
 		
@@ -69,6 +69,8 @@ class FuelTransaction_Controller extends ControllerSQL{
 			$param = new FieldExtFloat('total'
 				,$f_params);
 		$pm->addParam($param);
+		
+		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		//default event
 		$ev_opts = [
@@ -85,12 +87,17 @@ class FuelTransaction_Controller extends ControllerSQL{
 		/* update */		
 		$pm = new PublicMethod('update');
 		
-		$pm->addParam(new FieldExtText('old_id',array('required'=>TRUE)));
+		$pm->addParam(new FieldExtInt('old_id',array('required'=>TRUE)));
 		
 		$pm->addParam(new FieldExtInt('obj_mode'));
 		
 			$f_params=array();
-			$param = new FieldExtText('id'
+			$param = new FieldExtInt('id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtText('transaction_id'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -124,7 +131,7 @@ class FuelTransaction_Controller extends ControllerSQL{
 				,$f_params);
 			$pm->addParam($param);
 		
-			$param = new FieldExtText('id',array(
+			$param = new FieldExtInt('id',array(
 			));
 			$pm->addParam($param);
 		
@@ -143,7 +150,7 @@ class FuelTransaction_Controller extends ControllerSQL{
 		/* delete */
 		$pm = new PublicMethod('delete');
 		
-		$pm->addParam(new FieldExtText('id'
+		$pm->addParam(new FieldExtInt('id'
 		));		
 		
 		$pm->addParam(new FieldExtInt('count'));
@@ -185,7 +192,7 @@ class FuelTransaction_Controller extends ControllerSQL{
 		$pm = new PublicMethod('get_object');
 		$pm->addParam(new FieldExtString('mode'));
 		
-		$pm->addParam(new FieldExtText('id'
+		$pm->addParam(new FieldExtInt('id'
 		));
 		
 		$pm->addParam(new FieldExtString('lsn'));
@@ -305,7 +312,7 @@ class FuelTransaction_Controller extends ControllerSQL{
 
 				// Use prepared statement parameters
 				$queries[] = [
-					'id' => $vals["ID"],
+					'transaction_id' => $vals["ID"],
 					'date' => $vals["DATE"],
 					'card_id' => $vals["CARD_ID"] ?? '',
 					'attrs' => json_encode($attrs, JSON_UNESCAPED_UNICODE),
@@ -328,11 +335,11 @@ class FuelTransaction_Controller extends ControllerSQL{
 					/* file_put_contents(OUTPUT_PATH.'fuel.txt', var_export($params, true).PHP_EOL.PHP_EOL, FILE_APPEND); */
 					$link->query(
 						"INSERT INTO fuel_transactions 
-						(id, date_time, card_id, vehicle_id, attrs, quant, total)
+						(transaction_id, date_time, card_id, vehicle_id, attrs, quant, total)
 						VALUES ($1, $2, $3,
 							(SELECT vh.id FROM vehicles AS vh WHERE vh.fuel_card_id = $3),
 							$4, $5, $6)
-						ON CONFLICT (id) DO UPDATE SET
+						ON CONFLICT (transaction_id) DO UPDATE SET
 							card_id = EXCLUDED.card_id,
 							vehicle_id = EXCLUDED.vehicle_id,
 							attrs = EXCLUDED.attrs,

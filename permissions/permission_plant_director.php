@@ -1812,6 +1812,8 @@ $permissions = array();
 				
 					$permissions['Connect1c_Controller_complete_user']=TRUE;
 				
+					$permissions['Connect1c_Controller_complete_warehouse']=TRUE;
+				
 					$permissions['Connect1c_Controller_complete_item']=TRUE;
 				
 					$permissions['Connect1c_Controller_service_stop']=TRUE;
@@ -1823,6 +1825,8 @@ $permissions = array();
 					$permissions['Connect1c_Controller_service_status']=TRUE;
 				
 					$permissions['Connect1c_Controller_production_report_export']=TRUE;
+				
+					$permissions['Connect1c_Controller_export_shipments']=TRUE;
 				
 					$permissions['FuelTransaction_Controller_insert']=TRUE;
 				
@@ -1847,6 +1851,42 @@ $permissions = array();
 					$permissions['ProductionReport_Controller_get_object']=TRUE;
 				
 					$permissions['ProductionReport_Controller_generate_docs']=TRUE;
+				
+					$permissions['FuelConsumptionSchema_Controller_insert']=TRUE;
+				
+					$permissions['FuelConsumptionSchema_Controller_update']=TRUE;
+				
+					$permissions['FuelConsumptionSchema_Controller_delete']=TRUE;
+				
+					$permissions['FuelConsumptionSchema_Controller_get_list']=TRUE;
+				
+					$permissions['FuelConsumptionSchema_Controller_get_object']=TRUE;
+				
+					$permissions['FuelConsumptionSchema_Controller_complete']=TRUE;
+				
+					$permissions['FuelConsumptionSchemaDetail_Controller_insert']=TRUE;
+				
+					$permissions['FuelConsumptionSchemaDetail_Controller_update']=TRUE;
+				
+					$permissions['FuelConsumptionSchemaDetail_Controller_delete']=TRUE;
+				
+					$permissions['FuelConsumptionSchemaDetail_Controller_get_list']=TRUE;
+				
+					$permissions['FuelConsumptionSchemaDetail_Controller_get_object']=TRUE;
+				
+					$permissions['RAFuelFlow_Controller_get_list']=TRUE;
+				
+					$permissions['RAFuelFlow_Controller_get_object']=TRUE;
+				
+					$permissions['FuelConsumption_Controller_insert']=TRUE;
+				
+					$permissions['FuelConsumption_Controller_update']=TRUE;
+				
+					$permissions['FuelConsumption_Controller_delete']=TRUE;
+				
+					$permissions['FuelConsumption_Controller_get_list']=TRUE;
+				
+					$permissions['FuelConsumption_Controller_get_object']=TRUE;
 				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

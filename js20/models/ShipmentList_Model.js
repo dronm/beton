@@ -400,6 +400,33 @@ function ShipmentList_Model(options){
 	
 	options.fields.pump_for_client_cost_edit = new FieldBool("pump_for_client_cost_edit",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Ссылка на Документ 1с';
+	filed_options.autoInc = false;	
+	
+	options.fields.upd_ref_1c = new FieldJSONB("upd_ref_1c",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Ссылка на Документ 1с';
+	filed_options.autoInc = false;	
+	
+	options.fields.faktura_ref_1c = new FieldJSONB("faktura_ref_1c",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.client_specifications_ref = new FieldJSONB("client_specifications_ref",filed_options);
+	
 			
 			
 		ShipmentList_Model.superclass.constructor.call(this,id,options);

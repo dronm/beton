@@ -1,8 +1,8 @@
--- Function: transp_nakl_print(in_shipment_id int, in_shipment_ind int, in_buh_doc jsonb)
+-- Function: transp_nakl_print(in_shipment_id int, in_shipment_ind int, in_buh_doc jsonb, in_consignee int)
 
--- DROP FUNCTION transp_nakl_print(in_shipment_id int, in_shipment_ind int, in_buh_doc jsonb);
+-- DROP FUNCTION transp_nakl_print(in_shipment_id int, in_shipment_ind int, in_buh_doc jsonb, in_consignee int);
 
-CREATE OR REPLACE FUNCTION transp_nakl_print(in_shipment_id int, in_shipment_ind int, in_buh_doc jsonb)
+CREATE OR REPLACE FUNCTION transp_nakl_print(in_shipment_id int, in_shipment_ind int, in_buh_doc jsonb, in_consignee int)
   RETURNS TABLE(
   	nomer text,
   	nomer2 text,
@@ -35,7 +35,9 @@ CREATE OR REPLACE FUNCTION transp_nakl_print(in_shipment_id int, in_shipment_ind
 	data_ispoln text,
 	
 	dispetcher text,
-	dispetcher_dolzhnost text	
+	dispetcher_dolzhnost text,
+
+	tip_vladeniya text
   )
      LANGUAGE 'sql'
 
@@ -72,7 +74,7 @@ AS $BODY$
 			ELSE 'Бетон (БСТ)'
 		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
 		
-		'1 место' AS gruz_mest,
+		'1' AS gruz_mest,
 		-- round(sh.quant*2.4*1000)||' кг, '||sh.quant||' м3' AS gruz_massa,
 		sh.quant||' м3' AS gruz_massa,
 		round(sh.quant*2.4*1000)||' кг' AS massa_netto,
@@ -93,11 +95,11 @@ AS $BODY$
 		
 		dest.name AS adres,
 		
-		to_char(sh.date_time,'DD.MM.YY HH24:MI') AS data_vremia_pogruzki,
+		to_char(sh.date_time,'DD.MM.YY') AS data_vremia_pogruzki,
 		
 		coalesce(
 			(SELECT
-				to_char(st.date_time,'DD.MM.YY HH24:MI')
+				to_char(st.date_time,'DD.MM.YY')
 			FROM vehicle_schedule_states AS st
 			WHERE st.schedule_id = sh.vehicle_schedule_id
 				AND st.date_time > sh.date_time
@@ -109,7 +111,7 @@ AS $BODY$
 
 		coalesce(
 			(SELECT
-				to_char(st.date_time,'DD.MM.YY HH24:MI')
+				to_char(st.date_time,'DD.MM.YY')
 			FROM vehicle_schedule_states AS st
 			WHERE st.schedule_id = sh.vehicle_schedule_id
 				AND st.date_time > sh.date_time
@@ -119,11 +121,11 @@ AS $BODY$
 			to_char(sh.date_time,'DD.MM.YY')	
 		) AS data_fakt_prib_pogruzki,
 		
-		to_char(sh.ship_date_time, 'DD.MM.YY HH24:MI') AS data_fakt_ubit_pogruzki,
+		to_char(sh.ship_date_time, 'DD.MM.YY') AS data_fakt_ubit_pogruzki,
 		
 		coalesce(
 			(SELECT
-				to_char(st.date_time,'DD.MM.YY HH24:MI')
+				to_char(st.date_time,'DD.MM.YY')
 			FROM vehicle_schedule_states AS st
 			WHERE st.schedule_id = sh.vehicle_schedule_id
 				AND st.date_time > sh.date_time
@@ -135,7 +137,7 @@ AS $BODY$
 		
 		coalesce(
 			(SELECT
-				to_char(st.date_time,'DD.MM.YY HH24:MI')
+				to_char(st.date_time,'DD.MM.YY')
 			FROM vehicle_schedule_states AS st
 			WHERE st.schedule_id = sh.vehicle_schedule_id
 				AND st.date_time > sh.date_time
@@ -155,15 +157,27 @@ AS $BODY$
 		
 		--coalesce(emp_disp.name, 'Верхорубов Евгений Николаевич') AS dispetcher,
 		--coalesce(emp_disp.post, 'Диспетчер РБУ') AS dispetcher_dolzhnost
-		person_init((select users_ref->>'descr'
-		from operators_for_transp_nakls_list
-		where (production_sites_ref->'keys'->>'id')::int = sh.production_site_id
-		)::text) AS dispetcher,
-		'Оператор' AS dispetcher_dolzhnost
+		-- person_init(
+		-- 	(select users_ref->>'descr'
+		-- 	from operators_for_transp_nakls_list
+		-- 	where (production_sites_ref->'keys'->>'id')::int = sh.production_site_id
+		-- 	)::text
+		-- ) AS dispetcher,
+		person_init(
+			(select users_ref(op_u)->>'descr')::text
+		) AS dispetcher,
+		'Оператор' AS dispetcher_dolzhnost,
+
+		CASE
+			WHEN vh.ownership_type = 'preperty' THEN '1'
+			WHEN vh.ownership_type = 'leasing' THEN '4'
+			WHEN vh.ownership_type = 'rent' THEN '3'
+			ELSE '1'
+		END AS tip_vladeniya
 		
 	FROM shipments AS sh
 	LEFT JOIN orders o ON o.id = sh.order_id
-	LEFT JOIN clients cl ON cl.id = o.client_id
+	LEFT JOIN clients cl ON cl.id = CASE WHEN COALESCE(in_consignee, 0) > 0 THEN in_consignee ELSE o.client_id END
 	LEFT JOIN concrete_types ct ON ct.id = o.concrete_type_id
 	
 	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
@@ -172,7 +186,7 @@ AS $BODY$
 	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
 	LEFT JOIN production_sites pr_st ON pr_st.id = sh.production_site_id
 	LEFT JOIN drivers dr ON dr.id = vh.driver_id
-	LEFT JOIN users AS op_u ON op_u.id=sh.operator_user_id
+	LEFT JOIN users AS op_u ON op_u.id = 563 --sh.operator_user_id
 	LEFT JOIN vehicle_owners AS v_own ON v_own.id = vh.official_vehicle_owner_id
 	LEFT JOIN clients AS vh_cl ON vh_cl.id = v_own.client_id
 	

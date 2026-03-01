@@ -49,15 +49,45 @@ function ProductionReportList_View(id,options){
 								new GridColumn({
 									"ctrlEdit":false,
 									"formatFunction":function(f, gridCell){
+										//materials
 										const ref = f.ref_1c.getValue();
-										if(!ref || !("descr" in ref)){
-											const n = gridCell.getNode();
-											(new ProductionReportTo1cBtn("prodRepList:export", {
-												grid: self.getElement("grid")
-											})).toDOM(n);
-											return "";
+										const refMat = f.material_ref_1c.getValue();
+										const cellNode = gridCell.getNode();
+
+										const matCont = document.createElement("div");
+										(new ProductionReportMatTo1cBtn("prodRepList:export_mat", {
+											grid: self.getElement("grid")
+										})).toDOM(matCont);
+										if(refMat && refMat.length){
+											const matNode = document.createElement("span");
+											let docs = "";
+											for(let i = 0; i < refMat.length; i++){
+												if(!("descr" in refMat[i])){
+													continue;
+												}
+												if(docs !== ""){
+													docs+= ", ";
+												}
+												docs+= refMat[i].descr;
+											}
+											matNode.textContent = docs;
+											matCont.appendChild(matNode);
 										}
-										return ref.descr;
+										cellNode.appendChild(matCont);
+
+										//production report
+										const prodCont = document.createElement("div");
+										(new ProductionReportTo1cBtn("prodRepList:export", {
+											grid: self.getElement("grid")
+										})).toDOM(prodCont);
+										if(ref && ("descr" in ref)){
+											const prodNode = document.createElement("span");
+											prodNode.textContent = ref.descr;
+											prodCont.appendChild(prodNode);
+										}
+										cellNode.appendChild(prodCont);
+
+										return "";
 									}
 								})
 							]

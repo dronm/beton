@@ -126,7 +126,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 
 				// Use prepared statement parameters
 				$queries[] = [
-					'id' => $vals["ID"],
+					'transaction_id' => $vals["ID"],
 					'date' => $vals["DATE"],
 					'card_id' => $vals["CARD_ID"] ?? '',
 					'attrs' => json_encode($attrs, JSON_UNESCAPED_UNICODE),
@@ -149,11 +149,11 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 					/* file_put_contents(OUTPUT_PATH.'fuel.txt', var_export($params, true).PHP_EOL.PHP_EOL, FILE_APPEND); */
 					$link->query(
 						"INSERT INTO fuel_transactions 
-						(id, date_time, card_id, vehicle_id, attrs, quant, total)
+						(transaction_id, date_time, card_id, vehicle_id, attrs, quant, total)
 						VALUES ($1, $2, $3,
 							(SELECT vh.id FROM vehicles AS vh WHERE vh.fuel_card_id = $3),
 							$4, $5, $6)
-						ON CONFLICT (id) DO UPDATE SET
+						ON CONFLICT (transaction_id) DO UPDATE SET
 							card_id = EXCLUDED.card_id,
 							vehicle_id = EXCLUDED.vehicle_id,
 							attrs = EXCLUDED.attrs,

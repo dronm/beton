@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-01-25 12:21:13</lastBuild></version>
+		<lastBuild>2026-03-02 03:45:31</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -302,6 +302,7 @@
 		<version dateOpen="2026-01-16 13:02:01" dateClose="2026-01-20 06:20:33">1.00394</version>
 		<version dateOpen="2026-01-20 06:24:31" dateClose="2026-01-20 06:26:55">1.00395</version>
 		<version dateOpen="2026-01-20 06:38:42" dateClose="2026-01-25 12:21:35">1.00396</version>
+		<version dateOpen="2026-01-28 11:15:10" dateClose="2026-03-02 03:45:53">1.00397</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -527,6 +528,12 @@
 			<value id="material_movement">
 				<ru descr="Перемещение материалов"/>
 			</value>
+			<value id="fuel_transactions">
+				<ru descr="Транзакции по топливным картам"/>
+			</value>
+			<value id="fuel_consumptions">
+				<ru descr="расход топлива"/>
+			</value>
 		</enum>
 		<enum id="reg_types">
 			<value id="material">
@@ -612,6 +619,17 @@
 			</value>
 			<value id="sms">
 				<ru descr="СМС"/>
+			</value>
+		</enum>
+		<enum id="ownership_types">
+			<value id="preperty">
+				<ru descr="Собственность"/>
+			</value>
+			<value id="leasing">
+				<ru descr="Лизинг"/>
+			</value>
+			<value id="rent">
+				<ru descr="Аренда"/>
 			</value>
 		</enum>
 	</enums>
@@ -1083,6 +1101,7 @@
 			<field id="insurance_kasko" dataType="JSONB" alias="Insurance kasko data"/>
 			<field id="official_vehicle_owner_id" dataType="Int" refTable="vehicle_owners" refField="id" alias="УДАЛИТЬ Владелец"/>
 			<field id="fuel_card_id" dataType="Text" alias="Номер топливной карты"/>
+			<field id="ownership_type" dataType="Enum" enumId="ownership_types" alias="Тип владения"/>
 			<index id="vehicles_plate_idx" unique="TRUE">
 				<expression>lower(plate)</expression>
 			</index>
@@ -1125,6 +1144,7 @@
 			<field id="insurance_kasko" dataType="JSONB" alias="Insurance kasko data"/>
 			<field id="official_vehicle_owners_ref" dataType="JSON"/>
 			<field id="fuel_card_id" dataType="Text" alias="Номер топливной карты"/>
+			<field id="ownership_type" dataType="Enum" enumId="ownership_types" alias="Тип владения"/>
 			<globalFilter id="vehicle_owner_list" fieldId="vehicle_owners_ar"/>
 		</model>
 		<model id="VehicleMileage" parent="ModelSQLBeton" dataTable="vehicle_mileages" virtual="FALSE">
@@ -1447,7 +1467,7 @@
 			<field id="client_specification_id" dataType="Int" refTable="client_specifications" refField="id" alias="Спецификация"/>
 			<field id="f_val" dataType="Int" alias="F"/>
 			<field id="w_val" dataType="Int" alias="W"/>
-			<field id="ref_1c" dataType="JSONB" alias="Ссылка на справочник 1с"/>
+			<field id="ref_1c" dataType="JSONB" alias="Ссылка на объект 1с"/>
 			<index id="date_time_index">
 				<field id="date_time"/>
 			</index>
@@ -1807,6 +1827,7 @@
 			<field id="production_base_id" dataType="Int" refTable="production_bases" refField="id" alias="База"/>
 			<field id="dispatcher_id" dataType="Int" refTable="employees" refField="id" alias="Диспетчер (ТТН)"/>
 			<field id="unclosed_production_ids" dataType="Array"/>
+			<field id="ref_1c" dataType="JSONB" alias="Ссылка на склад 1с"/>
 		</model>
 		<model id="ProductionSiteDialog" parent="ModelSQLBeton" dataTable="production_sites_dialog" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
@@ -1820,6 +1841,7 @@
 			<field id="production_plant_type" dataType="Enum" enumId="production_plant_types" alias="Вид завода"/>
 			<field id="production_base_id" dataType="Int" refTable="production_bases" refField="id" alias="База"/>
 			<field id="dispatchers_ref" dataType="JSONB" alias="Диспетчер (ТТН)"/>
+			<field id="ref_1c" dataType="JSONB" alias="Ссылка на склад 1с"/>
 		</model>
 		<model id="ProductionSiteList" parent="ModelSQLBeton" dataTable="production_sites_list" virtual="FALSE">
 			<defaultOrder>
@@ -1842,6 +1864,7 @@
 			<field id="production_plant_type" dataType="String" alias="Вид завода"/>
 			<field id="production_base_id" dataType="Int"/>
 			<field id="production_bases_ref" dataType="JSON"/>
+			<field id="ref_1c" dataType="JSONB" alias="Ссылка на склад 1с"/>
 		</model>
 		<model id="Shipment" parent="ModelSQLBeton" dataTable="shipments" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
@@ -1866,6 +1889,9 @@
 			<field id="ship_cost_edit" dataType="Bool" defaultValue="FALSE"/>
 			<field id="pump_for_client_cost" dataType="Float" length="15" precision="2"/>
 			<field id="pump_for_client_cost_edit" dataType="Bool" defaultValue="FALSE"/>
+			<field id="client_specification_id" dataType="Int" refTable="client_specifications" refField="id" alias="Спецификация"/>
+			<field id="upd_ref_1c" dataType="JSONB" alias="Ссылка на Документ 1с"/>
+			<field id="faktura_ref_1c" dataType="JSONB" alias="Ссылка на Документ 1с"/>
 			<index id="shipments_date_time_index">
 				<field id="date_time"/>
 			</index>
@@ -1928,6 +1954,9 @@
 			<field id="owner_pump_agreed_date_time" dataType="DateTimeTZ" alias="Дата согласования насос"/>
 			<field id="pump_for_client_cost" dataType="Float" length="15" precision="2"/>
 			<field id="pump_for_client_cost_edit" dataType="Bool" defaultValue="FALSE"/>
+			<field id="upd_ref_1c" dataType="JSONB" alias="Ссылка на Документ 1с"/>
+			<field id="faktura_ref_1c" dataType="JSONB" alias="Ссылка на Документ 1с"/>
+			<field id="client_specifications_ref" dataType="JSONB"/>
 			<sql/>
 			<globalFilter id="vehicle_owner_id"/>
 		</model>
@@ -2128,6 +2157,7 @@
 			<field id="pump_for_client_cost_default" dataType="Float" length="15" precision="2"/>
 			<field id="pump_for_client_cost_edit" dataType="Bool"/>
 			<field id="vs_state" dataType="String" alias="Статус"/>
+			<field id="client_specifications_ref" dataType="JSON" alias="Спецификация"/>
 			<sql/>
 			<globalFilter id="vehicle_owner_id"/>
 		</model>
@@ -5098,6 +5128,11 @@
 			<field id="search" dataType="Text"/>
 			<field id="ref" dataType="JSON"/>
 		</model>
+		<model id="Warehouse1cList" parent="ModelJSON" virtual="TRUE" alias="Модель склада 1с">
+			<field id="name" dataType="String" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="search" dataType="Text"/>
+			<field id="ref" dataType="JSON"/>
+		</model>
 		<model id="Item1cList" parent="ModelJSON" virtual="TRUE" alias="Модель номенклатура 1с">
 			<field id="name" dataType="String" primaryKey="TRUE" autoInc="FALSE"/>
 			<field id="search" dataType="Text"/>
@@ -5416,7 +5451,8 @@
 			<field id="old_descr" dataType="String"/>
 		</model>
 		<model id="FuelTransaction" parent="ModelSQLBeton" dataTable="fuel_transactions" virtual="FALSE">
-			<field id="id" dataType="Text" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="transaction_id" dataType="Text"/>
 			<field id="date_time" dataType="DateTime" required="TRUE"/>
 			<field id="card_id" dataType="Text" required="TRUE"/>
 			<field id="vehicle_id" dataType="Int"/>
@@ -5441,7 +5477,8 @@
 			<defaultOrder>
 				<field id="id" sortDirect="DESC"/>
 			</defaultOrder>
-			<field id="id" dataType="Text" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="transaction_id" dataType="Text"/>
 			<field id="date_time" dataType="DateTime" required="TRUE"/>
 			<field id="card_id" dataType="Text" required="TRUE"/>
 			<field id="vehicle_id" dataType="Int"/>
@@ -5455,6 +5492,7 @@
 			<field id="shift_from" dataType="DateTime" required="TRUE"/>
 			<field id="shift_to" dataType="DateTime" required="TRUE"/>
 			<field id="ref_1c" dataType="JSONB" alias="Ссылка на документ 1с"/>
+			<field id="material_ref_1c" dataType="JSONB" alias="Требование накладная (список)"/>
 			<field id="data_for_1c" dataType="JSON"/>
 			<index id="production_reports_period_idx">
 				<field id="shift_to"/>
@@ -5465,16 +5503,104 @@
 			<field id="shift_from" dataType="DateTime" required="TRUE"/>
 			<field id="shift_to" dataType="DateTime" required="TRUE"/>
 			<field id="ref_1c" dataType="JSONB" alias="Ссылка на документ 1с"/>
+			<field id="material_ref_1c" dataType="JSONB" alias="Требование накладная (список)"/>
 		</model>
 		<model id="ProductionReportDialog" parent="ModelSQLBeton" dataTable="production_reports_dialog" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="shift_from" dataType="DateTime" required="TRUE"/>
 			<field id="shift_to" dataType="DateTime" required="TRUE"/>
 			<field id="ref_1c" dataType="JSONB" alias="Ссылка на документ 1с"/>
+			<field id="material_ref_1c" dataType="JSONB" alias="Требование накладная"/>
 			<field id="items" dataType="JSON"/>
 			<field id="materials" dataType="JSON"/>
 			<field id="date_for_1c" dataType="JSON"/>
 			<field id="date_for_1c_current" dataType="JSON"/>
+		</model>
+		<model id="RGFuelFlow" parent="ModelSQLBeton" dataTable="rg_fuel_flow" virtual="FALSE" modelType="RG" period="1 month">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="date_time" dataType="DateTime" required="TRUE" alias="Период"/>
+			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id"/>
+			<field id="quant" dataType="Int" alias="Количество"/>
+			<index id="rg_fuel_flow_date_time_idx">
+				<field id="date_time"/>
+			</index>
+			<index id="rg_fuel_flow_vehicle_idx">
+				<field id="vehicle_id"/>
+			</index>
+		</model>
+		<model id="RAFuelFlow" parent="ModelSQLBeton" dataTable="ra_fuel_flow" virtual="FALSE" modelType="RA" regTypeId="fuel_flow">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="date_time" dataType="DateTime" required="TRUE" alias="Период"/>
+			<field id="deb" dataType="Bool" alias="Дебет"/>
+			<field id="doc_type" dataType="Enum" enumId="doc_types" alias="Вид документа" required="TRUE"/>
+			<field id="doc_id" dataType="Int"/>
+			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id" regFieldType="dimension" required="TRUE"/>
+			<field id="quant" dataType="Int" alias="Количество" regFieldType="fact"/>
+			<index id="ra_fuel_flow_date_time_idx">
+				<field id="date_time"/>
+			</index>
+			<index id="ra_fuel_flow_doc_idx">
+				<field id="doc_type"/>
+				<field id="doc_id"/>
+			</index>
+			<index id="ra_fuel_flow_vehicle_idx">
+				<field id="vehicle_id"/>
+			</index>
+		</model>
+		<model id="RAFuelFlowList" parent="ModelSQLBeton" dataTable="ra_fuel_flow_list" virtual="TRUE" modelType="RA" regTypeId="fuel_flow">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+			<aggFunctions>
+				<aggFunction alias="total_quant" expr="sum(quant)"/>
+			</aggFunctions>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
+			<field id="date_time" dataType="DateTime" alias="Период"/>
+			<field id="deb" dataType="Bool" alias="Дебет"/>
+			<field id="docs_ref" dataType="JSON"/>
+			<field id="vehicles_ref" dataType="JSON"/>
+			<field id="vehicle_id" dataType="Int" sysCol="TRUE"/>
+			<field id="quant" dataType="Int" alias="Количество"/>
+		</model>
+		<model id="FuelConsumptionSchema" parent="ModelSQLDOC" dataTable="fuel_consumption_schema" virtual="FALSE">
+			<defaultOrder>
+				<field id="date_time"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="name" dataType="Text" alias="Наименование"/>
+		</model>
+		<model id="FuelConsumptionSchemaDetail" parent="ModelSQLDOC" dataTable="fuel_consumption_schema_details" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="fuel_consumption_schema_id" dataType="Int" refTable="fuel_consumption_schema" refField="id" required="TRUE"/>
+			<field id="month_from" dataType="Int" alias="1-12"/>
+			<field id="month_to" dataType="Int" alias="1-12"/>
+			<field id="quant_distance" dataType="Int" alias="Расход на 100 км"/>
+			<field id="quant_time" dataType="Int" alias="Расход на 1 час"/>
+			<index id="fuel_consumption_schema_schema_idx">
+				<field id="schema_id"/>
+				<field id="month_from"/>
+			</index>
+		</model>
+		<model id="FuelConsumptionSchemaDetailList" parent="ModelSQLDOC" dataTable="fuel_consumption_schema_details_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="schema_id" dataType="Int"/>
+			<field id="schemas_ref" dataType="JSON"/>
+			<field id="month_from" dataType="Int" alias="1-12"/>
+			<field id="month_to" dataType="Int" alias="1-12"/>
+			<field id="quant_distance" dataType="Int" alias="Расход на 100 км"/>
+			<field id="quant_time" dataType="Int" alias="Расход на 1 час"/>
+		</model>
+		<model id="FuelConsumption" parent="ModelSQLDOC" dataTable="fuel_consumptions" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="date_time" dataType="DateTime" alias="Период" required="TRUE"/>
+			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id" required="TRUE"/>
+			<field id="quant" dataType="Int" alias="Количество" required="TRUE"/>
 		</model>
 	</models>
 	<constants>
@@ -6045,6 +6171,8 @@
 				<field id="shipment_ids" dataType="Text"/>
 				<field id="faksim" dataType="Bool" required="TRUE"/>
 				<field id="buh_doc" dataType="Text" required="TRUE"/>
+				<field id="rollup_runs" dataType="Bool"/>
+				<field id="consignee" dataType="Int"/>
 			</publicMethod>
 			<publicMethod id="get_time_list" modelId="ShipmentTimeList" condFields="TRUE">
 				<field id="templ" dataType="String"/>
@@ -7497,6 +7625,11 @@
 				<field id="ic" dataType="Int"/>
 				<field id="mid" dataType="Int"/>
 			</publicMethod>
+			<publicMethod id="complete_warehouse" patternFieldId="search" modelId="Warehouse1cList">
+				<field id="search" dataType="String" length="500"/>
+				<field id="ic" dataType="Int"/>
+				<field id="mid" dataType="Int"/>
+			</publicMethod>
 			<publicMethod id="complete_item" patternFieldId="search" modelId="Item1cList">
 				<field id="search" dataType="String" length="500"/>
 				<field id="ic" dataType="Int"/>
@@ -7508,6 +7641,9 @@
 			<publicMethod id="service_status"/>
 			<publicMethod id="production_report_export">
 				<field id="id" dataType="Int"/>
+			</publicMethod>
+			<publicMethod id="export_shipments">
+				<field id="ids" dataType="Text"/>
 			</publicMethod>
 		</controller>
 		<controller id="FuelTransaction" parentId="ControllerSQL" noState="FALSE">
@@ -7530,6 +7666,32 @@
 				<field id="shift_from" dataType="DateTime" required="TRUE"/>
 				<field id="shift_to" dataType="DateTime" required="TRUE"/>
 			</publicMethod>
+		</controller>
+		<controller id="FuelConsumptionSchema" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="FuelConsumptionSchema"/>
+			<publicMethod id="update" modelId="FuelConsumptionSchema"/>
+			<publicMethod id="delete" modelId="FuelConsumptionSchema"/>
+			<publicMethod id="get_list" modelId="FuelConsumptionSchema"/>
+			<publicMethod id="get_object" modelId="FuelConsumptionSchema"/>
+			<publicMethod id="complete" modelId="FuelConsumptionSchema" patternFieldId="name"/>
+		</controller>
+		<controller id="FuelConsumptionSchemaDetail" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="FuelConsumptionSchemaDetail"/>
+			<publicMethod id="update" modelId="FuelConsumptionSchemaDetail"/>
+			<publicMethod id="delete" modelId="FuelConsumptionSchemaDetail"/>
+			<publicMethod id="get_list" modelId="FuelConsumptionSchemaDetailList"/>
+			<publicMethod id="get_object" modelId="FuelConsumptionSchemaDetailList"/>
+		</controller>
+		<controller id="RAFuelFlow" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="get_list" modelId="RAFuelFlowList"/>
+			<publicMethod id="get_object" modelId="RAFuelFlowList"/>
+		</controller>
+		<controller id="FuelConsumption" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="FuelConsumption"/>
+			<publicMethod id="update" modelId="FuelConsumption"/>
+			<publicMethod id="delete" modelId="FuelConsumption"/>
+			<publicMethod id="get_list" modelId="FuelConsumption"/>
+			<publicMethod id="get_object" modelId="FuelConsumption"/>
 		</controller>
 	</controllers>
 	<permissions>
@@ -7717,6 +7879,7 @@
 		<view id="10055" c="CementSiloMaterial_Controller" t="CementSiloMaterialList" f="get_list" section="Справочники" descr="Материалы в силосах"/>
 		<view id="10056" c="OperatorForTranspNakl" t="OperatorForTranspNaklList" f="get_list" section="Справочники" descr="Список операторов для трансп.накл."/>
 		<view id="10057" c="UserAllowedMaterialCorrection_Controller" t="UserAllowedMaterialCorrectionList" f="get_list" section="Справочники" descr="Список пользователей с разрешенным правом редактирования данных по материалам"/>
+		<view id="10058" c="FuelConsumptionSchema" t="FuelConsumptionSchemaList" f="get_list" section="Справочники" descr="Схемы расхода топлива"/>
 		<view id="20000" c="Order_Controller" t="OrderList" f="get_list" section="Документы" descr="Заявки"/>
 		<view id="20001" c="OrderPump_Controller" t="OrderPumpList" f="get_list" section="Документы" descr="Заявки (насосы)"/>
 		<view id="20002" c="Shipment_Controller" t="ShipmentList" f="get_list" section="Документы" descr="Отгрузки"/>
@@ -8616,6 +8779,7 @@
 		<jsScript file="js20/views/Connect1c_View.js"/>
 		<jsScript file="js20/views/ProductionReportList_View.js"/>
 		<jsScript file="js20/views/ProductionReportDialog_View.js"/>
+		<jsScript file="js20/views/FuelConsumptionSchemaList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="js20/forms/ViewList_Form.js"/>
 		<jsScript file="js20/forms/MainMenuConstructor_Form.js"/>
@@ -8660,6 +8824,7 @@
 		<jsScript file="js20/forms/ClientSpecificationList_Form.js"/>
 		<jsScript file="js20/forms/VehicleTotRepItem_Form.js"/>
 		<jsScript file="js20/forms/ProductionReportDialog_Form.js"/>
+		<jsScript file="js20/forms/FuelConsumptionSchemaList_Form.js"/>
 		<!--custom controls-->
 		<jsScript file="js20/tmpl/App.templates.js" compressed="FALSE" standalone="FALSE"/>
 		<jsScript file="js20/custom_controls/EditDateInlineValidation.js"/>
@@ -8794,6 +8959,7 @@
 		<jsScript file="js20/custom_controls/RawMaterialTicketGridCmdIssue.js"/>
 		<jsScript file="js20/custom_controls/ClientSpecificationGridCmdAllDog.js"/>
 		<jsScript file="js20/custom_controls/FuelTransactionGridCmdImport.js"/>
+		<jsScript file="js20/custom_controls/ShipmentGridCmdToBuh.js"/>
 		<jsScript file="js20/custom_controls/RawMaterialTicketIssueBtn.js"/>
 		<jsScript file="js20/custom_controls/ClientSpecificationEdit.js"/>
 		<jsScript file="js20/custom_controls/VehicleScheduleEdit_View.js"/>
@@ -8801,6 +8967,7 @@
 		<jsScript file="js20/custom_controls/TaskImportanceLevelEdit.js"/>
 		<jsScript file="js20/custom_controls/Client1cEdit.js"/>
 		<jsScript file="js20/custom_controls/User1cEdit.js"/>
+		<jsScript file="js20/custom_controls/Warehouse1cEdit.js"/>
 		<jsScript file="js20/custom_controls/Item1cEdit.js"/>
 		<jsScript file="js20/custom_controls/BuhRBP1cEdit.js"/>
 		<jsScript file="js20/custom_controls/Firm1cEdit.js"/>
@@ -8813,6 +8980,9 @@
 		<jsScript file="js20/custom_controls/ConnectElkonCheck.js"/>
 		<jsScript file="js20/custom_controls/ClientSetRef1c.js"/>
 		<jsScript file="js20/custom_controls/ProductionReportTo1cBtn.js"/>
+		<jsScript file="js20/custom_controls/ProductionReportMatTo1cBtn.js"/>
+		<jsScript file="js20/custom_controls/EditMonth.js"/>
+		<jsScript file="js20/custom_controls/FuelConsumptionSchemaEdit.js"/>
 		<jsScript file="js20/views/rs_ru.js"/>
 		<jsScript file="js20/views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -9348,6 +9518,17 @@
 		<jsScript file="js20/controllers/ProductionReport_Controller.js"/>
 		<jsScript file="js20/models/ProductionReportList_Model.js"/>
 		<jsScript file="js20/models/ProductionReportDialog_Model.js"/>
+		<jsScript file="js20/models/RAFuelFlow_Model.js"/>
+		<jsScript file="js20/models/RGFuelFlow_Model.js"/>
+		<jsScript file="js20/models/FuelConsumptionSchema_Model.js"/>
+		<jsScript file="js20/models/FuelConsumptionSchemaDetail_Model.js"/>
+		<jsScript file="js20/models/FuelConsumptionSchemaDetailList_Model.js"/>
+		<jsScript file="js20/controllers/FuelConsumptionSchema_Controller.js"/>
+		<jsScript file="js20/controllers/FuelConsumptionSchemaDetail_Controller.js"/>
+		<jsScript file="js20/enum_controls/Enum_ownership_types.js"/>
+		<jsScript file="js20/enum_controls/EnumGridColumn_ownership_types.js"/>
+		<jsScript file="js20/controllers/FuelConsumption_Controller.js"/>
+		<jsScript file="js20/models/ProductionSiteDialog_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

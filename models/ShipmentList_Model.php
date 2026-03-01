@@ -15,6 +15,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
  
 class ShipmentList_Model extends ModelSQLBeton{
 	
@@ -425,6 +426,34 @@ class ShipmentList_Model extends ModelSQLBeton{
 						
 		$f_pump_for_client_cost_edit=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"pump_for_client_cost_edit",$f_opts);
 		$this->addField($f_pump_for_client_cost_edit);
+		//********************
+		
+		//*** Field upd_ref_1c ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Ссылка на Документ 1с';
+		$f_opts['id']="upd_ref_1c";
+						
+		$f_upd_ref_1c=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"upd_ref_1c",$f_opts);
+		$this->addField($f_upd_ref_1c);
+		//********************
+		
+		//*** Field faktura_ref_1c ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Ссылка на Документ 1с';
+		$f_opts['id']="faktura_ref_1c";
+						
+		$f_faktura_ref_1c=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"faktura_ref_1c",$f_opts);
+		$this->addField($f_faktura_ref_1c);
+		//********************
+		
+		//*** Field client_specifications_ref ***
+		$f_opts = array();
+		$f_opts['id']="client_specifications_ref";
+						
+		$f_client_specifications_ref=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_specifications_ref",$f_opts);
+		$this->addField($f_client_specifications_ref);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	$this->setAggFunctions(

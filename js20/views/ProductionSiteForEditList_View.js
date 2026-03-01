@@ -99,38 +99,58 @@ function ProductionSiteForEditList_View(id,options){
 								})
 							]
 						})
-						,new GridCellHead(id+":grid:head:elkon_connection",{
-							"value":"Соединение с сервром Elkon",
+						// ,new GridCellHead(id+":grid:head:elkon_connection",{
+						// 	"value":"Соединение с сервром Elkon",
+						// 	"columns":[
+						// 		new GridColumn({
+						// 			"field":model.getField("elkon_connection"),
+						// 			"ctrlOptions":{
+						// 				"enabled":false
+						// 			},
+						// 			"formatFunction":function(fields){
+						// 				var res = "";
+						// 				var con = fields.elkon_connection.getValue();
+						// 				if(con){
+						// 					res = "Сервер:"+con.host+
+						// 					" Порт:"+con.port+
+						// 					" база:"+con.databaseName+
+						// 					" Уровень лога:"+con.logLevel+
+						// 					" Пользователь:"+con.userName+
+						// 					" Пароль:"+con.userPassword
+						// 				}
+						// 				return res;
+						// 			}
+						// 		})
+						// 	]
+						// })
+						// ,new GridCellHead(id+":grid:head:missing_elkon_production_ids",{
+						// 	"value":"Пропущенные пр-ва",
+						// 	"columns":[
+						// 		new GridColumn({
+						// 			"field":model.getField("missing_elkon_production_ids"),
+						// 			"ctrlOptions":{
+						// 				"enabled":false
+						// 			}	
+						// 		})
+						// 	]
+						// })						
+						,new GridCellHead(id+":grid:head:ref_1c",{
+							"value":"Склад 1с",
 							"columns":[
 								new GridColumn({
-									"field":model.getField("elkon_connection"),
+									"field":model.getField("ref_1c"),
+									"ctrlClass": Warehouse1cEdit,
 									"ctrlOptions":{
-										"enabled":false
+										"labelCaption": ""
 									},
-									"formatFunction":function(fields){
-										var res = "";
-										var con = fields.elkon_connection.getValue();
-										if(con){
-											res = "Сервер:"+con.host+
-											" Порт:"+con.port+
-											" база:"+con.databaseName+
-											" Уровень лога:"+con.logLevel+
-											" Пользователь:"+con.userName+
-											" Пароль:"+con.userPassword
+									"formatFunction": function(fields){
+										const ref = fields.ref_1c.getValue();
+										let res = "";
+										if(ref && !ref.isNull()){
+											res = ref.getDescr();
 										}
 										return res;
 									}
-								})
-							]
-						})
-						,new GridCellHead(id+":grid:head:missing_elkon_production_ids",{
-							"value":"Пропущенные пр-ва",
-							"columns":[
-								new GridColumn({
-									"field":model.getField("missing_elkon_production_ids"),
-									"ctrlOptions":{
-										"enabled":false
-									}	
 								})
 							]
 						})						

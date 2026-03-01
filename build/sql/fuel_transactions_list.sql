@@ -5,6 +5,7 @@
 CREATE OR REPLACE VIEW fuel_transactions_list AS
 	SELECT
 		t.id,
+		t.transaction_id,
 		t.date_time,
 		t.card_id,
 		t.vehicle_id,

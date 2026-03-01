@@ -203,6 +203,24 @@ extend(Shipment_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Спецификация";
+	var field = new FieldInt("client_specification_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Ссылка на Документ 1с";
+	var field = new FieldJSONB("upd_ref_1c",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Ссылка на Документ 1с";
+	var field = new FieldJSONB("faktura_ref_1c",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -344,6 +362,24 @@ extend(Shipment_Controller,ControllerObjServer);
 	var options = {};
 	
 	var field = new FieldBool("pump_for_client_cost_edit",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Спецификация";
+	var field = new FieldInt("client_specification_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Ссылка на Документ 1с";
+	var field = new FieldJSONB("upd_ref_1c",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Ссылка на Документ 1с";
+	var field = new FieldJSONB("faktura_ref_1c",options);
 	
 	pm.addField(field);
 	
@@ -499,6 +535,15 @@ extend(Shipment_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldBool("pump_for_client_cost_edit",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Ссылка на Документ 1с";
+	pm.addField(new FieldJSONB("upd_ref_1c",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Ссылка на Документ 1с";
+	pm.addField(new FieldJSONB("faktura_ref_1c",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSONB("client_specifications_ref",f_opts));
 }
 
 			Shipment_Controller.prototype.add_get_list_for_veh_owner = function(){
@@ -865,6 +910,18 @@ extend(Shipment_Controller,ControllerObjServer);
 		options.required = true;
 	
 		pm.addField(new FieldText("buh_doc",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldBool("rollup_runs",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("consignee",options));
 	
 			
 	this.addPublicMethod(pm);

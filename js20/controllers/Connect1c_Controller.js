@@ -23,12 +23,14 @@ function Connect1c_Controller(options){
 	
 	//methods
 	this.add_complete_user();
+	this.add_complete_warehouse();
 	this.add_complete_item();
 	this.add_service_stop();
 	this.add_service_start();
 	this.add_service_health();
 	this.add_service_status();
 	this.add_production_report_export();
+	this.add_export_shipments();
 		
 }
 extend(Connect1c_Controller,ControllerObjServer);
@@ -36,6 +38,34 @@ extend(Connect1c_Controller,ControllerObjServer);
 			Connect1c_Controller.prototype.add_complete_user = function(){
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('complete_user',opts);
+	
+				
+	
+	var options = {};
+	
+		options.maxlength = "500";
+	
+		pm.addField(new FieldString("search",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("ic",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("mid",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Connect1c_Controller.prototype.add_complete_warehouse = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('complete_warehouse',opts);
 	
 				
 	
@@ -126,6 +156,20 @@ extend(Connect1c_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldInt("id",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Connect1c_Controller.prototype.add_export_shipments = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('export_shipments',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldText("ids",options));
 	
 			
 	this.addPublicMethod(pm);

@@ -86,9 +86,13 @@ function ProductionReportDialog_View(id,options){
 		}));
 
 		//materials
+		//
 		this.m_modelMaterials = new ModelJSON(id+":materials", {
 			simpleStructure: true,
-			fields: ["ref_1c", "name", "quant", "ref_1c_descr"]
+			fields: [
+				"wareshouse_ref_1c", "wareshouse_name", "production_site_name",
+				"ref_1c", "name", "quant", "ref_1c_descr"
+			]
 		});
 
 		this.addElement(new Grid(id+":materials",{
@@ -98,8 +102,24 @@ function ProductionReportDialog_View(id,options){
 				"elements":[
 					new GridRow(id+":materials:head:row0",{
 						"elements":[
-							new GridCellHead(id+":materials:head:name",{
-								"value":"Наименование",
+							new GridCellHead(id+":materials:head:production_site_name",{
+								"value":"Завод",
+								"columns":[
+									new GridColumn({
+										"field":this.m_modelMaterials.getField("production_site_name")
+									})
+								]
+							})
+							,new GridCellHead(id+":materials:head:wareshouse_name",{
+								"value":"Склад 1с",
+								"columns":[
+									new GridColumn({
+										"field":this.m_modelMaterials.getField("wareshouse_name")
+									})
+								]
+							})
+							,new GridCellHead(id+":materials:head:name",{
+								"value":"Материал",
 								"columns":[
 									new GridColumn({
 										"field":this.m_modelMaterials.getField("name")

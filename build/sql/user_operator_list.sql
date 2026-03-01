@@ -38,6 +38,3 @@ CREATE OR REPLACE VIEW user_operator_list AS
 	WHERE role_id='operator' AND NOT coalesce(banned,FALSE)
 	ORDER BY u.name
 	;
-	
-ALTER VIEW user_operator_list OWNER TO ;
-

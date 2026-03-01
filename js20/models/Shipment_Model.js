@@ -232,6 +232,15 @@ function Shipment_Model(options){
 	
 	options.fields.pump_for_client_cost_edit = new FieldBool("pump_for_client_cost_edit",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Спецификация';
+	filed_options.autoInc = false;	
+	
+	options.fields.client_specification_id = new FieldInt("client_specification_id",filed_options);
+	
 			
 			
 			

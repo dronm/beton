@@ -58,6 +58,16 @@ class ProductionReport_Model extends ModelSQLBeton{
 		$this->addField($f_ref_1c);
 		//********************
 		
+		//*** Field material_ref_1c ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Требование накладная';
+		$f_opts['id']="material_ref_1c";
+						
+		$f_material_ref_1c=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_ref_1c",$f_opts);
+		$this->addField($f_material_ref_1c);
+		//********************
+		
 		//*** Field data_for_1c ***
 		$f_opts = array();
 		$f_opts['id']="data_for_1c";

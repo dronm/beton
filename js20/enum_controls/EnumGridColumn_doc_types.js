@@ -36,6 +36,10 @@ function EnumGridColumn_doc_types(options){
 
 	options.multyLangValues["ru"]["material_movement"] = "Перемещение материалов";
 
+	options.multyLangValues["ru"]["fuel_transactions"] = "Транзакции по топливным картам";
+
+	options.multyLangValues["ru"]["fuel_consumptions"] = "расход топлива";
+
 	
 	options.ctrlClass = options.ctrlClass || Enum_doc_types;
 	options.searchOptions = options.searchOptions || {};

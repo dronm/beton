@@ -103,6 +103,16 @@ class ProductionSiteForEditList_Model extends ModelSQLBeton{
 		$f_production_bases_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"production_bases_ref",$f_opts);
 		$this->addField($f_production_bases_ref);
 		//********************
+		
+		//*** Field ref_1c ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Ссылка на склад 1с';
+		$f_opts['id']="ref_1c";
+						
+		$f_ref_1c=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ref_1c",$f_opts);
+		$this->addField($f_ref_1c);
+		//********************
 	
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		

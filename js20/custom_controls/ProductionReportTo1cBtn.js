@@ -16,10 +16,10 @@ function ProductionReportTo1cBtn(id,options){
 		
 	options.colorClass = "bg-"+window.getApp().getColorClass();//"bg-blue-400";
 	options.className = "btn "+options.colorClass+" btn-cmd prod-report-export";
-	options.caption = " Экспорт ";
+	options.caption = " Продукция ";
 
 	options.glyph = "glyphicon-download-alt";
-	options.title="Экспортировать документ в 1с";
+	options.title="Экспортировать отчет производства в 1с";
 
 	var self = this;
 	options.onClick = function(){

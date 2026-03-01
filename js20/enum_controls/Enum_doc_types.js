@@ -42,6 +42,12 @@ checked:(options.defaultValue&&options.defaultValue=="cement_silo_balance_reset"
 ,{"value":"material_movement",
 "descr":this.multyLangValues[window.getApp().getLocale()+"_"+"material_movement"],
 checked:(options.defaultValue&&options.defaultValue=="material_movement")}
+,{"value":"fuel_transactions",
+"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"fuel_transactions"],
+checked:(options.defaultValue&&options.defaultValue=="fuel_transactions")}
+,{"value":"fuel_consumptions",
+"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"fuel_consumptions"],
+checked:(options.defaultValue&&options.defaultValue=="fuel_consumptions")}
 ];
 	
 	Enum_doc_types.superclass.constructor.call(this,id,options);
@@ -58,6 +64,8 @@ Enum_doc_types.prototype.multyLangValues = {"ru_order":"Заявка"
 ,"ru_cement_silo_reset":"Обнуление силоса"
 ,"ru_cement_silo_balance_reset":"Обнуление остатка силоса"
 ,"ru_material_movement":"Перемещение материалов"
+,"ru_fuel_transactions":"Транзакции по топливным картам"
+,"ru_fuel_consumptions":"расход топлива"
 };
 
 

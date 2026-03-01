@@ -33,4 +33,4 @@ CREATE OR REPLACE VIEW client_specifications_list AS
 	LEFT JOIN concrete_types AS ct ON ct.id = t.concrete_type_id
 	LEFT JOIN destinations AS dest ON dest.id = t.destination_id
 	LEFT JOIN clients AS cl ON cl.id = t.client_id
-	LEFT JOIN client_contracts_1c AS contr ON contr.ref_1c->>'ref_1c' = t.client_contract_1c_ref;
+	LEFT JOIN client_contracts_1c AS contr ON contr.ref_1c->>'ref_1c' = t.client_contract_1c_ref

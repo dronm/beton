@@ -251,7 +251,7 @@ extend(Order_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.alias = "Ссылка на справочник 1с";
+	options.alias = "Ссылка на объект 1с";
 	var field = new FieldJSONB("ref_1c",options);
 	
 	pm.addField(field);
@@ -457,7 +457,7 @@ extend(Order_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
-	options.alias = "Ссылка на справочник 1с";
+	options.alias = "Ссылка на объект 1с";
 	var field = new FieldJSONB("ref_1c",options);
 	
 	pm.addField(field);
@@ -1008,6 +1008,12 @@ extend(Order_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldText("order_ids",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldBool("rollup_runs",options));
 	
 			
 	this.addPublicMethod(pm);

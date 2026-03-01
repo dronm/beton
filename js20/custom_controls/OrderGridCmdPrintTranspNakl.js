@@ -61,10 +61,22 @@ OrderGridCmdPrintTranspNakl.prototype.onCommandCont = function(model){
 		"content":new View("naklSelect:view", {
 			addElement: function(){
 				const naklView = this;
+
 				this.addElement(new EditSelect("naklSelect:view:nakl",{
 					labelCaption: "УПД:",
 					elements: nakls
 				}));	
+
+				this.addElement(new ClientEdit("naklSelect:view:nakl:consignee", {
+					labelCaption: "Грузополучатель (если не контрагент):",
+					title: "Грузополучатель, если отличается от контрагента"
+				}));
+
+				this.addElement(new EditCheckBox("naklSelect:view:nakl:rollup_runs", {
+					labelCaption: "Свернуть рейсы",
+					title: "Свернуть все рейсы по ТС в одну накладную"
+				}));
+
 				this.addElement(new ButtonCmd("naklSelect:view:nakl:printSgn", {
 					caption: "С подписями",
 					onClick: function(){
@@ -109,6 +121,12 @@ OrderGridCmdPrintTranspNakl.prototype.print = function(doc, shipmentIds, faksim,
 	pm.setFieldValue("shipment_ids", shipmentIds);
 	pm.setFieldValue("faksim", faksim);
 	pm.setFieldValue("buh_doc", doc);
+	pm.setFieldValue("rollup_runs", this.m_form.getContent().getElement("rollup_runs").getValue());
+	const consignee = this.m_form.getContent().getElement("consignee").getValue();
+	if(!consignee.isNull()){
+		pm.setFieldValue("consignee", consignee.getKey("id"));
+	}
+
 	pm.download("ViewXML", 0, function(res){
 		window.setGlobalWait(false);
 		naklView.getElement("printSgn").setEnabled(true);

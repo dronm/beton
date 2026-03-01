@@ -55,6 +55,18 @@ function InsuranceListGrid(id,options){
 				})
 			]
 		})
+		,new GridCellHead(id+":head:attachments_list",{
+			"value":"Документы",
+			"columns":[
+				new GridColumn({
+					"edit": false,
+					"formatFunction": function(f){
+						//upload a file, remove on deletion
+						return "";
+					}
+				})
+			]
+		})
 	];
 
 	options = {

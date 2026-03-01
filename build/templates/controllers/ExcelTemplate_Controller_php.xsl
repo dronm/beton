@@ -233,7 +233,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 	}
 
 	//generates template, populates with data. 
-	public static function genFilledTemplate($dbLink, $templateName, $paramArray, $erEmpty, &amp;$outFl, &amp;$flName){
+	public static function genFilledTemplate($dbLink, $templateName, $paramArray, $erEmpty, &amp;$outFl, &amp;$flName, $queryText=NULL){
 	
 		require_once(ABSOLUTE_PATH.'vendor/autoload.php');
 		
@@ -255,7 +255,8 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 			throw new Exception('Шаблон не найден!');
 		}
 		
-		if(!isset($ar['sql_query'])){
+		$sql_query_text = (is_null($queryText))? $ar['sql_query'] : $queryText;
+		if(!isset($sql_query_text)){
 			throw new Exception('Запрос не определен!');
 		}
 		if(!isset($ar['cell_matching'])){
@@ -263,7 +264,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		}
 
 		$outFl = OUTPUT_PATH.uniqid();
-		$ar_data = $dbLink->query_first(vsprintf($ar['sql_query'],$paramArray));
+		$ar_data = $dbLink->query_first(vsprintf($sql_query_text,$paramArray));
 	
 		if(!is_array($ar_data) || !count($ar_data)){
 			throw new Exception($erEmpty);

@@ -127,11 +127,53 @@ function VehicleDialog_View(id,options){
 		"maxLength": 17
 	}));	
 
+	this.addElement(new EditString(id+":reg_doc",{
+		"labelCaption":"Свидетельство о регистрации:",
+		"maxLength": 500
+	}));	
+
+	this.addElement(new Enum_ownership_types(id+":ownership_type",{
+		"labelCaption":"Тип владениея:"
+	}));	
+
+	this.addElement(new FuelConsumptionSchemaEdit(id+":fuel_consumption_schema_ref",{ }));	
+
 	this.addElement(new VehicleMileageList_View(id+":mileage_list",{
 		"detail":true
 	}));		
+	/*
+	this.addElement(new RAFuelFlowList_View(id+":ra_fuel_flow_list",{
+		"detail":true
+	}));		
+	*/
 	//****************************************************	
 	
+	this.addElement(new EditFile(id+":attachments_list",{
+		"maxWidth":"100",
+		"maxHeight":"100",
+		"multipleFiles":false
+		,"showHref":true
+		,"showPic":false
+		,"onDeleteFile":function(fileId,callBack){
+			self.m_attachManager.deleteAttachment(fileId,callBack);
+		}
+		,"onFileAdded":function(fileId){
+			//self.addAttachment(fileId);
+			self.m_attachManager.addAttachment(fileId);
+		}
+		,"onDownload":function(fileId){
+			self.m_attachManager.downloadAttachment(fileId);
+		}
+		,"allowedFileExtList":"jpeg,png,jpg,pdf"
+	}));	
+
+	//upload documents
+	this.m_attachManager = new AttachmentManager({
+		"view": this,
+		"dataType": "vehicles",
+		"attachmentViewName": "attachments_list"
+	});
+
 	//read
 	var r_bd = [
 		new DataBinding({"control":this.getElement("plate")})
@@ -157,6 +199,10 @@ function VehicleDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("ord_num")})
 		,new DataBinding({"control":this.getElement("weight_t")})		
 		,new DataBinding({"control":this.getElement("vin")})		
+		,new DataBinding({"control":this.getElement("reg_doc")})		
+		,new DataBinding({"control":this.getElement("ownership_type")})		
+		,new DataBinding({"control":this.getElement("fuel_consumption_schema_ref"),"fieldId":"fuel_consumption_schema_id"})
+		,new DataBinding({"control":this.getElement("attachments_list")})
 	];
 	this.setDataBindings(r_bd);
 	
@@ -177,10 +223,13 @@ function VehicleDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("leasing_contract_date"),"fieldId":"leasing_contract_date"})
 		,new CommandBinding({"control":this.getElement("feature")})
 		,new CommandBinding({"control":this.getElement("vin")})
+		,new CommandBinding({"control":this.getElement("reg_doc")})
+		,new CommandBinding({"control":this.getElement("ownership_type")})
 		,new CommandBinding({"control":this.getElement("tracker_id")})
 		,new CommandBinding({"control":this.getElement("ord_num")})
 		,new CommandBinding({"control":this.getElement("weight_t")})		
 		,new CommandBinding({"control":this.getElement("fuel_card_id")})		
+		,new CommandBinding({"control":this.getElement("fuel_consumption_schema_ref"),"fieldId":"fuel_consumption_schema_id"})
 		//,new CommandBinding({"control":this.getElement("sim_id")})
 		//,new CommandBinding({"control":this.getElement("sim_number")})
 	]);
@@ -192,6 +241,15 @@ function VehicleDialog_View(id,options){
 			return self.m_model.getFieldValue("id");
 		}]
 	});		
+	/*
+	this.addDetailDataSet({
+		"control":this.getElement("ra_fuel_flow_list").getElement("grid"),
+		"controlFieldId": ["vehicle_id"],
+		"value": [function(){
+			return self.m_model.getFieldValue("id");
+		}]
+	});		
+	*/
 }
 extend(VehicleDialog_View,ViewObjectAjx);
 

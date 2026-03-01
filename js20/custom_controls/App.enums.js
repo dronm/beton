@@ -83,6 +83,8 @@
 ,"ru_cement_silo_reset":"Обнуление силоса"
 ,"ru_cement_silo_balance_reset":"Обнуление остатка силоса"
 ,"ru_material_movement":"Перемещение материалов"
+,"ru_fuel_transactions":"Транзакции по топливным картам"
+,"ru_fuel_consumptions":"расход топлива"
 }
 
 		,"reg_types":{"ru_material":"Учет материалов"
@@ -121,6 +123,11 @@
 ,"ru_telegram":"Telegram"
 ,"ru_whatsup":"What's up"
 ,"ru_sms":"СМС"
+}
+
+		,"ownership_types":{"ru_preperty":"Собственность"
+,"ru_leasing":"Лизинг"
+,"ru_rent":"Аренда"
 }
 
 	

@@ -126,6 +126,24 @@ function ProductionSite_Model(options){
 	
 	options.fields.dispatcher_id = new FieldInt("dispatcher_id",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.unclosed_production_ids = new FieldArray("unclosed_production_ids",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Ссылка на склад 1с';
+	filed_options.autoInc = false;	
+	
+	options.fields.ref_1c = new FieldJSONB("ref_1c",filed_options);
+	
 		ProductionSite_Model.superclass.constructor.call(this,id,options);
 }
 extend(ProductionSite_Model,ModelXML);
