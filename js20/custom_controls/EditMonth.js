@@ -53,4 +53,4 @@ function EditMonth(id,options){
 	EditMonth.superclass.constructor.call(this,id,options);
 	
 }
-extend(EditMoth,EditSelect);
+extend(EditMonth,EditSelect);
