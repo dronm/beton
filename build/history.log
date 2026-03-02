@@ -1694,6 +1694,10 @@ shipments_for_transp_nakl_list.sql
 1.00397
 1) minor gleaches
 
+1.00400
+1) Connect1c_Controller
+
+
 - all messages are coming to all clients.
 
 

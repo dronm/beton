@@ -58,6 +58,7 @@ function ProductionReportList_View(id,options){
 										(new ProductionReportMatTo1cBtn("prodRepList:export_mat", {
 											grid: self.getElement("grid")
 										})).toDOM(matCont);
+
 										if(refMat && refMat.length){
 											const matNode = document.createElement("span");
 											let docs = "";

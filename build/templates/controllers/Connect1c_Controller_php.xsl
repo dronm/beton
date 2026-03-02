@@ -171,19 +171,29 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		*/
 		$data_for_1c['warehouses'] = [];
 		$whRef = NULL;
+		$wh = NULL;
 		foreach($data_for_1c['materials'] as $mat){
 			if(is_null($whRef) || $whRef != $mat["wareshouse_ref_1c"]){
 				// new warehouse
-				$data_for_1c['warehouses']["ref_1c"] = $mat["wareshouse_ref_1c"];
-				$data_for_1c['warehouses']["materials"] = [];
+				if(!is_null($wh)){
+					array_push($data_for_1c['warehouses'], $wh);
+				}
+				$whRef = $mat["wareshouse_ref_1c"];
+				$wh = [
+					'ref_1c' => $whRef,
+					'materials' => []
+				];
 			}
 			array_push(
-				$data_for_1c['warehouses']["materials"], 
+				$wh["materials"],
 				[ 
 					"ref_1c" => $mat["ref_1c"],
 					"quant" => $mat["quant"]
 				]
 			);
+		}
+		if(!is_null($wh)){
+			array_push($data_for_1c['warehouses'], $wh);
 		}
 		$data_for_1c['materials'] = NULL;
 		$res = Exch1c::newProductionReportMat($data_for_1c);

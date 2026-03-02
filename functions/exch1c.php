@@ -130,8 +130,8 @@ class Exch1c{
 
 		$curlOptions = [
 			CURLOPT_RETURNTRANSFER  => true,
-			CURLOPT_TIMEOUT         => $options['timeout']? $options['timeout']: 120,
-			CURLOPT_CONNECTTIMEOUT  => $options['connect_timeout']? $options['connect_timeout']: 10,
+			CURLOPT_TIMEOUT         => isset($options['timeout'])? $options['timeout']: 120,
+			CURLOPT_CONNECTTIMEOUT  => isset($options['connect_timeout'])? $options['connect_timeout']: 10,
 		];
 
 		if ($postCommand) {

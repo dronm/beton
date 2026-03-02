@@ -1826,6 +1826,8 @@ $permissions = array();
 				
 					$permissions['Connect1c_Controller_production_report_export']=TRUE;
 				
+					$permissions['Connect1c_Controller_production_report_mat_export']=TRUE;
+				
 					$permissions['Connect1c_Controller_export_shipments']=TRUE;
 				
 					$permissions['FuelTransaction_Controller_insert']=TRUE;

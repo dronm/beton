@@ -25,6 +25,7 @@ $ar = $dbLink->query_first(
 );
 if(is_array($ar) && count($ar) && isset($ar["id"])){
 	Connect1c_Controller::exportProductionReport($dbLink, intval($ar["id"]), PROD_REPORT_USER);
+	Connect1c_Controller::exportProductionReportMat($dbLink, intval($ar["id"]), PROD_REPORT_MAT_USER);
 }
 
 ?>

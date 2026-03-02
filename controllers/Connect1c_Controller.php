@@ -124,6 +124,17 @@ class Connect1c_Controller extends ControllerSQL{
 		$this->addPublicMethod($pm);
 
 			
+		$pm = new PublicMethod('production_report_mat_export');
+		
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
 		$pm = new PublicMethod('export_shipments');
 		
 				
@@ -278,21 +289,34 @@ class Connect1c_Controller extends ControllerSQL{
 		*/
 		$data_for_1c['warehouses'] = [];
 		$whRef = NULL;
+		$wh = NULL;
 		foreach($data_for_1c['materials'] as $mat){
 			if(is_null($whRef) || $whRef != $mat["wareshouse_ref_1c"]){
 				// new warehouse
-				$data_for_1c['warehouses']["ref_1c"] = $mat["wareshouse_ref_1c"];
-				$data_for_1c['warehouses']["materials"] = [];
+				if(!is_null($wh)){
+					array_push($data_for_1c['warehouses'], $wh);
+				}
+				$whRef = $mat["wareshouse_ref_1c"];
+				$wh = [
+					'ref_1c' => $whRef,
+					'materials' => []
+				];
 			}
 			array_push(
-				$data_for_1c['warehouses']["materials"], 
+				$wh["materials"],
 				[ 
 					"ref_1c" => $mat["ref_1c"],
 					"quant" => $mat["quant"]
 				]
 			);
 		}
+		if(!is_null($wh)){
+			array_push($data_for_1c['warehouses'], $wh);
+		}
 		$data_for_1c['materials'] = NULL;
+/* file_put_contents(OUTPUT_PATH.'extch.txt', var_export(json_encode($data_for_1c), TRUE)); */
+/* file_put_contents(OUTPUT_PATH.'extch.txt', var_export($data_for_1c, TRUE)); */
+/* throw new Exception("stop"); */
 		$res = Exch1c::newProductionReportMat($data_for_1c);
 
 		$dbLink->query(

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-03-02 04:30:59</lastBuild></version>
+		<lastBuild>2026-03-02 06:49:47</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -305,6 +305,7 @@
 		<version dateOpen="2026-01-28 11:15:10" dateClose="2026-03-02 03:45:53">1.00397</version>
 		<version dateOpen="2026-03-02 04:36:51" dateClose="2026-03-02 04:37:16">1.00398</version>
 		<version dateOpen="2026-03-02 04:42:25" dateClose="2026-03-02 04:42:37">1.00399</version>
+		<version dateOpen="2026-03-02 04:49:45" dateClose="2026-03-02 06:50:09">1.00400</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -7642,6 +7643,9 @@
 			<publicMethod id="service_health"/>
 			<publicMethod id="service_status"/>
 			<publicMethod id="production_report_export">
+				<field id="id" dataType="Int"/>
+			</publicMethod>
+			<publicMethod id="production_report_mat_export">
 				<field id="id" dataType="Int"/>
 			</publicMethod>
 			<publicMethod id="export_shipments">

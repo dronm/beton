@@ -30,6 +30,7 @@ function Connect1c_Controller(options){
 	this.add_service_health();
 	this.add_service_status();
 	this.add_production_report_export();
+	this.add_production_report_mat_export();
 	this.add_export_shipments();
 		
 }
@@ -150,6 +151,20 @@ extend(Connect1c_Controller,ControllerObjServer);
 			Connect1c_Controller.prototype.add_production_report_export = function(){
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('production_report_export',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("id",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Connect1c_Controller.prototype.add_production_report_mat_export = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('production_report_mat_export',opts);
 	
 				
 	
