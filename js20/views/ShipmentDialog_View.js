@@ -228,7 +228,7 @@ function ShipmentDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("pump_for_client_cost")})
 		,new CommandBinding({"control":this.getElement("ship_cost")})
 		,new CommandBinding({"control":this.getElement("orders_ref"),"fieldId":"order_id"})
-		,new CommandBinding({"control":this.getElement("client_specification"),"fieldId":"client_specifications_ref"})
+		,new CommandBinding({"control":this.getElement("client_specification"),"fieldId":"client_specification_id"})
 	]);
 	
 	this.addDetailDataSet({

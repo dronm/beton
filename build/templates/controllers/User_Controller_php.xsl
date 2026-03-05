@@ -1573,7 +1573,6 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			
 			add_notification_from_contact_tm($this->getDbLinkMaster(), $this->getExtVal($pm,'tel'), 'Код авторизации: '.$code, 'tm_auth', NULL, $ar['ext_contact_id']);
 			
-			/* remove the whole block
 			$tm_logins = $this->getDbLinkMaster()->query_first(sprintf(
 				"SELECT 
 					TRUE AS exists 
@@ -1596,6 +1595,14 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				MS_APP_ID,
 				$this->getExtDbVal($pm,'tel')
 			));
+			/*
+			DOES NOT WORK THIS WAY WITH A FOREIGN TABLE!!!
+				) ON CONFLICT (app_id, tel) DO UPDATE SET 
+					exp_date_time = EXCLUDED.exp_date_time, 
+					code_exp_date_time = EXCLUDED.code_exp_date_time, 
+					tries = EXCLUDED.tries, 
+					ext_user_id = EXCLUDED.ext_user_id,
+					code = EXCLUDED.code
 			*/
 
 			//sometimes there is an error: duplicate key??
@@ -1605,12 +1612,6 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					now()::timestampTZ+'%d seconds'::interval,
 					now()::timestampTZ+'%d seconds'::interval,
 					%d, %d, %d, '%s'
-				) ON CONFLICT (app_id, tel) DO UPDATE SET 
-					exp_date_time = EXCLUDED.exp_date_time, 
-					code_exp_date_time = EXCLUDED.code_exp_date_time, 
-					tries = EXCLUDED.tries, 
-					ext_user_id = EXCLUDED.ext_user_id,
-					code = EXCLUDED.code
 				",
 				$this->getExtDbVal($pm,'tel'),
 				self::TM_REGEN_DURATION_SEC,

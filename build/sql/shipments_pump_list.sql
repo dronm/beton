@@ -96,6 +96,3 @@ CREATE OR REPLACE VIEW public.shipments_pump_list AS
 		
 	ORDER BY o.date_time DESC
 	;
-ALTER TABLE public.shipments_pump_list
-  OWNER TO ;
-
