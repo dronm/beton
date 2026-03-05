@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-03-05 06:49:26</lastBuild></version>
+		<lastBuild>2026-03-06 03:18:55</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -307,6 +307,7 @@
 		<version dateOpen="2026-03-02 04:42:25" dateClose="2026-03-02 04:42:37">1.00399</version>
 		<version dateOpen="2026-03-02 04:49:45" dateClose="2026-03-02 06:50:09">1.00400</version>
 		<version dateOpen="2026-03-05 06:48:36" dateClose="2026-03-05 06:49:29">1.00401</version>
+		<version dateOpen="2026-03-05 14:45:29" dateClose="2026-03-06 03:19:18">1.00402</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1371,7 +1372,7 @@
 		</model>
 		<model id="PumpPriceValue" parent="ModelSQLBeton" dataTable="pump_prices_values" virtual="FALSE">
 			<defaultOrder>
-				<field id="quant_from"/>
+				<field id="quant_to"/>
 			</defaultOrder>
 			<field id="id" autoInc="TRUE" primaryKey="TRUE" dataType="Int"/>
 			<field id="pump_price_id" autoInc="TRUE" dataType="Int" refTable="pump_prices" refField="id"/>
@@ -1380,6 +1381,10 @@
 			<field id="price_m" dataType="Float" length="15" precision="2"/>
 			<field id="price_fixed" dataType="Float" length="15" precision="2"/>
 			<field id="price_garanteed" dataType="Bool" defaultValue="FALSE" alias="Гарантированная сумма (если установлено, и объем превышает, то сначала эта сумма, а потом по шкале остаток кубов)"/>
+			<index id="pump_prices_values_lookup_idx">
+				<field id="pump_price_id"/>
+				<field id="quant_to"/>
+			</index>
 		</model>
 		<model id="PumpVehicle" parent="ModelSQLBeton" dataTable="pump_vehicles" virtual="FALSE">
 			<field id="id" autoInc="TRUE" primaryKey="TRUE" dataType="Int"/>
@@ -1896,6 +1901,7 @@
 			<field id="client_specification_id" dataType="Int" refTable="client_specifications" refField="id" alias="Спецификация"/>
 			<field id="upd_ref_1c" dataType="JSONB" alias="Ссылка на Документ 1с"/>
 			<field id="faktura_ref_1c" dataType="JSONB" alias="Ссылка на Документ 1с"/>
+			<field id="shift_start_ts" dataType="DateTime"/>
 			<index id="shipments_date_time_index">
 				<field id="date_time"/>
 			</index>
@@ -1905,11 +1911,17 @@
 			<index id="shipments_production_site_idx">
 				<field id="production_site_id"/>
 			</index>
+			<index id="shipments_shift_start_idx">
+				<field id="shift_start_ts"/>
+			</index>
 			<registerAtcs>
 				<register id="RAMaterial"/>
 			</registerAtcs>
 		</model>
 		<model id="ShipmentList" parent="ModelSQLBeton" dataTable="shipments_list" virtual="TRUE">
+			<defaultOrder>
+				<field id="ship_date_time" sortDirect="DESC"/>
+			</defaultOrder>
 			<aggFunctions>
 				<aggFunction alias="total_quant" expr="sum(quant)"/>
 				<aggFunction alias="total_cost" expr="sum(cost)"/>
@@ -2107,6 +2119,9 @@
 			<sql/>
 		</model>
 		<model id="ShipmentForClientVehOwnerList" parent="ModelSQLBeton" dataTable="shipments_for_client_veh_owner_list" virtual="TRUE">
+			<defaultOrder>
+				<field id="ship_date" sortDirect="DESC"/>
+			</defaultOrder>
 			<aggFunctions>
 				<aggFunction alias="total_quant" expr="sum(quant)"/>
 				<aggFunction alias="total_cost_shipment" expr="sum(cost_shipment)"/>
@@ -2330,6 +2345,9 @@
 			<field id="production_sites_ref" dataType="JSON" alias="Завод"/>
 		</model>
 		<model id="ShipmentDateList" parent="ModelSQLBeton" dataTable="shipment_dates_list" virtual="TRUE">
+			<defaultOrder>
+				<field id="ship_date" sortDirect="DESC"/>
+			</defaultOrder>
 			<aggFunctions>
 				<aggFunction alias="total_quant" expr="sum(quant)"/>
 				<aggFunction alias="total_ship_cost" expr="sum(ship_cost)"/>

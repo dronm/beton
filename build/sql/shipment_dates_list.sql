@@ -4,7 +4,7 @@
 
 CREATE OR REPLACE VIEW shipment_dates_list AS 
 	SELECT
-		sh.ship_date_time::date AS ship_date,
+		sh.shift_start_ts::date AS ship_date,
 		
 		sh.concrete_type_id,
 		sh.concrete_types_ref::text,
@@ -32,7 +32,7 @@ CREATE OR REPLACE VIEW shipment_dates_list AS
 	LEFT JOIN production_sites ps ON ps.id = sh.production_site_id
 	*/
 	GROUP BY
-		sh.ship_date_time::date,
+		sh.shift_start_ts::date,
 		sh.concrete_type_id,
 		sh.concrete_types_ref::text,
 		sh.destination_id,
@@ -41,9 +41,4 @@ CREATE OR REPLACE VIEW shipment_dates_list AS
 		sh.clients_ref::text,
 		sh.production_site_id,
 		sh.production_sites_ref::text
-		
-	ORDER BY sh.ship_date_time::date DESC;
-
-ALTER TABLE shipment_dates_list
-  OWNER TO beton;
-
+		;

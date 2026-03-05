@@ -10,6 +10,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
+require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
@@ -163,7 +164,12 @@ class ShipmentForClientVehOwnerList_Model extends ModelSQLBeton{
 		$f_cost_total=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"cost_total",$f_opts);
 		$this->addField($f_cost_total);
 		//********************
-	$this->setLimitConstant('doc_per_page_count');
+	
+		$order = new ModelOrderSQL();		
+		$this->setDefaultModelOrder($order);		
+		$direct = 'DESC';
+		$order->addField($f_ship_date,$direct);
+$this->setLimitConstant('doc_per_page_count');
 	$this->setAggFunctions(
 		array(array('alias'=>'total_quant','expr'=>'sum(quant)')
 ,array('alias'=>'total_cost_shipment','expr'=>'sum(cost_shipment)')

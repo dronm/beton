@@ -228,8 +228,10 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 
 		sh.upd_ref,
 		-- sh.faktura_ref
-		client_specifications_ref(spec) AS client_specifications_ref
+		client_specifications_ref(spec) AS client_specifications_ref,
 		
+		sh.shift_start_ts
+
 	FROM shipments sh
 	LEFT JOIN orders o ON o.id = sh.order_id
 	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
@@ -257,7 +259,7 @@ CREATE OR REPLACE VIEW public.shipments_list AS
 	) AS prod ON prod.shipment_id = sh.id
 	LEFT JOIN concrete_types AS prod_concr ON prod_concr.id = prod.concrete_type_id
 	*/
-	ORDER BY sh.date_time DESC
+	--ORDER BY sh.date_time DESC
 	--LIMIT 60
 	;
 

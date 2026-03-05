@@ -19,6 +19,3 @@ $BODY$
 $BODY$
   LANGUAGE sql STABLE
   COST 100;
-ALTER FUNCTION get_shift_start(timestamp without time zone)
-  OWNER TO beton;
-

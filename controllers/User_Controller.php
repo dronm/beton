@@ -2276,13 +2276,7 @@ class User_Controller extends ControllerSQL{
 					now()::timestampTZ+'%d seconds'::interval,
 					now()::timestampTZ+'%d seconds'::interval,
 					%d, %d, %d, '%s'
-				) ON CONFLICT (app_id, tel) DO UPDATE SET
-					exp_date_time = EXCLUDED.exp_date_time, 
-					code_exp_date_time = EXCLUDED.code_exp_date_time, 
-					tries = EXCLUDED.tries, 
-					ext_user_id = EXCLUDED.ext_user_id,
-					code = EXCLUDED.code
-				",
+				)",
 				$this->getExtDbVal($pm,'tel'),
 				self::TM_REGEN_DURATION_SEC,
 				self::TM_CODE_DURATION_SEC,

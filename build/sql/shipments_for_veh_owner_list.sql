@@ -98,7 +98,7 @@ CREATE OR REPLACE VIEW shipments_for_veh_owner_list AS
 	
 	LEFT JOIN clients AS cl ON cl.id = sh.client_id
 	
-	ORDER BY ship_date_time DESC
+	--ORDER BY ship_date_time DESC
 	;
 	
 

@@ -2594,7 +2594,7 @@ class Shipment_Controller extends ControllerSQL{
 
 		$faksim = ($pm->getParamValue("faksim") == "1");
 		$buhDoc = $this->getExtDbVal($pm, "buh_doc");
-		$rollupRuns = $this->getExtDbVal($pm, "rollup_runs");
+		$rollupRuns = $this->getExtVal($pm, "rollup_runs");
 		$consignee = $this->getExtDbVal($pm, "consignee");
 		if(isset($consignee) && $consignee != "null"){
 			//check 1c ref
@@ -2668,7 +2668,13 @@ class Shipment_Controller extends ControllerSQL{
 				}
 				ExcelTemplate_Controller::genFilledTemplate(
 					$link, $templateName, 
-					array( 'array['.implode(",",$ids).']', $buhDoc, $consignee ), 
+					function($forImage) use ($ids, $buhDoc, $consignee){
+						if(!$forImage){
+							return [ 'array['.implode(",",$ids).']', $buhDoc, $consignee ];
+						}else{
+							return [$ids[0]];
+						}
+					},
 					$erEmpty, $tFile, $fileName,
 					"SELECT * FROM transp_nakl_print_agg(%s, %s::jsonb, %d)"
 				);		
@@ -2682,7 +2688,7 @@ class Shipment_Controller extends ControllerSQL{
 					$link, $templateName, 
 					array( $shAr["id"], $ind, $buhDoc, $consignee ), 
 					$erEmpty, $tFile, $fileName,
-					"SELECT * FROM transp_nakl_print(%s, %s::jsonb, %d)"
+					"SELECT * FROM transp_nakl_print(%d, %d, %s::jsonb, %d)"
 				);		
 			}
 

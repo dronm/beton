@@ -264,7 +264,17 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		}
 
 		$outFl = OUTPUT_PATH.uniqid();
-		$ar_data = $dbLink->query_first(vsprintf($sql_query_text,$paramArray));
+
+		$paramArrayMainQueryVal = NULL;
+		$paramArrayImgQueryVal = NULL;
+		if(gettype($paramArray)==="object"){ //function($forImage)
+			$paramArrayMainQueryVal = $paramArray(false);
+			$paramArrayImgQueryVal = $paramArray(true);
+		}else{
+			$paramArrayMainQueryVal = $paramArray;
+			$paramArrayImgQueryVal = $paramArray;
+		}
+		$ar_data = $dbLink->query_first(vsprintf($sql_query_text,$paramArrayMainQueryVal));
 	
 		if(!is_array($ar_data) || !count($ar_data)){
 			throw new Exception($erEmpty);
@@ -312,7 +322,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 				
 				if(isset($fields->sql_query) &amp;&amp; isset($fields->name) ){
 					if(!array_key_exists($fields->sql_query, $query_results)){
-						$q = vsprintf($fields->sql_query,$paramArray);
+						$q = vsprintf($fields->sql_query, $paramArrayImgQueryVal);
 						$ar_att = $dbLink->query_first($q);
 						if(!is_array($ar_att) || !count($ar_att) || !isset($ar_att['attachment_id'])){
 							throw new Exception("Не найден файл вложения для '".

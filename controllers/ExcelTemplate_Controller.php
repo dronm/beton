@@ -32,7 +32,7 @@ require_once('common/downloader.php');
 
 require_once(USER_CONTROLLERS_PATH.'Attachment_Controller.php');
 
-set_time_limit(120);
+set_time_limit(300);
 ini_set('memory_limit', '-1');
 
 class ExcelTemplate_Controller extends ControllerSQL{
@@ -484,13 +484,22 @@ class ExcelTemplate_Controller extends ControllerSQL{
 		if(!isset($sql_query_text)){
 			throw new Exception('Запрос не определен!');
 		}
-
 		if(!isset($ar['cell_matching'])){
 			throw new Exception('Соответствия полей не определены!');
 		}
 
 		$outFl = OUTPUT_PATH.uniqid();
-		$ar_data = $dbLink->query_first(vsprintf($sql_query_text,$paramArray));
+
+		$paramArrayMainQueryVal = NULL;
+		$paramArrayImgQueryVal = NULL;
+		if(gettype($paramArray)==="object"){ //function($forImage)
+			$paramArrayMainQueryVal = $paramArray(false);
+			$paramArrayImgQueryVal = $paramArray(true);
+		}else{
+			$paramArrayMainQueryVal = $paramArray;
+			$paramArrayImgQueryVal = $paramArray;
+		}
+		$ar_data = $dbLink->query_first(vsprintf($sql_query_text,$paramArrayMainQueryVal));
 	
 		if(!is_array($ar_data) || !count($ar_data)){
 			throw new Exception($erEmpty);
@@ -538,7 +547,7 @@ class ExcelTemplate_Controller extends ControllerSQL{
 				
 				if(isset($fields->sql_query) && isset($fields->name) ){
 					if(!array_key_exists($fields->sql_query, $query_results)){
-						$q = vsprintf($fields->sql_query,$paramArray);
+						$q = vsprintf($fields->sql_query, $paramArrayImgQueryVal);
 						$ar_att = $dbLink->query_first($q);
 						if(!is_array($ar_att) || !count($ar_att) || !isset($ar_att['attachment_id'])){
 							throw new Exception("Не найден файл вложения для '".
@@ -557,11 +566,10 @@ class ExcelTemplate_Controller extends ControllerSQL{
 						'offset_x' => isset($fields->offset_x)? $fields->offset_x : 0,
 						'fileName' => $query_results[$fields->sql_query]
 					));
-
 				}
 			}
 		}
-		/* file_put_contents(OUTPUT_PATH.'att.txt',var_export($attachments, true)); */
+		
 
 		$reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($reader_tp);
 		$spreadsheet = $reader->load($tmpl_fl);
@@ -602,46 +610,7 @@ class ExcelTemplate_Controller extends ControllerSQL{
 		$flName = $ar["file_name"]; 
 	}
 
-	//$image["coord", "w", "h", "fileName"]
-	private static function replaceImageByName($sheet, $image) {
-		$drawings = $sheet->getDrawingCollection();
-		
-		$found = false;
-		$cnt = 0;
-		foreach ($drawings as $key => $drawing) {
-			// Check if it's a regular Drawing and name matches
-			/* $img = [ */
-			/* 	'coord' => $drawing->getCoordinates(), */
-			/* 	'name' => $drawing->getName(), */
-			/* 	'w' => $drawing->getWidth(), */
-			/* 	'h' => $drawing->getHeight() */
-			/* ]; */
-		/* file_put_contents(OUTPUT_PATH.'images.txt',var_export($drawing->getCoordinates().PHP_EOL,true),FILE_APPEND); */
-		/* file_put_contents(OUTPUT_PATH.'images.txt',var_export($img,true).PHP_EOL); */
-			if (
-					$drawing->getCoordinates() == $imageNameToReplace
-			) {
-				// Create a new Drawing
-				$newDrawing = new Drawing();
-				$newDrawing->setName($drawing->getName());
-				$newDrawing->setDescription($drawing->getDescription());
-				$newDrawing->setPath($newImagePath);
-				$newDrawing->setHeight($drawing->getHeight());
-				$newDrawing->setWidth($drawing->getWidth());
-				$newDrawing->setCoordinates($drawing->getCoordinates());
-				$newDrawing->setWorksheet($sheet);
-
-				// Remove the old drawing by unsetting
-				$found = true;
-				unset($drawings[$key]);
-				break; // assuming names are unique
-			}
-			$cnt++;
-		}
-		if(!$found){
-			throw new Exception("image not found by getCoordinates() ".$imageNameToReplace." count:".$cnt);
-		}
-	}
+	
 
 	//downloads template as docx, xlsx.
 	public static function downloadFilledTemplate($dbLink, $templateName, $paramArray, $erEmpty, $fileName){
@@ -724,4 +693,4 @@ class ExcelTemplate_Controller extends ControllerSQL{
 
 
 }
-
+?>

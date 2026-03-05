@@ -1612,7 +1612,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					now()::timestampTZ+'%d seconds'::interval,
 					now()::timestampTZ+'%d seconds'::interval,
 					%d, %d, %d, '%s'
-				",
+				)",
 				$this->getExtDbVal($pm,'tel'),
 				self::TM_REGEN_DURATION_SEC,
 				self::TM_CODE_DURATION_SEC,

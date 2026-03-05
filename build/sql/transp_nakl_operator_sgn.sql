@@ -2,7 +2,7 @@
 
 -- DROP FUNCTION transp_nakl_operator_sgn(shipment_id int);
 
-CREATE OR REPLACE FUNCTION transp_nakl_operator_sgn(int)
+CREATE OR REPLACE FUNCTION transp_nakl_operator_sgn(in_shipment_id int)
   RETURNS int AS
 $$
 	SELECT
@@ -12,7 +12,7 @@ $$
 	LEFT JOIN entity_contacts ect ON ect.entity_type = 'users' AND ect.entity_id = (users_ref->'keys'->>'id')::int
 	LEFT JOIN contacts ct ON ct.id = ect.contact_id
 	LEFT JOIN attachments att ON (att.ref->'keys'->>'id')::int = ct.id AND att.ref->>'dataType' = 'contacts'
-	WHERE sh.id = $1;
+	WHERE sh.id = in_shipment_id;
 $$
   LANGUAGE sql COST 100;
 
