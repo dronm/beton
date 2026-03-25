@@ -283,6 +283,24 @@ function VehicleDialog_Model(options){
 	options.fields.ownership_type = new FieldEnum("ownership_type",filed_options);
 	filed_options.enumValues = 'preperty,leasing,rent';
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.reg_doc = new FieldText("reg_doc",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.fuel_consumption_schema_ref = new FieldJSON("fuel_consumption_schema_ref",filed_options);
+	
 			
 		VehicleDialog_Model.superclass.constructor.call(this,id,options);
 }

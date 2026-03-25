@@ -156,6 +156,11 @@ class Vehicle_Controller extends ControllerSQL{
 		$pm->addParam($param);
 		
 			$f_params = array();
+			$param = new FieldExtText('reg_doc'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
 			
 				$f_params['alias']='Leasor name';
 			$param = new FieldExtText('leasor'
@@ -202,6 +207,11 @@ class Vehicle_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Номер топливной карты';
 			$param = new FieldExtText('fuel_card_id'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtInt('fuel_consumption_schema_id'
 				,$f_params);
 		$pm->addParam($param);
 		
@@ -346,6 +356,11 @@ class Vehicle_Controller extends ControllerSQL{
 			$pm->addParam($param);
 		
 			$f_params=array();
+			$param = new FieldExtText('reg_doc'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
 			
 				$f_params['alias']='Leasor name';
 			$param = new FieldExtText('leasor'
@@ -392,6 +407,11 @@ class Vehicle_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Номер топливной карты';
 			$param = new FieldExtText('fuel_card_id'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtInt('fuel_consumption_schema_id'
 				,$f_params);
 			$pm->addParam($param);
 		

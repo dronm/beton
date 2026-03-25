@@ -98,7 +98,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$lang_id, $pumpVehicleId, $order_update,
 		$ordersRef, $extContactId){
 		//SMS service		
-		if (SMS_ACTIVE &amp;&amp; strlen($phone_cel)){
+		if (SMS_ACTIVE &amp;&amp; !is_null($phone_cel) &amp;&amp; strlen($phone_cel)){
 			$dbLink = $this->getDbLink();
 			$dbLinkMaster = $this->getDbLinkMaster();
 			
@@ -615,7 +615,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		}
 		EventSrv::publishAsync('OrderGarbage.insert',$event_par);
 
-		Graph_Controller::clearCacheOnOrderId($this->getDbLink(),$order_id);
+		Graph_Controller::clearCacheOnDate($this->getDbLink(), strtotime($ar_doc["date_time"]));
 	}
 	
 	public function get_make_orders_list($pm){

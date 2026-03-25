@@ -191,6 +191,15 @@ function Vehicle_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.reg_doc = new FieldText("reg_doc",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Leasor name';
 	filed_options.autoInc = false;	
 	
@@ -259,6 +268,15 @@ function Vehicle_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.fuel_card_id = new FieldText("fuel_card_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.fuel_consumption_schema_id = new FieldInt("fuel_consumption_schema_id",filed_options);
 	
 				
 	

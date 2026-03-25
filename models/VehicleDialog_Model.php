@@ -294,6 +294,22 @@ class VehicleDialog_Model extends ModelSQLBeton{
 		$f_ownership_type=new FieldSQLEnum($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ownership_type",$f_opts);
 		$this->addField($f_ownership_type);
 		//********************
+		
+		//*** Field reg_doc ***
+		$f_opts = array();
+		$f_opts['id']="reg_doc";
+						
+		$f_reg_doc=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"reg_doc",$f_opts);
+		$this->addField($f_reg_doc);
+		//********************
+		
+		//*** Field fuel_consumption_schema_ref ***
+		$f_opts = array();
+		$f_opts['id']="fuel_consumption_schema_ref";
+						
+		$f_fuel_consumption_schema_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"fuel_consumption_schema_ref",$f_opts);
+		$this->addField($f_fuel_consumption_schema_ref);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

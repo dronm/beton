@@ -720,9 +720,18 @@ OrderDialog_View.prototype.onGetData = function(resp,cmd){
 	//last modif
 	var last_modif_users_ref = m.getFieldValue("last_modif_users_ref");	
 	if(last_modif_users_ref&&!last_modif_users_ref.isNull()){
-		document.getElementById(id+":cmd-cont").style = "float:left;";
-		DOMHelper.setText(document.getElementById(id+":last_modif_user"), last_modif_users_ref.getDescr());
-		DOMHelper.setText(document.getElementById(id+":last_modif_date_time"), DateHelper.format(m.getFieldValue("last_modif_date_time"),"d/m/y H:i"));
+		const n = document.getElementById(id+":cmd-cont");
+		if(n){
+			n.style = "float:left;";
+		}
+		n_user = document.getElementById(id+":last_modif_user");
+		if(n_user){
+			DOMHelper.setText(n_user, last_modif_users_ref.getDescr());
+		}
+		n_time = document.getElementById(id+":last_modif_date_time");
+		if(n_time){
+			DOMHelper.setText(n_time, DateHelper.format(m.getFieldValue("last_modif_date_time"),"d/m/y H:i"));
+		}
 	}
 
 	//debts

@@ -300,6 +300,7 @@ class Graph_Controller extends Controller{
 		self::clearCache($shift_from,$shift_to);	
 		self::sendEvent($shift_from);
 	}	
+
 	public static function clearCacheOnOrderId($dbLink,$orderId){
 		$ar = $dbLink->query_first(
 			sprintf("SELECT d1,d2

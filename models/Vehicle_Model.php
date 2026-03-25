@@ -199,6 +199,14 @@ class Vehicle_Model extends ModelSQLBeton{
 		$this->addField($f_vin);
 		//********************
 		
+		//*** Field reg_doc ***
+		$f_opts = array();
+		$f_opts['id']="reg_doc";
+						
+		$f_reg_doc=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"reg_doc",$f_opts);
+		$this->addField($f_reg_doc);
+		//********************
+		
 		//*** Field leasor ***
 		$f_opts = array();
 		
@@ -272,6 +280,14 @@ class Vehicle_Model extends ModelSQLBeton{
 						
 		$f_fuel_card_id=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"fuel_card_id",$f_opts);
 		$this->addField($f_fuel_card_id);
+		//********************
+		
+		//*** Field fuel_consumption_schema_id ***
+		$f_opts = array();
+		$f_opts['id']="fuel_consumption_schema_id";
+						
+		$f_fuel_consumption_schema_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"fuel_consumption_schema_id",$f_opts);
+		$this->addField($f_fuel_consumption_schema_id);
 		//********************
 		
 		//*** Field ownership_type ***

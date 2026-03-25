@@ -157,6 +157,12 @@ extend(Vehicle_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
+	
+	var field = new FieldText("reg_doc",options);
+	
+	pm.addField(field);
+	
+	var options = {};
 	options.alias = "Leasor name";
 	var field = new FieldText("leasor",options);
 	
@@ -201,6 +207,12 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Номер топливной карты";
 	var field = new FieldText("fuel_card_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("fuel_consumption_schema_id",options);
 	
 	pm.addField(field);
 	
@@ -326,6 +338,12 @@ extend(Vehicle_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
+	
+	var field = new FieldText("reg_doc",options);
+	
+	pm.addField(field);
+	
+	var options = {};
 	options.alias = "Leasor name";
 	var field = new FieldText("leasor",options);
 	
@@ -370,6 +388,12 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Номер топливной карты";
 	var field = new FieldText("fuel_card_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldInt("fuel_consumption_schema_id",options);
 	
 	pm.addField(field);
 	
@@ -494,6 +518,12 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Тип владения";
 	pm.addField(new FieldEnum("ownership_type",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldText("reg_doc",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("fuel_consumption_schema_ref",f_opts));
 }
 
 			Vehicle_Controller.prototype.addGetObject = function(){

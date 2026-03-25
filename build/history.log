@@ -1706,7 +1706,17 @@ shipments_for_veh_owner_list removed ORDER BY
 shipments_for_client_veh_owner_list ORDER BY
 
 
+1.00403
+1) OrderDialog_View.js node values with guard.
+2) Order_Controller->delete clearCacheOnDate()
+clearCacheOnOrderId does not work
+3) VehicleDialog_View error on updating
 
+Look this query:
+select * from ra_material_facts where material_id = 4 order by date_time desc limit 10
+
+
+1.00404
 
 - all messages are coming to all clients.
 

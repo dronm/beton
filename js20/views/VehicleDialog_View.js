@@ -1,4 +1,4 @@
-/* Copyright (c) 2019
+/* Copyright (c) 2019-2026
  *	Andrey Mikhalevich, Katren ltd.
  */
 function VehicleDialog_View(id,options){	

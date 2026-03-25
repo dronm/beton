@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-03-06 03:18:55</lastBuild></version>
+		<lastBuild>2026-03-25 13:43:05</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -308,6 +308,7 @@
 		<version dateOpen="2026-03-02 04:49:45" dateClose="2026-03-02 06:50:09">1.00400</version>
 		<version dateOpen="2026-03-05 06:48:36" dateClose="2026-03-05 06:49:29">1.00401</version>
 		<version dateOpen="2026-03-05 14:45:29" dateClose="2026-03-06 03:19:18">1.00402</version>
+		<version dateOpen="2026-03-25 13:36:32" dateClose="2026-03-25 13:43:27">1.00403</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1098,6 +1099,7 @@
 			<field id="ord_num" dataType="Int"/>
 			<field id="weight_t" dataType="Int" alias="Масса, тонн"/>
 			<field id="vin" dataType="String" length="17" alias="VIN"/>
+			<field id="reg_doc" dataType="Text"/>
 			<field id="leasor" dataType="Text" alias="Leasor name"/>
 			<field id="leasing_contract_date" dataType="Date"/>
 			<field id="leasing_contract_num" dataType="Text"/>
@@ -1106,6 +1108,7 @@
 			<field id="insurance_kasko" dataType="JSONB" alias="Insurance kasko data"/>
 			<field id="official_vehicle_owner_id" dataType="Int" refTable="vehicle_owners" refField="id" alias="УДАЛИТЬ Владелец"/>
 			<field id="fuel_card_id" dataType="Text" alias="Номер топливной карты"/>
+			<field id="fuel_consumption_schema_id" dataType="Int" refTable="fuel_consumption_schema" refField="id"/>
 			<field id="ownership_type" dataType="Enum" enumId="ownership_types" alias="Тип владения"/>
 			<index id="vehicles_plate_idx" unique="TRUE">
 				<expression>lower(plate)</expression>
@@ -1150,6 +1153,8 @@
 			<field id="official_vehicle_owners_ref" dataType="JSON"/>
 			<field id="fuel_card_id" dataType="Text" alias="Номер топливной карты"/>
 			<field id="ownership_type" dataType="Enum" enumId="ownership_types" alias="Тип владения"/>
+			<field id="reg_doc" dataType="Text"/>
+			<field id="fuel_consumption_schema_ref" dataType="JSON"/>
 			<globalFilter id="vehicle_owner_list" fieldId="vehicle_owners_ar"/>
 		</model>
 		<model id="VehicleMileage" parent="ModelSQLBeton" dataTable="vehicle_mileages" virtual="FALSE">
