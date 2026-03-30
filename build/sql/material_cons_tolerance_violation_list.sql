@@ -24,5 +24,3 @@ CREATE OR REPLACE VIEW material_cons_tolerance_violation_list AS
 	ORDER BY get_shift_start(t.date_time::timestamp without time zone) DESC,mat.ord
 	
 	;
-	
-ALTER VIEW material_cons_tolerance_violation_list OWNER TO ;

@@ -1344,7 +1344,6 @@ class User_Controller extends ControllerSQL{
 			$pubKey = trim($log_ar['pub_key']);
 		}
 
-		//add lsn position to header
 		LSNPosition::add($sess_db_link);
 	}
 	
@@ -2244,7 +2243,9 @@ class User_Controller extends ControllerSQL{
 		if(!is_array($ar) || !count($ar)){
 			throw new Exception(self::ER_USER_NOT_DEFIND);
 		}
+
 		$link = $this->getDbLinkMaster();
+		
 		$link->query('BEGIN');
 		try{
 			$code = gen_pwd(3, "NUM");
@@ -2301,12 +2302,14 @@ class User_Controller extends ControllerSQL{
 			));
 			
 			$link->query('COMMIT');
-			
+
 			LSNPosition::add($link);
+
 		}catch(Exception $e){
 			$link->query('ROLLBACK');
 			throw $e;
 		}
+	
 	}
 	
 	/**
@@ -2341,10 +2344,12 @@ class User_Controller extends ControllerSQL{
 		
 		$code_exists = FALSE;
 		$left_time = 0;
-		
+
+		$link = $this->getDbLinkMaster();
+
 		if(is_array($ar_log) && count($ar_log) && $ar_log['code_expired']=='t'){
 			//есть, но умер
-			$this->getDbLinkMaster()->query(sprintf(
+			$link->query(sprintf(
 				"DELETE FROM notifications.tm_logins WHERE tel = %s AND app_id=%d",
 				$this->getExtDbVal($pm,'tel'),
 				MS_APP_ID
@@ -2356,7 +2361,7 @@ class User_Controller extends ControllerSQL{
 			$left_time = intval($ar_log['left_time']);
 		}
 
-		$ar = $this->getDbLinkMaster()->query_first(sprintf(
+		$ar = $link->query_first(sprintf(
 			"SELECT
 				u.tm_first_name AS first_name,
 				encode(u_o.tm_photo,'base64') AS tm_photo
@@ -2506,7 +2511,6 @@ class User_Controller extends ControllerSQL{
 			$this->add_auth_model($pubKey, session_id(), md5($ar['pwd']), $this->calc_session_expiration_time());
 
 			//add lsn model
-			/*
 			$ar = $this->getDbLinkMaster()->query_first(sprintf("SELECT pg_current_wal_lsn() AS lsn"));
 			if(is_array($ar) && count($ar) && isset($ar["lsn"])) {
 				$this->addModel(new ModelVars(
@@ -2516,7 +2520,6 @@ class User_Controller extends ControllerSQL{
 					)
 				));		
 			}
-			*/
 		}
 	}
 	

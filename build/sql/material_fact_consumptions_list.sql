@@ -78,5 +78,3 @@ CREATE OR REPLACE VIEW material_fact_consumptions_list AS
 		 AND t_cor.cement_silo_id=t.cement_silo_id
 	ORDER BY pr.name,t.date_time DESC,mat.name
 	;
-	
-ALTER VIEW material_fact_consumptions_list OWNER TO ;

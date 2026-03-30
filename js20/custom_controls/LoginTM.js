@@ -307,7 +307,7 @@ LoginTM.prototype.toDOM = function(p) {
 					var set_code_left_time = function(mdl) {
 						var c_lt = parseInt(mdl.getFieldValue("code_left_time"), 10);
 						if (c_lt) {
-							document.cookie = "tm_code_time_left=" + c_lt + "; Path=/; max-age=" + c_lt + ";";
+							document.cookie = "tm_code_time_left=" + c_lt + "; Path=/; max-age=" + c_lt + "; secure;";
 						}
 						return c_lt;
 					};
@@ -315,7 +315,7 @@ LoginTM.prototype.toDOM = function(p) {
 					var lt = parseInt(m.getFieldValue("left_time"), 10);
 					if (lt) {
 						lt += 2;
-						document.cookie = "tm_time_left=" + lt + "; Path=/; max-age=" + lt + ";";
+						document.cookie = "tm_time_left=" + lt + "; Path=/; max-age=" + lt + "; secure;";
 						set_code_left_time(m);
 						self.checkCodeContCont();
 					} else if (set_code_left_time(m)) {
@@ -521,7 +521,7 @@ LoginTM.prototype.setTel = function(t, callback) {
 					var lt = parseInt(m.getFieldValue("left_time"), 10);
 					if (lt) {
 						lt += 2;
-						document.cookie = "tm_time_left=" + lt + "; Path=/; max-age=" + lt + ";";
+						document.cookie = "tm_time_left=" + lt + "; Path=/; max-age=" + lt + "; secure;";
 					}
 					self.checkCodeContCont();
 				}

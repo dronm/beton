@@ -54,5 +54,3 @@ CREATE OR REPLACE VIEW material_fact_consumptions_rolled_list AS
 	ORDER BY date_time DESC
 
 	;
-	
-ALTER VIEW material_fact_consumptions_rolled_list OWNER TO ;

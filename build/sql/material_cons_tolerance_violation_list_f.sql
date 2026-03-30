@@ -54,5 +54,4 @@ $$
 $$
   LANGUAGE sql VOLATILE
   COST 100;
-ALTER FUNCTION material_cons_tolerance_violation_list(in_date_time_from timestamp,in_date_time_to timestamp) OWNER TO ;
 

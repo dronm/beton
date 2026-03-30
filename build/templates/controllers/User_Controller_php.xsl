@@ -1838,7 +1838,6 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$this->add_auth_model($pubKey, session_id(), md5($ar['pwd']), $this->calc_session_expiration_time());
 
 			//add lsn model
-			/*
 			$ar = $this->getDbLinkMaster()->query_first(sprintf("SELECT pg_current_wal_lsn() AS lsn"));
 			if(is_array($ar) &amp;&amp; count($ar) &amp;&amp; isset($ar["lsn"])) {
 				$this->addModel(new ModelVars(
@@ -1848,7 +1847,6 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					)
 				));		
 			}
-			*/
 		}
 	}
 	

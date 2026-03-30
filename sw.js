@@ -245,6 +245,7 @@ function isStaticAssetRequest(request, url) {
 }
 
 function isRootRequest(request) {
+	//return request.mode === 'navigate';
 	return (
 		request.url.indexOf('c=') === -1 &&
 		request.url === SW_SCOPE

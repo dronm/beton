@@ -1,6 +1,6 @@
 -- View: public.lab_entry_list
 
- DROP VIEW public.lab_entry_list;
+ DROP VIEW IF EXISTS public.lab_entry_list;
 
 CREATE OR REPLACE VIEW public.lab_entry_list AS 
 	SELECT
@@ -89,7 +89,3 @@ CREATE OR REPLACE VIEW public.lab_entry_list AS
 	LEFT JOIN production_sites pr_site ON pr_site.id = sh.production_site_id
 	LEFT JOIN raw_material_cons_rate_dates AS rt_d ON rt_d.id = lab.rate_date_id
 	ORDER BY sh.date_time DESC, sh.id;
-
-ALTER TABLE public.lab_entry_list OWNER TO ;
-
-
