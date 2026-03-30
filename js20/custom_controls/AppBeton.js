@@ -1284,9 +1284,9 @@ AppBeton.prototype.MSG_DURATION = 10 * 1000;
 AppBeton.prototype.initWorkers = function() {
 	console.log('AppBeton.initWorkers');
 
-	// if ('serviceWorker' in navigator) {
-	// 	this.initServiceWorker();
-	// }
+	if ('serviceWorker' in navigator) {
+		this.initServiceWorker();
+	}
 
 	this.bindNetworkStatusEvents();
 };
