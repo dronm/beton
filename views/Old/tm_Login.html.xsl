@@ -8,43 +8,187 @@
 <html>
 	<head>
 		<xsl:call-template name="initHead"/>		
-		<!--
-				var view = new Login_View("Login");
-				view.toDOM();
-		
-		-->
+
+		<style>
+			html,
+			body.login-container {
+				min-height: 100vh;
+			}
+
+			body.login-container {
+				margin: 0;
+				background:
+					linear-gradient(135deg, #f4f7fb 0%, #eef3ff 45%, #f9fbff 100%);
+			}
+
+			.page-container,
+			.page-content,
+			.content-wrapper,
+			.content {
+				min-height: 100vh;
+			}
+
+			.content {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 24px 16px;
+			}
+
+			#Login {
+				width: 100%;
+				max-width: 430px;
+			}
+
+			.login-form {
+				padding: 32px 28px 24px;
+				border: 1px solid #e7ecf3;
+				border-radius: 20px;
+				background: #ffffff;
+				box-shadow:
+					0 20px 60px rgba(30, 42, 64, 0.10),
+					0 4px 18px rgba(30, 42, 64, 0.06);
+			}
+
+			.logotype {
+				display: block;
+				margin: 0 auto 12px;
+				max-width: 180px;
+				height: auto;
+			}
+
+			.content-group {
+				margin-bottom: 18px;
+			}
+
+			#Login\:error {
+				margin-top: 12px;
+				padding: 10px 12px;
+				border-radius: 10px;
+				background: #fff2f2;
+				color: #b42318;
+				font-size: 13px;
+				line-height: 1.4;
+			}
+
+			.tmData {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				min-height: 44px;
+				margin-bottom: 20px;
+				padding: 10px 12px;
+				border: 1px solid #edf1f6;
+				border-radius: 12px;
+				background: #f8fafc;
+			}
+
+			.userPhoto {
+				width: 44px;
+				height: 44px;
+				border-radius: 50%;
+				object-fit: cover;
+				border: 2px solid #ffffff;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+			}
+
+			.tmCodeLabel {
+				display: block;
+				margin-bottom: 10px;
+				font-size: 13px;
+				font-weight: 600;
+				color: #344054;
+			}
+
+			.tmCodeRow {
+				display: flex;
+				justify-content: center;
+				gap: 10px;
+			}
+
+			.tmCode {
+				width: 56px !important;
+				height: 56px !important;
+				padding: 0 !important;
+				border: 1px solid #d8e1ec;
+				border-radius: 12px;
+				text-align: center;
+				font-size: 22px !important;
+				font-weight: 700;
+				line-height: 56px !important;
+				box-shadow: none;
+			}
+
+			.tmCode:focus {
+				border-color: #7c9cff;
+				box-shadow: 0 0 0 4px rgba(124, 156, 255, 0.16);
+			}
+
+			.tmCode[disabled] {
+				background: #f2f4f7;
+				cursor: not-allowed;
+			}
+
+			.tmSubmitGroup {
+				margin-top: 8px;
+			}
+
+			#Login\:check_code {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				min-height: 44px;
+				padding: 10px 16px;
+				border-radius: 12px;
+				font-weight: 600;
+				line-height: 1.25;
+				text-align: center;
+				white-space: normal;
+				box-shadow: 0 8px 20px rgba(80, 112, 255, 0.18);
+				transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+			}
+
+			#Login\:check_code:hover {
+				transform: translateY(-1px);
+				box-shadow: 0 10px 24px rgba(80, 112, 255, 0.22);
+			}
+
+			#Login\:check_code.tm-btn-disabled {
+				opacity: 0.55;
+				pointer-events: none;
+				box-shadow: none;
+				transform: none;
+			}
+
+			.tmTimer {
+				margin-top: 8px;
+				min-height: 18px;
+				text-align: center;
+				font-size: 13px;
+				line-height: 1.35;
+				color: #667085;
+			}
+
+			.footer {
+				margin-top: 18px;
+				font-size: 12px;
+			}
+		</style>
+
 		<script>		
 			function pageLoad(){
 			
 				<xsl:call-template name="initApp"/>
-								
-				var n = document.getElementById("Login:submit_login_tm");
-				if(n){
-					EventHelper.add(n, "click", function(){
-						//mode: tel or code
-						var tm_tel = CommonHelper.getCookie("tm_tel");
-						if(tm_tel &amp;&amp; tm_tel.length==10){
-							UserTel.setTel(tm_tel);
-						}else{
-							UserTel.show();
-						}
-					});
 					
-					var tm_first_name = CommonHelper.getCookie("tm_first_name");
-					if(tm_first_name){
-						DOMHelper.setText(n, " Сообщение в Telegram для "+tm_first_name)
-					}else{
-						DOMHelper.setText(n, " Войти через Telegram")
-					}
-				}			
-				
+				var view = new LoginTM("Login");
+				view.toDOM(document.body);
 			}
 		</script>		
 		
 	</head>
 	<body onload="pageLoad();" class="login-container">
 
-	<xsl:call-template name="page_header"/>
+	<!--<xsl:call-template name="page_header"/>-->
 
 	<!-- Page container -->
 	<div class="page-container">
@@ -59,92 +203,74 @@
 				<div class="content">
 
 					<!-- Advanced login -->
-					<form id="Login">
+					<form id="Login" autocomplete="off">
 						<div class="panel panel-body login-form">
-							<!--<div class="form-group has-feedback has-feedback-left">
-								<input id="Login:user" type="text" class="form-control" placeholder="Логин"/>
-								<div class="form-control-feedback">
-									<i class="icon-user text-muted"></i>
-								</div>
-								<div id="Login:user:error"/>
+							<div class="text-center">
+								<img class="logotype" src="img/logo.png">
+								</img>
+								<h5 class="content-group">
+									<small class="display-block">Авторизация
+									</small>									
+								</h5>
+								<div id="Login:error">
+								</div>								
 							</div>
-
+							
 							<div class="form-group has-feedback has-feedback-left">
-								<input id="Login:pwd" type="password" class="form-control" placeholder="Пароль"/>
+								<div id="Login:tel" />
 								<div class="form-control-feedback">
-									<i class="icon-lock2 text-muted"></i>
+									<i class="icon-mobile3 text-muted"/>
 								</div>
-								<div id="Login:pwd:error"/>
-							</div>
-							-->
-							<div>
-								<div id="Login:error"></div>
 							</div>
 
-							<!--<div class="form-group">
-								<div id="Login:submit_login" class="btn bg-{$COLOR_PALETTE} btn-block">Войти <i class="icon-arrow-right14 position-right"></i></div>
-							</div>
-							-->
-							<!--
-							<div class="form-group login-options">
-								<div class="row">
-									
-									<div class="col-sm-6">
-										<label class="checkbox-inline">
-										<input id="Login:rememberMe" type="checkbox" class="styled" checked="checked"/>
-										Запомнить</label>
-									</div>
-									
-									<div class="col-sm-6 text-right">
-										<a href="index.php?v=PasswordRecovery">Забыли пароль?</a>
-									</div>
+							<div class="form-group tmData">
+								<img id="Login:userPhoto" class="userPhoto hidden">
+								</img>
+								<div id="Login:userData">
 								</div>
 							</div>
-							-->
-							<div class="form-group">
-								<div id="Login:submit_login_tm" class="btn bg-{$COLOR_PALETTE} btn-block" title="Войти через Telegram">
-									<i class="glyphicon glyphicon-send"></i>
-								</div>
-							</div>
-							
-							<!--
-							<script src="https://telegram.org/js/telegram-widget.js?18" data-telegram-login="eurobeton_crm_bot"
-								data-size="large" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
-							<script type="text/javascript">
-								function onTelegramAuth(authData) {
-									var pm = (new User_Controller()).getPublicMethod("login_tm");
-									pm.setFieldValue("width_type", window.getWidthType());
-									pm.setFieldValue("auth_data", CommonHelper.serialize(authData));
-									pm.run({
-										"ok":function(){
-											document.location.href = window.location.href;
-										}
-										,"fail":function(resp,errCode,errStr){
-											var n =document.getElementById("Login:error");
-											if(!n)return;
-											n.value = errStr;
-											DOMHelper.delClass(n, DOMHelper.INVIS_CLASS);
-										}
 										
-									});
-								}
-							</script>
-							-->						
-							<!-- IE8 condition -->
-							<xsl:comment><![CDATA[[if IE 8]>
-							<div class="alert alert-danger alert-styled-left alert-bordered">К сожалению, работа в личном кабинете с данным браузером невозможна!
+							<div id="Login:codeInput" class="form-group hidden">
+								<div class="text-center">
+									<small class="display-block tmCodeLabel">Введите код</small>
+									<div class="form-group tmCodeRow">
+										<input
+											id="tm_сode1"
+											code_ind="1"
+											type="text"
+											inputmode="numeric"
+											autocomplete="one-time-code"
+											maxlength="1"
+											class="form-control tmCode" />
+										<input
+											id="tm_сode2"
+											code_ind="2"
+											type="text"
+											inputmode="numeric"
+											autocomplete="one-time-code"
+											maxlength="1"
+											class="form-control tmCode" />
+										<input
+											id="tm_сode3"
+											code_ind="3"
+											type="text"
+											inputmode="numeric"
+											autocomplete="one-time-code"
+											maxlength="1"
+											class="form-control tmCode" />
+									</div>
+								</div>
+							</div>	
+
+							<div class="form-group tmSubmitGroup">
+								<div
+									id="Login:check_code"
+									class="btn bg-{$COLOR_PALETTE} btn-block"
+									title="Отправить сообщение в Телеграм">Отправить код
+								</div>
+								<div id="Login:timer" class="tmTimer hidden"></div>
 							</div>
-							<![endif]]]></xsl:comment>
-							
-							<!--
-							<div class="content-divider text-muted form-group"><span>или авторизуйтесь через</span></div>
-							<ul class="list-inline form-group list-inline-condensed text-center">
-								<li><a href="#" class="btn border-indigo text-indigo btn-flat btn-icon btn-rounded"><i class="icon-facebook"></i></a></li>
-								<li><a href="#" class="btn border-pink-300 text-pink-300 btn-flat btn-icon btn-rounded"><i class="icon-dribbble3"></i></a></li>
-								<li><a href="#" class="btn border-slate-600 text-slate-600 btn-flat btn-icon btn-rounded"><i class="icon-github"></i></a></li>
-								<li><a href="#" class="btn border-info text-info btn-flat btn-icon btn-rounded"><i class="icon-twitter"></i></a></li>
-							</ul>
-							-->
+
 						</div>
 					</form>
 					<!-- /advanced login -->
@@ -152,7 +278,7 @@
 
 					<!-- Footer -->
 					<div class="footer text-muted text-center">
-						2013г - 2022г <a href="#">Катрэн+</a>
+						2013г - 2026г <a href="#">Катрэн+</a>
 					</div>
 					<!-- /footer -->
 
@@ -167,19 +293,11 @@
 
 	</div>
 	<!-- /page container -->
-	<!--	
-	<script>
-			var n = document.getElementById("Login:user");
-			if (n){
-				if (document.activeElement &amp;&amp; document.activeElement.id!="Login:pwd"){
-					n.focus();
-				}
-			}
-	</script>
-		-->
+	
 		<xsl:call-template name="initJS"/>
 	</body>
 </html>		
 </xsl:template>
 
 </xsl:stylesheet>
+

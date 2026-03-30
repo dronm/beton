@@ -333,20 +333,8 @@ LoginTM.prototype.toDOM = function(p) {
 };
 
 LoginTM.prototype.setError = function(s) {
-	var text = s || "";
-	this.getElement("error").setValue(text);
-
-	var n = document.getElementById(this.getId() + ":error");
-	if (!n) {
-		return;
-	}
-
-	if (text) {
-		n.classList.remove("hidden");
-	} else {
-		n.classList.add("hidden");
-	}
-};
+	this.getElement("error").setValue(s);
+}
 
 LoginTM.prototype.setSubmitText = function(t) {
 	DOMHelper.setText(this.getId() + ":check_code", t);
@@ -475,7 +463,6 @@ LoginTM.prototype.setUserDataCtrl = function(tel, name, photo) {
 		this.getElement("userPhoto").setAttr("src", "data:image/png;base64, " + photo);
 	}
 	this.getElement("userPhoto").setVisible(!!photo);
-	this.getElement("userData").setVisible(true);
 
 	this.updateSubmitAvailability();
 };
@@ -595,4 +582,3 @@ LoginTM.prototype.submitCode = function() {
 		}
 	});
 };
-

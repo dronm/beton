@@ -24,7 +24,6 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
 
 
 
-//require_once('functions/res_rus.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/GlobalFilter.php');
@@ -32,6 +31,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelWhereSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ParamsSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelVars.php');
 require_once(FRAME_WORK_PATH.'basic_classes/SessionVarManager.php');
+require_once(FRAME_WORK_PATH.'basic_classes/LSNPosition.php');
 
 require_once('common/PwdGen.php');
 require_once(ABSOLUTE_PATH.'functions/notifications.php');
@@ -759,7 +759,7 @@ class User_Controller extends ControllerSQL{
 		header("Location: index.php");
 	}
 	
-	/* array with user inf*/
+	/* array with user inf */
 	private function set_logged($ar,&$pubKey){
 		//if($ar['role_id'] == "vehicle_owner" || $ar['role_id'] == "client"){
 		//	throw new Exception("Доступ временно запрещен!");
@@ -1266,13 +1266,15 @@ class User_Controller extends ControllerSQL{
 		
 		$sess_db_link = $this->getDbLinkMaster();//$GLOBALS['dbLinkSessMaster'];
 		$log_ar = $sess_db_link->query_first(sprintf(
-			"SELECT pub_key
+			"SELECT 
+				pub_key
 			FROM logins
 			WHERE session_id='%s' AND user_id =%d AND date_time_out IS NULL%s"
 			,session_id()
 			,intval($ar['id'])
 			,$dif_sess_srv? aprintf(' AND app_id=%d',MS_APP_ID):''
 		));
+
 		if (!isset($log_ar['pub_key'])){
 			//no user login
 			
@@ -1336,11 +1338,14 @@ class User_Controller extends ControllerSQL{
 				}
 			}
 			$_SESSION['LOGIN_ID'] = $log_ar['id'];			
-		}
-		else{
+
+		} else{
 			//user logged
 			$pubKey = trim($log_ar['pub_key']);
 		}
+
+		//add lsn position to header
+		LSNPosition::add($sess_db_link);
 	}
 	
 	private function do_login($pm,&$pubKey,&$pwd){		
@@ -2239,14 +2244,14 @@ class User_Controller extends ControllerSQL{
 		if(!is_array($ar) || !count($ar)){
 			throw new Exception(self::ER_USER_NOT_DEFIND);
 		}
-		
-		$this->getDbLinkMaster()->query('BEGIN');
+		$link = $this->getDbLinkMaster();
+		$link->query('BEGIN');
 		try{
 			$code = gen_pwd(3, "NUM");
 			
-			add_notification_from_contact_tm($this->getDbLinkMaster(), $this->getExtVal($pm,'tel'), 'Код авторизации: '.$code, 'tm_auth', NULL, $ar['ext_contact_id']);
+			add_notification_from_contact_tm($link, $this->getExtVal($pm,'tel'), 'Код авторизации: '.$code, 'tm_auth', NULL, $ar['ext_contact_id']);
 			
-			$tm_logins = $this->getDbLinkMaster()->query_first(sprintf(
+			$tm_logins = $link->query_first(sprintf(
 				"SELECT 
 					TRUE AS exists 
 				FROM notifications.tm_logins 
@@ -2255,22 +2260,31 @@ class User_Controller extends ControllerSQL{
 				$this->getExtDbVal($pm,'tel')
 			));
 			if(is_array($tm_logins) && count($tm_logins) && $tm_logins["exists"] == "t"){
-				 $this->getDbLinkMaster()->query(sprintf(
+				 $link->query(sprintf(
 					"DELETE FROM notifications.tm_logins 
 					WHERE app_id = %d AND tel = %s",
 					MS_APP_ID,
 					$this->getExtDbVal($pm,'tel')
 				));
 			}
-
-			$this->getDbLinkMaster()->query(sprintf(
+			$link->query(sprintf(
 				"DELETE FROM notifications.tm_logins
 				WHERE app_id = %d AND tel = %s",
 				MS_APP_ID,
 				$this->getExtDbVal($pm,'tel')
 			));
+			/*
+			DOES NOT WORK THIS WAY WITH A FOREIGN TABLE!!!
+				) ON CONFLICT (app_id, tel) DO UPDATE SET 
+					exp_date_time = EXCLUDED.exp_date_time, 
+					code_exp_date_time = EXCLUDED.code_exp_date_time, 
+					tries = EXCLUDED.tries, 
+					ext_user_id = EXCLUDED.ext_user_id,
+					code = EXCLUDED.code
+			*/
 
-			$this->getDbLinkMaster()->query(sprintf(
+			//sometimes there is an error: duplicate key??
+			$link->query(sprintf(
 				"INSERT INTO notifications.tm_logins (tel, exp_date_time, code_exp_date_time, tries, ext_user_id, app_id, code)
 				VALUES (%s,
 					now()::timestampTZ+'%d seconds'::interval,
@@ -2286,13 +2300,13 @@ class User_Controller extends ControllerSQL{
 				$code
 			));
 			
-			$this->getDbLinkMaster()->query('COMMIT');
+			$link->query('COMMIT');
 			
+			LSNPosition::add($link);
 		}catch(Exception $e){
-			$this->getDbLinkMaster()->query('ROLLBACK');
+			$link->query('ROLLBACK');
 			throw $e;
 		}
-	
 	}
 	
 	/**
@@ -2492,6 +2506,7 @@ class User_Controller extends ControllerSQL{
 			$this->add_auth_model($pubKey, session_id(), md5($ar['pwd']), $this->calc_session_expiration_time());
 
 			//add lsn model
+			/*
 			$ar = $this->getDbLinkMaster()->query_first(sprintf("SELECT pg_current_wal_lsn() AS lsn"));
 			if(is_array($ar) && count($ar) && isset($ar["lsn"])) {
 				$this->addModel(new ModelVars(
@@ -2501,6 +2516,7 @@ class User_Controller extends ControllerSQL{
 					)
 				));		
 			}
+			*/
 		}
 	}
 	

@@ -1277,3 +1277,13 @@ tr.deleted_row {
 .RepMaterialAction-tr {
 	background-color: #DAF7A6 !important;
 }
+
+#MaterialActionList1_Model td {
+	padding: 5px 10px !important;
+}
+#MaterialActionList2_Model td {
+	padding: 5px 10px !important;
+}
+#MaterialActionList3_Model td {
+	padding: 5px 10px !important;
+}

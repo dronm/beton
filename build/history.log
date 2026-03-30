@@ -1717,31 +1717,36 @@ select * from ra_material_facts where material_id = 4 order by date_time desc li
 
 
 1.00404
+1) Library changes: add LSN header
+	basic_classes/LSNPosition.php
+	basic_classes/ControllerDb.php
+	index.php added header acceptance
+	Javascript libraries:
+		SrvConnector.js to maintain lsn position. + reconnect retries.
+	User_Controller.php lsn is added to set_logged() function.
+2) Login page gui.
+	LoginTM.js
+	Login.html.xsl
 
+
+What to change in the first place:
+- Offline mode. Finish
+- Document transfer to bug. Finish.
++ Connector. Remember, send LSN. Server must send lsn after every post (insert, update...) login
+	must take into considiration the lsn position when accepting a get request.
++ Connector. Retry logic.
 - all messages are coming to all clients.
-
-
-Если открыта детальная модель на редактирование и при приходит основная модель, то она перересовывается и уходит фокус с детальной модели
-XXX Удаленные элементы справочника: фильтр вверху, пометка спереди, по возможности у всех справочиников. Example: PumpVehicle
-Движение на базу - контроль всех баз. Поиск ближайшей, смена
-Отобразить, если остлось Х км до базы какой-то знак
-VehiceRoute::getZoneListQuery()
-Vehice_Controller->get_current_position()  возвращает одну зону в модели ZoneList_Model поле base_zone
-Map_View.js Map_View.prototype.addZones(model)
-
-
-
-
-КРОМЕ!!! AstCall_Controller
-!!!productions_get_mat_tolerance_violated!!
+- Отобразить, если остлось Х км до базы какой-то знак
+- Передвигаемое окно звонка и не модальное
 
 
 ЧТо НАДО
-+ 1) Автообновление данных OSRM хотя бы раз в месяц (?)
+- Fill address on position, yandex does not work.
+- Автообновление данных OSRM хотя бы раз в месяц (?)
+
+- Autoupdate addresses from FIAS
 
 - Новая программа CallAgent webSocket, https
-
-- Установка заявок по кнопке в Elkon
 
 + Autoreload SrvConf on publish, script.php to send ws event. Event Service.reload_config
 
@@ -1770,7 +1775,5 @@ Map_View.js Map_View.prototype.addZones(model)
 Если маршрута нет показать базу и объект, а не пустую карту!
 При показе поеледнего маршрута (по тек. время) показывать и авто тоже!
 
-Перенос накладных в бухгалтерию
-Передвигаемое окно звонка и не модальное
 
 

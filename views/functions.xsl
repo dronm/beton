@@ -37,7 +37,7 @@
 			<xsl:text>&#160;</xsl:text>
 		</xsl:when>
 		<xsl:otherwise>
-			<xsl:value-of select="format-number( round(10000*$val) div 10000 ,'##0,0000','num_quant')"/>
+			<xsl:value-of select="format-number( round(100000*$val) div 100000 ,'##0,00000','num_quant')"/>
 		</xsl:otherwise>		
 	</xsl:choose>
 </xsl:template>

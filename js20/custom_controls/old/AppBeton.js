@@ -1282,115 +1282,56 @@ AppBeton.prototype.MSG_OFFLINE_THROTLE = 5 * 60 * 1000;
 AppBeton.prototype.MSG_DURATION = 10 * 1000;
 
 AppBeton.prototype.initWorkers = function() {
-	console.log('AppBeton.initWorkers');
-
+	const self = this;
+	console.log("AppBeton.initWorkers")
 	if ('serviceWorker' in navigator) {
-		this.initServiceWorker();
-	}
-
-	this.bindNetworkStatusEvents();
-};
-
-AppBeton.prototype.initServiceWorker = function() {
-	const self = this;
-
-	navigator.serviceWorker.register('sw.js')
-		.then(function(registration) {
-			console.log('Service Worker registered');
-
-			self.bindServiceWorkerMessages();
-			self.watchServiceWorkerUpdates(registration);
-
-			return navigator.serviceWorker.ready;
-		})
-		.then(function() {
-			console.log('Service Worker ready');
-
-			if (!navigator.onLine) {
-				//self.setOnline(); // no need to show this at startup
-				//} else {
-				self.setOffline();
+		navigator.serviceWorker.getRegistration().then(registration => {
+			if (registration) {
+				registration.unregister().then(success => {
+					if (success) {
+						console.log('Service Worker unregistered successfully.');
+					} else {
+						console.log('No Service Worker registration found to unregister.');
+					}
+				}).catch(error => {
+					console.error('Error unregistering Service Worker:', error);
+				});
+			} else {
+				console.log('No active Service Worker registration found.');
 			}
-		})
-		.catch(function(error) {
-			console.error('ServiceWorker registration failed:', error);
-			window.showTempError('ServiceWorker registration failed:', null, 10000);
 		});
-};
+		navigator.serviceWorker.register("sw.js")
+		.then(reg => {
+			console.log('Service Worker registered')
+			 // listen for messages from SW
+			navigator.serviceWorker.addEventListener('message', event => {
+				const msg = event.data;
+				if (!msg || !msg.type) return;
 
-AppBeton.prototype.bindServiceWorkerMessages = function() {
-	const self = this;
+				if (msg.type === 'OFFLINE') {
+					self.setOffline();
 
-	if (this._swMessageHandlerBound) {
-		return;
+				}else if (msg.type === 'ONLINE') {
+					self.setOnline();
+				}
+			});
+		}).catch(
+			err => {
+				window.showTempError('ServiceWorker registration failed:', null, 10000);					
+			}
+		);
 	}
 
-	this._swMessageHandlerBound = true;
-
-	navigator.serviceWorker.addEventListener('message', function(event) {
-		self.handleServiceWorkerMessage(event);
-	});
-};
-
-AppBeton.prototype.handleServiceWorkerMessage = function(event) {
-	const msg = event.data;
-
-	if (!msg || !msg.type) {
-		return;
-	}
-
-	if (msg.type === 'OFFLINE') {
-		this.setOffline();
-		this.startServerHealthProbe();
-
-	} else if (msg.type === 'ONLINE') {
-		this.setOnline();
-		this.stopServerHealthProbe();
-	}
-};
-
-AppBeton.prototype.watchServiceWorkerUpdates = function(registration) {
-	registration.addEventListener('updatefound', function() {
-		console.log('Service Worker update found');
-
-		const newWorker = registration.installing;
-
-		if (!newWorker) {
-			return;
-		}
-
-		newWorker.addEventListener('statechange', function() {
-			console.log('Service Worker state:', newWorker.state);
-		});
-	});
-};
-
-AppBeton.prototype.bindNetworkStatusEvents = function() {
-	const self = this;
-
-	if (this._networkStatusHandlersBound) {
-		return;
-	}
-
-	this._networkStatusHandlersBound = true;
-
-	window.addEventListener('online', function() {
+	window.addEventListener('online', () => {
 		self.setOnline();
 	});
 
-	window.addEventListener('offline', function() {
+	window.addEventListener('offline', () => {
 		self.setOffline();
 	});
-};
-
-//******************* online/offline modes switching
-AppBeton.prototype.isOfflineMode = function() {
-	return !!this.m_isOfflineMode;
-};
+}
 
 AppBeton.prototype.setOffline = function() {
-	this.m_isOfflineMode = true;
-
 	const isOffline = !DOMHelper.visible("main-menu");
 
 	if (this.m_offLineWarnTimer && isOffline) {
@@ -1408,20 +1349,15 @@ AppBeton.prototype.setOffline = function() {
 			this.MSG_OFFLINE_THROTLE
 		);
 	}
-};
+}
 
 AppBeton.prototype.setOnline = function() {
-	this.m_isOfflineMode = false;
-
 	window.showTempOk(this.MSG_ONLINE, null, this.MSG_DURATION);
-
 	if (this.m_offLineWarnTimer) {
 		clearInterval(this.m_offLineWarnTimer);
-		this.m_offLineWarnTimer = null;
 	}
-
 	this.enableControlsForOnline(true);
-};
+}
 
 AppBeton.prototype.enableControlsForOnline = function(en) {
 	if (!en) {
@@ -1464,45 +1400,3 @@ AppBeton.prototype.enableControlsForOnline = function(en) {
 		// }
 	}
 }
-
-AppBeton.prototype.startServerHealthProbe = function() {
-	const self = this;
-
-	if (this._serverHealthProbeTimer) {
-		return;
-	}
-
-	this._serverHealthProbeTimer = window.setInterval(function() {
-		self.probeServerHealth();
-	}, 5000);
-};
-
-AppBeton.prototype.stopServerHealthProbe = function() {
-	if (!this._serverHealthProbeTimer) {
-		return;
-	}
-
-	clearInterval(this._serverHealthProbeTimer);
-	this._serverHealthProbeTimer = null;
-};
-
-AppBeton.prototype.probeServerHealth = function() {
-	const self = this;
-
-	fetch('/healthz.txt?ts=' + Date.now(), {
-		method: 'GET',
-		cache: 'no-store',
-		credentials: 'same-origin'
-	})
-		.then(function(response) {
-			if (!response.ok) {
-				throw new Error('Health check failed with status ' + response.status);
-			}
-
-			self.setOnline();
-			self.stopServerHealthProbe();
-		})
-		.catch(function() {
-			self.setOffline();
-		});
-};
