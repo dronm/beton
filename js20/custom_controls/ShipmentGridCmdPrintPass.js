@@ -81,7 +81,8 @@ ShipmentGridCmdPrintPass.prototype.onPrintCont = function(pmId, dlg, shipment_id
 	var h = $( window ).width()/3*2;
 	var left = $( window ).width()/2;
 	var w = left - 20;
-	pm.openHref("ViewPDF","location=0,menubar=0,status=0,titlebar=0,top="+(50+offset)+",left="+(left+offset)+",width="+w+",height="+h);	
+	//location=0,menubar=0,status=0,titlebar=0
+	pm.openHref("ViewPDF","popup,top="+(50+offset)+",left="+(left+offset)+",width="+w+",height="+h);	
 }
 
 ShipmentGridCmdPrintPass.prototype.onPrint = function(pmId, dlg, shipment_id){	

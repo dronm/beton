@@ -72,5 +72,5 @@ PrintInvoiceBtn.prototype.onClick = function(){
 	var h = $( window ).width()/3*2;
 	var left = $( window ).width()/2;
 	var w = left - 20;
-	pm.openHref("ViewPDF","location=0,menubar=0,status=0,titlebar=0,top="+(50+offset)+",left="+(left+offset)+",width="+w+",height="+h);
+	pm.openHref("ViewPDF","popup,top="+(50+offset)+",left="+(left+offset)+",width="+w+",height="+h);
 }

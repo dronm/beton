@@ -1731,6 +1731,11 @@ select * from ra_material_facts where material_id = 4 order by date_time desc li
 1.00407
 1) removed sw, problem with NS_BINDING_ABORTED, print passports (download files)
 AppBeton.initWorkers commented
+ServConnector there is a new version in old/ServConnectorNew.js with retries
+
+
+1.00408
+1) ServConnector with lsn and retries
 
 
 

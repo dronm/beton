@@ -96,6 +96,7 @@ PrintPassBtn.prototype.onPrint = function(pmId, shipment_id){
 	var left = $( window ).width()/2;
 	var w = left - 20;
 	pm.openHref("ViewPDF","location=0,menubar=0,status=0,titlebar=0,top="+(50+offset)+",left="+(left+offset)+",width="+w+",height="+h);			
+	//pm.openHref("ViewPDF","popup,top="+(50+offset)+",left="+(left+offset)+",width="+w+",height="+h);			
 	
 	if(this.m_closeAfterPrint && this.m_dialogView){
 		this.m_dialogView.close();
