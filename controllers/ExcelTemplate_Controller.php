@@ -499,6 +499,8 @@ class ExcelTemplate_Controller extends ControllerSQL{
 			$paramArrayMainQueryVal = $paramArray;
 			$paramArrayImgQueryVal = $paramArray;
 		}
+/* file_put_contents(OUTPUT_PATH.'print.txt', var_export($paramArrayMainQueryVal, true).PHP_EOL, FILE_APPEND); */
+/* throw new Exception($sql_query_text); */
 		$ar_data = $dbLink->query_first(vsprintf($sql_query_text,$paramArrayMainQueryVal));
 	
 		if(!is_array($ar_data) || !count($ar_data)){

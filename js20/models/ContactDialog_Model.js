@@ -148,6 +148,15 @@ function ContactDialog_Model(options){
 	
 	options.fields.attachments_list = new FieldJSON("attachments_list",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.max_data = new FieldJSON("max_data",filed_options);
+	
 		ContactDialog_Model.superclass.constructor.call(this,id,options);
 }
 extend(ContactDialog_Model,ModelXML);

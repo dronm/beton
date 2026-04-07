@@ -5,7 +5,7 @@ function TmOutMessageList_View(id,options){
 
 	options.HEAD_TITLE = "Исходящие сообщения Telegram";
 
-	TmUserList_View.superclass.constructor.call(this,id,options);
+	TmOutMessageList_View.superclass.constructor.call(this,id,options);
 
 	var model = (options.models&&options.models.TmOutMessageList_Model)? options.models.TmOutMessageList_Model : new TmOutMessageList_Model();
 	var contr = new TmOutMessage_Controller();

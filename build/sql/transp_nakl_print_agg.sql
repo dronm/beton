@@ -1,8 +1,9 @@
--- Function: transp_nakl_print(in_shipment_id int, in_buh_doc jsonb, in_consignee int);
 
- --DROP FUNCTION transp_nakl_print_agg(in_shipment_list int[], in_buh_doc jsonb, in_consignee int);
+-- Function: transp_nakl_print_agg(in_shipment_id int, in_ship_ind int, in_buh_doc jsonb, in_consignee int);
 
-CREATE OR REPLACE FUNCTION transp_nakl_print_agg(in_shipment_list int[], in_buh_doc jsonb, in_consignee int)
+--DROP FUNCTION transp_nakl_print_agg(in_shipment_list int[], in_ship_ind int,  in_buh_doc jsonb, in_consignee int);
+
+CREATE OR REPLACE FUNCTION transp_nakl_print_agg(in_shipment_list int[], in_ship_ind int, in_buh_doc jsonb, in_consignee int)
   RETURNS TABLE(
   	nomer text,
   	nomer2 text,
@@ -47,9 +48,9 @@ CREATE OR REPLACE FUNCTION transp_nakl_print_agg(in_shipment_list int[], in_buh_
 AS $BODY$
 
 	SELECT
-		in_buh_doc->>'nomer'||'/1' AS nomer,
+		in_buh_doc->>'nomer'||'/'||(in_ship_ind::text) AS nomer,
 		
-		in_buh_doc->>'nomer'||'/1' AS nomer2,
+		in_buh_doc->>'nomer'||'/'||(in_ship_ind::text) AS nomer2,
 		
 		to_char(sh.date_time::date,'DD.MM.YY') AS data,
 		to_char(sh.date_time::date,'DD.MM.YY') AS data_nakl,
@@ -220,4 +221,5 @@ AS $BODY$
 		tip_vladeniya
 	;
 $BODY$;
+
 

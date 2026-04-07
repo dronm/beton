@@ -70,7 +70,7 @@ AS $BODY$
 		CASE
 			WHEN substring(ct.name, 1, 2) = 'ПБ' THEN '(БСМ)'
 			WHEN substring(ct.name, 1, 2) = 'РР' THEN ''
-			WHEN ct.name ilike '%%вода%%' THEN 'Вода'
+			WHEN ct.name ilike '%%вода%%' THEN ''
 			ELSE 'Бетон (БСТ)'
 		END||' '||coalesce(ct.official_name, ct.name) AS gruz_naim,
 		

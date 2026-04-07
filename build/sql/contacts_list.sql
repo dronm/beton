@@ -16,12 +16,20 @@ CREATE OR REPLACE VIEW contacts_list AS
 		e_us.tm_photo,
 		e_us.id AS ext_id,
 		(e_us.id IS NOT NULL) AS tm_exists,
-		(e_us.tm_id IS NOT NULL) AS tm_activated
+		(e_us.tm_id IS NOT NULL) AS tm_activated,
+
+		CASE WHEN mxu.max_user_id IS NULL THEN NULL
+		ELSE
+			json_build_object(
+				'max_user_id', mxu.max_user_id,
+				'username', mxu.username,
+				'avatar_url', mxu.avatar_url
+			) 
+		END AS max_data
 		
 	FROM contacts AS ct
 	LEFT JOIN posts AS p ON p.id = ct.post_id
 	LEFT JOIN notifications.ext_users_photo_list AS e_us ON e_us.ext_contact_id = ct.id
+	LEFT JOIN notifications.max_users AS mxu ON mxu.contact_id = ct.id
 	ORDER BY ct.name
 	;
-	
-ALTER VIEW contacts_list OWNER TO ;

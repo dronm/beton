@@ -221,6 +221,12 @@ extend(Shipment_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldDateTime("shift_start_ts",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -380,6 +386,12 @@ extend(Shipment_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Ссылка на Документ 1с";
 	var field = new FieldJSONB("faktura_ref_1c",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldDateTime("shift_start_ts",options);
 	
 	pm.addField(field);
 	
@@ -544,6 +556,8 @@ extend(Shipment_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldJSONB("client_specifications_ref",f_opts));
+	pm.getField(this.PARAM_ORD_FIELDS).setValue("ship_date_time");
+	
 }
 
 			Shipment_Controller.prototype.add_get_list_for_veh_owner = function(){

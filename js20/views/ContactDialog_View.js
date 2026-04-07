@@ -18,17 +18,29 @@ function ContactDialog_View(id,options){
 	options = options || {};
 	
 	options.controller = new Contact_Controller();
-	options.model = options.models.ContactDialog_Model;
+
+	if(options.models && options.models.ContactDialog_Model){
+		options.model = options.models.ContactDialog_Model;
+	}
 	
-	var tm_inv_vis = true;
+	var max_inv_vis = true;
+	// var tm_inv_vis = true;
 	if(options.model && options.model.getNextRow()){
 		if(options.model.getFieldValue("tm_activated")){
 			options.templateOptions = options.templateOptions || {};
 			options.templateOptions.TM_ACTIVATED = true;
 			options.templateOptions.TM_PHOTO = options.model.getFieldValue("tm_photo");
-			tm_inv_vis = false;
+			// tm_inv_vis = false;
+		}
+		const max_data = options.model.getFieldValue("max_data");
+		if(max_data){
+			options.templateOptions = options.templateOptions || {};
+			options.templateOptions.MAX_ACTIVATED = true;
+			options.templateOptions.MAX_PHOTO = max_data.avatar_url;
+			max_inv_vis = false;
 		}
 	}
+
 	var self = this;
 	options.addElement = function(){
 		this.addElement(new EditString(id+":name",{
@@ -66,6 +78,7 @@ function ContactDialog_View(id,options){
 			"title":"Коммантарий менеджера о физическом лице"
 		}));	
 
+		/*
 		this.addElement(new ButtonCtrl(id+":btnTmInvite",{
 			"caption":"Пригласить в Telegram:",
 			"title":"Отправить контакту приглашение в Telegram",
@@ -85,7 +98,44 @@ function ContactDialog_View(id,options){
 				);
 			}
 		}));	
+		*/
 		
+			/*
+		this.addElement(new ButtonCtrl(id+":btnMaxInvite",{
+			"caption":" СМС для регистрации в MAX",
+			"title":"Отправить контакту СМС с приглашением в MAX",
+			"visible": max_inv_vis,
+			"onClick": function(){
+				var b = this;
+				b.setEnabled(false);
+				window.getApp().MAXInviteContact(
+					new RefType({"keys" :{"id": self.getElement("id").getValue()},
+						"descr": self.getElement("name").getValue(),
+						"dataType": "contacts"
+						}),
+					function(){
+						b.setEnabled(true);
+					}
+				);
+			}
+		}));	*/
+
+		this.addElement(new MAXInviteBtn(id+":btnMaxInvite", {
+			"self": this,
+			"getRef": (function(self){
+				return function(){
+					return new RefType({
+						"keys" :{"id": self.getElement("id").getValue()},
+						"descr": self.getElement("name").getValue(),
+						"dataType": "contacts"
+					});
+				}
+			})(this),
+			"visible": max_inv_vis
+		}));
+		this.addElement(new MAXShowQRBtn(id+":btnMaxQR", {"visible": max_inv_vis}));
+
+
 		this.addElement(new EditFile(id+":attachments_list",{
 			"maxWidth":"100",
 			"maxHeight":"100",

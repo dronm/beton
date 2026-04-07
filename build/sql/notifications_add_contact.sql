@@ -57,4 +57,3 @@ END;
 $$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION add_contact(in_app_id int, in_contact_id int) OWNER TO ;

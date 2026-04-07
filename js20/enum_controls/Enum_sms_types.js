@@ -66,6 +66,9 @@ checked:(options.defaultValue&&options.defaultValue=="order_cancel")}
 ,{"value":"tm_invite",
 "descr":this.multyLangValues[window.getApp().getLocale()+"_"+"tm_invite"],
 checked:(options.defaultValue&&options.defaultValue=="tm_invite")}
+,{"value":"max_invite",
+"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"max_invite"],
+checked:(options.defaultValue&&options.defaultValue=="max_invite")}
 ,{"value":"new_pwd",
 "descr":this.multyLangValues[window.getApp().getLocale()+"_"+"new_pwd"],
 checked:(options.defaultValue&&options.defaultValue=="new_pwd")}
@@ -93,6 +96,7 @@ Enum_sms_types.prototype.multyLangValues = {"ru_order":"заявка"
 ,"ru_mixer_route":"Маршрут для миксериста"
 ,"ru_order_cancel":"Отмена заявки"
 ,"ru_tm_invite":"Приглашение в Telegram"
+,"ru_max_invite":"Приглашение в MAX"
 ,"ru_new_pwd":"Новый пароль"
 };
 

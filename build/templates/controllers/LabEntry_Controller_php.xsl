@@ -181,6 +181,7 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 					rate_date_id
 				FROM lab_entries
 				WHERE shipment_id = %d", $shipment_id));
+
 			$samples = ($pm->getParamValue('samples'))? $this->getExtDbVal($pm,'samples') : "'".$ar['samples']."'";
 			$materials = ($pm->getParamValue('materials'))? $this->getExtDbVal($pm,'materials') : "'".$ar['materials']."'";
 			$ok2 = ($pm->getParamValue('ok2'))? $this->getExtDbVal($pm,'ok2') : "'".$ar['ok2']."'";

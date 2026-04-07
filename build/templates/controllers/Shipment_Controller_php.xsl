@@ -1776,9 +1776,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$fileName = '';
 
 			if($rollupRuns){
-				if(strlen($shAr["ids"]) &lt; 2){
-					continue;
-				}
+				//remove curly braces
 				$ids_str = substr($shAr["ids"], 1,  strlen($shAr["ids"])-2);
 				$ids = explode(",", $ids_str);
 				foreach($ids as $sh_id){
@@ -1787,15 +1785,15 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				$ind++;
 				ExcelTemplate_Controller::genFilledTemplate(
 					$link, $templateName, 
-					function($forImage) use ($ids, $buhDoc, $consignee){
+					function($forImage) use ($ids, $ind, $buhDoc, $consignee){
 						if(!$forImage){
-							return [ 'array['.implode(",",$ids).']', $buhDoc, $consignee ];
+							return [ 'array['.implode(",",$ids).']', $ind, $buhDoc, $consignee ];
 						}else{
 							return [$ids[0]];
 						}
 					},
 					$erEmpty, $tFile, $fileName,
-					"SELECT * FROM transp_nakl_print_agg(%s, %s::jsonb, %d)"
+					"SELECT * FROM transp_nakl_print_agg(%s, %d, %s::jsonb, %d)"
 				);		
 			}else{
 				$ind++;

@@ -726,11 +726,27 @@ AppBeton.prototype.TMInviteContact = function(contactRef, callBack) {
 			}
 		}
 		, "ok": function() {
-			window.showTempNote("Отправлено приглашение в Telegram", null, 5000);
+			window.showTempNote("Отправлено СМС с приглашением в Telegram", null, 5000);
 		}
 	});
 }
 
+AppBeton.prototype.MAXInviteContact = function(contactRef, callBack) {
+	var pm = (new MaxOutMessage_Controller()).getPublicMethod("invite_contact");
+	pm.setFieldValue("contact_id", contactRef.getKey("id"));
+	window.setGlobalWait(true);
+	pm.run({
+		"all": function() {
+			window.setGlobalWait(false);
+			if (callBack) {
+				callBack();//disable controls
+			}
+		}
+		, "ok": function() {
+			window.showTempNote("Отправлено СМС с приглашением в MAX", null, 5000);
+		}
+	});
+}
 
 AppBeton.prototype.selectLoginRole = function() {
 	var allowed_roles = this.getServVar("allowed_roles");

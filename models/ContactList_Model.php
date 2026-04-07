@@ -133,6 +133,14 @@ class ContactList_Model extends ModelSQL{
 		$this->addField($f_tm_activated);
 		//********************
 		
+		//*** Field max_data ***
+		$f_opts = array();
+		$f_opts['id']="max_data";
+						
+		$f_max_data=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"max_data",$f_opts);
+		$this->addField($f_max_data);
+		//********************
+		
 		//*** Field ext_id ***
 		$f_opts = array();
 		$f_opts['id']="ext_id";

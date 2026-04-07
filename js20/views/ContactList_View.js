@@ -29,12 +29,54 @@ function ContactList_View(id,options){
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
 						new GridCellHead(id+":grid:head:name",{
-							"value":"Наименование",
+							"value":"ФИО",
 							"columns":[
 								new GridColumn({"field":model.getField("name")})
 							],
 							"sortable":true,
 							"sort":"asc"							
+						})
+						,new GridCellHead(id+":grid:head:max_data",{
+							"value":"MAX",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("max_data"),
+									"ctrlOptions":{
+										"enabled":false,
+										"labelCaption":""
+									},
+									"formatFunction":function(f, cell){
+										var cell_n = cell.getNode();										
+										var max_data = f.max_data.getValue();
+										if(!max_data){
+											return ""; //no registration
+										}
+
+										if (max_data.avatar_url){
+											var i = document.createElement("img");
+											i.setAttribute("src", max_data.avatar_url);
+											i.className = "userPhoto";
+											cell_n.appendChild(i);
+											self.photoDetail = new ToolTip({
+												"node": cell_n,
+												"wait":2,
+												"onHover":(function(grid, maxData){
+													return function(event){
+														self.showPhotoMax(this, maxData);
+													}
+												})(self, max_data)
+											});
+										}
+
+										if(max_data.username && max_data.username.length){									
+											var t = document.createElement("span");										
+											DOMHelper.setText(t, max_data.username);
+											cell_n.appendChild(t);
+										}
+									}
+								})
+							],
+							"sortable":true
 						})
 						,new GridCellHead(id+":grid:head:tm_first_name",{
 							"value":"Telegram",
@@ -172,6 +214,13 @@ extend(ContactList_View,ViewAjxList);
 ContactList_View.prototype.showPhoto = function(ctrl, base64Data){
 	ctrl.popup(
 		'<div><img src="data:image/png;base64, '+base64Data+'"/></div>',
+		{"title":"Данные по контакту"}
+	);
+}
+
+ContactList_View.prototype.showPhotoMax = function(ctrl, maxData){
+	ctrl.popup(
+		'<div><img src="'+maxData.avatar_url+'"/></div>',
 		{"title":"Данные по контакту"}
 	);
 }

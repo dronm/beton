@@ -1,6 +1,7 @@
 -- View: public.orders_make_list
 
--- DROP VIEW public.orders_make_list;
+--DROP VIEW public.orders_make_for_lab_list;
+--DROP VIEW public.orders_make_list;
 
 CREATE OR REPLACE VIEW public.orders_make_list
  AS
@@ -19,9 +20,10 @@ CREATE OR REPLACE VIEW public.orders_make_list
     o.date_time,
     o.date_time_to,
     o.quant,
-    o.quant - COALESCE(( SELECT sum(shipments.quant) AS sum
+    o.quant::numeric - COALESCE(( SELECT sum(shipments.quant::numeric) AS sum
            FROM shipments
-          WHERE shipments.order_id = o.id AND shipments.shipped), 0::double precision) AS quant_rest,
+          WHERE shipments.order_id = o.id AND shipments.shipped), 0::numeric
+	) AS quant_rest,
         CASE
             WHEN o.date_time::time without time zone >= const_first_shift_start_time_val() AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) AND o.date_time_to::time without time zone >= const_first_shift_start_time_val() AND o.date_time_to::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) THEN o.quant
             WHEN o.date_time::time without time zone >= const_first_shift_start_time_val() AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) AND o.date_time::time without time zone < (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) THEN round((o.quant / (date_part('epoch'::text, o.date_time_to - o.date_time) / 60::double precision) * (date_part('epoch'::text, o.date_time::date + (const_first_shift_start_time_val()::interval + const_day_shift_length_val()) - o.date_time) / 60::double precision))::numeric, 2)::double precision

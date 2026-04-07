@@ -145,6 +145,14 @@ class ContactDialog_Model extends ModelSQL{
 		$f_attachments_list=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"attachments_list",$f_opts);
 		$this->addField($f_attachments_list);
 		//********************
+		
+		//*** Field max_data ***
+		$f_opts = array();
+		$f_opts['id']="max_data";
+						
+		$f_max_data=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"max_data",$f_opts);
+		$this->addField($f_max_data);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

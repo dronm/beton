@@ -89,6 +89,9 @@
 <li><a href="#MaterialFactBalanceCorretion_Controller">MaterialFactBalanceCorretion_Controller</a></li>
 <li><a href="#MaterialFactConsumption_Controller">MaterialFactConsumption_Controller</a></li>
 <li><a href="#MaterialFactConsumptionCorretion_Controller">MaterialFactConsumptionCorretion_Controller</a></li>
+<li><a href="#MaxInMessage_Controller">MaxInMessage_Controller</a></li>
+<li><a href="#MaxOutMessage_Controller">MaxOutMessage_Controller</a></li>
+<li><a href="#MaxUser_Controller">MaxUser_Controller</a></li>
 <li><a href="#OperatorForTranspNakl_Controller">OperatorForTranspNakl_Controller</a></li>
 <li><a href="#Order_Controller">Order_Controller</a></li>
 <li><a href="#OrderFromClient_Controller">OrderFromClient_Controller</a></li>
@@ -473,6 +476,10 @@
 <li><a href="#TmOutMessageList_Model">TmOutMessageList_Model</a></li>
 <li><a href="#TmInMessage_Model">TmInMessage_Model</a></li>
 <li><a href="#TmInMessageList_Model">TmInMessageList_Model</a></li>
+<li><a href="#MaxUser_Model">MaxUser_Model</a></li>
+<li><a href="#MaxUserList_Model">MaxUserList_Model</a></li>
+<li><a href="#MaxOutMessage_Model">MaxOutMessage_Model</a></li>
+<li><a href="#MaxOutMessageList_Model">MaxOutMessageList_Model</a></li>
 <li><a href="#Chat_Model">Chat_Model</a></li>
 <li><a href="#RawMaterialTicket_Model">RawMaterialTicket_Model</a></li>
 <li><a href="#RawMaterialTicketList_Model">RawMaterialTicketList_Model</a></li>
@@ -2605,6 +2612,119 @@
 <p>Length:500</p>
 </div>
 </div>
+</div>
+</div>
+<div id="MaxInMessage_Controller" class="content_box">
+<h1>MaxInMessage_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>get_list</h2>
+<a href="#MaxInMessageList_Model">Model: MaxInMessageList_Model</a><h2>get_object</h2>
+<a href="#MaxInMessageList_Model">Model: MaxInMessageList_Model</a>
+</div>
+</div>
+<div id="MaxOutMessage_Controller" class="content_box">
+<h1>MaxOutMessage_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>get_list</h2>
+<a href="#MaxOutMessageList_Model">Model: MaxOutMessageList_Model</a><h2>get_object</h2>
+<a href="#MaxOutMessageList_Model">Model: MaxOutMessageList_Model</a><h2>send</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>recipient</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Да</p>
+<p>Length:500</p>
+</div>
+<h3>message</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Да</p>
+</div>
+</div>
+<h2>send_media</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>recipient</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Да</p>
+<p>Length:500</p>
+</div>
+<h3>caption</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Нет</p>
+<p>Length:1000</p>
+</div>
+<h3>media_file</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Text</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
+<h2>invite</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>recipient</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Да</p>
+<p>Length:500</p>
+</div>
+</div>
+<h2>invite_contact</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>contact_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Да</p>
+</div>
+</div>
+<h2>get_recipient_inf</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>recipient</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Да</p>
+<p>Length:500</p>
+</div>
+</div>
+</div>
+</div>
+<div id="MaxUser_Controller" class="content_box">
+<h1>MaxUser_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>delete</h2>
+<a href="#MaxUser_Model">Model: MaxUser_Model</a><h2>get_list</h2>
+<a href="#MaxUserList_Model">Model: MaxUserList_Model</a><h2>get_object</h2>
+<a href="#MaxUserList_Model">Model: MaxUserList_Model</a><h2>complete</h2>
+<a href="#MaxUserList_Model">Model: MaxUserList_Model</a><h2>update</h2>
+<a href="#MaxUser_Model">Model: MaxUser_Model</a>
 </div>
 </div>
 <div id="OperatorForTranspNakl_Controller" class="content_box">
@@ -8719,6 +8839,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>max_data</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="ContactList_Model" class="content_box">
@@ -8793,6 +8919,12 @@
 <div>Precision:</div>
 <h2>tm_activated</h2>
 <div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>max_data</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -13822,6 +13954,222 @@
 <div>Precision:4</div>
 <h2>material_id</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="MaxOutMessage_Model" class="content_box">
+<h1>MaxOutMessage_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>message</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>created_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>sent_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>max_chat_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>contact_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>errors_str</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="MaxOutMessageList_Model" class="content_box">
+<h1>MaxOutMessageList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>message</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>created_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>sent_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>max_chat_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>contact_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>contacts_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>error_str</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="MaxUser_Model" class="content_box">
+<h1>MaxUser_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>max_user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>username</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>avatar_url</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>row_user</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>row_user_with_phote</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ext_contact_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>updated_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="MaxUserList_Model" class="content_box">
+<h1>MaxUserList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>max_user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>username</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>avatar_url</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>raw_user</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>raw_user_with_phote</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>contacts_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>updated_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>contacts_tel</h2>
+<div>Type:Text</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -26809,6 +27157,8 @@
 <h2>order_cancel</h2>
 <div>Description:</div>
 <h2>tm_invite</h2>
+<div>Description:</div>
+<h2>max_invite</h2>
 <div>Description:</div>
 <h2>new_pwd</h2>
 <div>Description:</div>

@@ -1738,12 +1738,20 @@ ServConnector there is a new version in old/ServConnectorNew.js with retries
 1) ServConnector with lsn and retries
 
 
+1.00409
+1) MAX integration
+
+to correct for MAX
+SendNotificationBtn
+
+
 
 What to change in the first place:
 - Offline mode. Finish
-- Document transfer to bug. Finish.
+- Document transfer to accountant system. Finish.
 + Connector. Remember, send LSN. Server must send lsn after every post (insert, update...) login
 	must take into considiration the lsn position when accepting a get request.
+- Set SrvConnector LSN from web socket.
 + Connector. Retry logic.
 - all messages are coming to all clients.
 - Отобразить, если остлось Х км до базы какой-то знак

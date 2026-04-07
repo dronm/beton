@@ -213,6 +213,11 @@ class Shipment_Controller extends ControllerSQL{
 				,$f_params);
 		$pm->addParam($param);
 		
+			$f_params = array();
+			$param = new FieldExtDateTime('shift_start_ts'
+				,$f_params);
+		$pm->addParam($param);
+		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		//default event
@@ -382,6 +387,11 @@ class Shipment_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Ссылка на Документ 1с';
 			$param = new FieldExtJSONB('faktura_ref_1c'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtDateTime('shift_start_ts'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -2658,30 +2668,24 @@ class Shipment_Controller extends ControllerSQL{
 			$fileName = '';
 
 			if($rollupRuns){
-				if(strlen($shAr["ids"]) < 2){
-					continue;
-				}
 				$ids_str = substr($shAr["ids"], 1,  strlen($shAr["ids"])-2);
 				$ids = explode(",", $ids_str);
 				foreach($ids as $sh_id){
 					$this->check_shipment_for_tn($sh_id, $faksim? TRUE:FALSE);
 				}
+				$ind++;
 				ExcelTemplate_Controller::genFilledTemplate(
 					$link, $templateName, 
-					function($forImage) use ($ids, $buhDoc, $consignee){
+					function($forImage) use ($ids, $ind, $buhDoc, $consignee){
 						if(!$forImage){
-							return [ 'array['.implode(",",$ids).']', $buhDoc, $consignee ];
+							return [ 'array['.implode(",",$ids).']', $ind, $buhDoc, $consignee ];
 						}else{
 							return [$ids[0]];
 						}
 					},
 					$erEmpty, $tFile, $fileName,
-					"SELECT * FROM transp_nakl_print_agg(%s, %s::jsonb, %d)"
+					"SELECT * FROM transp_nakl_print_agg(%s, %d, %s::jsonb, %d)"
 				);		
-				$ind++;
-				/* if($ind ==2){ */
-				/* throw new Exception("stop"); */
-				/* } */
 			}else{
 				$ind++;
 				ExcelTemplate_Controller::genFilledTemplate(

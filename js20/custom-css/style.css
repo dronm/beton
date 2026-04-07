@@ -239,8 +239,7 @@ tr.grid_foot{
 	min-height: 220px;
 	font-size:70%;
 }
-.service-type-en{
-}
+
 .service-type-dis{
 	color: transparent;
 	text-shadow: 0 0 5px rgba(0,0,0,0.2);
@@ -253,8 +252,6 @@ tr.grid_foot{
 	font-size:120%;
 }
 
-.custom-edit-cont{
-}
 label.percentcalc:before {
 	content: "*";
 	/*font-weight:bolder;
@@ -326,7 +323,7 @@ table,tr,td.noBorder{
 }
 .mesRecipient{
 	text-decoration:underline;
-	text-weight:bolder;
+	font-weight:bolder;
 	font-size:120%;
 }
 .panel-even{
@@ -385,6 +382,7 @@ table,tr,td.noBorder{
 input[type="number"] {
 	-moz-appearance: textfield;
 }
+
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -869,16 +867,16 @@ td.negativeNumber{
 	.smallWidthCardFormat > tfoot > tr > th,
 	.smallWidthCardFormat > thead > tr > td,
 	.smallWidthCardFormat > thead > tr > th {
-	    border: none;  !important;
+	    border: none  !important;
 	}	
 	.smallWidthCardFormat tr{
-		margin-bottom: 20px;  !important;
-		display: block;  !important;
-		box-shadow: 2px 2px 1px #dadada;  !important;
+		margin-bottom: 20px  !important;
+		display: block  !important;
+		box-shadow: 2px 2px 1px #dadada  !important;
 	}
 	.smallWidthCardFormat td{
-		display: block;  !important;
-		font-size: 13px; !important;
+		display: block  !important;
+		font-size: 13px !important;
 		text-align:left;
 	}
 	
@@ -930,12 +928,14 @@ select {
 }
 
 .navbar-nav > li > a {
-    padding-top: 5px;  !important;
-    line-height: 0px;  !important;
+    padding-top: 5px  !important;
+    line-height: 0px  !important;
 }
+
 .content:first-child {
-    padding-top: 0px;  !important;
+    padding-top: 0px  !important;
 }
+
 .ordListParamCont{
 	display:inline;
 	clear:right;
@@ -1100,7 +1100,7 @@ select {
 	font-size: bigger;
 	font-weight:bolder !important;	
 	border:2px solid black !important;	
-	background-color:# ffcccc !important;		
+	background-color:#ffcccc !important;		
 	display: inline;
 }
 .contactPhoto{
@@ -1286,4 +1286,170 @@ tr.deleted_row {
 }
 #MaterialActionList3_Model td {
 	padding: 5px 10px !important;
+}
+
+/* TM MAX activation  */
+.activation-grid {
+	padding: 12px 0;
+}
+
+.two-columns {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(280px, 560px));
+	gap: 16px;
+	align-items: stretch;
+	justify-content: start;
+}
+
+.status-card {
+	box-sizing: border-box;
+	width: 100%;
+	min-height: 104px;
+	border: 1px solid #e5e7eb;
+	border-radius: 18px;
+	background: #ffffff;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+	overflow: hidden;
+}
+
+.card-telegram {
+	border-color: rgba(34, 158, 217, 0.22);
+	background:
+		linear-gradient(135deg, rgba(34, 158, 217, 0.08), rgba(34, 158, 217, 0.02)),
+		#ffffff;
+}
+
+.card-max {
+	border-color: rgba(138, 92, 246, 0.22);
+	background:
+		linear-gradient(135deg, rgba(138, 92, 246, 0.08), rgba(138, 92, 246, 0.02)),
+		#ffffff;
+}
+
+.card-content {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	min-height: 104px;
+	padding: 18px 20px;
+	box-sizing: border-box;
+}
+
+.status-text {
+	display: inline-block;
+	font-size: 15px;
+	line-height: 1.35;
+	font-weight: 600;
+	color: #1f2937;
+}
+
+.card-telegram .status-text {
+	color: #1687c9;
+}
+
+.card-max .status-text {
+	color: #6f42c1;
+}
+
+.status-text-muted {
+	color: #6b7280 !important;
+	font-weight: 500;
+}
+
+.avatar-img {
+	display: block;
+	width: 56px;
+	height: 56px;
+	min-width: 56px;
+	border-radius: 50%;
+	object-fit: cover;
+	background: #f3f4f6;
+	border: 2px solid rgba(255, 255, 255, 0.95);
+	box-shadow:
+		0 4px 12px rgba(0, 0, 0, 0.12),
+		0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.card-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: center;
+	gap: 12px;
+	width: 100%;
+}
+
+.invite-wrap {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	width: 100%;
+}
+
+[id$=":btnTmInvite"],
+[id$=":btnMaxQR"],
+[id$=":btnMaxInvite"] {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 40px;
+}
+
+[id$=":btnTmInvite"] > *,
+[id$=":btnMaxQR"] > *,
+[id$=":btnMaxInvite"] > * {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-height: 40px;
+	padding: 0 16px;
+	border: 0;
+	border-radius: 12px;
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: none;
+	box-sizing: border-box;
+}
+
+[id$=":btnTmInvite"] > * {
+	background: #229ed9;
+	color: #ffffff;
+	box-shadow: 0 6px 16px rgba(34, 158, 217, 0.28);
+}
+[id$=":btnMaxQR"] > *,
+[id$=":btnMaxInvite"] > * {
+	background: #8a5cf6;
+	color: #ffffff;
+	box-shadow: 0 6px 16px rgba(138, 92, 246, 0.28);
+}
+
+[id$=":btnTmInvite"] > *:hover,
+[id$=":btnMaxQR"] > *:hover,
+[id$=":btnMaxInvite"] > *:hover {
+	opacity: 0.94;
+}
+
+[id$=":btnTmInvite"] img,
+[id$=":btnMaxQR"] img,
+[id$=":btnMaxInvite"] img {
+	display: block;
+	width: 18px;
+	height: 18px;
+	object-fit: contain;
+}
+
+@media (max-width: 760px) {
+	.two-columns {
+		grid-template-columns: 1fr;
+	}
+}
+
+.glyphicon-before{
+	margin-right: 5px;
+}
+.glyphicon-after{
+	margin-left: 5px;
 }

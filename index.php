@@ -1,7 +1,10 @@
 <?php
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Expose-Headers: X-LSN-Position');
-header('Access-Control-Allow-Headers: Content-Type, X-Requested-With, X-LSN-Position');
+header('Access-Control-Allow-Headers: Content-Type, X-Requested-With, X-LSN-Position, X-NODE-ID, X-NODE-DB-ID');
+
+require_once('Config.uniq.php');
+header('X-NODE-ID: '.NODE_ID);
 
 /* header('Service-Worker-Allowed: /'); */
 require_once('Config.php');

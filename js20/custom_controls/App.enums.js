@@ -67,6 +67,7 @@
 ,"ru_mixer_route":"Маршрут для миксериста"
 ,"ru_order_cancel":"Отмена заявки"
 ,"ru_tm_invite":"Приглашение в Telegram"
+,"ru_max_invite":"Приглашение в MAX"
 ,"ru_new_pwd":"Новый пароль"
 }
 

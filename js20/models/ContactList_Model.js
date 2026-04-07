@@ -140,6 +140,15 @@ function ContactList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
+	options.fields.max_data = new FieldJSON("max_data",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
 	options.fields.ext_id = new FieldInt("ext_id",filed_options);
 	
 		ContactList_Model.superclass.constructor.call(this,id,options);

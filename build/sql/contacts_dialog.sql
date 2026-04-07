@@ -1,6 +1,6 @@
 -- VIEW: contacts_dialog
 
---DROP VIEW contacts_dialog;
+DROP VIEW contacts_dialog;
 
 CREATE OR REPLACE VIEW contacts_dialog AS
 	SELECT
@@ -28,11 +28,21 @@ CREATE OR REPLACE VIEW contacts_dialog AS
 			)
 		FROM attachments AS att
 		WHERE att.ref->>'dataType' = 'contacts' AND (att.ref->'keys'->>'id')::int = ct.id
-		) AS attachments_list
+		) AS attachments_list,
 		
+		CASE WHEN mxu.max_user_id IS NULL THEN NULL
+		ELSE
+			json_build_object(
+				'max_user_id', mxu.max_user_id,
+				'username', mxu.username,
+				'avatar_url', mxu.avatar_url
+			) 
+		END AS max_data
+
 	FROM contacts AS ct
 	LEFT JOIN posts AS p ON p.id = ct.post_id
 	LEFT JOIN notifications.ext_users_photo_list AS e_us ON e_us.ext_contact_id = ct.id
+	LEFT JOIN notifications.max_users AS mxu ON mxu.contact_id = ct.id
 	ORDER BY ct.name
 	;
 	

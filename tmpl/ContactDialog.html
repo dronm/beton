@@ -31,13 +31,63 @@
 		</div>
 	</div>
 
-	{{#TM_ACTIVATED}}
-	<div sytle="display: flex; align-items: center;gap: 10px;">
-		<span>Активирован Telegram
-		</span>
-		<img src="data:image/png;base64, {{TM_PHOTO}}">
-		</img>
+	<div class="activation-grid">
+		<div class="two-columns">
+			<div class="status-card card-telegram">
+				<div class="card-content">
+					{{#TM_ACTIVATED}}
+					<span class="status-text">
+						Активирован Telegram
+					</span>
+					<img
+						class="avatar-img"
+						src="data:image/png;base64, {{TM_PHOTO}}"
+						alt="Telegram avatar"
+					/>
+					{{/TM_ACTIVATED}}
+
+					{{^TM_ACTIVATED}}
+					<div class="card-empty">
+						<span class="status-text status-text-muted">
+							Telegram не активирован
+						</span>
+						<div class="invite-wrap">
+							<div id="{{id}}:btnTmInvite">
+							</div>
+						</div>
+					</div>
+					{{/TM_ACTIVATED}}
+				</div>
+			</div>
+
+			<div class="status-card card-max">
+				<div class="card-content">
+					{{#MAX_ACTIVATED}}
+					<span class="status-text">
+						Активирован MAX
+					</span>
+					<img
+						class="avatar-img"
+						src="{{MAX_PHOTO}}"
+						alt="MAX activation avatar"
+					/>
+					{{/MAX_ACTIVATED}}
+
+					{{^MAX_ACTIVATED}}
+					<div class="card-empty">
+						<span class="status-text status-text-muted">
+							MAX не активирован
+						</span>
+						<div class="invite-wrap">
+							<div id="{{id}}:btnMaxInvite">
+							</div>
+							<div id="{{id}}:btnMaxQR" style="margin-left: 10px;">
+							</div>
+						</div>
+					</div>
+					{{/MAX_ACTIVATED}}
+				</div>
+			</div>
+		</div>
 	</div>
-	{{/TM_ACTIVATED}}
-	
 </div>	

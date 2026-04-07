@@ -1456,6 +1456,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/views/ProductionReportList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ProductionReportList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/ProductionReportDialog_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ProductionReportDialog_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/FuelConsumptionSchemaList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/FuelConsumptionSchemaList_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/views/MaxUserList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/MaxUserList_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/views/MaxOutMessageList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/MaxOutMessageList_View.js')) ));
 		
 		$this->addJsModel(new ModelJavaScript('js20/forms/ViewList_Form.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/forms/ViewList_Form.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/forms/MainMenuConstructor_Form.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/forms/MainMenuConstructor_Form.js')) ));
@@ -1654,6 +1656,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ProductionReportMatTo1cBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ProductionReportMatTo1cBtn.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/EditMonth.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/EditMonth.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/FuelConsumptionSchemaEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/FuelConsumptionSchemaEdit.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/MAXShowQRBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/MAXShowQRBtn.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/MAXInviteBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/MAXInviteBtn.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/rs_ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/rs_ru.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/rs_common_ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/rs_common_ru.js')) ));
 		
@@ -2198,6 +2202,10 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/enum_controls/EnumGridColumn_ownership_types.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/enum_controls/EnumGridColumn_ownership_types.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controllers/FuelConsumption_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/FuelConsumption_Controller.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/ProductionSiteDialog_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ProductionSiteDialog_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/controllers/MaxUser_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/MaxUser_Controller.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/MaxUserList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/MaxUserList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/controllers/MaxOutMessage_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/MaxOutMessage_Controller.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/MaxOutMessageList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/MaxOutMessageList_Model.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

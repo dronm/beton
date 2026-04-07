@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-03-30 11:23:56</lastBuild></version>
+		<lastBuild>2026-04-07 06:53:57</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -314,6 +314,7 @@
 		<version dateOpen="2026-03-30 08:13:57" dateClose="2026-03-30 08:14:09">1.00406</version>
 		<version dateOpen="2026-03-30 11:21:14" dateClose="2026-03-30 11:23:59">1.00407</version>
 		<version dateOpen="2026-03-31 07:14:41" dateClose="2026-03-31 07:16:24">1.00408</version>
+		<version dateOpen="2026-04-03 10:39:17" dateClose="2026-04-07 06:54:23">1.00409</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -498,6 +499,9 @@
 			</value>
 			<value id="tm_invite">
 				<ru descr="Приглашение в Telegram"/>
+			</value>
+			<value id="max_invite">
+				<ru descr="Приглашение в MAX"/>
 			</value>
 			<value id="new_pwd">
 				<ru descr="Новый пароль"/>
@@ -3244,6 +3248,7 @@
 			<field id="tm_first_name" dataType="String"/>
 			<field id="tm_exists" dataType="Bool"/>
 			<field id="tm_activated" dataType="Bool"/>
+			<field id="max_data" dataType="JSON"/>
 			<field id="ext_id" dataType="Int"/>
 		</model>
 		<model id="ContactDialog" parent="ModelSQL" dataTable="contacts_dialog" virtual="FALSE">
@@ -3261,6 +3266,7 @@
 			<field id="tm_first_name" dataType="String"/>
 			<field id="tm_first_name" dataType="String"/>
 			<field id="attachments_list" dataType="JSON"/>
+			<field id="max_data" dataType="JSON"/>
 		</model>
 		<model id="EntityContact" parent="ModelSQL" dataTable="entity_contacts" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" sysCol="TRUE"/>
@@ -4710,6 +4716,73 @@
 			<field id="date_time" dataType="DateTime"/>
 			<field id="contacts_ref" dataType="JSON"/>
 			<field id="entity" dataType="JSON"/>
+		</model>
+		<model id="MaxUser" parent="ModelSQL" dataTable="max_users" virtual="FALSE" dataSchema="notifications">
+			<defaultOrder>
+				<field id="updated_at" sortDirect="DESC"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="max_user_id" dataType="Int"/>
+			<field id="username" dataType="Text"/>
+			<field id="avatar_url" dataType="Text"/>
+			<field id="row_user" dataType="JSONB"/>
+			<field id="row_user_with_phote" dataType="JSONB"/>
+			<field id="ext_contact_id" dataType="Int"/>
+			<field id="updated_at" dataType="DateTimeTZ"/>
+			<index id="max_users_max_user_id_idx" unique="TRUE">
+				<field id="max_user_id"/>
+			</index>
+			<index id="max_users_max_contact_id_idx" unique="TRUE">
+				<field id="contact_id"/>
+			</index>
+		</model>
+		<model id="MaxUserList" parent="ModelSQL" dataTable="max_users_list" virtual="TRUE" dataSchema="notifications">
+			<defaultOrder>
+				<field id="updated_at" sortDirect="DESC"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="max_user_id" dataType="Int"/>
+			<field id="username" dataType="Text"/>
+			<field id="avatar_url" dataType="Text"/>
+			<field id="raw_user" dataType="JSONB"/>
+			<field id="raw_user_with_phote" dataType="JSONB"/>
+			<field id="contacts_ref" dataType="JSON"/>
+			<field id="updated_at" dataType="DateTimeTZ"/>
+			<field id="contacts_tel" dataType="Text"/>
+		</model>
+		<model id="MaxOutMessage" parent="ModelSQL" dataTable="max_out_messages" virtual="FALSE" dataSchema="notifications">
+			<defaultOrder>
+				<field id="sent_at" sortDirect="DESC"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="message" dataType="JSONB"/>
+			<field id="created_at" dataType="DateTimeTZ"/>
+			<field id="sent_at" dataType="DateTimeTZ"/>
+			<field id="max_chat_id" dataType="Int"/>
+			<field id="contact_id" dataType="Int" refTable="contacts" refField="id"/>
+			<field id="errors_str" dataType="Text"/>
+			<index id="max_out_messages_created_at_idx">
+				<field id="created_at"/>
+			</index>
+			<index id="max_out_messages_contact_id_idx">
+				<field id="contact_id"/>
+			</index>
+			<index id="max_out_messages_not_sent_idx">
+				<expression>sent_at IS NULL</expression>
+			</index>
+		</model>
+		<model id="MaxOutMessageList" parent="ModelSQL" dataTable="max_out_messages_list" virtual="TRUE" dataSchema="notifications">
+			<defaultOrder>
+				<field id="created_at" sortDirect="DESC"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="message" dataType="JSONB"/>
+			<field id="created_at" dataType="DateTimeTZ"/>
+			<field id="sent_at" dataType="DateTimeTZ"/>
+			<field id="max_chat_id" dataType="Int"/>
+			<field id="contact_id" dataType="Int" refTable="contacts" refField="id"/>
+			<field id="contacts_ref" dataType="JSON"/>
+			<field id="error_str" dataType="Text"/>
 		</model>
 		<model id="Chat" parent="ModelSQL" dataTable="chat" virtual="TRUE" dataSchema="notifications">
 			<field id="date_time" dataType="DateTimeTZ" primaryKey="TRUE"/>
@@ -7268,6 +7341,39 @@
 			<publicMethod id="get_list" modelId="TmInMessageList"/>
 			<publicMethod id="get_object" modelId="TmInMessageList"/>
 		</controller>
+		<controller id="MaxUser" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="delete" modelId="MaxUser"/>
+			<publicMethod id="get_list" modelId="MaxUserList"/>
+			<publicMethod id="get_object" modelId="MaxUserList"/>
+			<publicMethod id="complete" modelId="MaxUserList" patternFieldId="username"/>
+			<publicMethod id="update" modelId="MaxUser"/>
+		</controller>
+		<controller id="MaxOutMessage" parentId="ControllerSQL" noState="FALSE" file="build/templates/controllers/MaxOutMessage_Controller_php.xsl">
+			<publicMethod id="get_list" modelId="MaxOutMessageList"/>
+			<publicMethod id="get_object" modelId="MaxOutMessageList"/>
+			<publicMethod id="send">
+				<field id="recipient" dataType="String" length="500" required="TRUE"/>
+				<field id="message" dataType="String" lengith="1000" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="send_media" encType="multipart" requestType="post">
+				<field id="recipient" dataType="String" length="500" required="TRUE"/>
+				<field id="caption" dataType="String" length="1000"/>
+				<field id="media_file" dataType="Text"/>
+			</publicMethod>
+			<publicMethod id="invite">
+				<field id="recipient" dataType="String" length="500" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="invite_contact">
+				<field id="contact_id" dataType="Int" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="get_recipient_inf">
+				<field id="recipient" dataType="String" length="500" required="TRUE"/>
+			</publicMethod>
+		</controller>
+		<controller id="MaxInMessage" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="get_list" modelId="MaxInMessageList"/>
+			<publicMethod id="get_object" modelId="MaxInMessageList"/>
+		</controller>
 		<controller id="Chat" parentId="ControllerSQL" noState="FALSE">
 			<publicMethod id="get_history" modelId="Chat">
 				<field id="recipient" dataType="String" length="500" required="TRUE"/>
@@ -7985,6 +8091,8 @@
 		<view id="30041" c="AuditLog_Controller" f="get_list" t="AuditLogList" section="Формы" descr="История изменений объектов"/>
 		<view id="30042" c="FuelTransaction_Controller" f="get_list" t="FuelTransactionList" section="Формы" descr="Транзакции по топливным картам"/>
 		<view id="30043" t="Connect1c" section="Формы" descr="Управление состоянием коннектора 1с"/>
+		<view id="30044" c="MaxUser_Controller" t="MaxUserList" f="get_list" section="Формы" descr="Соответствия пользователей в MAX"/>
+		<view id="30045" c="MaxOutMessage_Controller" t="MaxOutMessageList" f="get_list" section="Формы" descr="Исходящие сообщения MAX"/>
 		<view id="50001" t="VehicleStopsReport" section="Отчеты" descr="Стоянки ТС"/>
 		<view id="50002" t="VehicleScheduleReportAll" section="Отчеты" descr="Печать графиков"/>
 		<view id="50003" t="RouteToDestAvgTimeRep" section="Отчеты" descr="Среднее время до объектов"/>
@@ -8154,6 +8262,8 @@
 		<serverTemplate id="AuditLogList" class="list"/>
 		<serverTemplate id="FuelTransactionList" class="list"/>
 		<serverTemplate id="ProductionReportList" class="list"/>
+		<serverTemplate id="MaxUserList" class="list"/>
+		<serverTemplate id="MaxOutMessageList" class="list"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="js20/tmpl/FatalException.html"/>
@@ -8815,6 +8925,8 @@
 		<jsScript file="js20/views/ProductionReportList_View.js"/>
 		<jsScript file="js20/views/ProductionReportDialog_View.js"/>
 		<jsScript file="js20/views/FuelConsumptionSchemaList_View.js"/>
+		<jsScript file="js20/views/MaxUserList_View.js"/>
+		<jsScript file="js20/views/MaxOutMessageList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="js20/forms/ViewList_Form.js"/>
 		<jsScript file="js20/forms/MainMenuConstructor_Form.js"/>
@@ -9018,6 +9130,8 @@
 		<jsScript file="js20/custom_controls/ProductionReportMatTo1cBtn.js"/>
 		<jsScript file="js20/custom_controls/EditMonth.js"/>
 		<jsScript file="js20/custom_controls/FuelConsumptionSchemaEdit.js"/>
+		<jsScript file="js20/custom_controls/MAXShowQRBtn.js"/>
+		<jsScript file="js20/custom_controls/MAXInviteBtn.js"/>
 		<jsScript file="js20/views/rs_ru.js"/>
 		<jsScript file="js20/views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -9564,6 +9678,10 @@
 		<jsScript file="js20/enum_controls/EnumGridColumn_ownership_types.js"/>
 		<jsScript file="js20/controllers/FuelConsumption_Controller.js"/>
 		<jsScript file="js20/models/ProductionSiteDialog_Model.js"/>
+		<jsScript file="js20/controllers/MaxUser_Controller.js"/>
+		<jsScript file="js20/models/MaxUserList_Model.js"/>
+		<jsScript file="js20/controllers/MaxOutMessage_Controller.js"/>
+		<jsScript file="js20/models/MaxOutMessageList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

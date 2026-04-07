@@ -52,6 +52,8 @@ function EnumGridColumn_sms_types(options){
 
 	options.multyLangValues["ru"]["tm_invite"] = "Приглашение в Telegram";
 
+	options.multyLangValues["ru"]["max_invite"] = "Приглашение в MAX";
+
 	options.multyLangValues["ru"]["new_pwd"] = "Новый пароль";
 
 	

@@ -238,6 +238,9 @@ function add_notification_from_contact($linkMaster, $tel, $msg, $smsType, $docRe
 							'tm', jsonb_build_object(
 								'text', %s
 							),
+							'max', jsonb_build_object(
+								'text', %s
+							),
 							'ext_user',(SELECT users_ref(u) FROM users AS u WHERE u.id=%d),
 							'sms',jsonb_build_object(
 								'tel', %s,
@@ -251,6 +254,7 @@ function add_notification_from_contact($linkMaster, $tel, $msg, $smsType, $docRe
 		)",
 		MS_APP_ID,
 		$extContactId,
+		$msg_for_db,
 		$msg_for_db,
 		$_SESSION['user_id'],
 		$tel_for_db,
@@ -274,6 +278,32 @@ function add_notification_from_contact_tm($linkMaster, $tel, $msg, $smsType, $do
 						jsonb_build_object(
 							'ext_contact_id', %d,
 							'tm', jsonb_build_object(
+								'text', %s
+							),
+							'ext_user',(SELECT users_ref(u) FROM users AS u WHERE u.id=%d)
+						)
+					)
+				)
+		)",
+		MS_APP_ID,
+		$extContactId,
+		$msg_for_db,
+		isset($_SESSION['user_id'])? $_SESSION['user_id']:0
+	));
+}
+
+function add_notification_from_contact_max($linkMaster, $tel, $msg, $smsType, $docRef, $extContactId){
+	$msg_for_db = NULL;
+	FieldSQLString::formatForDb($linkMaster, $msg, $msg_for_db);
+
+	$linkMaster->query(sprintf(
+		"INSERT INTO notifications.ext_messages VALUES(
+				jsonb_build_object(
+					'app_id', %d,
+					'messages', jsonb_build_array(
+						jsonb_build_object(
+							'ext_contact_id', %d,
+							'max', jsonb_build_object(
 								'text', %s
 							),
 							'ext_user',(SELECT users_ref(u) FROM users AS u WHERE u.id=%d)

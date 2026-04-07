@@ -181,7 +181,8 @@ function OrderDialog_View(id,options){
 				"tm_id":new FieldInt("tm_id"),
 				"tm_exists":new FieldBool("tm_exists"),
 				"tm_activated":new FieldBool("tm_activated"),
-				"tm_photo":new FieldString("tm_photo")
+				"tm_photo":new FieldString("tm_photo"),
+				"max_data":new FieldJSON("max_data")
 			}
 		})
 		
@@ -198,14 +199,29 @@ function OrderDialog_View(id,options){
 			"acPatternFieldId":"descr",
 			"acKeyFields":[descr_ac_model.getField("descr")],
 			"acDescrFunction":function(f){
-				var tm = (f.tm_exists.getValue()&&f.tm_activated.getValue());
-				return f.descr.getValue()+" "+CommonHelper.maskFormat(f.phone_cel.getValue(), window.getApp().getPhoneEditMask()) + (tm? " (Telegarm)":" (СМС)");
+				const tm = (f.tm_exists.getValue() && f.tm_activated.getValue());
+				const mx = f.max_data? f.max_data.getValue() : undefined;
+				let msng = "СМС";
+				if(mx){
+					msng = "MAX";
+				}else if (tm){
+					msng = "Telegarm";
+				}
+				return f.descr.getValue()+" "+CommonHelper.maskFormat(f.phone_cel.getValue(), window.getApp().getPhoneEditMask()) + " ("+msng+")";
 			},
 			"acOnCompleteTextOut": function(textHTML,modelRow){
 				var pref = "";
-				if(modelRow&&modelRow.tm_photo.getValue()){
-					//Contact photo
-					pref = "<img class='contactPhoto' src='data:image/png;base64, "+modelRow.tm_photo.getValue()+"'/img>";
+				if(modelRow){
+					if(modelRow.max_data && modelRow.max_data.getValue()){
+						const max_data = modelRow.max_data.getValue();
+						if(max_data.avatar_url){
+							pref = "<img class='contactPhoto' src='"+max_data.avatar_url+"'/img>";
+						}
+					}
+					if(pref == "" && modelRow.tm_photo.getValue()){
+						//Contact photo
+						pref = "<img class='contactPhoto' src='data:image/png;base64, "+modelRow.tm_photo.getValue()+"'/img>";
+					}
 				}
 				DOMHelper.delNodesOnClass("contactPhoto");
 				return pref + textHTML;
@@ -415,20 +431,55 @@ OrderDialog_View.prototype.showTMInvite = function(){
 	EventHelper.add(tm_ctrl.getNode(), "click", this.m_onTMInviteClick);
 
 }
+
+OrderDialog_View.prototype.showMaxInvite = function(){
+	const invCont = this.getElement("descr").getInfoControls();
+	const self = this;
+	const invBtn = new MAXInviteBtn(this.getId()+":descr:error:maxInvite", {
+		"onClick": function(){
+			self.getContactRef(function(ref){
+				window.getApp().MAXInviteContact(ref, function(){
+					self.hideMsngInvite();
+				});
+			});
+		}
+	});
+	const qrBtn = new MAXShowQRBtn(this.getId()+":descr:error:maxShowQR", {"attrs": {"style":"margin-left: 3px;"}});
+	invCont.clear();
+	invCont.addElement(invBtn);
+	invCont.addElement(qrBtn);
+	invCont.toDOM();
+
+	// DOMHelper.addClass(invCont.getNode(), "tmInvite");
+}
+
 OrderDialog_View.prototype.showPhoto = function(ctrl, base64Data){
 	ctrl.popup(
 		'<div><img src="data:image/png;base64, '+base64Data+'"/></div>',
 		{"title":"Данные по контакту"}
 	);
 }
+OrderDialog_View.prototype.showPhotoFromUrl = function(ctrl, photoUrl){
+	ctrl.popup(
+		'<div><img src="'+photoUrl+'"/></div>',
+		{"title":"Данные по контакту"}
+	);
+}
+
 OrderDialog_View.prototype.showTMInf = function(activated, photo, tmId){
-	var tm_ctrl = this.getElement("descr").getErrorControl();
-	tm_ctrl.setValue(activated? "Пользователь Telegram" : "Сообщение отправлено, Telegram не активирован", "info");	
-	DOMHelper.delNodesOnClass("contactPhoto");
+	const infCont = this.getElement("descr").getInfoControls();
+	infCont.clear();
+
 	if(photo && tmId){
-		var img = DOMHelper.elem("IMG", {"class":"contactPhoto", "src": "data:image/png;base64, "+photo});
+		const img = new Control(null, "IMG", {
+			"attrs": {
+				"class":"contactPhoto", 
+				"src": "data:image/png;base64, "+photo
+			}
+		});
+
 		this.photoDetail = new ToolTip({
-			"node": img,
+			"node": img.m_node,
 			"wait":2,
 			"onHover":(function(cont, id){
 				return function(event){
@@ -455,17 +506,68 @@ OrderDialog_View.prototype.showTMInf = function(activated, photo, tmId){
 			})(this, tmId)
 		});
 	
-		tm_ctrl.m_node.parentNode.insertBefore(img, tm_ctrl.m_node);
+		// tm_ctrl.m_node.parentNode.insertBefore(img, tm_ctrl.m_node);
+		infCont.addElement(img);
+	}
+
+	infCont.addElement(new Control(null, "SPAN", {
+		"value": activated? "Пользователь Telegram" : "Сообщение отправлено, Telegram не активирован",
+		"attrs": {
+			"class": "help-block text-info"
+		}
+	}));
+	infCont.toDOM();
+}
+
+OrderDialog_View.prototype.hideMsngInvite = function(){
+	const msng_ctrl = this.getElement("descr").getErrorControl();
+	msng_ctrl.setValue("","info");
+	if(this.m_onTMInviteClick){
+		EventHelper.add(msng_ctrl.getNode(), "click", this.m_onTMInviteClick);
+	}	
+	DOMHelper.delNodesOnClass("contactPhoto");
+
+	const inf_cont = this.getElement("descr").getInfoControls();
+	if(inf_cont.getCount()){
+		inf_cont.clear();
+		inf_cont.toDOM();
 	}
 }
 
-OrderDialog_View.prototype.hideTMInvite = function(){
-	var tm_ctrl = this.getElement("descr").getErrorControl();
-	tm_ctrl.setValue("","info");
-	if(this.m_onTMInviteClick){
-		EventHelper.add(tm_ctrl.getNode(), "click", this.m_onTMInviteClick);
-	}	
-	DOMHelper.delNodesOnClass("contactPhoto");
+OrderDialog_View.prototype.showMAXInf = function(activated, avatarUrl, avatarBigUrl ){
+	var cont = this.getElement("descr").getInfoControls();
+	cont.clear();
+
+	if(avatarUrl && avatarUrl.length){
+		// var img = DOMHelper.elem("IMG", {"class":"contactPhoto", "src": avatarUrl, "widht": "35px", "height":"35px"});
+		const img = new Control(null, "IMG", 
+			{
+			"attrs":{
+				"class":"contactPhoto", 
+				"src": avatarUrl, "widht": "35px", "height":"35px"
+			}
+		});
+
+		this.photoDetail = new ToolTip({
+			"node": img.m_node,
+			"wait":2,
+			"onHover":(function(cont, avatarUrl){
+				return function(event){
+					cont.showPhotoFromUrl(this, avatarUrl);
+				}
+			})(this, avatarBigUrl)
+		});
+	
+		// mx_ctrl.m_node.parentNode.insertBefore(img, mx_ctrl.m_node);
+		cont.addElement(img);
+	}
+	cont.addElement(new Control(null, "SPAN", {
+		"value": activated? "Пользователь MAX" : "Сообщение отправлено, MAX не активирован",
+		"attrs": {
+			"class": "help-block text-info"
+		}
+	}));
+	cont.toDOM();
 }
 
 OrderDialog_View.prototype.onSelectDescr = function(f){
@@ -474,11 +576,18 @@ OrderDialog_View.prototype.onSelectDescr = function(f){
 	this.m_selectedContactId = f.contact_id.getValue();	
 	var descr = f.descr.getValue();
 	this.getElement("descr").setValue(descr);	
-	if(descr && descr.length && !f.tm_exists.getValue()){
-		this.showTMInvite();
-		
-	}else if(descr && descr.length){
-		this.showTMInf(f.tm_activated.getValue(), f.tm_photo.getValue(), f.tm_id.getValue());
+
+	//messenger
+	if(descr && descr.length){
+		const max_data = f.max_data.getValue();
+		if(max_data){
+			this.showMAXInf(true, max_data.avatar_url, max_data.avatar_url);
+
+		}else if(f.tm_exists.getValue()){
+			this.showTMInf(f.tm_activated.getValue(), f.tm_photo.getValue(), f.tm_id.getValue());
+		}else{
+			this.showMaxInvite();
+		}
 	}
 }
 
@@ -488,20 +597,20 @@ OrderDialog_View.prototype.onLeaveContact = function(){
 	var phone_cel = this.getElement("phone_cel").getValue();
 	if(!this.m_selectedContactId && descr && descr.length && phone_cel && phone_cel.length==10){
 		//new contact
-		this.showTMInvite();
+		this.showMaxInvite();
 	}
 }
 
 OrderDialog_View.prototype.onClearDescr = function(f){
 	this.getElement("phone_cel").reset();
-	this.hideTMInvite();
+	this.hideMsngInvite();
 }
 
 OrderDialog_View.prototype.onTMInviteClick = function(){
 	var self = this;
 	self.getContactRef(function(ref){
 		window.getApp().TMInviteContact(ref, function(){
-			self.hideTMInvite();
+			self.hideMsngInvite();
 		});
 	});
 }

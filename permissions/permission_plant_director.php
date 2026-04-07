@@ -1458,6 +1458,34 @@ $permissions = array();
 				
 					$permissions['TmInMessage_Controller_get_object']=TRUE;
 				
+					$permissions['MaxUser_Controller_delete']=TRUE;
+				
+					$permissions['MaxUser_Controller_get_list']=TRUE;
+				
+					$permissions['MaxUser_Controller_get_object']=TRUE;
+				
+					$permissions['MaxUser_Controller_complete']=TRUE;
+				
+					$permissions['MaxUser_Controller_update']=TRUE;
+				
+					$permissions['MaxOutMessage_Controller_get_list']=TRUE;
+				
+					$permissions['MaxOutMessage_Controller_get_object']=TRUE;
+				
+					$permissions['MaxOutMessage_Controller_send']=TRUE;
+				
+					$permissions['MaxOutMessage_Controller_send_media']=TRUE;
+				
+					$permissions['MaxOutMessage_Controller_invite']=TRUE;
+				
+					$permissions['MaxOutMessage_Controller_invite_contact']=TRUE;
+				
+					$permissions['MaxOutMessage_Controller_get_recipient_inf']=TRUE;
+				
+					$permissions['MaxInMessage_Controller_get_list']=TRUE;
+				
+					$permissions['MaxInMessage_Controller_get_object']=TRUE;
+				
 					$permissions['Chat_Controller_get_history']=TRUE;
 				
 					$permissions['Post_Controller_insert']=TRUE;
