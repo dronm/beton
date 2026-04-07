@@ -1,4 +1,4 @@
-/** Copyright (c) 2019
+/** Copyright (c) 2019 - 2026
  *	Andrey Mikhalevich, Katren ltd.
  */
 function OrderDialog_View(id,options){	
@@ -432,8 +432,7 @@ OrderDialog_View.prototype.showTMInvite = function(){
 
 }
 
-OrderDialog_View.prototype.showMaxInvite = function(){
-	const invCont = this.getElement("descr").getInfoControls();
+OrderDialog_View.prototype.addMaxInviteToCont = function(invCont){
 	const self = this;
 	const invBtn = new MAXInviteBtn(this.getId()+":descr:error:maxInvite", {
 		"onClick": function(){
@@ -448,9 +447,12 @@ OrderDialog_View.prototype.showMaxInvite = function(){
 	invCont.clear();
 	invCont.addElement(invBtn);
 	invCont.addElement(qrBtn);
-	invCont.toDOM();
+}
 
-	// DOMHelper.addClass(invCont.getNode(), "tmInvite");
+OrderDialog_View.prototype.showMaxInvite = function(){
+	const invCont = this.getElement("descr").getInfoControls();
+	this.addMaxInviteToCont(invCont);
+	invCont.toDOM();
 }
 
 OrderDialog_View.prototype.showPhoto = function(ctrl, base64Data){
@@ -469,6 +471,22 @@ OrderDialog_View.prototype.showPhotoFromUrl = function(ctrl, photoUrl){
 OrderDialog_View.prototype.showTMInf = function(activated, photo, tmId){
 	const infCont = this.getElement("descr").getInfoControls();
 	infCont.clear();
+
+	//container for tm+max
+	const msgCont = new ControlContainer(null, "DIV", {
+		"attrs":{
+			//"style": "margin-top: 5px; display: grid; grid-template-columns: 50% 50%; border-radius: 1.5rem;"
+			"style": "margin-top: 5px;",
+			"class": "row"
+		}
+	});
+
+	const tmCont = new ControlContainer(null, "DIV", {
+		"attrs":{
+			"class": "col-lg-2"
+		}
+	});
+	msgCont.addElement(tmCont);
 
 	if(photo && tmId){
 		const img = new Control(null, "IMG", {
@@ -507,15 +525,27 @@ OrderDialog_View.prototype.showTMInf = function(activated, photo, tmId){
 		});
 	
 		// tm_ctrl.m_node.parentNode.insertBefore(img, tm_ctrl.m_node);
-		infCont.addElement(img);
+		tmCont.addElement(img);
 	}
 
-	infCont.addElement(new Control(null, "SPAN", {
+	tmCont.addElement(new Control(null, "SPAN", {
 		"value": activated? "Пользователь Telegram" : "Сообщение отправлено, Telegram не активирован",
 		"attrs": {
 			"class": "help-block text-info"
 		}
 	}));
+
+
+	//max invite
+	const maxCont = new ControlContainer(null, "DIV", {
+		"attrs":{
+			"class": "col-lg-4"
+		}
+	});
+	this.addMaxInviteToCont(maxCont);
+	msgCont.addElement(maxCont);
+
+	infCont.addElement(msgCont);
 	infCont.toDOM();
 }
 
