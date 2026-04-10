@@ -22,6 +22,9 @@ function ClientList_Model(options){
 	
 	options.fields = {};
 	
+			
+				
+			
 				
 	
 	var filed_options = {};
@@ -192,16 +195,6 @@ function ClientList_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.ref_1c_exists = new FieldBool("ref_1c_exists",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.shipment_quant_for_cost = new FieldFloat("shipment_quant_for_cost",filed_options);
-	options.fields.shipment_quant_for_cost.getValidator().setMaxLength('19');
 	
 		ClientList_Model.superclass.constructor.call(this,id,options);
 }

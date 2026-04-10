@@ -1746,8 +1746,12 @@ ServConnector there is a new version in old/ServConnectorNew.js with retries
 MAX info in Order
 
 
-to correct for MAX
-SendNotificationBtn
+1.00411
+1) MaterialFactConsumption_Controller->get_rolled_list() corrected heavy query.
+2) Graph_Controller corrected database connector, just like functions/con_f()
+TODO: invite to Telegram from saved orders?
+Still big latency (1000-3000)
+
 
 
 

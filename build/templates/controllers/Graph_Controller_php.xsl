@@ -92,19 +92,20 @@ class Graph_Controller extends Controller{
 	}
 	private static function get_db_con(){
 		$dbLink = new DB_Sql;
-		$dbLink->appname = APP_NAME;
+		$dbLink->appname		= APP_NAME;
 		$dbLink->technicalemail = TECH_EMAIL;
-		$dbLink->reporterror = DEBUG;
-		$dbLink->database	= DB_NAME;
+		$dbLink->database		= DB_NAME;
+		$dbLink->detailedError	= defined('DETAILED_ERROR')? DETAILED_ERROR:DEBUG;
 		$dbLink->connect(DB_SERVER,DB_USER,DB_PASSWORD, DB_PORT);			
 		return $dbLink;
 	}
 	private static function get_db_con_master(){
+		$db_name = (defined('DB_NAME_MASTER'))? DB_NAME_MASTER : DB_NAME;
 		$dbLink = new DB_Sql;
-		$dbLink->appname = APP_NAME;
+		$dbLink->appname		= APP_NAME;
 		$dbLink->technicalemail = TECH_EMAIL;
-		$dbLink->reporterror = DEBUG;
-		$dbLink->database	= DB_NAME;
+		$dbLink->database		= $db_name;
+		$dbLink->detailedError	= defined('DETAILED_ERROR')? DETAILED_ERROR:DEBUG;
 		$dbLink->connect(DB_SERVER_MASTER,DB_USER,DB_PASSWORD,DB_PORT_MASTER);			
 		return $dbLink;
 	}

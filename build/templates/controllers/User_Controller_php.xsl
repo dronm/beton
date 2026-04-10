@@ -1515,7 +1515,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	}
 		
 	/**
-	 * Отпрвляет код в телеграм
+	 * Отпрвляет код в Telergam, MAX
 	 */
 	public function tm_send_code($pm){
 		$ar_log = $this->getDbLink()->query_first(sprintf(
@@ -1540,34 +1540,25 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			throw new Exception('Код авторизации уже отправлен!');
 		}
 
-		$ar = $this->getDbLinkMaster()->query_first(sprintf(
+		$ar = $this->getDbLinkMaster()->query_first(
 			"SELECT
-				u.tm_first_name AS first_name,
-				u.ext_contact_id
-			FROM notifications.ext_users_list AS u
-			WHERE u.app_id = %d
-				AND u.ext_contact_id=(SELECT ct.id FROM contacts AS ct WHERE ct.tel=%s LIMIT 1)"
-			,MS_APP_ID
-			,$this->getExtDbVal($pm,'tel')
-		));
+				CASE 
+					WHEN mx.max_user_id IS NOT NULL THEN 'max' 
+					WHEN utm.tm_id IS NOT NULL THEN 'tm' 
+					ELSE NULL
+				END AS tp, 
+				coalesce(utm.tm_first_name, mx.username) AS first_name,
+				ct.id AS ext_contact_id
+			FROM contacts AS ct
+			LEFT JOIN notifications.ext_users_list AS utm 
+				ON utm.ext_contact_id = ct.id AND utm.app_id = $1
+			LEFT JOIN notifications.max_users AS mx ON mx.contact_id = ct.id
+			WHERE ct.tel = $2
+			LIMIT 1"
+			,[ MS_APP_ID, $this->getExtVal($pm,'tel') ]
+		);
 		
-		/*
-		$ar = $this->getDbLinkMaster()->query_first(sprintf(
-			"SELECT
-				u.tm_first_name AS first_name,
-				u.ext_obj,
-				t.id AS client_tel_id
-			FROM client_tels AS t
-			LEFT JOIN notifications.ext_users_list AS u ON
-				u.ext_obj->>'dataType'='client_tels'
-				AND (u.ext_obj->'keys'->>'id')::int=t.id
-			WHERE format_cel_standart(t.tel) = %s AND u.ext_obj IS NOT NULL
-			LIMIT 1",
-			$this->getExtDbVal($pm,'tel')
-		));
-		*/
-		
-		if(!is_array($ar) || !count($ar)){
+		if(!is_array($ar) || !count($ar) || !isset($ar["tp"])){
 			throw new Exception(self::ER_USER_NOT_DEFIND);
 		}
 
@@ -1577,8 +1568,13 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		try{
 			$code = gen_pwd(3, "NUM");
 			
-			add_notification_from_contact_tm($link, $this->getExtVal($pm,'tel'), 'Код авторизации: '.$code, 'tm_auth', NULL, $ar['ext_contact_id']);
-			
+			$txt = 'Код авторизации: '.$code;
+			if($ar["tp"] == "max"){
+				add_notification_from_contact_max($link, $this->getExtVal($pm,'tel'), $txt, 'max_auth', NULL, $ar['ext_contact_id']);
+			} else if($ar["tp"] == "tm"){
+				add_notification_from_contact_tm($link, $this->getExtVal($pm,'tel'), $txt, 'tm_auth', NULL, $ar['ext_contact_id']);
+			}
+
 			$tm_logins = $link->query_first(sprintf(
 				"SELECT 
 					TRUE AS exists 

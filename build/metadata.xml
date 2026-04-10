@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-04-07 06:53:57</lastBuild></version>
+		<lastBuild>2026-04-10 07:06:57</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -316,6 +316,7 @@
 		<version dateOpen="2026-03-31 07:14:41" dateClose="2026-03-31 07:16:24">1.00408</version>
 		<version dateOpen="2026-04-03 10:39:17" dateClose="2026-04-07 06:54:23">1.00409</version>
 		<version dateOpen="2026-04-07 07:41:32" dateClose="2026-04-07 07:42:28">1.00410</version>
+		<version dateOpen="2026-04-09 08:03:40" dateClose="2026-04-10 07:07:18">1.00411</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -914,6 +915,9 @@
 			</index>
 		</model>
 		<model id="ClientList" parent="ModelSQLBeton" dataTable="clients_list" virtual="TRUE">
+			<defaultOrder>
+				<field id="name"/>
+			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
 			<field id="name" dataType="String" alias="Наименование"/>
 			<field id="manager_comment" dataType="String"/>

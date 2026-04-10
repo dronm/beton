@@ -101,7 +101,8 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		//||' ('||pr_st.name||')'
 		$mat_model = new ModelSQL($link,array('id'=>'MaterialFactConsumptionMaterialList_Model'));
 		$mat_model->addField(new FieldSQLString($link,null,null,"raw_material_production_descr"));
-		$mat_model->query(sprintf(
+		/*
+		$q = sprintf(
 			"WITH 
 			prod_tot AS (
 				SELECT sum(concrete_quant) AS v
@@ -141,8 +142,125 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 			ORDER BY mat.ord,t.production_site_id",
 			$cond,
 			$cond
-		),
-		TRUE);
+		);
+		*/
+		//new variant
+		$q = sprintf("
+			WITH filtered_t AS MATERIALIZED (
+				SELECT
+					t.production_site_id,
+					t.production_id,
+					t.raw_material_id,
+					t.cement_silo_id,
+					t.raw_material_production_descr,
+					sum(t.material_quant) AS material_quant,
+					sum(t.material_quant_req) AS material_quant_req,
+					sum(t.concrete_quant) AS concrete_quant
+				FROM material_fact_consumptions AS t
+				%s
+				GROUP BY
+					t.production_site_id,
+					t.production_id,
+					t.raw_material_id,
+					t.cement_silo_id,
+					t.raw_material_production_descr
+			),
+			prod_keys AS MATERIALIZED (
+				SELECT DISTINCT
+					t.production_site_id,
+					t.production_id
+				FROM filtered_t AS t
+			),
+			prod_tot AS MATERIALIZED (
+				SELECT
+					sum(p.concrete_quant) AS v
+				FROM prod_keys AS k
+				JOIN productions AS p
+					ON p.production_site_id = k.production_site_id
+					AND p.production_id = k.production_id
+			),
+			t_cor AS MATERIALIZED (
+				SELECT
+					c.production_site_id,
+					c.production_id,
+					c.material_id,
+					c.cement_silo_id,
+					sum(c.quant) AS quant
+				FROM material_fact_consumption_corrections AS c
+				GROUP BY
+					c.production_site_id,
+					c.production_id,
+					c.material_id,
+					c.cement_silo_id
+			),
+			ra_mat AS MATERIALIZED (
+				SELECT
+					r.doc_id,
+					r.material_id,
+					sum(r.quant) AS quant
+				FROM ra_materials AS r
+				WHERE r.doc_type = 'shipment'
+				GROUP BY
+					r.doc_id,
+					r.material_id
+			),
+			agg AS (
+				SELECT
+					t.raw_material_production_descr,
+					t.production_site_id,
+					t.raw_material_id,
+					sum(t.material_quant + coalesce(c.quant, 0)) AS material_quant,
+					sum(t.material_quant_req) AS material_quant_req,
+					sum(
+						CASE
+							WHEN coalesce(sh.quant, 0) = 0 OR coalesce(t.concrete_quant, 0) = 0
+								THEN 0
+							ELSE coalesce(rm.quant, 0) / sh.quant * t.concrete_quant
+						END
+					) AS material_quant_shipped
+				FROM filtered_t AS t
+				LEFT JOIN productions AS p
+					ON p.production_site_id = t.production_site_id
+					AND p.production_id = t.production_id
+				LEFT JOIN shipments AS sh
+					ON sh.id = p.shipment_id
+				LEFT JOIN ra_mat AS rm
+					ON rm.doc_id = sh.id
+					AND rm.material_id = t.raw_material_id
+				LEFT JOIN t_cor AS c
+					ON c.production_site_id = t.production_site_id
+					AND c.production_id = t.production_id
+					AND c.material_id = t.raw_material_id
+					AND c.cement_silo_id = t.cement_silo_id
+				GROUP BY
+					t.raw_material_production_descr,
+					t.production_site_id,
+					t.raw_material_id
+			)
+			SELECT
+				a.raw_material_production_descr,
+				materials_ref(mat) AS raw_materials_ref,
+				pr_st.name AS production_name,
+				a.production_site_id,
+				pt.v AS concrete_quant,
+				a.material_quant,
+				a.material_quant_req,
+				a.material_quant_shipped
+			FROM agg AS a
+			JOIN raw_materials AS mat
+				ON mat.id = a.raw_material_id
+			LEFT JOIN production_sites AS pr_st
+				ON pr_st.id = a.production_site_id
+			CROSS JOIN prod_tot AS pt
+			ORDER BY
+				mat.ord,
+				a.production_site_id,
+				a.raw_material_production_descr
+			", 
+			$cond
+		);
+
+		$mat_model->query($q, TRUE);
 		$this->addModel($mat_model);			
 	
 		$this->setListModelId("MaterialFactConsumptionRolledList_Model");

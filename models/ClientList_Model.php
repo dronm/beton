@@ -10,9 +10,9 @@ require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
-require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
+require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class ClientList_Model extends ModelSQLBeton{
@@ -205,16 +205,12 @@ class ClientList_Model extends ModelSQLBeton{
 		$f_ref_1c_exists=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ref_1c_exists",$f_opts);
 		$this->addField($f_ref_1c_exists);
 		//********************
-		
-		//*** Field shipment_quant_for_cost ***
-		$f_opts = array();
-		$f_opts['length']=19;
-		$f_opts['id']="shipment_quant_for_cost";
-						
-		$f_shipment_quant_for_cost=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"shipment_quant_for_cost",$f_opts);
-		$this->addField($f_shipment_quant_for_cost);
-		//********************
-	$this->setLimitConstant('doc_per_page_count');
+	
+		$order = new ModelOrderSQL();		
+		$this->setDefaultModelOrder($order);		
+		$direct = 'ASC';
+		$order->addField($f_name,$direct);
+$this->setLimitConstant('doc_per_page_count');
 	}
 
 }
