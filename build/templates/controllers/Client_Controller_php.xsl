@@ -122,6 +122,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					max(orders.date_time) AS date_time,
 					orders.client_id
 				FROM orders
+				WHERE orders.concrete_type_id &lt;&gt; (const_water_val()->'keys'->>'id')::int
 				GROUP BY orders.client_id
 			) AS o_cl ON o_cl.client_id = clients.id
 			LEFT JOIN orders AS o_last ON o_last.client_id = clients.id AND o_last.date_time = o_cl.date_time

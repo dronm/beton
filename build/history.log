@@ -1749,8 +1749,16 @@ MAX info in Order
 1.00411
 1) MaterialFactConsumption_Controller->get_rolled_list() corrected heavy query.
 2) Graph_Controller corrected database connector, just like functions/con_f()
+
+
+1.00412
+1) orders_make_list.sql numeric instead of double precision
+2) Client_Controller->complete_for_order() removed water from last order search
+3) actb.js
+
+Order_Controller->get_make_orders_form() is too slow, 3.5s
 TODO: invite to Telegram from saved orders?
-Still big latency (1000-3000)
+Still big latency (1000-3000). No latency without cloud server
 
 
 

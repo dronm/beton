@@ -1569,10 +1569,12 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$code = gen_pwd(3, "NUM");
 			
 			$txt = 'Код авторизации: '.$code;
+			//TODO: make user selector: login_notification_types: tm/max/sms
 			if($ar["tp"] == "max"){
 				add_notification_from_contact_max($link, $this->getExtVal($pm,'tel'), $txt, 'max_auth', NULL, $ar['ext_contact_id']);
 			} else if($ar["tp"] == "tm"){
-				add_notification_from_contact_tm($link, $this->getExtVal($pm,'tel'), $txt, 'tm_auth', NULL, $ar['ext_contact_id']);
+				//not tm!!!
+				add_notification_from_contact_sms($link, $this->getExtVal($pm,'tel'), $txt, 'tm_auth', NULL, $ar['ext_contact_id']);
 			}
 
 			$tm_logins = $link->query_first(sprintf(

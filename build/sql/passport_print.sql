@@ -69,7 +69,7 @@ BEGIN
 			--ID подбора/порядковый номер материала в подбре
 			pas.smes_num AS smes_num,
 			
-			REPLACE(sum(sh.quant)::text, '.', ',') || ' м3' AS obiem,
+			REPLACE(sum(sh.quant::numeric)::text, '.', ',') || ' м3' AS obiem,
 			to_char(o.date_time, 'dd/mm/yy') || (
 				SELECT
 					to_char(min(t.ship_date_time), 'HH24:MI')|| ' - ' ||to_char(max(t.ship_date_time), 'HH24:MI')
@@ -189,4 +189,3 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
-ALTER FUNCTION passport_print(in_shipment_id int, in_all bool) OWNER TO ;
