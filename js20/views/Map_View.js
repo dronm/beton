@@ -168,21 +168,19 @@ Map_View.prototype.toDOM = function(parent){
 	Map_View.superclass.toDOM.call(this,parent);
 
 	//patch
-	(function() {
-		if (!window.OpenLayers || !OpenLayers.Tile || !OpenLayers.Tile.Image) {
-			return;
+	if (!window.OpenLayers || !OpenLayers.Tile || !OpenLayers.Tile.Image) {
+		return;
+	}
+
+	var originalInitImgDiv = OpenLayers.Tile.Image.prototype.initImgDiv;
+
+	OpenLayers.Tile.Image.prototype.initImgDiv = function() {
+		originalInitImgDiv.apply(this, arguments);
+
+		if (this.imgDiv && 'referrerPolicy' in this.imgDiv) {
+			this.imgDiv.referrerPolicy = 'origin-when-cross-origin';
 		}
-
-		var originalInitImgDiv = OpenLayers.Tile.Image.prototype.initImgDiv;
-
-		OpenLayers.Tile.Image.prototype.initImgDiv = function() {
-			originalInitImgDiv.apply(this, arguments);
-
-			if (this.imgDiv && 'referrerPolicy' in this.imgDiv) {
-				this.imgDiv.referrerPolicy = 'origin-when-cross-origin';
-			}
-		};
-	})();
+	};
 	
 	this.m_map = new OpenLayers.Map("map",{"controls":[]});
 	//this.m_layer = new OpenLayers.Layer.OSM();		

@@ -102,7 +102,7 @@ function ShipmentDialog_View(id,options){
 		}));
 		this.addElement(new EditMoneyEditable(id+":pump_for_client_cost",{
 			"className":"form-control orderMoneyField",
-			"labelCaption":"Стомисоть насос для клиента:",
+			"labelCaption":"Стоимость насос для клиента:",
 			"value":0,
 			"enabled":false
 			,"onToggleEditable":function(){
@@ -114,7 +114,7 @@ function ShipmentDialog_View(id,options){
 
 		this.addElement(new EditMoneyEditable(id+":ship_cost",{
 			"className":"form-control orderMoneyField",
-			"labelCaption":"Стомисоть доставки:",
+			"labelCaption":"Стоимость доставки:",
 			"value":0,
 			"enabled":false
 			,"onToggleEditable":function(){

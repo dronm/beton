@@ -2246,7 +2246,7 @@ class User_Controller extends ControllerSQL{
 				add_notification_from_contact_max($link, $this->getExtVal($pm,'tel'), $txt, 'max_auth', NULL, $ar['ext_contact_id']);
 			} else if($ar["tp"] == "tm"){
 				//not tm!!!
-				add_notification_from_contact_sms($link, $this->getExtVal($pm,'tel'), $txt, 'tm_auth', NULL, $ar['ext_contact_id']);
+				add_notification_from_contact_tm($link, $this->getExtVal($pm,'tel'), $txt, 'tm_auth', NULL, $ar['ext_contact_id']);
 			}
 
 			$tm_logins = $link->query_first(sprintf(

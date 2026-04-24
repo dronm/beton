@@ -7,5 +7,3 @@ CREATE OR REPLACE VIEW material_fact_balance_corrections AS
 		id 
 	FROM material_fact_balance_corrections
 	;
-	
-ALTER VIEW material_fact_balance_corrections OWNER TO ;

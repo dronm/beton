@@ -566,6 +566,7 @@ OrderMakeGrid.prototype.onGetData = function(){
 		var prev_time_m,init_time_m;
 		var future_shift;
 		var now_m = now.getHours()*60 + now.getMinutes();
+
 		
 		//console.log("shift_start_time="+shift_start_time)
 		if(now.getTime() < shift_start_time.getTime()){
@@ -619,7 +620,8 @@ OrderMakeGrid.prototype.onGetData = function(){
 								
 				var cell = this.createNewCell(columns[col_id],row);
 				
-				if(columns[col_id].getMaster()&&details_expanded){
+				const is_master = columns[col_id].getMaster();
+				if(is_master && details_expanded){
 					master_cell = cell;
 				}
 				
@@ -706,8 +708,12 @@ OrderMakeGrid.prototype.onGetData = function(){
 			}
 		}
 
-		
-		
+		if(window.getApp().isOfflineMode()){
+			const sh = DOMHelper.getElementsByAttr("detailToggle", body.getNode(), "class", false);
+			for(let i = 0; i< sh.length; i++){
+				DOMHelper.hide(sh[i]);
+			}
+		}
 	}
 	if (this.m_navigate || this.m_navigateClick){
 		this.setSelection();

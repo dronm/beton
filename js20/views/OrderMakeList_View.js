@@ -77,6 +77,9 @@ function OrderMakeList_View(id,options){
 			"template":window.getApp().getTemplate( ((window.getWidthType()=="sm")? "EditPeriodShiftSM":"EditPeriodShift") ),
 			"dateFrom":init_dt,
 			"onChange":function(dateTime){
+				if(!this.getEnabled()){
+					return;
+				}
 				window.setGlobalWait(true);
 				self.refresh(function(){
 					window.setGlobalWait(false);
@@ -275,6 +278,9 @@ OrderMakeList_View.prototype.m_endShiftMS;
  * Все обновляется разом за один запрос из нескольких моделей
  */
 OrderMakeList_View.prototype.refresh = function(callBack, removeWait){
+	if(window.getApp().isOfflineMode()){
+		return;
+	}
 	this.m_refreshMethod.setFieldValue("date", this.getElement("order_make_filter").getDateFrom());
 	var self = this;
 	

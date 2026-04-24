@@ -1756,23 +1756,33 @@ MAX info in Order
 2) Client_Controller->complete_for_order() removed water from last order search
 3) actb.js
 
+1.00413
+1) EditMoneyEditable 
+	this.m_editAllowed = false; // default value on setup
+2) Map_View toDOM() patch for openLayers to remove Openstreetmap blocked message.
+
+
+
+
 Order_Controller->get_make_orders_form() is too slow, 3.5s
 TODO: invite to Telegram from saved orders?
 Still big latency (1000-3000). No latency without cloud server
 
 
 
-
 What to change in the first place:
 - Offline mode. Finish
 - Document transfer to accountant system. Finish.
-+ Connector. Remember, send LSN. Server must send lsn after every post (insert, update...) login
-	must take into considiration the lsn position when accepting a get request.
-- Set SrvConnector LSN from web socket.
-+ Connector. Retry logic.
+- Openstreetmap blocked message. CHECK
 - all messages are coming to all clients.
 - Отобразить, если остлось Х км до базы какой-то знак
 - Передвигаемое окно звонка и не модальное
+- OSAGO, KASKO add files to documents
+
++ Connector. Remember, send LSN. Server must send lsn after every post (insert, update...) login
+	must take into considiration the lsn position when accepting a get request.
++ Set SrvConnector LSN from web socket.
++ Connector. Retry logic.
 
 
 ЧТо НАДО

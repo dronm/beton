@@ -1,4 +1,4 @@
-const SW_VERSION = '2026-03-30-2';
+const SW_VERSION = '2026-04-20-1';
 const CACHE_NAME = 'static-cache-v1.4';
 
 /*

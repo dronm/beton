@@ -608,7 +608,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		$d_phone_exists = (strlen($ar['d_phone'])==10);
 		
-		//responsible person notification through TM
+		//responsible person notification through MAX
 		if (strlen($ar['phone_cel']) &amp;&amp; isset($ar['ext_contact_id'])){
 			$text = $ar['text'];
 			$text = str_replace('[quant]',$ar['quant'],$text);
@@ -626,8 +626,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				$text.= ' '.ROUTE_HREF.$idForDb;
 			}
 					
-			//Только телеграм
-			add_notification_from_contact_tm($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['ext_contact_id']);
+			//Только max
+			add_notification_from_contact_max($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['ext_contact_id']);
 		}
 
 		//notify pump driver if there is a pump in this order
@@ -661,8 +661,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			}
 			$text = str_replace('[href]', ROUTE_HREF.'m'.$idForDb, $mix_pat['pattern']);
 			
-			//Только телеграм
-			add_notification_from_contact_tm($dbLinkMaster, $ar['d_phone'], $text, 'mixer_route', $ar['doc_ref'], $ar['dr_ext_contact_id']);
+			//Только max
+			add_notification_from_contact_max($dbLinkMaster, $ar['d_phone'], $text, 'mixer_route', $ar['doc_ref'], $ar['dr_ext_contact_id']);
 		}
 	}
 	

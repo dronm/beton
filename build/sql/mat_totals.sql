@@ -1,6 +1,6 @@
 -- FUNCTION: public.mat_totals(in_d date, in_production_base_id int)
 
- DROP FUNCTION public.mat_totals(in_d date, in_production_base_id int);
+ --DROP FUNCTION public.mat_totals(in_d date, in_production_base_id int);
 
 CREATE OR REPLACE FUNCTION public.mat_totals(in_d date, in_production_base_id int)
     RETURNS TABLE(
@@ -54,7 +54,8 @@ WITH
 			COALESCE(proc.quant, 0)::numeric AS quant_procured,
 			
 			--остатки
-			COALESCE(bal.quant, 0)::numeric AS quant_balance,
+			--COALESCE(bal.quant, 0)::numeric AS quant_balance,
+			0::numeric AS quant_balance,
 			
 			COALESCE(bal_fact.quant, 0)::numeric AS quant_fact_balance,
 			
@@ -65,7 +66,8 @@ WITH
 			COALESCE(bal_fact.quant, 0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_balance,
 			COALESCE(bal_fact.quant, 0) - COALESCE(mat_virt_cons.quant,0) AS quant_morn_next_balance,
 			
-			COALESCE(bal_morn.quant, 0)::numeric AS quant_morn_cur_balance,
+			--COALESCE(bal_morn.quant, 0)::numeric AS quant_morn_cur_balance,
+			0::numeric AS quant_morn_cur_balance,
 			
 			COALESCE(bal_morn_fact.quant, 0)::numeric AS quant_morn_fact_cur_balance,
 			
@@ -91,20 +93,24 @@ WITH
 			
 		FROM raw_materials AS m
 
+		/*
 		LEFT JOIN (
 			SELECT *
 			FROM rg_materials_balance((SELECT shift_time_from.v FROM shift_time_from)-'1 second'::interval, ARRAY[in_production_base_id], '{}'::int[])
 		) AS bal_morn ON bal_morn.material_id=m.id
+		*/
 		
 		LEFT JOIN (
 			SELECT * FROM rg_material_facts_balance((SELECT shift_time_from.v FROM shift_time_from), ARRAY[in_production_base_id], '{}'::int[], '{}'::int[])
 		) AS bal_morn_fact ON bal_morn_fact.material_id=m.id
 
-		
+		/*
 		LEFT JOIN (
 			SELECT *
 			FROM rg_materials_balance(ARRAY[in_production_base_id], '{}'::int[])
 		) AS bal ON bal.material_id=m.id
+		*/
+
 		LEFT JOIN (
 			SELECT
 				material_id,

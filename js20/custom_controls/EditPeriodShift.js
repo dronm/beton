@@ -70,6 +70,9 @@ EditPeriodShift.prototype.addControls = function(){
 		"caption":this.getPeriodDescr(),
 		"events":{
 			"click":function(){
+				if(!self.getEnabled()){
+					return;
+				}
 				self.picCustomDate();
 			}
 		}

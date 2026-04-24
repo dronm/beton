@@ -1,5 +1,5 @@
 /**
- * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2016
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2016-2026
  
  * @class
  * @classdesc
@@ -1300,9 +1300,9 @@ AppBeton.prototype.MSG_DURATION = 10 * 1000;
 AppBeton.prototype.initWorkers = function() {
 	console.log('AppBeton.initWorkers');
 
-	// if ('serviceWorker' in navigator) {
-	// 	this.initServiceWorker();
-	// }
+	//if ('serviceWorker' in navigator) {
+		//this.initServiceWorker();
+	//}
 
 	this.bindNetworkStatusEvents();
 };
@@ -1443,6 +1443,7 @@ AppBeton.prototype.enableControlsForOnline = function(en) {
 	if (!en) {
 		DOMHelper.hide("main-menu");
 		DOMHelper.hide("user-menu");
+		DOMHelper.disable("OrderMakeList:order_make_filter");
 		DOMHelper.disable("OrderMakeList:order_make_filter:downFast");
 		DOMHelper.disable("OrderMakeList:order_make_filter:down");
 		DOMHelper.disable("OrderMakeList:order_make_filter:upFast");
@@ -1450,34 +1451,18 @@ AppBeton.prototype.enableControlsForOnline = function(en) {
 		DOMHelper.disable("OrderMakeList:order_make_grid:order_make_grid:cmd:insert");
 		DOMHelper.disable("OrderMakeList:order_make_grid:order_make_grid:cmd:allCommands");
 		DOMHelper.show("offline-mode-alert");
-		// const n = document.getElementById("OrderMakeList:order_make_grid:body");
-		// if(n){
-		// 	const sh = DOMHelper.getElementsByAttr("detailToggle", n, "class", false);
-		// 	if(sh && sh.length){
-		// 		sh.forEach(n => {
-		// 			DOMHelper.hide(n);
-		// 		});
-		// 	}
-		// }
+
 	} else {
 		DOMHelper.hide("offline-mode-alert");
 		DOMHelper.show("main-menu");
 		DOMHelper.show("user-menu");
+		DOMHelper.enable("OrderMakeList:order_make_filter");
 		DOMHelper.enable("OrderMakeList:order_make_filter:downFast");
 		DOMHelper.enable("OrderMakeList:order_make_filter:up");
 		DOMHelper.enable("OrderMakeList:order_make_filter:upFast");
 		DOMHelper.enable("OrderMakeList:order_make_filter:up");
 		DOMHelper.enable("OrderMakeList:order_make_grid:order_make_grid:cmd:insert");
 		DOMHelper.enable("OrderMakeList:order_make_grid:order_make_grid:cmd:allCommands");
-		// const n = document.getElementById("OrderMakeList:order_make_grid:body");
-		// if(n){
-		// 	const sh = DOMHelper.getElementsByAttr("detailToggle", n, "class", false);
-		// 	if(sh && sh.length){
-		// 		sh.forEach(n => {
-		// 			DOMHelper.hide(n);
-		// 		});
-		// 	}
-		// }
 	}
 }
 
@@ -1505,7 +1490,7 @@ AppBeton.prototype.stopServerHealthProbe = function() {
 AppBeton.prototype.probeServerHealth = function() {
 	const self = this;
 
-	fetch('/healthz.txt?ts=' + Date.now(), {
+	fetch(this.getServVar("basePath")+'healthz.txt?ts=' + Date.now(), {
 		method: 'GET',
 		cache: 'no-store',
 		credentials: 'same-origin'
