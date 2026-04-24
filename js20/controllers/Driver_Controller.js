@@ -31,6 +31,7 @@ function Driver_Controller(options){
 	this.addGetObject();
 	this.addComplete();
 	this.add_driver_cheat_report();
+	this.add_work_time_report();
 		
 }
 extend(Driver_Controller,ControllerObjServer);
@@ -247,6 +248,34 @@ extend(Driver_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldInt("vehicle_id",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Driver_Controller.prototype.add_work_time_report = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('work_time_report',opts);
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldDate("month_date",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("vehicle_id",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("driver_id",options));
 	
 			
 	this.addPublicMethod(pm);

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-04-14 06:14:43</lastBuild></version>
+		<lastBuild>2026-04-24 14:51:39</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -319,6 +319,7 @@
 		<version dateOpen="2026-04-09 08:03:40" dateClose="2026-04-10 07:07:18">1.00411</version>
 		<version dateOpen="2026-04-14 06:13:13" dateClose="2026-04-14 06:15:07">1.00412</version>
 		<version dateOpen="2026-04-24 05:57:49" dateClose="2026-04-24 05:59:04">1.00413</version>
+		<version dateOpen="2026-04-24 11:33:08" dateClose="2026-04-24 14:52:00">1.00414</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -6041,6 +6042,11 @@
 				<field id="cheat_end_date_time" dataType="DateTime"/>
 				<field id="vehicle_id" dataType="Int"/>
 			</publicMethod>
+			<publicMethod id="work_time_report">
+				<field id="month_date" dataType="Date" required="TRUE"/>
+				<field id="vehicle_id" dataType="Int"/>
+				<field id="driver_id" dataType="Int"/>
+			</publicMethod>
 		</controller>
 		<controller id="RawMaterial" parentId="ControllerSQL" state="TRUE" noState="FALSE">
 			<publicMethod id="insert" modelId="RawMaterial"/>
@@ -8124,6 +8130,7 @@
 		<view id="50022" t="VehicleOwnerTotIncomeAllRep" section="Отчеты" descr="Итоговый отчет для владельцев (все)"/>
 		<view id="50023" t="ShipmentDocRep" section="Отчеты" descr="Отгрузочные документы: путевой лист, ТТН"/>
 		<view id="50024" t="VehicleListReport" section="Отчеты" descr="Отчет по спику ТС (страховки, лизинг)"/>
+		<view id="50025" t="DriverWorkTimeReport" section="Отчеты" descr="Табель по водителям"/>
 		<view id="40000" c="Constant_Controller" t="ConstantList" f="get_list" section="Константы" descr="Все константы"/>
 	</views>
 	<serverTemplates>
@@ -8271,6 +8278,7 @@
 		<serverTemplate id="ProductionReportList" class="list"/>
 		<serverTemplate id="MaxUserList" class="list"/>
 		<serverTemplate id="MaxOutMessageList" class="list"/>
+		<serverTemplate id="DriverWorkTimeReport" class="list"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="js20/tmpl/FatalException.html"/>
@@ -8319,6 +8327,7 @@
 		<jsTemplate id="VehicleOwnerTotIncomeRep_View" file="js20/tmpl/VehicleOwnerTotIncomeRep_View.html"/>
 		<jsTemplate id="UserChatUserList" file="js20/tmpl/UserChatUserList.html"/>
 		<jsTemplate id="ShipmentDocRep_View" file="js20/tmpl/ShipmentDocRep_View.html"/>
+		<jsTemplate id="DriverWorkTimeReport_View" file="js20/tmpl/DriverWorkTimeReport_View.html"/>
 	</jsTemplates>
 	<jsScripts>
 		<!-- Core JS files -->
@@ -9139,6 +9148,7 @@
 		<jsScript file="js20/custom_controls/FuelConsumptionSchemaEdit.js"/>
 		<jsScript file="js20/custom_controls/MAXShowQRBtn.js"/>
 		<jsScript file="js20/custom_controls/MAXInviteBtn.js"/>
+		<jsScript file="js20/custom_controls/DriverWorkTimeReport_View.js"/>
 		<jsScript file="js20/views/rs_ru.js"/>
 		<jsScript file="js20/views/rs_common_ru.js"/>
 		<!--openLayers-->

@@ -255,6 +255,28 @@ class Driver_Controller extends ControllerSQL{
 			
 		$this->addPublicMethod($pm);
 
+			
+		$pm = new PublicMethod('work_time_report');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtDate('month_date',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('vehicle_id',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('driver_id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
 		
 	}
 	
@@ -276,6 +298,24 @@ class Driver_Controller extends ControllerSQL{
 		$cond->getValForDb('stop_spot_offset','e',DT_INT),
 		$vehicle_id),
 		'driver_cheat_report');
+	}
+
+	public function work_time_report($pm){
+		$month_date = $this->getExtVal($pm, 'month_date');
+		if(!isset($month_date)){
+			$month_date = time();
+		}
+
+		$vehicle_id = $this->getExtVal($pm, 'vehicle_id');
+		$driver_id = $this->getExtVal($pm, 'driver_id');
+
+		$this->addNewModel(
+			sprintf("SELECT * FROM drivers_work_time_report('%s', %d, %d)",
+				date("Y-m-d", $month_date),
+				$vehicle_id, 
+				$driver_id
+			),
+		'WorkTimeReport_Model');
 	}
 }
 ?>

@@ -1453,3 +1453,86 @@ tr.deleted_row {
 .glyphicon-after{
 	margin-left: 5px;
 }
+
+.driver_work_time_rep_shift{
+	background: #ccf7fc;
+}
+
+.driver_work_time_rep_weekend{
+	background-color:#fcfce1;
+}
+.driver_work_time_rep_day {
+	height: 34px;
+	min-width: 32px;
+	text-align: center;
+	vertical-align: middle !important;
+	padding: 0 !important;
+}
+
+.driver_work_time_rep_hours {
+	display: inline-block;
+	line-height: 34px;
+}
+
+
+
+.driver_work_time_rep_table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13px;
+}
+
+.driver_work_time_rep_table th,
+.driver_work_time_rep_table td {
+	padding: 6px 8px;
+	text-align: center;
+	vertical-align: middle !important;
+}
+
+.driver_work_time_rep_head th {
+	font-size: 12px;
+	font-weight: 500;
+	text-align: center;
+	vertical-align: middle !important;
+	background: #f3f4f6;
+}
+
+.driver_work_time_rep_foot td {
+	font-size: 12px;
+	font-weight: 500;
+	text-align: center;
+	vertical-align: middle !important;
+	background: #f3f4f6;
+}
+
+.driver_work_time_rep_head th:first-child,
+.driver_work_time_rep_head th:nth-child(2),
+.driver_work_time_rep_table tbody td:first-child,
+.driver_work_time_rep_table tbody td:nth-child(2),
+.driver_work_time_rep_foot td:first-child {
+	text-align: left;
+}
+
+.driver_work_time_rep_day {
+	height: 34px;
+	min-width: 32px;
+	padding: 0 !important;
+	vertical-align: middle !important;
+}
+
+.driver_work_time_rep_hours {
+	display: inline-block;
+	line-height: 28px;
+	font-weight: 400;
+}
+
+.driver_work_time_rep_row_total,
+.driver_work_time_rep_day_total,
+.driver_work_time_rep_grand_total {
+	font-weight: 700;
+	background: #f9fafb;
+}
+
+.driver_work_time_rep_grand_total {
+	font-size: 16px;
+}

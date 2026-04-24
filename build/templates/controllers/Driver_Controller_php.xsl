@@ -42,7 +42,26 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$vehicle_id),
 		'driver_cheat_report');
 	}
+
+	public function work_time_report($pm){
+		$month_date = $this->getExtVal($pm, 'month_date');
+		if(!isset($month_date)){
+			$month_date = time();
+		}
+
+		$vehicle_id = $this->getExtVal($pm, 'vehicle_id');
+		$driver_id = $this->getExtVal($pm, 'driver_id');
+
+		$this->addNewModel(
+			sprintf("SELECT * FROM drivers_work_time_report('%s', %d, %d)",
+				date("Y-m-d", $month_date),
+				$vehicle_id, 
+				$driver_id
+			),
+		'WorkTimeReport_Model');
+	}
 }
+
 <![CDATA[?>]]>
 </xsl:template>
 	

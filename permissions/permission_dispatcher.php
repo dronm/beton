@@ -210,6 +210,8 @@ $permissions = array();
 				
 					$permissions['Driver_Controller_driver_cheat_report']=TRUE;
 				
+					$permissions['Driver_Controller_work_time_report']=TRUE;
+				
 					$permissions['RawMaterial_Controller_insert']=TRUE;
 				
 					$permissions['RawMaterial_Controller_update']=TRUE;

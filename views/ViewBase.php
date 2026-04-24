@@ -1658,6 +1658,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/FuelConsumptionSchemaEdit.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/FuelConsumptionSchemaEdit.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/MAXShowQRBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/MAXShowQRBtn.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/MAXInviteBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/MAXInviteBtn.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/DriverWorkTimeReport_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/DriverWorkTimeReport_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/rs_ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/rs_ru.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/rs_common_ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/rs_common_ru.js')) ));
 		

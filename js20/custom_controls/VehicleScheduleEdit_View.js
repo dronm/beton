@@ -984,7 +984,7 @@ VehicleScheduleEdit_View.prototype.cmdApplyFilter = function(){
 		,"all":function(){
 			window.setGlobalWait(false);
 		}
-	})
+	});
 }
 
 VehicleScheduleEdit_View.prototype.switchTmplDay = function(dayNode){

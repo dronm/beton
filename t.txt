@@ -1,0 +1,9 @@
+SELECT 
+	sch.*,
+	drivers_ref(dr) AS drivers_ref,
+	vehicles_ref(v) AS vehicles_ref
+FROM vehicle_schedules AS sch
+LEFT JOIN vehicles AS v ON v.id = sch.vehicle_id
+LEFT JOIN drivers AS dr ON dr.id = sch.driver_id
+WHERE sch.schedule_date = now()::date
+ORDER BY dr.name

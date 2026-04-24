@@ -1,0 +1,53 @@
+<table class="table-bordered table-responsive table-striped driver_work_time_rep_table">
+	<thead class="driver_work_time_rep_head">
+		<tr>
+			<th rowspan="2">Автомобиль</th>
+			<th rowspan="2">Водитель</th>
+			<th colspan="{{DAY_COUNT}}">Часы</th>
+			<th rowspan="2">Всего</th>
+		</tr>
+		<tr>
+			{{#DAYS}}
+			<th class="owner_schedule_day_header{{#WEEKEND}} owner_schedule_weekend{{/WEEKEND}}">
+				<span class="owner_schedule_head_day">{{DAY}}</span>
+				<span class="owner_schedule_head_dow">{{DOW}}</span>
+			</th>
+			{{/DAYS}}
+		</tr>
+	</thead>
+
+	<tbody>
+		{{#ROWS}}
+		<tr>
+			<td>{{VEHICLE}}</td>
+			<td>{{DRIVER}}</td>
+
+			{{#DAYS}}
+			<td
+				class="driver_work_time_rep_day{{#SHIFT}} driver_work_time_rep_shift{{/SHIFT}}{{#WEEKEND}} driver_work_time_rep_weekend{{/WEEKEND}}"
+			>
+				{{#SHIFT}}<span class="driver_work_time_rep_hours">{{HOURS}}</span>{{/SHIFT}}
+				{{#NO_SHIFT}}&nbsp;{{/NO_SHIFT}}
+			</td>
+			{{/DAYS}}
+
+			<td class="driver_work_time_rep_row_total">{{HOUR_TOTAL}}</td>
+		</tr>
+		{{/ROWS}}
+	</tbody>
+
+	<tfoot class="driver_work_time_rep_foot">
+		<tr>
+			<td colspan="2">Всего</td>
+
+			{{#TOTALS}}
+			<td class="driver_work_time_rep_day_total">
+				{{#EXISTS}}{{HOURS}}{{/EXISTS}}
+				{{#NOT_EXISTS}}&nbsp;{{/NOT_EXISTS}}
+			</td>
+			{{/TOTALS}}
+
+			<td class="driver_work_time_rep_grand_total">{{GRAND_TOTAL}}</td>
+		</tr>
+	</tfoot>
+</table>
