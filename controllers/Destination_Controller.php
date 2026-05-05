@@ -57,6 +57,13 @@ class Destination_Controller extends ControllerSQL{
 		
 			$f_params = array();
 			
+				$f_params['alias']='Наименование полное';
+			$param = new FieldExtText('name_full'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
 				$f_params['alias']='Расстояние';
 			
 				$f_params['required']=FALSE;
@@ -144,6 +151,13 @@ class Destination_Controller extends ControllerSQL{
 			
 				$f_params['alias']='Наименование';
 			$param = new FieldExtString('name'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Наименование полное';
+			$param = new FieldExtText('name_full'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -548,7 +562,6 @@ class Destination_Controller extends ControllerSQL{
 		$addr_h = md5($addr['city']);
 		
 		if(!isset($_SESSION['get_coords_on_name_cash']) || !isset($_SESSION['get_coords_on_name_cash'][$addr_h])){
-		/* throw new Exception("test2"); */
 		
 			//yandex
 			get_inf_on_address(DADATA_KEY, DADATA_SECRET, $addr, $inf);

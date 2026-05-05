@@ -47,6 +47,7 @@ function Shipment_Controller(options){
 	this.add_shipment_transp_nakl();
 	this.add_shipment_transp_nakl_all();
 	this.add_shipment_transp_nakl_on_list();
+	this.add_shipment_transp_nakl_on_list_result();
 	this.add_get_time_list();
 	this.add_set_blanks_exist();
 	this.add_delete_shipped();
@@ -936,6 +937,34 @@ extend(Shipment_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldInt("consignee",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		options.maxlength = "36";
+	
+		pm.addField(new FieldString("operation_id",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Shipment_Controller.prototype.add_shipment_transp_nakl_on_list_result = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('shipment_transp_nakl_on_list_result',opts);
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		options.maxlength = "36";
+	
+		pm.addField(new FieldString("operation_id",options));
 	
 			
 	this.addPublicMethod(pm);

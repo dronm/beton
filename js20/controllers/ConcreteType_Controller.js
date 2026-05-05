@@ -1,5 +1,5 @@
 /**
- * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017 - 2024
  
  * THIS FILE IS GENERATED FROM TEMPLATE build/templates/controllers/Controller_js20.xsl
  * ALL DIRECT MODIFICATIONS WILL BE LOST WITH THE NEXT BUILD PROCESS!!!
@@ -114,6 +114,12 @@ extend(ConcreteType_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldJSONB("ref_1c",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -198,6 +204,12 @@ extend(ConcreteType_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	
+	var field = new FieldJSONB("ref_1c",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -263,6 +275,9 @@ extend(ConcreteType_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "W";
 	pm.addField(new FieldInt("w_val",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSONB("ref_1c",f_opts));
 }
 
 			ConcreteType_Controller.prototype.addGetObject = function(){

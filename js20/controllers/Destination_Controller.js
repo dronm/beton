@@ -59,6 +59,12 @@ extend(Destination_Controller,ControllerObjServer);
 	pm.addField(field);
 	
 	var options = {};
+	options.alias = "Наименование полное";
+	var field = new FieldText("name_full",options);
+	
+	pm.addField(field);
+	
+	var options = {};
 	options.alias = "Расстояние";
 	var field = new FieldFloat("distance",options);
 	
@@ -133,6 +139,12 @@ extend(Destination_Controller,ControllerObjServer);
 	var options = {};
 	options.alias = "Наименование";
 	var field = new FieldString("name",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Наименование полное";
+	var field = new FieldText("name_full",options);
 	
 	pm.addField(field);
 	

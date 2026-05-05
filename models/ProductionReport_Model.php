@@ -61,7 +61,7 @@ class ProductionReport_Model extends ModelSQLBeton{
 		//*** Field material_ref_1c ***
 		$f_opts = array();
 		
-		$f_opts['alias']='Требование накладная';
+		$f_opts['alias']='Требование накладная (список)';
 		$f_opts['id']="material_ref_1c";
 						
 		$f_material_ref_1c=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_ref_1c",$f_opts);
@@ -74,6 +74,16 @@ class ProductionReport_Model extends ModelSQLBeton{
 						
 		$f_data_for_1c=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"data_for_1c",$f_opts);
 		$this->addField($f_data_for_1c);
+		//********************
+		
+		//*** Field transfer_ref_1c ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Перемещение';
+		$f_opts['id']="transfer_ref_1c";
+						
+		$f_transfer_ref_1c=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"transfer_ref_1c",$f_opts);
+		$this->addField($f_transfer_ref_1c);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

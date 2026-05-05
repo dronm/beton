@@ -1252,6 +1252,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 
 	//all shipments, background operation 
 	//returns zip file name with all shipments
+	//this function is not used, zip is never returned, 
+	//only pdf with all shipments in one file
 	public function shipment_transp_nakl_all_operation($anyDocId, $faksim){
 		$this->check_1c_attrs_for_tn($anyDocId);
 		$link = $this->getDbLink();
@@ -1394,7 +1396,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					(SELECT order_id FROM data) AS order_id,
 					(SELECT veh_owner_client FROM data) AS veh_owner_client,
 					(SELECT ship_date FROM data) AS ship_date,
-					(SELECT ref_1c FROM buh_docs WHERE order_id =(SELECT order_id FROM data)) AS doc_ref_1c,
+					--(SELECT ref_1c FROM buh_docs WHERE order_id =(SELECT order_id FROM data)) AS doc_ref_1c,
 					(SELECT bool_and((data.operator->>'no_sig')::bool) FROM data) AS operators_no_sig,
 					(SELECT string_agg(data.operator->>'name',',') FROM data WHERE (data.operator->>'no_sig')::bool) AS operators_no_sig_names,
 					(SELECT bool_and((data.driver->>'no_sig')::bool) FROM data) AS drivers_no_sig,
@@ -1611,7 +1613,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					(SELECT order_id FROM data) AS order_id,
 					(SELECT veh_owner_client FROM data) AS veh_owner_client,
 					(SELECT ship_date FROM data) AS ship_date,
-					(SELECT ref_1c FROM buh_docs WHERE order_id =(SELECT order_id FROM data)) AS doc_ref_1c,
+					--(SELECT ref_1c FROM buh_docs WHERE order_id =(SELECT order_id FROM data)) AS doc_ref_1c,
 					(SELECT bool_and((data.operator->>'no_sig')::bool) FROM data) AS operators_no_sig,
 					(SELECT string_agg(data.operator->>'name',',') FROM data WHERE (data.operator->>'no_sig')::bool) AS operators_no_sig_names,
 					(SELECT bool_and((data.driver->>'no_sig')::bool) FROM data) AS drivers_no_sig,
@@ -1664,188 +1666,395 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$this->check_client_rekv($vehOwnerClient);
 	}
 
-	//print transp nakl on list on shipments
+	public function shipment_transp_nakl_on_list_result($pm){	
+		$link = $this->getDbLink();
+		$res = $link->query_first(
+			"SELECT payload FROM user_operations
+			WHERE operation_id = $1 AND user_id = $2",
+			[ $pm->getParamValue("operation_id"), $_SESSION["user_id"] ]
+		);
+		if(!$res || !isset($res["payload"])){
+			throw  new Exception("operation not found");
+		}
+		$payload = json_decode($res["payload"], TRUE);
+		try {
+			ob_clean();
+			$flMime = getMimeTypeOnExt($payload["file_name"]);
+
+			downloadFile(
+				$payload["path"],
+				$flMime,
+				"attachment;",
+				$payload["file_name"]
+			);
+		} finally {
+			if (file_exists($payload["path"])) {
+				unlink($payload["path"]);
+			}
+		}
+	}
+
 	public function shipment_transp_nakl_on_list($pm){	
-		$docList = []; //shipments
+		$params = [ 
+			"shipment_ids" => $this->getExtVal($pm, 'shipment_ids'),	
+			"shipment_ids_exist" => $pm->getParamValue("shipment_ids"),
+			"faksim" => ($pm->getParamValue("faksim") == "1"),
+			"buhDoc" => $this->getExtDbVal($pm, "buh_doc"),
+			"rollupRuns" => $this->getExtVal($pm, "rollup_runs"),
+			"consignee" => $this->getExtDbVal($pm, "consignee")
+		];
+		if($pm->getParamValue("operation_id")){
+			$params["operation_id"] = $_REQUEST["operation_id"];
+			self::shipment_transp_nakl_on_list_async($params);
+		}else{
+			self::shipment_transp_nakl_on_list_sync($params);
+		}
+	}
+
+	public function shipment_transp_nakl_on_list_sync($params) {
+		$result = $this->shipment_transp_nakl_on_list_generate($params);
+
+		try {
+			ob_clean();
+
+			downloadFile(
+				$result["path"],
+				$result["mime"],
+				"attachment;",
+				$result["file_name"]
+			);
+		} finally {
+			if (file_exists($result["path"])) {
+				unlink($result["path"]);
+			}
+		}
+	}
+
+	private function shipment_transp_nakl_on_list_generate($params) {
+		$docList = [];
 
 		$link = $this->getDbLinkMaster();
 
-		//from selected shipments
-		if($pm->getParamValue("shipment_ids")){
-			$shIds = json_decode("[".$this->getExtVal($pm, 'shipment_ids')."]", TRUE);
-			if(!count($shIds)){
+		if (!empty($params["shipment_ids_exist"])) {
+			$shIds = json_decode("[" . $params["shipment_ids"] . "]", true);
+
+			if (!is_array($shIds) || !count($shIds)) {
 				throw new Exception("no ids found");
 			}
+
 			foreach ($shIds as $id) {
 				$shId = intval($id);
-				if($shId){
-					array_push($docList, $shId); 
+
+				if ($shId) {
+					$docList[] = $shId;
 				}
 			}
 		}
 
-		if(!count($docList)){
+		if (!count($docList)) {
 			throw new Exception("no doc found");
 		}
 
-		//must be one client!!!
 		$arId = $link->query(sprintf(
 			"SELECT 
 				o.client_id,
 				count(*) AS cnt
-		   	FROM shipments AS sh 
+			FROM shipments AS sh 
 			LEFT JOIN orders AS o ON o.id = sh.order_id
 			WHERE sh.id IN (%s)
 			GROUP BY o.client_id",
 			implode(",", $docList)
 		));
+
 		$cnt = 0;
-		while($ar = $link->fetch_array($arId)){
+
+		while ($ar = $link->fetch_array($arId)) {
 			$cnt++;
 		}
-		if(!$cnt){
+
+		if (!$cnt) {
 			throw new Exception("docs not found");
 		}
-		if($cnt > 1){
+
+		if ($cnt > 1) {
 			throw new Exception("Документы принадлежат разным контрагентам");
 		}
 
-		$faksim = ($pm->getParamValue("faksim") == "1");
-		$buhDoc = $this->getExtDbVal($pm, "buh_doc");
-		$rollupRuns = $this->getExtVal($pm, "rollup_runs");
-		$consignee = $this->getExtDbVal($pm, "consignee");
-		if(isset($consignee) &amp;&amp; $consignee != "null"){
-			//check 1c ref
+		$faksim = !empty($params["faksim"]);
+		$buhDoc = $params["buhDoc"] ?? "null";
+		$rollupRuns = !empty($params["rollupRuns"]);
+		$consignee = $params["consignee"] ?? null;
+
+		if (isset($consignee) &amp;&amp; $consignee !== "null" &amp;&amp; $consignee !== "") {
+			$consignee = intval($consignee);
+
 			$consAr = $link->query_first(
 				vsprintf(
 					"SELECT ref_1c->'keys'->>'ref_1c' AS ref_1c 
 					FROM clients 
-					WHERE id = %d", 
+					WHERE id = %d",
 					[$consignee]
 				)
 			);
-			if(!is_array($consAr)){
+
+			if (!is_array($consAr)) {
 				throw new Exception("consignee not found");
 			}
-			if(!isset($consAr["ref_1c"])){
+
+			if (!isset($consAr["ref_1c"])) {
 				throw new Exception("Грузополучатель не связан с 1с");
 			}
-		}else{
+		} else {
 			$consignee = 0;
 		}
 
-		$templateName = $faksim? "Транспортная накладная (факсимиле)" : "Транспортная накладная";
-		$erEmpty = 'Отгрузка не найдена!';
+		$templateName = $faksim
+			? "Транспортная накладная (факсимиле)"
+			: "Транспортная накладная";
 
-		$multiFile = (count($docList) > 1);
+		$erEmpty = "Отгрузка не найдена!";
 
-		//always one file, merged or standalone
 		$outFileName = "ТН.pdf";
-		$fileList = array();
-		$outFile = OUTPUT_PATH. md5(uniqid()).'.pdf';
+		$outFile = OUTPUT_PATH . md5(uniqid("", true)) . ".pdf";
 
-		//all shipments on order
-		$queryId = NULL;
-		if($rollupRuns){
-			//rollup on vehicle
+		$fileList = [];
+
+		if ($rollupRuns) {
 			$queryId = $link->query(
 				sprintf(
 					"SELECT
 						array_agg(sh.id) AS ids
 					FROM shipments AS sh
 					WHERE sh.id IN (%s)
-					GROUP BY sh.vehicle_schedule_id"
-					,implode(",", $docList)
+					GROUP BY sh.vehicle_schedule_id",
+					implode(",", $docList)
 				)
 			);
-		}else{
+		} else {
 			$queryId = $link->query(
 				sprintf(
 					"SELECT
 						sh.id
 					FROM shipments AS sh
 					WHERE sh.id IN (%s)
-					ORDER BY sh.date_time"
-					,implode(",", $docList)
+					ORDER BY sh.date_time",
+					implode(",", $docList)
 				)
 			);
 		}
+
 		$ind = 0;
-		while($shAr = $link->fetch_array($queryId)){
-			$tFile = '';
-			$fileName = '';
+		$multiFile = count($docList) > 1;
 
-			if($rollupRuns){
-				//remove curly braces
-				$ids_str = substr($shAr["ids"], 1,  strlen($shAr["ids"])-2);
-				$ids = explode(",", $ids_str);
-				foreach($ids as $sh_id){
-					$this->check_shipment_for_tn($sh_id, $faksim? TRUE:FALSE);
+		$operationId = $params["operation_id"];
+		$jobCount = $link->num_rows($queryId);
+
+		while ($shAr = $link->fetch_array($queryId)) {
+			$tFile = "";
+			$fileName = "";
+
+			if ($rollupRuns) {
+				$idsStr = substr($shAr["ids"], 1, strlen($shAr["ids"]) - 2);
+				$ids = explode(",", $idsStr);
+
+				foreach ($ids as $shId) {
+					$this->check_shipment_for_tn($shId, $faksim ? true : false);
 				}
+
 				$ind++;
+
+				self::updateOperStatus(
+					$link, 
+					$operationId, 
+					sprintf("Формирование Excel (%d из %d)", $ind, $jobCount)
+				);
 				ExcelTemplate_Controller::genFilledTemplate(
-					$link, $templateName, 
-					function($forImage) use ($ids, $ind, $buhDoc, $consignee){
-						if(!$forImage){
-							return [ 'array['.implode(",",$ids).']', $ind, $buhDoc, $consignee ];
-						}else{
-							return [$ids[0]];
+					$link,
+					$templateName,
+					function ($forImage) use ($ids, $ind, $buhDoc, $consignee) {
+						if (!$forImage) {
+							return [
+								"array[" . implode(",", $ids) . "]",
+								$ind,
+								$buhDoc,
+								$consignee,
+							];
 						}
+
+						return [$ids[0]];
 					},
-					$erEmpty, $tFile, $fileName,
+					$erEmpty,
+					$tFile,
+					$fileName,
 					"SELECT * FROM transp_nakl_print_agg(%s, %d, %s::jsonb, %d)"
-				);		
-			}else{
+				);
+			} else {
 				$ind++;
+
+				self::updateOperStatus(
+					$link, 
+					$operationId, 
+					sprintf("Формирование Excel (%d из %d)", $ind, count($docList))
+				);
+
 				ExcelTemplate_Controller::genFilledTemplate(
-					$link, $templateName, 
-					array( $shAr["id"], $ind, $buhDoc, $consignee ), 
-					$erEmpty, $tFile, $fileName,
+					$link,
+					$templateName,
+					[
+						$shAr["id"],
+						$ind,
+						$buhDoc,
+						$consignee,
+					],
+					$erEmpty,
+					$tFile,
+					$fileName,
 					"SELECT * FROM transp_nakl_print(%d, %d, %s::jsonb, %d)"
-				);		
+				);
 			}
 
-			$fileNameParts = pathinfo($fileName,  PATHINFO_EXTENSION);
-			$fileExt = '';
-			if(is_array($fileNameParts) &amp;&amp; isset($fileNameParts['extension'])){
-				$fileExt = $fileNameParts['extension'];
-			}else if (gettype($fileNameParts) == "string"){
-				$fileExt = $fileNameParts;
-			}
-			if(!strlen($fileExt)){
-				$fileExt = '.xlsx';
-			}else if($fileExt[0] != '.'){
-				$fileExt = '.'.$fileExt;
-			}
+			$fileList[] = $tFile;
 
-			array_push($fileList, $tFile);
-			if($multiFile) {
+			if ($multiFile) {
 				usleep(500000);
 			}
 		}
 
-		self::merge_xls_files($fileList, $outFile);
+		$progressCallback = NULL;
+		$progressUnite = NULL;
+		if(!empty($operationId)){
+			$progressCallback = function($totCount, $ind) use ($link, $operationId){
+				//job done
+				self::updateOperStatus(
+					$link, 
+					$operationId, 
+					sprintf("Конвертация Excel в pdf (%d из %d)", $ind, $totCount)
+				);
+			};
+			$progressUnite = function() use ($link, $operationId){
+				//job done
+				self::updateOperStatus(
+					$link, 
+					$operationId, 
+					"Объединение в общий pdf"
+				);
+			};
+		}
+		self::merge_xls_files($fileList, $outFile, $progressCallback, $progressUnite);
 
-		//delete files, as they are already in a zip
-		foreach($fileList as $fl){
-			unlink($fl);
+		foreach ($fileList as $fl) {
+			if (file_exists($fl)) {
+				unlink($fl);
+			}
 		}
 
-		try{
-			$flMime = getMimeTypeOnExt($outFileName);
-			ob_clean();
-			downloadFile(
-				$outFile,
-				$flMime,
-				'attachment;',
-				$outFileName
+		return [
+			"path" => $outFile,
+			"file_name" => $outFileName,
+			"mime" => getMimeTypeOnExt($outFileName),
+		];
+	}
+
+	private function safe_operation_id($operationId) {
+		return preg_replace("/[^a-zA-Z0-9_-]/", "", (string)$operationId);
+	}
+
+	public function shipment_transp_nakl_on_list_async($params) {
+		if (empty($params["operation_id"])) {
+			throw new Exception("operation_id is required");
+		}
+
+		$operationId = $this->safe_operation_id($params["operation_id"]);
+
+		if (!$operationId) {
+			throw new Exception("invalid operation_id");
+		}
+
+		$link = $this->getDbLinkMaster();
+		$link->query(
+			"INSERT INTO user_operations
+			(user_id, operation_id, operation, status, percent)
+			VALUES ($1, $2, 'transp_nakl', 'started', 0)",
+			[ 
+				$_SESSION["user_id"],
+				$params["operation_id"]
+			]
+		);
+
+		$paramsFile = OUTPUT_PATH . "tn_params_" . $operationId . "_" . md5(uniqid("", true)) . ".json";
+
+		file_put_contents(
+			$paramsFile,
+			json_encode($params, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+		);
+
+		$phpBin = "php";
+		$workerScript = ABSOLUTE_PATH . "functions/shipment_transp_nakl_worker.php";
+		/* $logFile = OUTPUT_PATH . "tn_worker_" . $operationId . ".log"; */
+		$cmd = sprintf(
+			//"cd %s &amp;&amp; %s %s %s &gt;&gt; %s 2&gt;&amp;1 &amp; echo $!",
+			"cd %s &amp;&amp; %s %s %s &gt; /dev/null 2&gt;&amp;1 &amp;",
+			escapeshellarg(ABSOLUTE_PATH),
+			escapeshellarg($phpBin),
+			escapeshellarg($workerScript),
+			escapeshellarg($paramsFile),
+			/* escapeshellarg($logFile) */
+		);
+
+		exec($cmd);
+	}
+
+	//callled from cli
+	public function shipment_transp_nakl_on_list_async_worker($params) {
+		if (empty($params["operation_id"])) {
+			throw new Exception("operation_id is required");
+		}
+
+		$operationId = $this->safe_operation_id($params["operation_id"]);
+
+		$link = $this->getDbLinkMaster();
+		try {
+			$result = $this->shipment_transp_nakl_on_list_generate($params);
+
+			$finalFileName = "tn_" . $operationId . "_" . date("Ymd_His") . "_" . md5(uniqid("", true)) . ".pdf";
+			$finalPath = OUTPUT_PATH . $finalFileName;
+
+			rename($result["path"], $finalPath);
+
+			//job done
+			$link->query(
+				"UPDATE user_operations 
+				SET 
+					status = 'end',
+					percent = 100,
+					date_time_end = now(),
+					payload = $2
+				WHERE operation_id = $1",
+				[ 
+					$params["operation_id"], 
+					json_encode([ 
+						"path" => $finalPath, 
+						"file_name" => "ТН.pdf"
+					], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+				]
 			);
-		}finally{
-			unlink($outFile);
+		} catch (Throwable $e) {
+			$link->query(
+				"UPDATE user_operations 
+				SET 
+					error_text = $2,
+					status = 'error',
+					percent = 100,
+					date_time_end = now()
+				WHERE operation_id = $1",
+				[ $params["operation_id"], $e->getMessage() ]
+			);
+
+			throw $e;
 		}
 	}
 
-	public static function merge_xls_files($inputFiles, $outputPdfFile) {
+	public static function merge_xls_files($inputFiles, $outputPdfFile, $progressCallback=NULL, $progressUnite=NULL) {
 		// Check if LibreOffice is installed and available
 		$command = 'libreoffice --version';
 		$output = shell_exec($command);
@@ -1864,7 +2073,9 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		array_map('unlink', glob("$tempDir/*.pdf"));
 
 		// Loop through each file and convert them to PDF using LibreOffice
+		$fileInd = 0;
 		foreach ($inputFiles as $file) {
+			$fileInd++;
 			// Check if the file exists
 			if (!file_exists($file)) {
 				throw new Exception("File $file does not exist.");
@@ -1875,6 +2086,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			// Convert the file to PDF
 			$command = "libreoffice --headless --convert-to pdf \"$file\" --outdir \"$tempDir\"";
 			shell_exec($command);
+
+			if(!is_null($progressCallback)){
+				$progressCallback(count($inputFiles), $fileInd);
+			}
 		}
 
 		// Prepare the command to merge PDFs using pdfunite
@@ -1885,6 +2100,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			throw new Exception('No PDFs were generated to merge.');
 		}
 
+		if(!is_null($progressUnite)){
+			$progressUnite();
+		}
+
 		// Merge PDFs
 		$command = 'pdfunite ' . implode(' ', array_map('escapeshellarg', $pdfFiles)) . ' ' . $outputPdf;
 		shell_exec($command);
@@ -1893,6 +2112,21 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		array_map('unlink', glob("$tempDir/*.pdf"));
 		rmdir($tempDir);
 
+	}
+
+	private static function updateOperStatus($link, $operationId, $txt){
+		$link->query(
+			"UPDATE user_operations 
+			SET 
+				status = 'progress',
+				date_time_end = now(),
+				payload = $2
+			WHERE operation_id = $1",
+			[ 
+				$operationId, 
+				json_encode([ "txt" => $txt ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+			]
+		);
 	}
 }
 <![CDATA[?>]]>

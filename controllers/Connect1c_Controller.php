@@ -314,17 +314,22 @@ class Connect1c_Controller extends ControllerSQL{
 			array_push($data_for_1c['warehouses'], $wh);
 		}
 		$data_for_1c['materials'] = NULL;
-/* file_put_contents(OUTPUT_PATH.'extch.txt', var_export(json_encode($data_for_1c), TRUE)); */
-/* file_put_contents(OUTPUT_PATH.'extch.txt', var_export($data_for_1c, TRUE)); */
-/* throw new Exception("stop"); */
+		$data_for_1c['transfers'] = NULL;
+		$data_for_1c['make_transfers'] = TRUE;
 		$res = Exch1c::newProductionReportMat($data_for_1c);
 
 		$dbLink->query(
 			"UPDATE production_reports SET 
 				data_for_1c = $1,
-				material_ref_1c = $2
-			WHERE id = $3", 
-			[ json_encode($ar["params"]), json_encode($res), $id ]
+				material_ref_1c = $2,
+				transfer_ref_1c = $3
+			WHERE id = $4", 
+			[ 
+				json_encode($ar["params"]), 
+				json_encode($res["material_ref_1c"]), 
+				json_encode($res["transfer_ref_1c"]), 
+				$id 
+			]
 		);
 
 		return $res;

@@ -11,11 +11,32 @@ CREATE OR REPLACE VIEW public.shipments_for_transp_nakl_list AS
 		vehicles_ref(vh) AS vehicles_ref,
 
 		drivers_ref(dr) AS drivers_ref,
-		att_drv.id IS NOT NULL AS driver_sig_exists,
 
-		-- op.users_ref AS operators_ref,
+		EXISTS (
+			SELECT 1
+			FROM entity_contacts AS ect_drv
+			JOIN contacts AS ct_drv ON ct_drv.id = ect_drv.contact_id
+			JOIN attachments AS att_drv ON 
+				(att_drv.ref->'keys'->>'id')::int = ct_drv.id
+				AND att_drv.ref->>'dataType' = 'contacts'
+			WHERE
+				ect_drv.entity_type = 'drivers'
+				AND ect_drv.entity_id = dr.id
+		) AS driver_sig_exists,
+
 		users_ref(u) AS operators_ref,
-		att_op.id IS NOT NULL AS operator_sig_exists,
+
+		EXISTS (
+			SELECT 1
+			FROM entity_contacts AS ect_op
+			JOIN contacts AS ct_op ON ct_op.id = ect_op.contact_id
+			JOIN attachments AS att_op ON 
+				(att_op.ref->'keys'->>'id')::int = ct_op.id
+				AND att_op.ref->>'dataType' = 'contacts'
+			WHERE
+				ect_op.entity_type = 'users'
+				AND ect_op.entity_id = sh.operator_user_id
+		) AS operator_sig_exists,
 
 		clients_ref(vh_cl) AS carriers_ref,		
 		vh_cl.ref_1c IS NOT NULL AS carrier_ref_1c_exists,
@@ -26,34 +47,16 @@ CREATE OR REPLACE VIEW public.shipments_for_transp_nakl_list AS
 
 	FROM shipments AS sh 
 
-	LEFT JOIN production_sites pr_st ON pr_st.id = sh.production_site_id
-	--driver sig
-	LEFT JOIN vehicle_schedules sch ON sch.id = sh.vehicle_schedule_id
-	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
-	LEFT JOIN drivers dr ON dr.id = vh.driver_id
-	LEFT JOIN entity_contacts ect_drv ON ect_drv.entity_type = 'drivers' AND ect_drv.entity_id = dr.id
-	LEFT JOIN contacts ct_drv ON ct_drv.id = ect_drv.contact_id
-	LEFT JOIN attachments att_drv ON 
-			(att_drv.ref->'keys'->>'id')::int = ct_drv.id 
-			AND att_drv.ref->>'dataType' = 'contacts'
+	LEFT JOIN production_sites AS pr_st ON pr_st.id = sh.production_site_id
 
-	--operator sig
-	-- LEFT JOIN operators_for_transp_nakls_list op ON 
-	-- 		(op.production_sites_ref->'keys'->>'id')::int = sh.production_site_id
-	LEFT JOIN users AS u ON u.id = 563--sh.operator_user_id
-	LEFT JOIN employees AS emp ON emp.user_id = sh.operator_user_id
-	LEFT JOIN entity_contacts ect_op ON 
-			ect_op.entity_type = 'users' 
-			AND ect_op.entity_id = sh.operator_user_id
-			--(op.users_ref->'keys'->>'id')::int
-	LEFT JOIN contacts ct_op ON ct_op.id = ect_op.contact_id
-	LEFT JOIN attachments att_op ON 
-			(att_op.ref->'keys'->>'id')::int = ct_op.id 
-			AND att_op.ref->>'dataType' = 'contacts'
+	LEFT JOIN vehicle_schedules AS sch ON sch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS vh ON vh.id = sch.vehicle_id
+	LEFT JOIN drivers AS dr ON dr.id = vh.driver_id
 
-	--owner
+	LEFT JOIN users AS u ON u.id = 563
+	--LEFT JOIN users AS u ON u.id = sh.operator_user_id
+
 	LEFT JOIN vehicle_owners AS v_own ON v_own.id = vh.official_vehicle_owner_id
 	LEFT JOIN clients AS vh_cl ON vh_cl.id = v_own.client_id
 
 	ORDER BY sh.date_time ASC;
-

@@ -1765,6 +1765,13 @@ MAX info in Order
 1.00414
 1) New report driver work hours
 
+1.00415
+transp_nakl_operator_sgn
+transp_nakl_driver_sgn
+ConcreteTypeList_View +ref_1c, fill list with ref, correct 1c method.
+DriverWorkTimeReport +print +download excel file
+ProductionReport +transfers
+OrderForTranspNaklList_View async query.
 
 Order_Controller->get_make_orders_form() is too slow, 3.5s
 TODO: invite to Telegram from saved orders?

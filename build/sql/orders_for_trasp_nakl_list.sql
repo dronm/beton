@@ -21,6 +21,7 @@ CREATE OR REPLACE VIEW public.orders_for_transp_nakl_list AS
 	LEFT JOIN clients cl ON cl.id = o.client_id
 	LEFT JOIN destinations d ON d.id = o.destination_id
 	LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
+	WHERE o.quant > 0
 
 	ORDER BY cl.name, o.date_time;
 

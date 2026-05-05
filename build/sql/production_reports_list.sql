@@ -8,7 +8,8 @@ CREATE OR REPLACE VIEW public.production_reports_list AS
 		shift_from,
 		shift_to,
 		ref_1c,
-		material_ref_1c
+		material_ref_1c,
+		transfer_ref_1c
 	FROM production_reports AS t
 	ORDER BY shift_to DESC
 	;

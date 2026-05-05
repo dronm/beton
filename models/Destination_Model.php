@@ -2,6 +2,7 @@
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
@@ -38,6 +39,16 @@ class Destination_Model extends ModelSQLBeton{
 						
 		$f_name=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name",$f_opts);
 		$this->addField($f_name);
+		//********************
+		
+		//*** Field name_full ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Наименование полное';
+		$f_opts['id']="name_full";
+						
+		$f_name_full=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"name_full",$f_opts);
+		$this->addField($f_name_full);
 		//********************
 		
 		//*** Field distance ***

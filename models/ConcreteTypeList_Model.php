@@ -11,6 +11,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
  
 class ConcreteTypeList_Model extends ModelSQLBeton{
 	
@@ -141,6 +142,14 @@ class ConcreteTypeList_Model extends ModelSQLBeton{
 						
 		$f_w_val=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"w_val",$f_opts);
 		$this->addField($f_w_val);
+		//********************
+		
+		//*** Field ref_1c ***
+		$f_opts = array();
+		$f_opts['id']="ref_1c";
+						
+		$f_ref_1c=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ref_1c",$f_opts);
+		$this->addField($f_ref_1c);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

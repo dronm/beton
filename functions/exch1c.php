@@ -11,6 +11,10 @@ class Exch1c{
 
 		static $status_codes = null;
 
+		if(!defined("EXCH_1C_HOST")){
+			throw new Exception("костанта 'EXCH_1C_HOST' не определена");
+		}
+
 		if ($status_codes === null) {
 			$status_codes = array (
 				100 => 'Continue',

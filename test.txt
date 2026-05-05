@@ -1,0 +1,1 @@
+http://localhost/beton_new/?c=Shipment_Controller&f=shipment_transp_nakl_on_list&v=ViewXML&shipment_ids=256282&buh_doc={%22ref_1c%22:%22%22}&faksim=0

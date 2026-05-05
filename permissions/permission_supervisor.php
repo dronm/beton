@@ -190,6 +190,10 @@ $permissions = array();
 				
 					$permissions['Order_Controller_get_transp_nakl_shipment_list']=TRUE;
 				
+					$permissions['Order_Controller_get_for_buh_list']=TRUE;
+				
+					$permissions['Order_Controller_get_for_buh_shipment_list']=TRUE;
+				
 					$permissions['Order_Controller_get_nakl_1c_list']=TRUE;
 				
 					$permissions['Order_Controller_new_order_1c']=TRUE;
@@ -395,6 +399,8 @@ $permissions = array();
 					$permissions['Shipment_Controller_shipment_transp_nakl_all']=TRUE;
 				
 					$permissions['Shipment_Controller_shipment_transp_nakl_on_list']=TRUE;
+				
+					$permissions['Shipment_Controller_shipment_transp_nakl_on_list_result']=TRUE;
 				
 					$permissions['Shipment_Controller_get_time_list']=TRUE;
 				
@@ -1919,6 +1925,18 @@ $permissions = array();
 					$permissions['FuelConsumption_Controller_get_list']=TRUE;
 				
 					$permissions['FuelConsumption_Controller_get_object']=TRUE;
+				
+					$permissions['BuhDoc_Controller_insert']=TRUE;
+				
+					$permissions['BuhDoc_Controller_update']=TRUE;
+				
+					$permissions['BuhDoc_Controller_delete']=TRUE;
+				
+					$permissions['BuhDoc_Controller_get_list']=TRUE;
+				
+					$permissions['BuhDoc_Controller_get_object']=TRUE;
+				
+					$permissions['BuhDoc_Controller_new_doc']=TRUE;
 				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

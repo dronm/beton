@@ -64,7 +64,7 @@ function ProductionReport_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Требование накладная';
+	filed_options.alias = 'Требование накладная (список)';
 	filed_options.autoInc = false;	
 	
 	options.fields.material_ref_1c = new FieldJSONB("material_ref_1c",filed_options);
@@ -77,6 +77,15 @@ function ProductionReport_Model(options){
 	filed_options.autoInc = false;	
 	
 	options.fields.data_for_1c = new FieldJSON("data_for_1c",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Перемещение';
+	filed_options.autoInc = false;	
+	
+	options.fields.transfer_ref_1c = new FieldJSONB("transfer_ref_1c",filed_options);
 	
 			
 		ProductionReport_Model.superclass.constructor.call(this,id,options);

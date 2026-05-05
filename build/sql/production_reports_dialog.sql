@@ -8,6 +8,7 @@ SELECT
     t.shift_from,
     t.shift_to,
     t.ref_1c,
+	t.transfer_ref_1c,
     t.data_for_1c,
     
     -- Use json_agg to handle multiple rows

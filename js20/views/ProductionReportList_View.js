@@ -52,13 +52,15 @@ function ProductionReportList_View(id,options){
 										//materials
 										const ref = f.ref_1c.getValue();
 										const refMat = f.material_ref_1c.getValue();
+										const refTransf = f.transfer_ref_1c.getValue();
+
 										const cellNode = gridCell.getNode();
 
+										//materials
 										const matCont = document.createElement("div");
 										(new ProductionReportMatTo1cBtn("prodRepList:export_mat", {
 											grid: self.getElement("grid")
 										})).toDOM(matCont);
-
 										if(refMat && refMat.length){
 											const matNode = document.createElement("span");
 											let docs = "";
@@ -75,6 +77,25 @@ function ProductionReportList_View(id,options){
 											matCont.appendChild(matNode);
 										}
 										cellNode.appendChild(matCont);
+
+										//transfer
+										const transfCont = document.createElement("div");
+										if(refTransf && refTransf.length){
+											const transfNode = document.createElement("span");
+											let docs = "";
+											for(let i = 0; i < refTransf.length; i++){
+												if(!("descr" in refTransf[i])){
+													continue;
+												}
+												if(docs !== ""){
+													docs+= ", ";
+												}
+												docs+= refTransf[i].descr;
+											}
+											transfNode.textContent = docs;
+											transfCont.appendChild(transfNode);
+										}
+										cellNode.appendChild(transfCont);
 
 										//production report
 										const prodCont = document.createElement("div");

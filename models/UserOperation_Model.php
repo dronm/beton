@@ -99,6 +99,14 @@ class UserOperation_Model extends ModelSQL{
 		$f_date_time_end=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"date_time_end",$f_opts);
 		$this->addField($f_date_time_end);
 		//********************
+		
+		//*** Field payload ***
+		$f_opts = array();
+		$f_opts['id']="payload";
+						
+		$f_payload=new FieldSQLjson($this->getDbLink(),$this->getDbName(),$this->getTableName(),"payload",$f_opts);
+		$this->addField($f_payload);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

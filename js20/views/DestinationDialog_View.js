@@ -16,6 +16,11 @@ function DestinationDialog_View(id,options){
 			"value":(options.defDialogValues&&options.defDialogValues["name"])? options.defDialogValues["name"]:""
 		}));	
 	
+		this.addElement(new EditString(id+":name_full",{
+			"maxLength": "500",
+			"labelCaption":"Адрес:"
+		}));	
+
 		this.addElement(new EditFloat(id+":distance",{
 			"labelCaption":"Расстояние (км.):",
 			"editContClassName":"input-group "+window.getBsCol(4)
@@ -120,6 +125,7 @@ function DestinationDialog_View(id,options){
 	//read
 	var r_bd = [
 		new DataBinding({"control":this.getElement("name")})
+		,new DataBinding({"control":this.getElement("name_full")})
 		,new DataBinding({"control":this.getElement("distance")})
 		,new DataBinding({"control":this.getElement("time_route")})
 		,new DataBinding({"control":this.getElement("price")})
@@ -132,6 +138,7 @@ function DestinationDialog_View(id,options){
 	//write
 	this.setWriteBindings([
 		new CommandBinding({"control":this.getElement("name")})
+		,new CommandBinding({"control":this.getElement("name_full")})
 		,new CommandBinding({"control":this.getElement("distance")})
 		,new CommandBinding({"control":this.getElement("time_route")})
 		,new CommandBinding({"control":this.getElement("send_route_sms")})

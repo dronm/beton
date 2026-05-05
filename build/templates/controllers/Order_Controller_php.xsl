@@ -1266,6 +1266,14 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$this->modelGetList(new ShipmentForTranspNaklList_Model($this->getDbLink()),$pm);
 	}
 
+	function get_for_buh_list($pm){
+		$this->modelGetList(new OrderForBuhList_Model($this->getDbLink()),$pm);
+	}
+
+	function get_for_buh_shipment_list($pm){
+		$this->modelGetList(new ShipmentForBuhList_Model($this->getDbLink()),$pm);
+	}
+
 	function get_nakl_1c_list($pm){
 		$link = $this->getDbLink();
 		$ordersList = []; //orders

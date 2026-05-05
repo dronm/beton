@@ -51,6 +51,8 @@ function Order_Controller(options){
 	this.add_calc_for_site();
 	this.add_get_transp_nakl_list();
 	this.add_get_transp_nakl_shipment_list();
+	this.add_get_for_buh_list();
+	this.add_get_for_buh_shipment_list();
 	this.add_get_nakl_1c_list();
 	this.add_new_order_1c();
 	this.add_print_order_1c();
@@ -993,6 +995,42 @@ extend(Order_Controller,ControllerObjServer);
 	this.addPublicMethod(pm);
 }
 
+			Order_Controller.prototype.add_get_for_buh_list = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_for_buh_list',opts);
+	
+	pm.addField(new FieldInt(this.PARAM_COUNT));
+	pm.addField(new FieldInt(this.PARAM_FROM));
+	pm.addField(new FieldString(this.PARAM_COND_FIELDS));
+	pm.addField(new FieldString(this.PARAM_COND_SGNS));
+	pm.addField(new FieldString(this.PARAM_COND_VALS));
+	pm.addField(new FieldString(this.PARAM_COND_ICASE));
+	pm.addField(new FieldString(this.PARAM_ORD_FIELDS));
+	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
+	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
+	pm.addField(new FieldString(this.PARAM_FIELD_LSN));
+
+	this.addPublicMethod(pm);
+}
+
+			Order_Controller.prototype.add_get_for_buh_shipment_list = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_for_buh_shipment_list',opts);
+	
+	pm.addField(new FieldInt(this.PARAM_COUNT));
+	pm.addField(new FieldInt(this.PARAM_FROM));
+	pm.addField(new FieldString(this.PARAM_COND_FIELDS));
+	pm.addField(new FieldString(this.PARAM_COND_SGNS));
+	pm.addField(new FieldString(this.PARAM_COND_VALS));
+	pm.addField(new FieldString(this.PARAM_COND_ICASE));
+	pm.addField(new FieldString(this.PARAM_ORD_FIELDS));
+	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
+	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
+	pm.addField(new FieldString(this.PARAM_FIELD_LSN));
+
+	this.addPublicMethod(pm);
+}
+
 			Order_Controller.prototype.add_get_nakl_1c_list = function(){
 	var opts = {"controller":this};	
 	var pm = new PublicMethodServer('get_nakl_1c_list',opts);
@@ -1008,12 +1046,6 @@ extend(Order_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldText("order_ids",options));
-	
-				
-	
-	var options = {};
-	
-		pm.addField(new FieldBool("rollup_runs",options));
 	
 			
 	this.addPublicMethod(pm);

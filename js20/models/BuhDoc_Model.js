@@ -27,9 +27,18 @@ function BuhDoc_Model(options){
 	var filed_options = {};
 	filed_options.primaryKey = true;	
 	
+	filed_options.autoInc = true;	
+	
+	options.fields.id = new FieldInt("id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Ссылка на документ 1с';
 	filed_options.autoInc = false;	
 	
-	options.fields.order_id = new FieldInt("order_id",filed_options);
+	options.fields.ref_1c = new FieldJSONB("ref_1c",filed_options);
 	
 				
 	
@@ -38,16 +47,7 @@ function BuhDoc_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.nomer = new FieldText("nomer",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Formatted document datetime';
-	filed_options.autoInc = false;	
-	
-	options.fields.data = new FieldText("data",filed_options);
+	options.fields.faktura_ref_1c = new FieldJSONB("faktura_ref_1c",filed_options);
 	
 				
 	
@@ -56,26 +56,7 @@ function BuhDoc_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.faktura_nomer = new FieldText("faktura_nomer",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	filed_options.alias = 'Formatted document datetime';
-	filed_options.autoInc = false;	
-	
-	options.fields.faktura_data = new FieldText("faktura_data",filed_options);
-	
-				
-	
-	var filed_options = {};
-	filed_options.primaryKey = false;	
-	
-	filed_options.autoInc = false;	
-	
-	options.fields.ref_1c = new FieldString("ref_1c",filed_options);
-	options.fields.ref_1c.getValidator().setMaxLength('36');
+	options.fields.items = new FieldJSONB("items",filed_options);
 	
 		BuhDoc_Model.superclass.constructor.call(this,id,options);
 }

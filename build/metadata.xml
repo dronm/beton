@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-04-24 14:51:39</lastBuild></version>
+		<lastBuild>2026-05-05 18:01:02</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -320,6 +320,7 @@
 		<version dateOpen="2026-04-14 06:13:13" dateClose="2026-04-14 06:15:07">1.00412</version>
 		<version dateOpen="2026-04-24 05:57:49" dateClose="2026-04-24 05:59:04">1.00413</version>
 		<version dateOpen="2026-04-24 11:33:08" dateClose="2026-04-24 14:52:00">1.00414</version>
+		<version dateOpen="2026-04-27 09:13:07" dateClose="2026-05-05 18:01:23">1.00415</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -969,6 +970,7 @@
 			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
 			<field id="name" dataType="String" required="TRUE" length="250" alias="Наименование" display="TRUE"/>
+			<field id="name_full" dataType="Text" alias="Наименование полное"/>
 			<field id="distance" dataType="Float" required="FALSE" length="15" precision="2" alias="Расстояние"/>
 			<field id="time_route" dataType="Time" required="TRUE" alias="Время"/>
 			<field id="price" dataType="Float" alias="Стоимость"/>
@@ -1009,6 +1011,7 @@
 		<model id="DestinationDialog" parent="ModelSQLBeton" dataTable="destinations_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
 			<field id="name" dataType="String"/>
+			<field id="name_full" dataType="Text" alias="Наименование полное"/>
 			<field id="distance" dataType="String"/>
 			<field id="time_route" dataType="String"/>
 			<field id="price" dataType="Float"/>
@@ -1063,7 +1066,7 @@
 			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE" alias="Код"/>
 			<field id="name" dataType="String" required="TRUE" length="100" alias="Наименование"/>
-			<field id="code_1c" dataType="String" required="TRUE" length="11" alias="Код 1С"/>
+			<field id="code_1c" dataType="String" required="TRUE" length="11" alias="Код 1С" descr="deprecated, use ref_1c"/>
 			<field id="pres_norm" dataType="Float" required="TRUE" length="15" precision="3" alias="Норма давл."/>
 			<field id="mpa_ratio" dataType="Float" length="19" precision="5" alias="Кф.МПА"/>
 			<field id="price" dataType="Float" length="15" precision="2" alias="Цена"/>
@@ -1073,6 +1076,7 @@
 			<field id="prochnost" dataType="Int" alias="Прочность для паспорта качества"/>
 			<field id="f_val" dataType="Int" alias="F"/>
 			<field id="w_val" dataType="Int" alias="W"/>
+			<field id="ref_1c" dataType="JSONB"/>
 			<index id="code_1c_index">
 				<field id="code_1c" unique="TRUE"/>
 			</index>
@@ -1090,6 +1094,7 @@
 			<field id="prochnost" dataType="Int" alias="Прочность для паспорта качества"/>
 			<field id="f_val" dataType="Int" alias="F"/>
 			<field id="w_val" dataType="Int" alias="W"/>
+			<field id="ref_1c" dataType="JSONB"/>
 		</model>
 		<model id="ConcreteTypeForSiteList" parent="ModelSQLBeton" dataTable="concrete_types_for_site_list" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" alias="Код"/>
@@ -4953,6 +4958,7 @@
 			<field id="error_text" dataType="Text"/>
 			<field id="comment_text" dataType="Text"/>
 			<field id="date_time_end" dataType="DateTimeTZ"/>
+			<field id="payload" dataType="json"/>
 		</model>
 		<model id="VehicleTotRepItem" parent="ModelSQL" dataTable="vehicle_tot_rep_items" virtual="FALSE" alias="Статьи доходов/расходов отчета по ТС">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
@@ -5409,21 +5415,61 @@
 			<field id="date_time" dataType="DateTimeTZ"/>
 			<field id="message" dataType="JSONB"/>
 		</model>
-		<model id="ShipmentBuhDoc" parent="ModelSQL" dataTable="shipment_buh_docs" virtual="FALSE" alias="Бух документ УПД">
-			<field id="ref_1c" dataType="String" length="36" primaryKey="TRUE"/>
-			<field id="nomer" dataType="Text"/>
-			<field id="data" dataType="Text" alias="Formatted document datetime"/>
-			<field id="faktura_nomer" dataType="Text"/>
-			<field id="faktura_data" dataType="Text" alias="Formatted document datetime"/>
-			<field id="shipment_ids" dataType="Array"/>
-		</model>
 		<model id="BuhDoc" parent="ModelSQL" dataTable="buh_docs" virtual="FALSE" alias="Бух документ УПД">
-			<field id="order_id" dataType="Int" refTable="orders" refField="id" primaryKey="TRUE"/>
-			<field id="nomer" dataType="Text"/>
-			<field id="data" dataType="Text" alias="Formatted document datetime"/>
-			<field id="faktura_nomer" dataType="Text"/>
-			<field id="faktura_data" dataType="Text" alias="Formatted document datetime"/>
-			<field id="ref_1c" dataType="String" length="36"/>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="ref_1c" dataType="JSONB" alias="Ссылка на документ 1с"/>
+			<field id="faktura_ref_1c" dataType="JSONB"/>
+			<field id="client_1c" dataType="JSONB"/>
+			<field id="contract_1c" dataType="JSONB"/>
+			<field id="total" dataType="Float" length="15" precision="2"/>
+			<field id="items" dataType="JSONB"/>
+			<field id="comment_text" dataType="Text"/>
+		</model>
+		<model id="BuhDocItem" parentJS="ModelJSON" virtual="TRUE" server="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="item_1c" dataType="JSON"/>
+			<field id="quant" dataType="Float" precision="5" length="19"/>
+			<field id="price" dataType="Float" precision="2" length="15"/>
+			<field id="total" dataType="Float" precision="2" length="15"/>
+		</model>
+		<model id="BuhDocShipment" parent="ModelSQL" dataTable="buh_doc_shipments" virtual="FALSE" alias="Отгрузки по бух УПД">
+			<field id="order_id" dataType="Int" refTable="orders" refField="id" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="shipment_id" dataType="Int" refTable="shipments" refField="id" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="buh_doc_id" dataType="Int" refTable="buh_docs" refField="id"/>
+			<index id="buh_doc_shipments_buh_doc_id_idx">
+				<field id="buh_doc_id"/>
+			</index>
+		</model>
+		<model id="OrderForBuhList" parent="ModelSQLBeton" dataTable="orders_for_buh_list" virtual="TRUE" descr="Для переноса накладных в 1с">
+			<defaultOrder>
+				<field id="client_descr"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер заявки"/>
+			<field id="date_time" dataType="DateTime" alias="Дата заявки"/>
+			<field id="orders_ref" dataType="JSON" alias="Order"/>
+			<field id="order_num" dataType="String" alias="Order num"/>
+			<field id="clients_ref" dataType="JSON" alias="Клиент"/>
+			<field id="client_descr" dataType="String" alias="Клиент"/>
+			<field id="client_ref_1c_exists" dataType="Bool"/>
+			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
+			<field id="concrete_types_ref" dataType="JSON" alias="Марка"/>
+			<field id="quant" dataType="Float" alias="Кол-во в заявке,м3"/>
+			<field id="buh_doc_ref_1c" dataType="JSON" alias="Накладная 1с"/>
+		</model>
+		<model id="ShipmentForBuhList" parent="ModelSQLBeton" dataTable="shipments_for_buh_list" virtual="TRUE">
+			<defaultOrder>
+				<field id="date_time" sortDirect="DESC"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE" alias="Номер"/>
+			<field id="order_id" dataType="Int" alias="Order ID"/>
+			<field id="date_time" dataType="DateTime" alias="Дата"/>
+			<field id="shipments_ref" dataType="JSON" alias="Shipment"/>
+			<field id="production_sites_ref" dataType="JSON" alias="Production site"/>
+			<field id="vehicles_ref" dataType="JSON" alias="Vehicle"/>
+			<field id="drivers_ref" dataType="JSON" alias="Driver"/>
+			<field id="quant" dataType="Float" alias="Кол-во,м3"/>
+			<field id="buh_doc_ref_1c" dataType="JSON" alias="Накладная 1с"/>
+			<sql/>
 		</model>
 		<model id="OperatorForTranspNakl" parent="ModelSQL" dataTable="operators_for_transp_nakl" virtual="FALSE" alias="Список операторов">
 			<field id="user_id" dataType="Int" refTable="users" refField="id" primaryKey="TRUE"/>
@@ -5607,6 +5653,7 @@
 			<field id="ref_1c" dataType="JSONB" alias="Ссылка на документ 1с"/>
 			<field id="material_ref_1c" dataType="JSONB" alias="Требование накладная (список)"/>
 			<field id="data_for_1c" dataType="JSON"/>
+			<field id="transfer_ref_1c" dataType="JSONB" alias="Перемещение"/>
 			<index id="production_reports_period_idx">
 				<field id="shift_to"/>
 			</index>
@@ -5616,7 +5663,8 @@
 			<field id="shift_from" dataType="DateTime" required="TRUE"/>
 			<field id="shift_to" dataType="DateTime" required="TRUE"/>
 			<field id="ref_1c" dataType="JSONB" alias="Ссылка на документ 1с"/>
-			<field id="material_ref_1c" dataType="JSONB" alias="Требование накладная (список)"/>
+			<field id="material_ref_1c" dataType="JSONB" alias="Требование накладная"/>
+			<field id="transfer_ref_1c" dataType="JSONB" alias="Перемещение"/>
 		</model>
 		<model id="ProductionReportDialog" parent="ModelSQLBeton" dataTable="production_reports_dialog" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
@@ -5624,6 +5672,7 @@
 			<field id="shift_to" dataType="DateTime" required="TRUE"/>
 			<field id="ref_1c" dataType="JSONB" alias="Ссылка на документ 1с"/>
 			<field id="material_ref_1c" dataType="JSONB" alias="Требование накладная"/>
+			<field id="transfer_ref_1c" dataType="JSONB" alias="Перемещение"/>
 			<field id="items" dataType="JSON"/>
 			<field id="materials" dataType="JSON"/>
 			<field id="date_for_1c" dataType="JSON"/>
@@ -5710,6 +5759,12 @@
 			<field id="quant_time" dataType="Int" alias="Расход на 1 час"/>
 		</model>
 		<model id="FuelConsumption" parent="ModelSQLDOC" dataTable="fuel_consumptions" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="date_time" dataType="DateTime" alias="Период" required="TRUE"/>
+			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id" required="TRUE"/>
+			<field id="quant" dataType="Int" alias="Количество" required="TRUE"/>
+		</model>
+		<model id="BuhNakl" parent="ModelSQLDOC" dataTable="fuel_consumptions" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="date_time" dataType="DateTime" alias="Период" required="TRUE"/>
 			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id" required="TRUE"/>
@@ -6017,6 +6072,8 @@
 			</publicMethod>
 			<publicMethod id="get_transp_nakl_list" modelId="OrderForTranspNaklList" condFields="TRUE"/>
 			<publicMethod id="get_transp_nakl_shipment_list" modelId="ShipmentForTranspNaklList" condFields="TRUE"/>
+			<publicMethod id="get_for_buh_list" modelId="OrderForBuhList" condFields="TRUE"/>
+			<publicMethod id="get_for_buh_shipment_list" modelId="ShipmentForBuhList" condFields="TRUE"/>
 			<publicMethod id="get_nakl_1c_list">
 				<field id="shipment_ids" dataType="Text"/>
 				<field id="order_ids" dataType="Text"/>
@@ -6291,6 +6348,10 @@
 				<field id="buh_doc" dataType="Text" required="TRUE"/>
 				<field id="rollup_runs" dataType="Bool"/>
 				<field id="consignee" dataType="Int"/>
+				<field id="operation_id" dataType="String" length="36" required="false"/>
+			</publicMethod>
+			<publicMethod id="shipment_transp_nakl_on_list_result" modelId="ModelSQL">
+				<field id="operation_id" dataType="String" length="36" required="false"/>
 			</publicMethod>
 			<publicMethod id="get_time_list" modelId="ShipmentTimeList" condFields="TRUE">
 				<field id="templ" dataType="String"/>
@@ -7847,6 +7908,17 @@
 			<publicMethod id="get_list" modelId="FuelConsumption"/>
 			<publicMethod id="get_object" modelId="FuelConsumption"/>
 		</controller>
+		<controller id="BuhDoc" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="BuhDoc"/>
+			<publicMethod id="update" modelId="BuhDoc"/>
+			<publicMethod id="delete" modelId="BuhDoc"/>
+			<publicMethod id="get_list" modelId="BuhDoc"/>
+			<publicMethod id="get_object" modelId="BuhDoc"/>
+			<publicMethod id="new_doc">
+				<field id="shipment_ids" dataType="Text"/>
+				<field id="order_ids" dataType="Text"/>
+			</publicMethod>
+		</controller>
 	</controllers>
 	<permissions>
 		<permission type="allow" controllerId="all" methodId="all" roleId="owner"/>
@@ -8106,6 +8178,7 @@
 		<view id="30043" t="Connect1c" section="Формы" descr="Управление состоянием коннектора 1с"/>
 		<view id="30044" c="MaxUser_Controller" t="MaxUserList" f="get_list" section="Формы" descr="Соответствия пользователей в MAX"/>
 		<view id="30045" c="MaxOutMessage_Controller" t="MaxOutMessageList" f="get_list" section="Формы" descr="Исходящие сообщения MAX"/>
+		<view id="30046" t="OrderForBuhList" section="Формы" descr="Заявки для формирования накладных в 1с"/>
 		<view id="50001" t="VehicleStopsReport" section="Отчеты" descr="Стоянки ТС"/>
 		<view id="50002" t="VehicleScheduleReportAll" section="Отчеты" descr="Печать графиков"/>
 		<view id="50003" t="RouteToDestAvgTimeRep" section="Отчеты" descr="Среднее время до объектов"/>
@@ -8279,6 +8352,7 @@
 		<serverTemplate id="MaxUserList" class="list"/>
 		<serverTemplate id="MaxOutMessageList" class="list"/>
 		<serverTemplate id="DriverWorkTimeReport" class="list"/>
+		<serverTemplate id="OrderForBuhList" class="list"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="js20/tmpl/FatalException.html"/>
@@ -8775,6 +8849,8 @@
 		<jsScript file="js20/views/OrderForClientList_View.js"/>
 		<jsScript file="js20/views/OrderForTranspNaklList_View.js"/>
 		<jsScript file="js20/views/ShipmentForTranspNaklList_View.js"/>
+		<jsScript file="js20/views/OrderForBuhList_View.js"/>
+		<jsScript file="js20/views/ShipmentForBuhList_View.js"/>
 		<jsScript file="js20/views/ShipmentTimeList_View.js"/>
 		<jsScript file="js20/views/ShipmentDateList_View.js"/>
 		<jsScript file="js20/views/AstCallList_View.js"/>
@@ -9054,6 +9130,7 @@
 		<jsScript file="js20/custom_controls/ShipmentGridCmdPrintTTN.js"/>
 		<jsScript file="js20/custom_controls/ShipmentGridCmdPrintPutevoiList.js"/>
 		<jsScript file="js20/custom_controls/OrderGridCmdPrintTranspNakl.js"/>
+		<jsScript file="js20/custom_controls/OrderGridCmdShipmentToBuh.js"/>
 		<jsScript file="js20/custom_controls/ShipmentGridCmdChangeOrder.js"/>
 		<jsScript file="js20/custom_controls/ShipmentGridCmdDelete.js"/>
 		<jsScript file="js20/custom_controls/RawMaterialConsRateCalcBtn.js"/>
@@ -9149,6 +9226,7 @@
 		<jsScript file="js20/custom_controls/MAXShowQRBtn.js"/>
 		<jsScript file="js20/custom_controls/MAXInviteBtn.js"/>
 		<jsScript file="js20/custom_controls/DriverWorkTimeReport_View.js"/>
+		<jsScript file="js20/custom_controls/BuhDocItemGrid.js"/>
 		<jsScript file="js20/views/rs_ru.js"/>
 		<jsScript file="js20/views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -9699,6 +9777,9 @@
 		<jsScript file="js20/models/MaxUserList_Model.js"/>
 		<jsScript file="js20/controllers/MaxOutMessage_Controller.js"/>
 		<jsScript file="js20/models/MaxOutMessageList_Model.js"/>
+		<jsScript file="js20/models/BuhDocShipment_Model.js"/>
+		<jsScript file="js20/models/OrderForBuhList_Model.js"/>
+		<jsScript file="js20/models/ShipmentForBuhList_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

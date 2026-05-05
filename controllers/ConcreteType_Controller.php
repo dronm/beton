@@ -114,6 +114,11 @@ class ConcreteType_Controller extends ControllerSQL{
 				,$f_params);
 		$pm->addParam($param);
 		
+			$f_params = array();
+			$param = new FieldExtJSONB('ref_1c'
+				,$f_params);
+		$pm->addParam($param);
+		
 		$pm->addParam(new FieldExtInt('ret_id'));
 		
 		//default event
@@ -219,6 +224,11 @@ class ConcreteType_Controller extends ControllerSQL{
 				,$f_params);
 			$pm->addParam($param);
 		
+			$f_params=array();
+			$param = new FieldExtJSONB('ref_1c'
+				,$f_params);
+			$pm->addParam($param);
+		
 			$param = new FieldExtInt('id',array(
 			
 				'alias'=>'Код'
@@ -316,7 +326,7 @@ class ConcreteType_Controller extends ControllerSQL{
 		$this->addPublicMethod($pm);
 
 		
-	}	
+	}
 	
 	public function get_list_for_lab($pm){
 		$this->addNewModel('SELECT * FROM concrete_types_for_lab_list',
@@ -328,6 +338,11 @@ class ConcreteType_Controller extends ControllerSQL{
 		'ConcreteTypeForSiteList_Model');	
 	}
 	
+	/* public function update($pm){ */
+	/* 	parent::update($pm); */
+	/* 	throw new Exception("stop"); */
+	/* } */
+
 	public function get_for_client_list($pm){
 		$this->addNewModel(sprintf(
 		"SELECT * FROM concrete_types_list

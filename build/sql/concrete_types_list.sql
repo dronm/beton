@@ -18,6 +18,7 @@ CREATE OR REPLACE VIEW concrete_types_list AS
 		,ctp.prochnost
 		,f_val
 		,w_val
+		,ref_1c
 		
 	FROM concrete_types AS ctp
 	/*
@@ -45,5 +46,3 @@ CREATE OR REPLACE VIEW concrete_types_list AS
 	
 	ORDER BY ctp.name
 	;
-	
-ALTER VIEW concrete_types_list OWNER TO ;

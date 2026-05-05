@@ -1290,6 +1290,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/views/OrderForClientList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/OrderForClientList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/OrderForTranspNaklList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/OrderForTranspNaklList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/ShipmentForTranspNaklList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ShipmentForTranspNaklList_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/views/OrderForBuhList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/OrderForBuhList_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/views/ShipmentForBuhList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ShipmentForBuhList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/ShipmentTimeList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ShipmentTimeList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/ShipmentDateList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ShipmentDateList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/AstCallList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/AstCallList_View.js')) ));
@@ -1564,6 +1566,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ShipmentGridCmdPrintTTN.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ShipmentGridCmdPrintTTN.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ShipmentGridCmdPrintPutevoiList.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ShipmentGridCmdPrintPutevoiList.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/OrderGridCmdPrintTranspNakl.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/OrderGridCmdPrintTranspNakl.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/OrderGridCmdShipmentToBuh.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/OrderGridCmdShipmentToBuh.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ShipmentGridCmdChangeOrder.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ShipmentGridCmdChangeOrder.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/ShipmentGridCmdDelete.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/ShipmentGridCmdDelete.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/RawMaterialConsRateCalcBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/RawMaterialConsRateCalcBtn.js')) ));
@@ -1659,6 +1662,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/MAXShowQRBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/MAXShowQRBtn.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/MAXInviteBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/MAXInviteBtn.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/DriverWorkTimeReport_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/DriverWorkTimeReport_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/BuhDocItemGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/BuhDocItemGrid.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/rs_ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/rs_ru.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/rs_common_ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/rs_common_ru.js')) ));
 		
@@ -2207,6 +2211,9 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/models/MaxUserList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/MaxUserList_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controllers/MaxOutMessage_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/MaxOutMessage_Controller.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/MaxOutMessageList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/MaxOutMessageList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/BuhDocShipment_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/BuhDocShipment_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/OrderForBuhList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/OrderForBuhList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/ShipmentForBuhList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ShipmentForBuhList_Model.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

@@ -953,6 +953,38 @@ class Order_Controller extends ControllerSQL{
 		$this->addPublicMethod($pm);
 
 			
+		$pm = new PublicMethod('get_for_buh_list');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('get_for_buh_shipment_list');
+		
+		$pm->addParam(new FieldExtInt('count'));
+		$pm->addParam(new FieldExtInt('from'));
+		$pm->addParam(new FieldExtString('cond_fields'));
+		$pm->addParam(new FieldExtString('cond_sgns'));
+		$pm->addParam(new FieldExtString('cond_vals'));
+		$pm->addParam(new FieldExtString('cond_ic'));
+		$pm->addParam(new FieldExtString('ord_fields'));
+		$pm->addParam(new FieldExtString('ord_directs'));
+		$pm->addParam(new FieldExtString('field_sep'));
+		$pm->addParam(new FieldExtString('lsn'));
+
+		$this->addPublicMethod($pm);
+
+			
 		$pm = new PublicMethod('get_nakl_1c_list');
 		
 				
@@ -964,11 +996,6 @@ class Order_Controller extends ControllerSQL{
 	$opts=array();
 					
 		$pm->addParam(new FieldExtText('order_ids',$opts));
-	
-				
-	$opts=array();
-					
-		$pm->addParam(new FieldExtBool('rollup_runs',$opts));
 	
 			
 		$this->addPublicMethod($pm);
@@ -1047,7 +1074,7 @@ class Order_Controller extends ControllerSQL{
 		$lang_id, $pumpVehicleId, $order_update,
 		$ordersRef, $extContactId){
 		//SMS service		
-		if (SMS_ACTIVE && strlen($phone_cel)){
+		if (SMS_ACTIVE && !is_null($phone_cel) && strlen($phone_cel)){
 			$dbLink = $this->getDbLink();
 			$dbLinkMaster = $this->getDbLinkMaster();
 			
@@ -2213,6 +2240,14 @@ class Order_Controller extends ControllerSQL{
 
 	function get_transp_nakl_shipment_list($pm){
 		$this->modelGetList(new ShipmentForTranspNaklList_Model($this->getDbLink()),$pm);
+	}
+
+	function get_for_buh_list($pm){
+		$this->modelGetList(new OrderForBuhList_Model($this->getDbLink()),$pm);
+	}
+
+	function get_for_buh_shipment_list($pm){
+		$this->modelGetList(new ShipmentForBuhList_Model($this->getDbLink()),$pm);
 	}
 
 	function get_nakl_1c_list($pm){

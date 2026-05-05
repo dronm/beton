@@ -49,6 +49,15 @@ function Destination_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Наименование полное';
+	filed_options.autoInc = false;	
+	
+	options.fields.name_full = new FieldText("name_full",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Расстояние';
 	filed_options.autoInc = false;	
 	

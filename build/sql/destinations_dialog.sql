@@ -24,6 +24,7 @@ CREATE OR REPLACE VIEW destinations_dialog AS
 	SELECT
 		destinations.id,
 		destinations.name,
+		destinations.name_full,
 		destinations.distance,
 		destinations.time_route,
 		
@@ -56,6 +57,3 @@ CREATE OR REPLACE VIEW destinations_dialog AS
 		send_route_sms
 		
 	FROM destinations;
-
-ALTER TABLE destinations_dialog OWNER TO ;
-

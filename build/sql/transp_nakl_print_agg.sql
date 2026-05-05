@@ -60,7 +60,8 @@ AS $BODY$
 		coalesce(cl.name_full, cl.name)||
 		coalesce(', ИНН '||cl.inn, '')||
 		--coalesce(', КПП '||cl.kpp, '')||
-		', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		-- ', '||coalesce( coalesce(cl.address_fact, cl.address_legal), dest.name)||
+		', '|| coalesce( cl.address_fact, cl.address_legal, dest.name_full )||
 		coalesce(', '||cl.tels_1c, '')		
 		AS gruzopoluchatel,
 		
@@ -77,12 +78,13 @@ AS $BODY$
 		
 		SUM(1) AS gruz_mest,
 		SUM(sh.quant)||' м3' AS gruz_massa,
-		SUM(round(sh.quant*2.4*1000))||' кг' AS massa_netto,
+		-- SUM(round(sh.quant*2.4*1000))||' кг' AS massa_netto,
+		SUM(sh.quant)||' м3' AS massa_netto,
 
 		coalesce(vh_cl.name_full, vh_cl.name)||
 		coalesce(', ИНН '||vh_cl.inn, '')||
 		--coalesce(', КПП '||cl_per.kpp, '')||
-		', '||coalesce( coalesce(vh_cl.address_fact, vh_cl.address_legal), dest.name)||
+		', '||coalesce(vh_cl.address_fact, vh_cl.address_legal)||
 		coalesce(', '||vh_cl.tels_1c, '')
 		AS perevozchik,		
 		
@@ -92,8 +94,7 @@ AS $BODY$
 		person_init(coalesce(dr.name,''))||
 		coalesce(', ИНН '||dr.inn,'') AS voditel,
 		
-		
-		dest.name AS adres,
+		coalesce( dest.name_full, dest.name ) AS adres,
 		
 		to_char(sh.date_time,'DD.MM.YY') AS data_vremia_pogruzki,
 		

@@ -56,6 +56,27 @@ function ConcreteTypeList_View(id,options){
 								new GridColumn({"field":model.getField("code_1c")})
 							]
 						})								
+						//fill all items and change
+						,new GridCellHead(id+":grid:head:ref_1c",{
+							"value":"1c",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("ref_1c"),
+									"ctrlClass": Item1cEdit,
+									"ctrlOptions": {
+										"labelCaption": ""
+									},
+									"formatFunction": function(f){
+										let refDescr = "";
+										const v = f.ref_1c.getValue();
+										if(v && !v.isNull()){
+											refDescr = v.getDescr();
+										}
+										return refDescr;
+									}
+								})
+							]
+						})								
 						,new GridCellHead(id+":grid:head:pres_norm",{
 							"value":"Норма давл.",
 							"columns":[

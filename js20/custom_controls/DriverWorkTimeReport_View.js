@@ -47,6 +47,7 @@ function DriverWorkTimeReport_View(id,options){
 				self.cmdBuildReport(self.getElement("month_date").getDateFrom());
 			}
 		}));	
+
 	}
 
 	DriverWorkTimeReport_View.superclass.constructor.call(this,id,options);
@@ -79,6 +80,14 @@ DriverWorkTimeReport_View.prototype.cmdBuildReport = function(selectedDate){
 
 	DOMHelper.hide(this.getId()+":report-panel")
 	this.setTemplateContent("");
+	if(this.m_cmdPrint){
+		this.m_cmdPrint.delDOM();
+		delete(this.m_cmdPrint);
+	}
+	if(this.m_cmdExport){
+		this.m_cmdExport.delDOM();
+		delete(this.m_cmdExport);
+	}
 
 	pm.run({
 		"ok":function(resp){
@@ -197,5 +206,43 @@ DriverWorkTimeReport_View.prototype.setTemplateContent = function(cont){
 		throw new Error("Report node not found");
 	}
 	target_n.innerHTML = cont;
-	DOMHelper.show(this.getId()+":report-panel")
+	DOMHelper.show(this.getId()+":report-panel");
+
+	this.bindPrint();
+}
+
+DriverWorkTimeReport_View.prototype.bindPrint = function(){	
+	this.m_cmdPrint = new ButtonCmd(this.getId()+":cmdPrint",{
+		"title":"Печать таблицы"
+		,"glyph":"glyphicon-print"
+		,"onClick":function(){
+			WindowPrint.show({content:document.getElementById("driver_work_time_report_grid").outerHTML});
+		}
+	});
+	this.m_cmdPrint.toDOMAfter(this.getElement("cmdBuildReport").getNode());
+
+	this.m_cmdExport = new ButtonCmd(this.getId()+":cmdExport",{
+		"title":"Экспорт таблицы в Excel"
+		,"glyph":"glyphicon-save-file"
+		,"onClick":function(){
+			DOMHelper.tableToExcel("driver_work_time_report_grid","Табель водителей", 'ТабельВодителей.xls');
+		}
+	});
+	this.m_cmdExport.toDOMAfter(this.m_cmdPrint.getNode());
+
+	// (new ButtonCmd(this.getId()+":cmdPrint",{
+	// 	"title":"Печать таблицы"
+	// 	,"glyph":"glyphicon-print"
+	// 	,"onClick":function(){
+	// 		WindowPrint.show({content:document.getElementById("driver_work_time_report_grid").outerHTML});
+	// 	}
+	// })).toDOM(this.getNode());
+	//
+	// (new ButtonCmd(this.getId()+":cmdExport",{
+	// 	"title":"Экспорт таблицы в Excel"
+	// 	,"glyph":"glyphicon-save-file"
+	// 	,"onClick":function(){
+	// 		DOMHelper.tableToExcel("driver_work_time_report_grid","Табель водителей", 'ТабельВодителей.xls');
+	// 	}
+	// })).toDOM(this.getNode());
 }

@@ -18,6 +18,7 @@
 <li><a href="#AuditLog_Controller">AuditLog_Controller</a></li>
 <li><a href="#AuditLogChange_Controller">AuditLogChange_Controller</a></li>
 <li><a href="#Bank_Controller">Bank_Controller</a></li>
+<li><a href="#BuhDoc_Controller">BuhDoc_Controller</a></li>
 <li><a href="#BuhRBP1c_Controller">BuhRBP1c_Controller</a></li>
 <li><a href="#Caller_Controller">Caller_Controller</a></li>
 <li><a href="#Captcha_Controller">Captcha_Controller</a></li>
@@ -531,8 +532,11 @@
 <li><a href="#UserChatLastOpen_Model">UserChatLastOpen_Model</a></li>
 <li><a href="#UserChatMessageView_Model">UserChatMessageView_Model</a></li>
 <li><a href="#ShipmentMediaList_Model">ShipmentMediaList_Model</a></li>
-<li><a href="#ShipmentBuhDoc_Model">ShipmentBuhDoc_Model</a></li>
 <li><a href="#BuhDoc_Model">BuhDoc_Model</a></li>
+<li><a href="#BuhDocItem_Model">BuhDocItem_Model</a></li>
+<li><a href="#BuhDocShipment_Model">BuhDocShipment_Model</a></li>
+<li><a href="#OrderForBuhList_Model">OrderForBuhList_Model</a></li>
+<li><a href="#ShipmentForBuhList_Model">ShipmentForBuhList_Model</a></li>
 <li><a href="#OperatorForTranspNakl_Model">OperatorForTranspNakl_Model</a></li>
 <li><a href="#OperatorForTranspNaklList_Model">OperatorForTranspNaklList_Model</a></li>
 <li><a href="#UserAllowedMaterialCorrection_Model">UserAllowedMaterialCorrection_Model</a></li>
@@ -559,6 +563,7 @@
 <li><a href="#FuelConsumptionSchemaDetail_Model">FuelConsumptionSchemaDetail_Model</a></li>
 <li><a href="#FuelConsumptionSchemaDetailList_Model">FuelConsumptionSchemaDetailList_Model</a></li>
 <li><a href="#FuelConsumption_Model">FuelConsumption_Model</a></li>
+<li><a href="#BuhNakl_Model">BuhNakl_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -879,6 +884,36 @@
 <a href="#BankList_Model">Model: BankList_Model</a><h2>get_object</h2>
 <a href="#BankList_Model">Model: BankList_Model</a><h2>complete</h2>
 <a href="#BankList_Model">Model: BankList_Model</a>
+</div>
+</div>
+<div id="BuhDoc_Controller" class="content_box">
+<h1>BuhDoc_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#BuhDoc_Model">Model: BuhDoc_Model</a><h2>update</h2>
+<a href="#BuhDoc_Model">Model: BuhDoc_Model</a><h2>delete</h2>
+<a href="#BuhDoc_Model">Model: BuhDoc_Model</a><h2>get_list</h2>
+<a href="#BuhDoc_Model">Model: BuhDoc_Model</a><h2>get_object</h2>
+<a href="#BuhDoc_Model">Model: BuhDoc_Model</a><h2>new_doc</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>shipment_ids</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Text</p>
+<p>Required:
+								Нет</p>
+</div>
+<h3>order_ids</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Text</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
 </div>
 </div>
 <div id="BuhRBP1c_Controller" class="content_box">
@@ -3030,7 +3065,9 @@
 </div>
 <h2>get_transp_nakl_list</h2>
 <a href="#OrderForTranspNaklList_Model">Model: OrderForTranspNaklList_Model</a><h2>get_transp_nakl_shipment_list</h2>
-<a href="#ShipmentForTranspNaklList_Model">Model: ShipmentForTranspNaklList_Model</a><h2>get_nakl_1c_list</h2>
+<a href="#ShipmentForTranspNaklList_Model">Model: ShipmentForTranspNaklList_Model</a><h2>get_for_buh_list</h2>
+<a href="#OrderForBuhList_Model">Model: OrderForBuhList_Model</a><h2>get_for_buh_shipment_list</h2>
+<a href="#ShipmentForBuhList_Model">Model: ShipmentForBuhList_Model</a><h2>get_nakl_1c_list</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
 <h3>shipment_ids</h3>
@@ -4089,6 +4126,7 @@
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_transp_nakl</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_transp_nakl_all</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_transp_nakl_on_list</h2>
+<a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_transp_nakl_on_list_result</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>get_time_list</h2>
 <a href="#ShipmentTimeList_Model">Model: ShipmentTimeList_Model</a><h2>set_blanks_exist</h2>
 <p>Arguments:</p>
@@ -6715,41 +6753,143 @@
 <h1>BuhDoc_Model</h1>
 <div class="content_item">
 <p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>faktura_ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>contract_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>total</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+<h2>items</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>comment_text</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="BuhDocItem_Model" class="content_box">
+<h1>BuhDocItem_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>item_1c</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:5</div>
+<h2>price</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+<h2>total</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+</div>
+</div>
+<div id="BuhDocShipment_Model" class="content_box">
+<h1>BuhDocShipment_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
 <h2>order_id</h2>
 <div>Type:Int</div>
 <div>Primary key:TRUE</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>nomer</h2>
-<div>Type:Text</div>
+<h2>shipment_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>buh_doc_id</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>data</h2>
-<div>Type:Text</div>
-<div>Primary key:</div>
+</div>
+</div>
+<div id="BuhNakl_Model" class="content_box">
+<h1>BuhNakl_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>faktura_nomer</h2>
-<div>Type:Text</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
 <div>Primary key:</div>
-<div>Required:</div>
+<div>Required:TRUE</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>faktura_data</h2>
-<div>Type:Text</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
-<div>Required:</div>
+<div>Required:TRUE</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>ref_1c</h2>
-<div>Type:String</div>
+<h2>quant</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
-<div>Required:</div>
-<div>Length:36</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
 <div>Precision:</div>
 </div>
 </div>
@@ -8457,6 +8597,7 @@
 <div>Length:100</div>
 <div>Precision:</div>
 <h2>code_1c</h2>
+<p class="big">deprecated, use ref_1c</p>
 <div>Type:String</div>
 <div>Primary key:</div>
 <div>Required:TRUE</div>
@@ -8512,6 +8653,12 @@
 <div>Precision:</div>
 <h2>w_val</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -8608,6 +8755,12 @@
 <div>Precision:</div>
 <h2>w_val</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ref_1c</h2>
+<div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -9944,6 +10097,12 @@
 <div>Required:TRUE</div>
 <div>Length:250</div>
 <div>Precision:</div>
+<h2>name_full</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>distance</h2>
 <div>Type:Float</div>
 <div>Primary key:</div>
@@ -10012,6 +10171,12 @@
 <div>Precision:</div>
 <h2>name</h2>
 <div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>name_full</h2>
+<div>Type:Text</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -15125,6 +15290,78 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="OrderForBuhList_Model" class="content_box">
+<h1>OrderForBuhList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>orders_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>order_num</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>clients_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_descr</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_ref_1c_exists</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destinations_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>concrete_types_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>buh_doc_ref_1c</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="OrderForClientList_Model" class="content_box">
 <h1>OrderForClientList_Model</h1>
 <div class="content_item">
@@ -17319,6 +17556,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>transfer_ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="ProductionReportDialog_Model" class="content_box">
@@ -17350,6 +17593,12 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>material_ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>transfer_ref_1c</h2>
 <div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -17410,6 +17659,12 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>material_ref_1c</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>transfer_ref_1c</h2>
 <div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -21071,48 +21326,6 @@
 <div>Precision:</div>
 </div>
 </div>
-<div id="ShipmentBuhDoc_Model" class="content_box">
-<h1>ShipmentBuhDoc_Model</h1>
-<div class="content_item">
-<p>Поля:</p>
-<h2>ref_1c</h2>
-<div>Type:String</div>
-<div>Primary key:TRUE</div>
-<div>Required:</div>
-<div>Length:36</div>
-<div>Precision:</div>
-<h2>nomer</h2>
-<div>Type:Text</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>data</h2>
-<div>Type:Text</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>faktura_nomer</h2>
-<div>Type:Text</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>faktura_data</h2>
-<div>Type:Text</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>shipment_ids</h2>
-<div>Type:Array</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-</div>
-</div>
 <div id="ShipmentCancelation_Model" class="content_box">
 <h1>ShipmentCancelation_Model</h1>
 <div class="content_item">
@@ -21508,6 +21721,66 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>client_specifications_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ShipmentForBuhList_Model" class="content_box">
+<h1>ShipmentForBuhList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>order_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>shipments_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_sites_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicles_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>drivers_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>buh_doc_ref_1c</h2>
 <div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -25133,6 +25406,12 @@
 <div>Precision:</div>
 <h2>date_time_end</h2>
 <div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>payload</h2>
+<div>Type:json</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

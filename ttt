@@ -1,0 +1,195 @@
+
+I have this php function. I need to make two functions:
+	shipment_transp_nakl_on_list_sync($params)
+and its async counterpart shipment_transp_nakl_on_list_async($params)
+async version would have $params["operation_id"] set.
+It must do the same thing, but in the background. 
+It should return immediately, do the job (generate a file)
+I will then decide what to do with the file, for now just save it in OUTPUT_PATH.unique_file_name
+
+	//@params
+	//	shipment_ids string
+	// faksim boolean
+	// buhDoc string
+	// rollupRuns boolean
+	// consignee string
+	// operation_id string
+	public function shipment_transp_nakl_on_list_sync($params){	
+		$docList = []; //shipments
+
+		$link = $this->getDbLinkMaster();
+
+		//from selected shipments
+		if($params["shipment_ids_exist"]){
+			$shIds = json_decode("[".$params["shipment_ids"]."]", TRUE);
+			if(!count($shIds)){
+				throw new Exception("no ids found");
+			}
+			foreach ($shIds as $id) {
+				$shId = intval($id);
+				if($shId){
+					array_push($docList, $shId); 
+				}
+			}
+		}
+
+		if(!count($docList)){
+			throw new Exception("no doc found");
+		}
+
+		//must be one client!!!
+		$arId = $link->query(sprintf(
+			"SELECT 
+				o.client_id,
+				count(*) AS cnt
+		   	FROM shipments AS sh 
+			LEFT JOIN orders AS o ON o.id = sh.order_id
+			WHERE sh.id IN (%s)
+			GROUP BY o.client_id",
+			implode(",", $docList)
+		));
+		$cnt = 0;
+		while($ar = $link->fetch_array($arId)){
+			$cnt++;
+		}
+		if(!$cnt){
+			throw new Exception("docs not found");
+		}
+		if($cnt > 1){
+			throw new Exception("Документы принадлежат разным контрагентам");
+		}
+
+		$faksim = $params["faksim"];
+		$buhDoc = $params["buhDoc"];
+		$rollupRuns = $params["rollupRuns"];
+		$consignee = $params["consignee"];
+		if(isset($consignee) && $consignee != "null"){
+			//check 1c ref
+			$consAr = $link->query_first(
+				vsprintf(
+					"SELECT ref_1c->'keys'->>'ref_1c' AS ref_1c 
+					FROM clients 
+					WHERE id = %d", 
+					[$consignee]
+				)
+			);
+			if(!is_array($consAr)){
+				throw new Exception("consignee not found");
+			}
+			if(!isset($consAr["ref_1c"])){
+				throw new Exception("Грузополучатель не связан с 1с");
+			}
+		}else{
+			$consignee = 0;
+		}
+
+		$templateName = $faksim? "Транспортная накладная (факсимиле)" : "Транспортная накладная";
+		$erEmpty = 'Отгрузка не найдена!';
+
+		$multiFile = (count($docList) > 1);
+
+		//always one file, merged or standalone
+		$outFileName = "ТН.pdf";
+		$fileList = array();
+		$outFile = OUTPUT_PATH. md5(uniqid()).'.pdf';
+
+		//all shipments on order
+		$queryId = NULL;
+		if($rollupRuns){
+			//rollup on vehicle
+			$queryId = $link->query(
+				sprintf(
+					"SELECT
+						array_agg(sh.id) AS ids
+					FROM shipments AS sh
+					WHERE sh.id IN (%s)
+					GROUP BY sh.vehicle_schedule_id"
+					,implode(",", $docList)
+				)
+			);
+		}else{
+			$queryId = $link->query(
+				sprintf(
+					"SELECT
+						sh.id
+					FROM shipments AS sh
+					WHERE sh.id IN (%s)
+					ORDER BY sh.date_time"
+					,implode(",", $docList)
+				)
+			);
+		}
+		$ind = 0;
+		while($shAr = $link->fetch_array($queryId)){
+			$tFile = '';
+			$fileName = '';
+
+			if($rollupRuns){
+				$ids_str = substr($shAr["ids"], 1,  strlen($shAr["ids"])-2);
+				$ids = explode(",", $ids_str);
+				foreach($ids as $sh_id){
+					$this->check_shipment_for_tn($sh_id, $faksim? TRUE:FALSE);
+				}
+				$ind++;
+				ExcelTemplate_Controller::genFilledTemplate(
+					$link, $templateName, 
+					function($forImage) use ($ids, $ind, $buhDoc, $consignee){
+						if(!$forImage){
+							return [ 'array['.implode(",",$ids).']', $ind, $buhDoc, $consignee ];
+						}else{
+							return [$ids[0]];
+						}
+					},
+					$erEmpty, $tFile, $fileName,
+					"SELECT * FROM transp_nakl_print_agg(%s, %d, %s::jsonb, %d)"
+				);		
+			}else{
+				$ind++;
+				ExcelTemplate_Controller::genFilledTemplate(
+					$link, $templateName, 
+					array( $shAr["id"], $ind, $buhDoc, $consignee ), 
+					$erEmpty, $tFile, $fileName,
+					"SELECT * FROM transp_nakl_print(%d, %d, %s::jsonb, %d)"
+				);		
+			}
+
+			$fileNameParts = pathinfo($fileName,  PATHINFO_EXTENSION);
+			$fileExt = '';
+			if(is_array($fileNameParts) && isset($fileNameParts['extension'])){
+				$fileExt = $fileNameParts['extension'];
+			}else if (gettype($fileNameParts) == "string"){
+				$fileExt = $fileNameParts;
+			}
+			if(!strlen($fileExt)){
+				$fileExt = '.xlsx';
+			}else if($fileExt[0] != '.'){
+				$fileExt = '.'.$fileExt;
+			}
+
+			array_push($fileList, $tFile);
+			if($multiFile) {
+				usleep(500000);
+			}
+		}
+
+		self::merge_xls_files($fileList, $outFile);
+
+		//delete files, as they are already in a common file
+		foreach($fileList as $fl){
+			unlink($fl);
+		}
+
+		try{
+			$flMime = getMimeTypeOnExt($outFileName);
+			ob_clean();
+			downloadFile(
+				$outFile,
+				$flMime,
+				'attachment;',
+				$outFileName
+			);
+		}finally{
+			unlink($outFile);
+		}
+	}
+

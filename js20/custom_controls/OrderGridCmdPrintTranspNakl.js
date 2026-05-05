@@ -1,5 +1,5 @@
 /**	
- * @author Andrey Mikhalevich <katrenplus@mail.ru>,2024
+ * @author Andrey Mikhalevich <katrenplus@mail.ru>,2024-2026
 
  * @class
  * @classdesc
@@ -77,6 +77,24 @@ OrderGridCmdPrintTranspNakl.prototype.onCommandCont = function(model){
 					title: "Свернуть все рейсы по ТС в одну накладную"
 				}));
 
+				//status/progress
+				this.addElement(new ControlContainer("naklSelect:view:nakl:statusCont", "DIV", {
+					attrs: {
+						style: "margin-bottom: 20px; margin-top:10px;",
+						class: "hidden"
+					},
+					elements: [
+						new Control("naklSelect:view:nakl:statusCont:img", "IMG", {
+							attrs: {
+								src: "img/wait-sm.gif",
+								width: "25",
+								heith: "25"
+							}
+						})
+						,new Control("naklSelect:view:nakl:statusCont:txt", "SPAN")
+					]
+				}));
+
 				this.addElement(new ButtonCmd("naklSelect:view:nakl:printSgn", {
 					caption: "С подписями",
 					onClick: function(){
@@ -112,7 +130,6 @@ OrderGridCmdPrintTranspNakl.prototype.print = function(doc, shipmentIds, faksim,
 		throw new Error("Документ не выбран");
 	}
 
-	window.setGlobalWait(true);
 	naklView.getElement("printSgn").setEnabled(false);
 	naklView.getElement("printNoSgn").setEnabled(false);
 
@@ -122,23 +139,72 @@ OrderGridCmdPrintTranspNakl.prototype.print = function(doc, shipmentIds, faksim,
 	pm.setFieldValue("faksim", faksim);
 	pm.setFieldValue("buh_doc", doc);
 	pm.setFieldValue("rollup_runs", this.m_form.getContent().getElement("rollup_runs").getValue());
+
 	const consignee = this.m_form.getContent().getElement("consignee").getValue();
 	if(!consignee.isNull()){
 		pm.setFieldValue("consignee", consignee.getKey("id"));
 	}
 
-	pm.download("ViewXML", 0, function(res){
-		window.setGlobalWait(false);
-		naklView.getElement("printSgn").setEnabled(true);
-		naklView.getElement("printNoSgn").setEnabled(true);
+	const evSrv = window.getApp().getAppSrv();
+	if(evSrv && evSrv.connActive()){
+		//async
+		const operationId = CommonHelper.uniqid();
+		pm.setFieldValue("operation_id", operationId);
 
-		if(res == 0){
-			if(self.m_form){
-				self.m_form.close();
+		const eventId = "UserOperation."+CommonHelper.md5(window.getApp().getServVar("user_id") + operationId);
+		evSrv.subscribe({
+			"events":[
+				{"id": eventId}
+			],
+			"onEvent":function(json){
+				console.log("onEvent:", json);
+				if("params" in json && "status" in json.params && json.params.status == "progress"){
+					self.updateNaklViewProgress(naklView, json.params.payload.txt);
+
+				}else if("params" in json && "status" in json.params && json.params.status == "error"){
+					self.updateNaklViewError(naklView, json.params.error_text);
+
+				}else if("params" in json && "status" in json.params && json.params.status == "end"){
+
+					const pm = (new Shipment_Controller()).getPublicMethod("shipment_transp_nakl_on_list_result");
+					pm.setFieldValue("operation_id", operationId);
+
+					pm.download("ViewXML", 0, function(res){
+						self.updateNaklViewProgress(naklView, "Открытие файла", 0);
+
+						self.setNaklViewFinish(naklView);
+
+						if(res == 0){
+							if(self.m_form){
+								self.m_form.close();
+							}
+							window.showTempNote("Файл загружен", null, 5000);
+						}
+					});
+				}
 			}
-			window.showTempNote("Файл загружен", null, 5000);
-		}
-	});
+		});
+
+		pm.run({
+			ok: function(){
+				self.setNaklViewStart(naklView);
+			}
+		});
+
+	}else{
+		self.setNaklViewStart(naklView);
+
+		pm.download("ViewXML", 0, function(res){
+			self.setNaklViewFinish(naklView);
+
+			if(res == 0){
+				if(self.m_form){
+					self.m_form.close();
+				}
+				window.showTempNote("Файл загружен", null, 5000);
+			}
+		});
+	}
 }
 
 //"shipment_transp_nakl"
@@ -202,3 +268,37 @@ OrderGridCmdPrintTranspNakl.prototype.onCommand = function(e){
 }
 
 /* public methods */
+OrderGridCmdPrintTranspNakl.prototype.updateNaklViewProgress = function(naklView, txt){
+	const statCont  =  naklView.getElement("statusCont")
+	if(txt){
+		statCont.getElement("txt").setValue(txt);
+	}
+}
+
+OrderGridCmdPrintTranspNakl.prototype.updateNaklViewError = function(naklView, txt){
+	const statCont  =  naklView.getElement("statusCont")
+	if(txt){
+		statCont.getElement("txt").setValue(txt);
+	}
+	DOMHelper.hide(statCont.getElement("img").getNode());
+}
+
+OrderGridCmdPrintTranspNakl.prototype.setNaklViewFinish = function(naklView){
+	const statCont  =  naklView.getElement("statusCont")
+	statCont.getElement("txt").setValue("Выполнено");
+	DOMHelper.hide(statCont.getNode());
+
+	naklView.getElement("printSgn").setEnabled(false);
+	naklView.getElement("printNoSgn").setEnabled(false);
+}
+
+OrderGridCmdPrintTranspNakl.prototype.setNaklViewStart = function(naklView){
+	const statCont  =  naklView.getElement("statusCont")
+	statCont.getElement("txt").setValue("Выполняется формирование отчета");
+
+	DOMHelper.show(statCont.getElement("img").getNode());
+	DOMHelper.show(statCont.getNode());
+
+	naklView.getElement("printSgn").setEnabled(false);
+	naklView.getElement("printNoSgn").setEnabled(false);
+}

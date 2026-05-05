@@ -107,6 +107,15 @@ function UserOperation_Model(options){
 	
 	options.fields.date_time_end = new FieldDateTimeTZ("date_time_end",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.payload = new Fieldjson("payload",filed_options);
+	
 		UserOperation_Model.superclass.constructor.call(this,id,options);
 }
 extend(UserOperation_Model,ModelXML);

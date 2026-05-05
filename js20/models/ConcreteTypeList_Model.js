@@ -130,6 +130,15 @@ function ConcreteTypeList_Model(options){
 	
 	options.fields.w_val = new FieldInt("w_val",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.ref_1c = new FieldJSONB("ref_1c",filed_options);
+	
 		ConcreteTypeList_Model.superclass.constructor.call(this,id,options);
 }
 extend(ConcreteTypeList_Model,ModelXML);

@@ -66,6 +66,16 @@ class ProductionReportList_Model extends ModelSQLBeton{
 		$f_material_ref_1c=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material_ref_1c",$f_opts);
 		$this->addField($f_material_ref_1c);
 		//********************
+		
+		//*** Field transfer_ref_1c ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Перемещение';
+		$f_opts['id']="transfer_ref_1c";
+						
+		$f_transfer_ref_1c=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"transfer_ref_1c",$f_opts);
+		$this->addField($f_transfer_ref_1c);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 
