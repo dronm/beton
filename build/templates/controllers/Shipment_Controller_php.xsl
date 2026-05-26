@@ -528,7 +528,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 	public static function sendShipSMS($dbLinkMaster,$dbLink,$idForDb,$smsResOk,$smsResStr,$interactiveMode){
 		//Может не быть изменений order_id на слейве после update!!!
-		$ar = $dbLinkMaster->query_first(sprintf(
+		$ar = $dbLinkMaster->query_first(
 		"SELECT
 			orders.id AS order_id,
 			orders.phone_cel,
@@ -581,10 +581,20 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			CASE
 				WHEN e_user.tm_id IS NOT NULL THEN ct.id
 				ELSE NULL
-			END AS ext_contact_id,
+			END AS tm_contact_id,
+			CASE
+				WHEN m_user.id IS NOT NULL THEN ct.id
+				ELSE NULL
+			END AS mx_contact_id,
 
-			e_user.ext_contact_id AS ext_contact_id,				
-			e_user_d.ext_contact_id AS dr_ext_contact_id,
+			CASE
+				WHEN e_user_d.tm_id IS NOT NULL THEN ct_d.id
+				ELSE NULL
+			END AS dr_tm_contact_id,
+			CASE
+				WHEN m_user_d.id IS NOT NULL THEN ct.id
+				ELSE NULL
+			END AS dr_mx_contact_id,
 
 			orders.pump_vehicle_id IS NOT NULL as pump_exists
 			
@@ -596,20 +606,22 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		LEFT JOIN vehicles AS v ON v.id=vs.vehicle_id
 		LEFT JOIN destinations AS dest ON dest.id=orders.destination_id
 		
-		LEFT JOIN contacts AS ct ON coalesce(orders.phone_cel,'')&lt;&gt;'' AND ct.tel = orders.phone_cel
+		LEFT JOIN contacts AS ct ON coalesce(orders.phone_cel,'') &lt;&gt; '' AND ct.tel = orders.phone_cel
 		LEFT JOIN notifications.ext_users_list AS e_user ON e_user.app_id = 1 AND e_user.ext_contact_id = ct.id
+		LEFT JOIN notifications.max_users AS m_user ON m_user.contact_id = ct.id
 		
-		LEFT JOIN contacts AS ct_d ON coalesce(d.phone_cel,'')&lt;&gt;'' AND ct_d.tel = d.phone_cel
+		LEFT JOIN contacts AS ct_d ON coalesce(d.phone_cel,'') &lt;&gt; '' AND ct_d.tel = d.phone_cel
 		LEFT JOIN notifications.ext_users_list AS e_user_d ON e_user_d.app_id = 1 AND e_user_d.ext_contact_id = ct_d.id
+		LEFT JOIN notifications.max_users AS m_user_d ON m_user_d.contact_id = ct_d.id
 		
-		WHERE shipments.id=%d",
-		$idForDb
-		));
+		WHERE shipments.id = $1",
+		[ $idForDb ]
+		);
 		
 		$d_phone_exists = (strlen($ar['d_phone'])==10);
 		
-		//responsible person notification through MAX
-		if (strlen($ar['phone_cel']) &amp;&amp; isset($ar['ext_contact_id'])){
+		//responsible person notification through MAX or TM
+		if (strlen($ar['phone_cel']) &amp;&amp; (isset($ar['tm_contact_id']) || isset($ar['mx_contact_id']) )){
 			$text = $ar['text'];
 			$text = str_replace('[quant]',$ar['quant'],$text);
 			$text = str_replace('[concrete]',$ar['concrete'],$text);
@@ -626,8 +638,12 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				$text.= ' '.ROUTE_HREF.$idForDb;
 			}
 					
-			//Только max
-			add_notification_from_contact_max($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['ext_contact_id']);
+			if(isset($ar["mx_contact_id"])){
+				add_notification_from_contact_max($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['mx_contact_id']);
+
+			} else if(isset($ar["tm_contact_id"])){
+				add_notification_from_contact_tm($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['tm_contact_id']);
+			}
 		}
 
 		//notify pump driver if there is a pump in this order
@@ -645,13 +661,13 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			}
 		}*/
 		
-		//СМС миксеристу с маршрутом
+		//Notification Max OR TM миксеристу с маршрутом
 		//Если в этот день на этот объект уже отправляли - не отправлять!
 		if(isset($ar['send_route_sms'])
 		&amp;&amp; $ar['send_route_sms']=='t'
 		&amp;&amp; $d_phone_exists
 		&amp;&amp; $ar['tracker_exists']=='t'
-		&amp;&amp; isset($ar['dr_ext_contact_id'])
+		&amp;&amp; ( isset($ar['dr_tm_contact_id']) || isset($ar['dr_mx_contact_id']) )
 		){
 			$mix_pat = $dbLink->query_first(
 				"SELECT pattern FROM sms_patterns WHERE sms_type='mixer_route'::sms_types LIMIT 1"
@@ -661,8 +677,12 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			}
 			$text = str_replace('[href]', ROUTE_HREF.'m'.$idForDb, $mix_pat['pattern']);
 			
-			//Только max
-			add_notification_from_contact_max($dbLinkMaster, $ar['d_phone'], $text, 'mixer_route', $ar['doc_ref'], $ar['dr_ext_contact_id']);
+			if(isset($ar["dr_mx_contact_id"])){
+				add_notification_from_contact_max($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['dr_mx_contact_id']);
+
+			} else if(isset($ar["dr_tm_contact_id"])){
+				add_notification_from_contact_tm($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['dr_tm_contact_id']);
+			}
 		}
 	}
 	
@@ -1781,9 +1801,10 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		}
 
 		$faksim = !empty($params["faksim"]);
-		$buhDoc = $params["buhDoc"] ?? "null";
+		$buhDoc = (!array_key_exists("buhDoc", $params) || is_null($params["buhDoc"]))? 
+			"null" : $params["buhDoc"];
 		$rollupRuns = !empty($params["rollupRuns"]);
-		$consignee = $params["consignee"] ?? null;
+		$consignee = isset($params["consignee"]) ? $params["consignee"] : null;
 
 		if (isset($consignee) &amp;&amp; $consignee !== "null" &amp;&amp; $consignee !== "") {
 			$consignee = intval($consignee);
@@ -1997,7 +2018,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			escapeshellarg(ABSOLUTE_PATH),
 			escapeshellarg($phpBin),
 			escapeshellarg($workerScript),
-			escapeshellarg($paramsFile),
+			escapeshellarg($paramsFile)
 			/* escapeshellarg($logFile) */
 		);
 

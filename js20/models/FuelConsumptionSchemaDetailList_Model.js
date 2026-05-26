@@ -22,6 +22,9 @@ function FuelConsumptionSchemaDetailList_Model(options){
 	
 	options.fields = {};
 	
+			
+				
+			
 				
 	
 	var filed_options = {};
@@ -38,7 +41,7 @@ function FuelConsumptionSchemaDetailList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.schema_id = new FieldInt("schema_id",filed_options);
+	options.fields.fuel_consumption_schema_id = new FieldInt("fuel_consumption_schema_id",filed_options);
 	
 				
 	
@@ -47,7 +50,16 @@ function FuelConsumptionSchemaDetailList_Model(options){
 	
 	filed_options.autoInc = false;	
 	
-	options.fields.schemas_ref = new FieldJSON("schemas_ref",filed_options);
+	options.fields.fuel_consumption_schema_ref = new FieldJSON("fuel_consumption_schema_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.month_descr = new FieldString("month_descr",filed_options);
 	
 				
 	
@@ -74,7 +86,7 @@ function FuelConsumptionSchemaDetailList_Model(options){
 	filed_options.alias = 'Расход на 100 км';
 	filed_options.autoInc = false;	
 	
-	options.fields.quant_distance = new FieldInt("quant_distance",filed_options);
+	options.fields.quant_distance = new FieldFloat("quant_distance",filed_options);
 	
 				
 	
@@ -83,7 +95,7 @@ function FuelConsumptionSchemaDetailList_Model(options){
 	filed_options.alias = 'Расход на 1 час';
 	filed_options.autoInc = false;	
 	
-	options.fields.quant_time = new FieldInt("quant_time",filed_options);
+	options.fields.quant_time = new FieldFloat("quant_time",filed_options);
 	
 		FuelConsumptionSchemaDetailList_Model.superclass.constructor.call(this,id,options);
 }

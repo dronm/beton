@@ -59,8 +59,66 @@ CREATE OR REPLACE VIEW public.vehicles_dialog AS
 		v.leasor,
 		v.leasing_contract_date,
 		v.leasing_contract_num,
-		v.insurance_osago,
-		v.insurance_kasko,
+
+		(
+			SELECT jsonb_set(
+				v.insurance_osago,
+				'{rows}',
+				COALESCE(
+					jsonb_agg(
+						jsonb_set(
+							r.row_value,
+							'{fields,attachments}',
+							COALESCE(
+								to_jsonb(
+									attachments_for_key(
+										(r.row_value #>> '{fields,id}')::int,
+										'vehicle_insurance_osago'
+									)
+								),
+								'[]'::jsonb
+							),
+							true
+						)
+						ORDER BY r.ord
+					),
+					'[]'::jsonb
+				),
+				true
+			)
+			FROM jsonb_array_elements(COALESCE(v.insurance_osago->'rows', '[]'::jsonb))
+				WITH ORDINALITY AS r(row_value, ord)
+		) AS insurance_osago,
+
+		(
+			SELECT jsonb_set(
+				v.insurance_kasko,
+				'{rows}',
+				COALESCE(
+					jsonb_agg(
+						jsonb_set(
+							r.row_value,
+							'{fields,attachments}',
+							COALESCE(
+								to_jsonb(
+									attachments_for_key(
+										(r.row_value #>> '{fields,id}')::int,
+										'vehicle_insurance_kasko'
+									)
+								),
+								'[]'::jsonb
+							),
+							true
+						)
+						ORDER BY r.ord
+					),
+					'[]'::jsonb
+				),
+				true
+			)
+			FROM jsonb_array_elements(COALESCE(v.insurance_kasko->'rows', '[]'::jsonb))
+				WITH ORDINALITY AS r(row_value, ord)
+		) AS insurance_kasko,
 		
 		vehicle_owners_ref(of_v_own) AS official_vehicle_owners_ref,
 

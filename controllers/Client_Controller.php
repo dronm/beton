@@ -631,7 +631,7 @@ class Client_Controller extends ControllerSQL{
 			$this->getExtDbVal($pm,'name')
 			,$this->getExtDbVal($pm,'name')
 			),
-			'OrderClient_Model'
+			'OrderClient_Model', TRUE, TRUE
 		);	
 	}
 	

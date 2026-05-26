@@ -8,6 +8,9 @@
 
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLDOC.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
+require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
 class FuelConsumptionSchemaDetailList_Model extends ModelSQLDOC{
@@ -30,20 +33,28 @@ class FuelConsumptionSchemaDetailList_Model extends ModelSQLDOC{
 		$this->addField($f_id);
 		//********************
 		
-		//*** Field schema_id ***
+		//*** Field fuel_consumption_schema_id ***
 		$f_opts = array();
-		$f_opts['id']="schema_id";
+		$f_opts['id']="fuel_consumption_schema_id";
 						
-		$f_schema_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"schema_id",$f_opts);
-		$this->addField($f_schema_id);
+		$f_fuel_consumption_schema_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"fuel_consumption_schema_id",$f_opts);
+		$this->addField($f_fuel_consumption_schema_id);
 		//********************
 		
-		//*** Field schemas_ref ***
+		//*** Field fuel_consumption_schema_ref ***
 		$f_opts = array();
-		$f_opts['id']="schemas_ref";
+		$f_opts['id']="fuel_consumption_schema_ref";
 						
-		$f_schemas_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"schemas_ref",$f_opts);
-		$this->addField($f_schemas_ref);
+		$f_fuel_consumption_schema_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"fuel_consumption_schema_ref",$f_opts);
+		$this->addField($f_fuel_consumption_schema_ref);
+		//********************
+		
+		//*** Field month_descr ***
+		$f_opts = array();
+		$f_opts['id']="month_descr";
+						
+		$f_month_descr=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"month_descr",$f_opts);
+		$this->addField($f_month_descr);
 		//********************
 		
 		//*** Field month_from ***
@@ -72,7 +83,7 @@ class FuelConsumptionSchemaDetailList_Model extends ModelSQLDOC{
 		$f_opts['alias']='Расход на 100 км';
 		$f_opts['id']="quant_distance";
 						
-		$f_quant_distance=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_distance",$f_opts);
+		$f_quant_distance=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_distance",$f_opts);
 		$this->addField($f_quant_distance);
 		//********************
 		
@@ -82,10 +93,15 @@ class FuelConsumptionSchemaDetailList_Model extends ModelSQLDOC{
 		$f_opts['alias']='Расход на 1 час';
 		$f_opts['id']="quant_time";
 						
-		$f_quant_time=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_time",$f_opts);
+		$f_quant_time=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_time",$f_opts);
 		$this->addField($f_quant_time);
 		//********************
-	$this->setLimitConstant('doc_per_page_count');
+	
+		$order = new ModelOrderSQL();		
+		$this->setDefaultModelOrder($order);		
+		$direct = 'ASC';
+		$order->addField($f_name,$direct);
+$this->setLimitConstant('doc_per_page_count');
 	}
 
 }

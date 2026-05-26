@@ -310,6 +310,14 @@ class VehicleDialog_Model extends ModelSQLBeton{
 		$f_fuel_consumption_schema_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"fuel_consumption_schema_ref",$f_opts);
 		$this->addField($f_fuel_consumption_schema_ref);
 		//********************
+		
+		//*** Field attachments_list ***
+		$f_opts = array();
+		$f_opts['id']="attachments_list";
+						
+		$f_attachments_list=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"attachments_list",$f_opts);
+		$this->addField($f_attachments_list);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

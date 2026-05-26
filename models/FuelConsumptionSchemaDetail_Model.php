@@ -6,10 +6,11 @@
  *
  */
 
-require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLDOC.php');
+require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
  
-class FuelConsumptionSchemaDetail_Model extends ModelSQLDOC{
+class FuelConsumptionSchemaDetail_Model extends ModelSQLBeton{
 	
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
@@ -61,9 +62,10 @@ class FuelConsumptionSchemaDetail_Model extends ModelSQLDOC{
 		$f_opts = array();
 		
 		$f_opts['alias']='Расход на 100 км';
+		$f_opts['length']=15;
 		$f_opts['id']="quant_distance";
 						
-		$f_quant_distance=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_distance",$f_opts);
+		$f_quant_distance=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_distance",$f_opts);
 		$this->addField($f_quant_distance);
 		//********************
 		
@@ -71,9 +73,10 @@ class FuelConsumptionSchemaDetail_Model extends ModelSQLDOC{
 		$f_opts = array();
 		
 		$f_opts['alias']='Расход на 1 час';
+		$f_opts['length']=15;
 		$f_opts['id']="quant_time";
 						
-		$f_quant_time=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_time",$f_opts);
+		$f_quant_time=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_time",$f_opts);
 		$this->addField($f_quant_time);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');

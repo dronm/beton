@@ -30,7 +30,7 @@ function MaterialStoreForOrderList_View(id,options){
 extend(MaterialStoreForOrderList_View,Control);
 
 MaterialStoreForOrderList_View.prototype.PIC_H = 17;//60;
-MaterialStoreForOrderList_View.prototype.PIC_W = 150;//50;
+MaterialStoreForOrderList_View.prototype.PIC_W = 140;//150;
 MaterialStoreForOrderList_View.prototype.CONT_H = 17;//60;
 
 MaterialStoreForOrderList_View.prototype.setData = function(modelStores){

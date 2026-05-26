@@ -24,7 +24,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
 
 
 
-require_once(USER_CONTROLLERS_PATH.'Shipment_Controller.php');
+//require_once(USER_CONTROLLERS_PATH.'Shipment_Controller.php');
 
 require_once(USER_MODELS_PATH.'ProductionMaterialList_Model.php');
 

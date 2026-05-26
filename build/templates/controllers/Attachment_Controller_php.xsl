@@ -32,68 +32,98 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 
 <xsl:template name="extra_methods">
 
-	public function add_file($pm){
+
+	public function add_file($pm) {
 		if (
-			isset($_FILES['content_data']) 
-			&amp;&amp; is_array($_FILES['content_data']['name']) 
-			&amp;&amp; count($_FILES['content_data']['name'])
-		){
+			!isset($_FILES['content_data']) ||
+			!is_array($_FILES['content_data']['name']) ||
+			!count($_FILES['content_data']['name'])
+		) {
+			return;
+		}
 
-			$link = $this->getDbLinkMaster();
+		$origContentInfo = json_decode($this->getExtVal($pm, 'content_info'), TRUE);
+		$ref = json_decode($this->getExtVal($pm, 'ref'), TRUE);
 
-			$pm->setParamValue('content_data', pg_escape_bytea($link->link_id,file_get_contents($_FILES['content_data']['tmp_name'][0])) );
-			$pm->setParamValue('content_info',
-				sprintf('{"name":"%s","id":"1","size":"%s"}',
-				$_FILES['content_data']['name'][0],
-				filesize($_FILES['content_data']['tmp_name'][0])
-				)
-			);			
-			$link->query("BEGIN");
-			try{
+		$uploadedName = $_FILES['content_data']['name'][0];
+		$uploadedTmpName = $_FILES['content_data']['tmp_name'][0];
 
-				$ref = json_decode($this->getExtVal($pm, 'ref'), TRUE);
-				$contentInfo = json_decode($this->getExtVal($pm, 'content_info'), TRUE);
-				$query = sprintf(
-					"DELETE FROM attachments
-					WHERE (ref->'keys'->>'id')::int = %d AND content_info->>'id' = '%s'"
-					,$ref["keys"]["id"]
-					,$contentInfo["id"]
-				);
-				$arDel = $link->query_first($query);
-				if(is_array($arDel) &amp;&amp; isset($arDel["id"])){
-					self::delete_tmp_file_name($arDel["id"]);
-				}
+		$link = $this->getDbLinkMaster();
 
-				$link->query($query);
-				$query = sprintf(
-					"INSERT INTO attachments
-					(ref, content_info, content_data)
-					VALUES (%s, %s, %s)"
-					,$this->getExtDbVal($pm, 'ref')
-					,$this->getExtDbVal($pm, 'content_info')
-					,$this->getExtDbVal($pm, 'content_data')
-				);
-				$link->query($query);
-				$link->query("COMMIT");
+		$contentData = pg_escape_bytea(
+			$link->link_id,
+			file_get_contents($uploadedTmpName)
+		);
 
-			}catch(Exception $e){
-				$link->query("ROLLBACK");
-				throw $e;
+		$contentPreview = NULL;
+
+		try {
+			$contentPreview = $this->gen_thumbnail_bytea(
+				$uploadedTmpName,
+				$uploadedName,
+				$link->link_id
+			);
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			$contentPreview = NULL;
+		}
+
+		$contentInfo = json_encode(
+			[
+				'name' => $uploadedName,
+				'id' => $origContentInfo['id'],
+				'size' => filesize($uploadedTmpName),
+			],
+			JSON_UNESCAPED_UNICODE
+		);
+
+		$link->query("BEGIN");
+
+		try {
+			$arDel = $link->query_first(
+				"DELETE FROM attachments
+				WHERE (ref->'keys'->>'id')::int = $1
+					AND content_info->>'id' = $2
+				RETURNING id",
+				[
+					$ref['keys']['id'],
+					$origContentInfo['id'],
+				]
+			);
+
+			if (is_array($arDel) &amp;&amp; isset($arDel['id'])) {
+				self::delete_tmp_file_name($arDel['id']);
 			}
+
+			$link->query(
+				"INSERT INTO attachments
+				(ref, content_info, content_data, content_preview)
+				VALUES ($1, $2, $3, $4)",
+				[
+					$this->getExtVal($pm, 'ref'),
+					$contentInfo,
+					$contentData,
+					$contentPreview,
+				]
+			);
+
+			$link->query("COMMIT");
+		} catch (Exception $e) {
+			$link->query("ROLLBACK");
+			throw $e;
 		}
 	}
 
 	public function get_file($pm){
 		$link = $this->getDbLinkMaster();
 		$ref = json_decode($this->getExtVal($pm, 'ref'), TRUE);
-		$query = sprintf(
+
+		$ar = $link->query_first(
 			"SELECT content_info, content_data 
 			FROM attachments
-			WHERE (ref->'keys'->>'id')::int = %d AND content_info->>'id' = %s"
-			,$ref["keys"]["id"]
-			,$this->getExtDbVal($pm, 'content_id')
+			WHERE (ref->'keys'->>'id')::int = $1 AND content_info->>'id' = $2",
+			[ $ref["keys"]["id"] ,$this->getExtVal($pm, 'content_id') ]
 		);
-		$ar = $link->query_first($query);
 		if(!is_array($ar) || !count($ar) || !isset($ar["content_info"])){
 			throw new Exception("attachment not found");
 		}
@@ -120,14 +150,12 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 	public function delete_file($pm){
 		$link = $this->getDbLinkMaster();
 		$ref = json_decode($this->getExtVal($pm, 'ref'), TRUE);
-		$query = sprintf(
+		$ar = $link->query_first(
 			"DELETE FROM attachments
-			WHERE (ref->'keys'->>'id')::int = %d AND content_info->>'id' = '%s'
-			RETURNING id"
-			,$ref["keys"]["id"]
-			,$this->getExtVal($pm, 'content_id')
+			WHERE (ref->'keys'->>'id')::int = $1 AND content_info->>'id' = $2 
+			RETURNING id",
+			[ $ref["keys"]["id"], $this->getExtVal($pm, 'content_id') ]
 		);
-		$ar = $link->query_first($query);
 
 		if(is_array($ar) &amp;&amp; isset($ar["id"])){
 			self::delete_tmp_file_name($arr["id"]);
@@ -167,6 +195,188 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 		$tmpFile = self::get_tmp_file_name($attId);
 		if(file_exists($tmpFile)){
 			unlink($tmpFile);
+		}
+	}
+
+	private static function run_cmd(array $cmd, ?string $cwd = NULL, array $env = []): void {
+		$descriptorSpec = [
+			0 => ['pipe', 'r'],
+			1 => ['pipe', 'w'],
+			2 => ['pipe', 'w'],
+		];
+
+		$process = proc_open($cmd, $descriptorSpec, $pipes, $cwd, $env);
+
+		if (!is_resource($process)) {
+			throw new Exception('Failed to start command: ' . implode(' ', $cmd));
+		}
+
+		fclose($pipes[0]);
+
+		$stdout = stream_get_contents($pipes[1]);
+		$stderr = stream_get_contents($pipes[2]);
+
+		fclose($pipes[1]);
+		fclose($pipes[2]);
+
+		$exitCode = proc_close($process);
+
+		if ($exitCode !== 0) {
+			throw new Exception(
+				'Command failed: ' . implode(' ', $cmd) .
+				"\nExit code: " . $exitCode .
+				"\nSTDOUT: " . $stdout .
+				"\nSTDERR: " . $stderr
+			);
+		}
+	}
+
+	private static function remove_dir_recursive(string $dir): void {
+		if (!is_dir($dir)) {
+			return;
+		}
+
+		$items = scandir($dir);
+
+		foreach ($items as $item) {
+			if ($item === '.' || $item === '..') {
+				continue;
+			}
+
+			$path = $dir . DIRECTORY_SEPARATOR . $item;
+
+			if (is_dir($path)) {
+				self::remove_dir_recursive($path);
+			} else {
+				@unlink($path);
+			}
+		}
+
+		@rmdir($dir);
+	}
+
+	private static function gen_thumbnail_bytea(string $sourceTmpPath, string $realName, $pgLink): ?string {
+		$ext = strtolower(pathinfo($realName, PATHINFO_EXTENSION));
+
+		if ($ext === '') {
+			return NULL;
+		}
+
+		$officeExts = ['doc', 'docx', 'xls', 'xlsx', 'odt', 'ods'];
+		$pdfExts = ['pdf'];
+
+		$workDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'att_thumb_' . bin2hex(random_bytes(8));
+
+		if (!mkdir($workDir, 0700, TRUE) &amp;&amp; !is_dir($workDir)) {
+			throw new Exception('Failed to create thumbnail temp dir');
+		}
+
+		try {
+			$srcPath = $workDir . DIRECTORY_SEPARATOR . 'source.' . $ext;
+			$previewPrefix = $workDir . DIRECTORY_SEPARATOR . 'preview';
+			$previewPath = $workDir . DIRECTORY_SEPARATOR . 'preview.jpg';
+
+			if (!copy($sourceTmpPath, $srcPath)) {
+				throw new Exception('Failed to copy uploaded file for thumbnail generation');
+			}
+
+			if (in_array($ext, $officeExts, TRUE)) {
+				self::run_cmd(
+					[
+						'soffice',
+						'--headless',
+						'--convert-to',
+						'pdf:writer_pdf_Export',
+						'--outdir',
+						$workDir,
+						$srcPath,
+					],
+					$workDir,
+					[
+						'HOME' => $workDir,
+					]
+				);
+
+				$pdfPath = $workDir . DIRECTORY_SEPARATOR . 'source.pdf';
+
+				if (!file_exists($pdfPath)) {
+					throw new Exception('LibreOffice did not create PDF file');
+				}
+
+				$this->run_cmd(
+					[
+						'pdftoppm',
+						'-l',
+						'1',
+						'-scale-to',
+						'300',
+						'-jpeg',
+						$pdfPath,
+						$previewPrefix,
+					],
+					$workDir
+				);
+
+				$generatedPreviewPath = $previewPrefix . '-1.jpg';
+
+				if (!file_exists($generatedPreviewPath)) {
+					throw new Exception('pdftoppm did not create thumbnail');
+				}
+
+				$previewPath = $generatedPreviewPath;
+			} elseif (in_array($ext, $pdfExts, TRUE)) {
+				$this->run_cmd(
+					[
+						'pdftoppm',
+						'-l',
+						'1',
+						'-scale-to',
+						'300',
+						'-jpeg',
+						$srcPath,
+						$previewPrefix,
+					],
+					$workDir
+				);
+
+				$generatedPreviewPath = $previewPrefix . '-1.jpg';
+
+				if (!file_exists($generatedPreviewPath)) {
+					throw new Exception('pdftoppm did not create thumbnail');
+				}
+
+				$previewPath = $generatedPreviewPath;
+			} else {
+				self::run_cmd(
+					[
+						'convert',
+						'-define',
+						'jpeg:size=500x180',
+						$srcPath,
+						'-auto-orient',
+						'-thumbnail',
+						'250x100',
+						'-unsharp',
+						'0x.5',
+						$previewPath,
+					],
+					$workDir
+				);
+
+				if (!file_exists($previewPath)) {
+					throw new Exception('ImageMagick did not create thumbnail');
+				}
+			}
+
+			$previewData = file_get_contents($previewPath);
+
+			if ($previewData === FALSE || $previewData === '') {
+				return NULL;
+			}
+
+			return pg_escape_bytea($pgLink, $previewData);
+		} finally {
+			self::remove_dir_recursive($workDir);
 		}
 	}
 

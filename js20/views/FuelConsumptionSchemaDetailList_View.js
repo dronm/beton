@@ -18,9 +18,17 @@ function FuelConsumptionSchemaDetailList_View(id,options){
 	
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
+
+	const isDetail = (options.detailFilters && options.detailFilters.FuelConsumptionSchemaDetailList_Model);
+	const monthList = [
+			"Январь", "Февраль", "Март", "Апрель", "Май",
+			"Июнь", "Июль", "Август", "Сентябрь", "Октябрь",
+			 "Ноябрь", "Декабрь"
+	];
 	
 	var filters;
 	this.addElement(new GridAjx(id+":grid",{
+		"attrs": {"width": "80%"},
 		"filters": filters,
 		"model":model,
 		"keyIds":["id"],
@@ -28,47 +36,99 @@ function FuelConsumptionSchemaDetailList_View(id,options){
 		"editInline":true,
 		"editWinClass":null,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
-			"cmdInsert":false,
+			"cmdInsert":true,
 			"cmdEdit":true,
 			"cmdDelete":true,
 			"exportFileName" :"РасходГСМ",
 		}),		
 		"popUpMenu":popup_menu,
-		"filters":(options.detailFilters&&options.detailFilters.FuelConsumptionSchemaDetailList_Model)? 
-			options.detailFilters.FuelConsumptionSchemaDetailList_Model:null,	
+		"filters":isDetail? options.detailFilters.FuelConsumptionSchemaDetailList_Model:null,	
 		"head":new GridHead(id+"-grid:head",{
 			"elements":[
 				new GridRow(id+":grid:head:row0",{
 					"elements":[
+						isDetail? null:
 						new GridCellHead(id+":grid:head:fuel_consumption_schema_ref",{
 							"value":"Схема",
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("id"),
 									"ctrlClass":FuelConsumptionSchemaEdit,
+									"ctrlOptions": {
+										"labelCaption":""
+									},
 									"searchOptions":{
 										"field":new FieldInt("fuel_consumption_schema_id"),
 										"searchType":"on_match"
 									}									
 								})
-								,new GridColumn({
+							]
+						})
+						,new GridCellHead(id+":grid:head:month_from",{
+							"value":"Месяц с",
+							"attrs":{"width":"200px"},
+							"columns":[
+								new GridColumn({
 									"field":model.getField("month_from"),
-									"ctrlClass":EditMonth,
-								})
-								,new GridColumn({
-									"field":model.getField("month_to"),
-									"ctrlClass":EditMonth,
-								})
-								,new GridColumn({
-									"field":model.getField("quant_distance"),
-									"ctrlClass":EditNum,
-								})
-								,new GridColumn({
-									"field":model.getField("quant_time"),
-									"ctrlClass":EditNum,
+									"formatFunction": function(f){
+										const v = f.month_from.getValue();
+										if(v && v<12){
+											return monthList[v-1];
+										}
+										return "";
+									},
+									"ctrlClass":EditMonth
 								})
 							],
 							"sortable":true,
+							"sort":"asc"							
+						})
+						,new GridCellHead(id+":grid:head:month_to",{
+							"value":"Месяц по",
+							"attrs":{"width":"200px"},
+							"columns":[
+								new GridColumn({
+									"field":model.getField("month_to"),
+									"formatFunction": function(f){
+										const v = f.month_to.getValue();
+										if(v && v<12){
+											return monthList[v-1];
+										}
+										return "";
+									},
+									"ctrlClass":EditMonth
+								})
+							]
+						})
+						,new GridCellHead(id+":grid:head:quant_distance",{
+							"value":"Расход на 100 км",
+							"attrs":{"width":"200px"},
+							"columns":[
+								new GridColumnFloat({
+									"field":model.getField("quant_distance"),
+									"precision": "2",
+									"ctrlClass":EditFloat,
+									"ctrlOptions": {
+										"length":"15",
+										"precision": "2"
+									}
+								})
+							]
+						})
+						,new GridCellHead(id+":grid:head:quant_time",{
+							"value":"Расход на 1 час",
+							"attrs":{"width":"200px"},
+							"columns":[
+								new GridColumnFloat({
+									"field":model.getField("quant_time"),
+									"precision": "2",
+									"ctrlClass":EditFloat,
+									"ctrlOptions": {
+										"length":"15",
+										"precision": "2"
+									}
+								})
+							]
 						})
 					]
 				})

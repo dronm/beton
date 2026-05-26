@@ -20,7 +20,7 @@ function UserList_View(id,options){
 					"checked":false
 				}),
 				"field":new FieldBool("banned")}),
-			"sign":"ne",
+			"sign":"e",
 			"falseValueNoFilter":true
 		}
 	};

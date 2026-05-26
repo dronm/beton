@@ -2,6 +2,7 @@
 	<div id="{{id}}:colLeft" class="{{bsCol}}9">
 		{{#showChart}}		
 		<div class="panel panel-default">
+			{{#notLowResDevice}}		
 			<div class="panel-heading">
 				<h6 class="panel-title">Загрузка заводов
 				</h6>
@@ -14,6 +15,7 @@
 		                	</ul>
 		        	</div>				
 			</div>
+			{{/notLowResDevice}}		
 			
 			<div class="panel-body">
 				<canvas id="{{id}}:plant_load_graph">
@@ -76,6 +78,7 @@
 						</span>
 					</div>
 					
+					{{#notLowResDevice}}		
 					<div class="ordListParamCont" title="Заявлено {{workHours}}ч., м3">
 						<span class="ordListParamPref">Звл.({{workHours}}):
 						</span>
@@ -84,7 +87,8 @@
 						<span class="ordListParamPostf">м3
 						</span>
 					</div>
-						
+					{{/notLowResDevice}}		
+
 				</div>	
 				<div id="{{id}}:order_make_filter">
 				</div>	

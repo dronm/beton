@@ -98,6 +98,11 @@
 					<div class="content">
 						<div class="row">
 							<div id="windowData" class="col-lg-12">
+								<img src="img/logo.png?{$VERSION}" width="80px" height="23px" 
+									title="Перейти на главную" 
+									style="cursor:pointer;margin-bottom: 5px;"
+									onclick="window.location.href='/'"
+								/>
 								<xsl:apply-templates select="model[@htmlTemplate='TRUE']"/>
 							</div>
 

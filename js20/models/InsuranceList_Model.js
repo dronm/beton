@@ -68,6 +68,15 @@ function InsuranceList_Model(options){
 	options.fields.total = new FieldFloat("total",filed_options);
 	options.fields.total.getValidator().setMaxLength('15');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.attachments = new FieldJSON("attachments",filed_options);
+	
 		InsuranceList_Model.superclass.constructor.call(this,id,options);
 }
 extend(InsuranceList_Model,ModelJSON);

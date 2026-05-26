@@ -169,6 +169,7 @@
 <li><a href="#VariantStorage_Controller">VariantStorage_Controller</a></li>
 <li><a href="#Vehicle_Controller">Vehicle_Controller</a></li>
 <li><a href="#VehicleDriverForSchedGen_Controller">VehicleDriverForSchedGen_Controller</a></li>
+<li><a href="#VehicleFuelConsumptionSchemaDetail_Controller">VehicleFuelConsumptionSchemaDetail_Controller</a></li>
 <li><a href="#VehicleMileage_Controller">VehicleMileage_Controller</a></li>
 <li><a href="#VehicleOwner_Controller">VehicleOwner_Controller</a></li>
 <li><a href="#VehicleOwnerClient_Controller">VehicleOwnerClient_Controller</a></li>
@@ -562,6 +563,8 @@
 <li><a href="#FuelConsumptionSchema_Model">FuelConsumptionSchema_Model</a></li>
 <li><a href="#FuelConsumptionSchemaDetail_Model">FuelConsumptionSchemaDetail_Model</a></li>
 <li><a href="#FuelConsumptionSchemaDetailList_Model">FuelConsumptionSchemaDetailList_Model</a></li>
+<li><a href="#VehicleFuelConsumptionSchemaDetail_Model">VehicleFuelConsumptionSchemaDetail_Model</a></li>
+<li><a href="#VehicleFuelConsumptionSchemaDetailList_Model">VehicleFuelConsumptionSchemaDetailList_Model</a></li>
 <li><a href="#FuelConsumption_Model">FuelConsumption_Model</a></li>
 <li><a href="#BuhNakl_Model">BuhNakl_Model</a></li>
 </ul>
@@ -4666,7 +4669,7 @@
 <p>Type:Password</p>
 <p>Required:
 								Нет</p>
-<p>Length:20</p>
+<p>Length:50</p>
 </div>
 <h3>width_type</h3>
 <p></p>
@@ -5276,6 +5279,19 @@
 <a href="#VehicleDriverForSchedGen_Model">Model: VehicleDriverForSchedGen_Model</a><h2>get_list</h2>
 <a href="#VehicleDriverForSchedGen_Model">Model: VehicleDriverForSchedGen_Model</a><h2>get_object</h2>
 <a href="#VehicleDriverForSchedGen_Model">Model: VehicleDriverForSchedGen_Model</a>
+</div>
+</div>
+<div id="VehicleFuelConsumptionSchemaDetail_Controller" class="content_box">
+<h1>VehicleFuelConsumptionSchemaDetail_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#VehicleFuelConsumptionSchemaDetail_Model">Model: VehicleFuelConsumptionSchemaDetail_Model</a><h2>update</h2>
+<a href="#VehicleFuelConsumptionSchemaDetail_Model">Model: VehicleFuelConsumptionSchemaDetail_Model</a><h2>delete</h2>
+<a href="#VehicleFuelConsumptionSchemaDetail_Model">Model: VehicleFuelConsumptionSchemaDetail_Model</a><h2>get_list</h2>
+<a href="#VehicleFuelConsumptionSchemaDetailList_Model">Model: VehicleFuelConsumptionSchemaDetailList_Model</a><h2>get_object</h2>
+<a href="#VehicleFuelConsumptionSchemaDetailList_Model">Model: VehicleFuelConsumptionSchemaDetailList_Model</a>
 </div>
 </div>
 <div id="VehicleMileage_Controller" class="content_box">
@@ -11532,17 +11548,17 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>quant_distance</h2>
-<div>Type:Int</div>
+<div>Type:Float</div>
 <div>Primary key:</div>
 <div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
 <h2>quant_time</h2>
-<div>Type:Int</div>
+<div>Type:Float</div>
 <div>Primary key:</div>
 <div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
 </div>
 </div>
 <div id="FuelConsumptionSchemaDetailList_Model" class="content_box">
@@ -11555,14 +11571,20 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>schema_id</h2>
+<h2>fuel_consumption_schema_id</h2>
 <div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>schemas_ref</h2>
+<h2>fuel_consumption_schema_ref</h2>
 <div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>month_descr</h2>
+<div>Type:String</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -11580,13 +11602,13 @@
 <div>Length:</div>
 <div>Precision:</div>
 <h2>quant_distance</h2>
-<div>Type:Int</div>
+<div>Type:Float</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
 <h2>quant_time</h2>
-<div>Type:Int</div>
+<div>Type:Float</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -11843,6 +11865,12 @@
 <div>Required:</div>
 <div>Length:15</div>
 <div>Precision:2</div>
+<h2>attachments</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="Item1cList_Model" class="content_box">
@@ -25962,6 +25990,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>attachments_list</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="VehicleDriverForSchedGen_Model" class="content_box">
@@ -25998,6 +26032,96 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+</div>
+</div>
+<div id="VehicleFuelConsumptionSchemaDetail_Model" class="content_box">
+<h1>VehicleFuelConsumptionSchemaDetail_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>month_from</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>month_to</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_distance</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+<h2>quant_time</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+</div>
+</div>
+<div id="VehicleFuelConsumptionSchemaDetailList_Model" class="content_box">
+<h1>VehicleFuelConsumptionSchemaDetailList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicles_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>month_from</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>month_to</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_distance</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
+<h2>quant_time</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:15</div>
+<div>Precision:2</div>
 </div>
 </div>
 <div id="VehicleMakeList_Model" class="content_box">

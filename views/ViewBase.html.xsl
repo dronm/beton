@@ -648,8 +648,10 @@ throw Error(CommonHelper.longString(function () {/*
 </xsl:template>
 
 <xsl:template name="page_header">
-	<!-- Main navbar -inverse-->
-	<div class="navbar navbar">
+<!-- Main navbar -inverse
+these classes fix the menum but hides some content: navbar-default navbar-fixed-top
+-->
+	<div class="navbar">
 	<div class="container-fluid">
 	
 		<xsl:choose>

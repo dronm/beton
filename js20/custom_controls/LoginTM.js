@@ -578,7 +578,8 @@ LoginTM.prototype.submitCode = function() {
 		"ok": function(resp) {
 			var m = resp.getModel("Auth_Model");
 			if (m.getNextRow()) {
-				document.location.href = window.location.href;
+				//document.location.href = window.location.href;
+				window.location.reload();
 				return;
 			}
 

@@ -1,12 +1,12 @@
 <div id={{id}} class="row">
 	{{#productionSites}}
-	<div id="{{id}}:productionSite_{{productionSiteId}}" class="col-{{widthType}}-4">
+	<div id="{{id}}:productionSite_{{productionSiteId}}" class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
 		 <legend>{{productionSiteName}}
 			<img id="production_site_conn_img_{{productionSiteId}}" src="./img/dot_red.png">
 			</img>
 		 </legend>
 		{{#silos}}
-		<div id="{{id}}:silo_{{siloId}}" class="col-{{widthType}}-4">
+		<div id="{{id}}:silo_{{siloId}}" class="col-xs-4">
 			<div class="siloName">{{siloName}}
 			</div>
 			<canvas id="silo_canvas_{{siloId}}" class="cementSiloPic">
@@ -16,7 +16,7 @@
 		</div>
 		{{/silos}}
 		{{#material_stores}}
-		<div id="{{id}}:material_store_{{materialStoreId}}" class="col-{{widthType}}-4">
+		<div id="{{id}}:material_store_{{materialStoreId}}" class="col-xs-4">
 			<div class="materialStoreName">{{materialStoreName}}
 			</div>
 			<canvas id="material_store_canvas_{{materialStoreId}}" class="materialStorePic">

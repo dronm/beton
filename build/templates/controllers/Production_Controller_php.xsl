@@ -18,7 +18,7 @@
 <xsl:template match="controller"><![CDATA[<?php]]>
 <xsl:call-template name="add_requirements"/>
 
-require_once(USER_CONTROLLERS_PATH.'Shipment_Controller.php');
+//require_once(USER_CONTROLLERS_PATH.'Shipment_Controller.php');
 
 require_once(USER_MODELS_PATH.'ProductionMaterialList_Model.php');
 

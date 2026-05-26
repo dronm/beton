@@ -50,6 +50,14 @@
 				<div id="{{id}}:fuel_card_id"/>
 				<div id="{{id}}:official_owner"/>
 				<div id="{{id}}:ownership_type"/>
+				<div id="{{id}}:reg_doc"/>
+
+				<div>
+					<p>
+						Сканы документов
+					</p>
+					<div id="{{id}}:attachments_list"/>
+				</div>
 			</div>
 		</div>
 
@@ -120,7 +128,27 @@
 					<div id="{{id}}:tracker_last_dt"/>
 					<div id="{{id}}:tracker_sat_num"/>
 
-					<div id="{{id}}:mileage_list"/>
+					<div class="panel">
+						<div class="panel-heading">
+							<h4 class="panel-title">Пробег</h4>
+						</div>
+						<div class="panel-body">
+							<div id="{{id}}:mileage_list"/>
+						</div>
+					</div>
+
+
+					<div class="panel">
+						<div class="panel-heading">
+							<h4 class="panel-title">Схема расхода ГСМ</h4>
+						</div>
+						<div id="{{id}}:fuel_consumption_schema_ref"/>
+						<p>Индивидуальная схема расхода ГСМ
+						</p>
+						<div class="panel-body">
+							<div id="{{id}}:vehicle_fuel_consumption_schema_details_list"/>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -6,12 +6,12 @@
  *
  */
 
-require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLDOC.php');
+require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
  
-class FuelConsumptionSchema_Model extends ModelSQLDOC{
+class FuelConsumptionSchema_Model extends ModelSQLBeton{
 	
 	public function __construct($dbLink){
 		parent::__construct($dbLink);
@@ -44,7 +44,7 @@ class FuelConsumptionSchema_Model extends ModelSQLDOC{
 		$order = new ModelOrderSQL();		
 		$this->setDefaultModelOrder($order);		
 		$direct = 'ASC';
-		$order->addField($f_date_time,$direct);
+		$order->addField($f_name,$direct);
 $this->setLimitConstant('doc_per_page_count');
 	}
 

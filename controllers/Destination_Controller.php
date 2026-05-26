@@ -645,7 +645,7 @@ class Destination_Controller extends ControllerSQL{
 		//выдаем зоны клиента
 		if($client_id_set && !$name_pat_set){
 			
-			$model = new DestinationForOrderList_Model($this->getDbLink());
+			$model = new DestinationForOrderList_Model($this->getDbLink(TRUE));
 		
 			$model->query(sprintf(
 				"WITH
@@ -733,7 +733,7 @@ class Destination_Controller extends ControllerSQL{
 			}
 		
 			//client destinations
-			$q_id = $this->getDbLink()->query(sprintf(
+			$q_id = $this->getDbLink(TRUE)->query(sprintf(
 			"WITH
 			last_price AS
 				(SELECT
@@ -830,7 +830,7 @@ class Destination_Controller extends ControllerSQL{
 			,$this->getExtDbVal($pm,'name_pat')
 			));
 			
-			while($ar = $this->getDbLink()->fetch_array($q_id)){
+			while($ar = $this->getDbLink(TRUE)->fetch_array($q_id)){
 				$row = array(
 					new Field('id',DT_STRING,array('value'=>$ar['id']))
 					,new Field('name',DT_STRING,array('value'=>$ar['name']))
@@ -849,10 +849,10 @@ class Destination_Controller extends ControllerSQL{
 				//$name_pat_w = str_word_count($this->getExtVal($pm,'name_pat'),1,"АаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя");
 				$name_pat_w = explode(' ',$this->getExtVal($pm,'name_pat'));
 				$name_pat = '%'.implode('%',$name_pat_w).'%';
-				$q_id = $this->getDbLink()->query(
+				$q_id = $this->getDbLink(TRUE)->query(
 					"SELECT search_name FROM fias.find_address("."'".$name_pat."'".",".$limit_cnt.")"
 				);
-				while($ar = $this->getDbLink()->fetch_array($q_id)){
+				while($ar = $this->getDbLink(TRUE)->fetch_array($q_id)){
 					$row = array(
 						new Field('id',DT_STRING,array('value'=>NULL))
 						,new Field('name',DT_STRING,array('value'=>$ar['search_name']))
@@ -867,7 +867,7 @@ class Destination_Controller extends ControllerSQL{
 			}
 		}
 		else{
-			$model = new DestinationForOrderList_Model($this->getDbLink());
+			$model = new DestinationForOrderList_Model($this->getDbLink(TRUE));
 			//empty
 		}
 		
@@ -887,11 +887,11 @@ class Destination_Controller extends ControllerSQL{
 		//new addresses to model
 		$name_pat_w = explode(' ',$search);
 		$search = '%'.implode('%',$name_pat_w).'%';
-		$q_id = $this->getDbLink()->query(
+		$q_id = $this->getDbLink(TRUE)->query(
 			"SELECT search_name FROM fias.find_address("."'".$search."'".",".$limit_cnt.")"
 		);
 		$model = new Model(array('id'=>'DestinationForSiteList_Model'));
-		while($ar = $this->getDbLink()->fetch_array($q_id)){
+		while($ar = $this->getDbLink(TRUE)->fetch_array($q_id)){
 			$row = array(
 				new Field('address',DT_STRING,array('value'=>$ar['search_name']))
 			);

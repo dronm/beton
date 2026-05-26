@@ -161,6 +161,9 @@ extend(FuelConsumptionSchemaDetail_Controller,ControllerObjServer);
 	
 	pm.addField(new FieldJSON("schemas_ref",f_opts));
 	var f_opts = {};
+	
+	pm.addField(new FieldString("month_descr",f_opts));
+	var f_opts = {};
 	f_opts.alias = "1-12";
 	pm.addField(new FieldInt("month_from",f_opts));
 	var f_opts = {};

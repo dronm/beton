@@ -1912,6 +1912,16 @@ $permissions = array();
 				
 					$permissions['FuelConsumptionSchemaDetail_Controller_get_object']=TRUE;
 				
+					$permissions['VehicleFuelConsumptionSchemaDetail_Controller_insert']=TRUE;
+				
+					$permissions['VehicleFuelConsumptionSchemaDetail_Controller_update']=TRUE;
+				
+					$permissions['VehicleFuelConsumptionSchemaDetail_Controller_delete']=TRUE;
+				
+					$permissions['VehicleFuelConsumptionSchemaDetail_Controller_get_list']=TRUE;
+				
+					$permissions['VehicleFuelConsumptionSchemaDetail_Controller_get_object']=TRUE;
+				
 					$permissions['RAFuelFlow_Controller_get_list']=TRUE;
 				
 					$permissions['RAFuelFlow_Controller_get_object']=TRUE;

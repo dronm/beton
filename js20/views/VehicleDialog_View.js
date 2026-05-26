@@ -9,7 +9,7 @@ function VehicleDialog_View(id,options){
 	
 	VehicleDialog_View.superclass.constructor.call(this,id,options);
 	
-	let self = this;
+	const self = this;
 
 	this.addElement(new EditString(id+":plate",{
 		"labelCaption":"Рег.номер:",
@@ -65,8 +65,10 @@ function VehicleDialog_View(id,options){
 	this.addElement(new OwnerListGrid(id+":owners",{
 	}));	
 	this.addElement(new InsuranceListGrid(id+":insurance_osago",{
+		"dataType": "vehicle_insurance_osago"
 	}));	
 	this.addElement(new InsuranceListGrid(id+":insurance_kasko",{
+		"dataType": "vehicle_insurance_kasko"
 	}));	
 
 	this.addElement(new LeasorEdit(id+":leasor",{
@@ -136,7 +138,13 @@ function VehicleDialog_View(id,options){
 		"labelCaption":"Тип владениея:"
 	}));	
 
-	this.addElement(new FuelConsumptionSchemaEdit(id+":fuel_consumption_schema_ref",{ }));	
+	this.addElement(new FuelConsumptionSchemaEdit(id+":fuel_consumption_schema_ref",{ 
+		"labelCaption": "Общая схема расхода ГСМ:"
+	}));	
+
+	this.addElement(new VehicleFuelConsumptionSchemaDetailList_View(id+":vehicle_fuel_consumption_schema_details_list",{
+		"detail":true
+	}));		
 
 	this.addElement(new VehicleMileageList_View(id+":mileage_list",{
 		"detail":true
@@ -149,16 +157,15 @@ function VehicleDialog_View(id,options){
 	//****************************************************	
 	
 	this.addElement(new EditFile(id+":attachments_list",{
-		"maxWidth":"100",
-		"maxHeight":"100",
-		"multipleFiles":false
+		"maxWidth":"150",
+		"maxHeight":"150",
+		"multipleFiles":true
 		,"showHref":true
-		,"showPic":false
+		,"showPic":true
 		,"onDeleteFile":function(fileId,callBack){
 			self.m_attachManager.deleteAttachment(fileId,callBack);
 		}
 		,"onFileAdded":function(fileId){
-			//self.addAttachment(fileId);
 			self.m_attachManager.addAttachment(fileId);
 		}
 		,"onDownload":function(fileId){
@@ -236,6 +243,14 @@ function VehicleDialog_View(id,options){
 	
 	this.addDetailDataSet({
 		"control":this.getElement("mileage_list").getElement("grid"),
+		"controlFieldId": ["vehicle_id"],
+		"value": [function(){
+			return self.m_model.getFieldValue("id");
+		}]
+	});		
+
+	this.addDetailDataSet({
+		"control":this.getElement("vehicle_fuel_consumption_schema_details_list").getElement("grid"),
 		"controlFieldId": ["vehicle_id"],
 		"value": [function(){
 			return self.m_model.getFieldValue("id");

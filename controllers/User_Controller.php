@@ -62,6 +62,7 @@ require_once 'common/matomo/device-detector/Parser/Client/MediaPlayer.php';
 require_once 'common/matomo/device-detector/Parser/Client/PIM.php';
 require_once 'common/matomo/device-detector/Parser/Client/Browser.php';
 require_once 'common/matomo/device-detector/Parser/Client/Browser/Engine/Version.php';
+require_once 'common/matomo/device-detector/Parser/Client/Browser/Engine.php';
 require_once 'common/matomo/device-detector/Parser/Client/Library.php';
 require_once 'common/matomo/device-detector/Parser/Device/AbstractDeviceParser.php';
 require_once 'common/matomo/device-detector/Parser/Device/HbbTv.php';
@@ -1915,7 +1916,7 @@ class User_Controller extends ControllerSQL{
 		}
 		
 		//match ext_users to our users
-		$ar = $this->getDbLink()->query_first(sprintf(
+		$ar = $this->getDbLink()->query_first(
 			"SELECT 
 				u.*,
 				usr.pwd AS pwd,
@@ -1933,26 +1934,12 @@ class User_Controller extends ControllerSQL{
 			LEFT JOIN client_tels AS ct ON ct.id = (ex_u.ext_obj->'keys'->>'id')::int
 			LEFT JOIN users AS usr ON format_cel_standart(usr.phone_cel) = format_cel_standart(ct.tel)
 			LEFT JOIN users_dialog AS u ON usr.id = u.id
-			WHERE ex_u.app_id = %d AND ex_u.tm_user->>'id' = '%s'
-			LIMIT 1"
-			,MS_APP_ID
-			,$auth_data['id']
-		));
+			WHERE ex_u.app_id = $1 AND ex_u.tm_user->>'id' = $2 
+			LIMIT 1",
+			[ MS_APP_ID, $auth_data['id'] ]
+		);
 		
 		if (!is_array($ar) || !count($ar)){
-			//mark new user
-			/*
-			$this->getDbLinkMaster()->query(sprintf(
-				"SELECT notifications.reg_ext_user(%d, '%s'::jsonb) AS id",
-				MS_APP_ID,
-				sprintf(
-					'{"id":%s, "is_bot":false, "first_name":"%s", "username":"%s"}',
-					$auth_data['id'],
-					$auth_data['first_name'],
-					$auth_data['username']
-				)
-			));
-			*/
 			throw new Exception('Нет соответствия пользователя из Telergam!');
 			
 		}else if ($ar['banned']=='t'){
@@ -2001,24 +1988,22 @@ class User_Controller extends ControllerSQL{
 	 * все отправляется в set_logged
 	 */
 	public function tm_check_code($pm){
-		$ar_log = $this->getDbLinkMaster()->query_first(sprintf(
+		$ar_log = $this->getDbLinkMaster()->query_first(
 			"SELECT
 				l.*,
 				(l.code_exp_date_time < now()::timestampTZ) AS code_expired
 			FROM notifications.tm_logins AS l
-			WHERE l.tel = %s AND app_id=%d",
-			$this->getExtDbVal($pm,'tel'),
-			MS_APP_ID
-		));
+			WHERE l.tel = $1 AND app_id=$2",
+			[ $this->getExtVal($pm,'tel'), MS_APP_ID ]
+		);
 		
 		// code_expired используется для РЕгенерации кода
 		if(is_array($ar_log) && count($ar_log) && $ar_log['code_expired']=='t'){
 			//expired
-			$this->getDbLinkMaster()->query(sprintf(
+			$this->getDbLinkMaster()->query(
 				"DELETE FROM notifications.tm_logins WHERE tel = %s AND app_id=%d",
-				$this->getExtDbVal($pm,'tel'),
-				MS_APP_ID
-			));				
+				[ $this->getExtVal($pm,'tel'), MS_APP_ID ]
+			);				
 			throw new Exception('Истекло время ожидания, сгенерируйте новый код!');
 		}
 		
@@ -2028,13 +2013,12 @@ class User_Controller extends ControllerSQL{
 			
 		}else if(is_array($ar_log) && count($ar_log) && $ar_log['code']!=$this->getExtVal($pm,'code')
 		&& intval($ar_log['tries']) > 0){
-			$this->getDbLinkMaster()->query(sprintf(
+			$this->getDbLinkMaster()->query(
 				"UPDATE notifications.tm_logins
 				SET tries = tries - 1
-				WHERE tel = %s AND app_id=%d",
-				$this->getExtDbVal($pm,'tel'),
-				MS_APP_ID
-			));
+				WHERE tel = $1 AND app_id=$2",
+				[ $this->getExtDbVal($pm,'tel'), MS_APP_ID ]
+			);
 		
 			throw new Exception('Неверный код авторизации!');
 			
@@ -2051,68 +2035,95 @@ class User_Controller extends ControllerSQL{
 		//OK
 		$this->getDbLinkMaster()->query('BEGIN');
 		try{
-			$this->getDbLinkMaster()->query(sprintf(
-				"DELETE FROM notifications.tm_logins WHERE tel = %s AND app_id=%d",
-				$this->getExtDbVal($pm,'tel'),
-				MS_APP_ID
-			));
+			$this->getDbLinkMaster()->query(
+				"DELETE FROM notifications.tm_logins WHERE tel = $1 AND app_id=$2",
+				[ $this->getExtVal($pm,'tel'), MS_APP_ID ]
+			);
 			
 			//match ext_users to our users
-			$ar = $this->getDbLinkMaster()->query_first(sprintf(
-				"SELECT 
+			$ar = $this->getDbLinkMaster()->query_first(
+				"WITH login_contact AS (
+					SELECT
+						$2::int AS contact_id
+				)
+				SELECT 
 					u.*,
 					usr.pwd AS pwd,
 					const_first_shift_start_time_val() AS first_shift_start_time,
 					CASE
-						WHEN const_shift_length_time_val()>='24 hours'::interval THEN
+						WHEN const_shift_length_time_val() >= '24 hours'::interval THEN
 							const_first_shift_start_time_val()::interval + 
-							const_shift_length_time_val()::interval-'24 hours 1 second'::interval
+							const_shift_length_time_val()::interval - '24 hours 1 second'::interval
 						ELSE
 							const_first_shift_start_time_val()::interval + 
-							const_shift_length_time_val()::interval-'1 second'::interval
+							const_shift_length_time_val()::interval - '1 second'::interval
 					END AS first_shift_end_time,
+
 					encode(ex_u.tm_photo_preview, 'base64') AS tm_photo,
 					
-					(SELECT string_agg(bn.hash,',') FROM login_device_bans bn WHERE bn.user_id=u.id) AS ban_hash,
-					(SELECT
-						json_build_object(
-							'back_days_allowed',restr.back_days_allowed,
-							'front_days_allowed',restr.front_days_allowed
-							
-						)
-					FROM role_view_restrictions AS restr WHERE restr.role_id = u.role_id
+					(
+						SELECT string_agg(bn.hash, ',')
+						FROM login_device_bans AS bn
+						WHERE bn.user_id = u.id
+					) AS ban_hash,
+
+					(
+						SELECT
+							json_build_object(
+								'back_days_allowed', restr.back_days_allowed,
+								'front_days_allowed', restr.front_days_allowed
+							)
+						FROM role_view_restrictions AS restr
+						WHERE restr.role_id = u.role_id
 					) AS role_view_restriction,
+
 					ct.tel_ext AS ct_tel_ext,
 					users_login_roles(u.id) AS allowed_roles,
 					u_ct.contact_id AS login_contact_id
-					
-				FROM notifications.ext_users AS ex_u
-				LEFT JOIN entity_contacts AS u_ct ON u_ct.entity_type = 'users' AND u_ct.contact_id = ex_u.ext_contact_id
-				LEFT JOIN contacts AS ct ON ct.id = u_ct.contact_id
-				LEFT JOIN users AS usr ON usr.id = u_ct.entity_id
-				LEFT JOIN users_dialog AS u ON usr.id = u.id
-				WHERE ex_u.app_id = %d AND ex_u.ext_contact_id = %d
-				LIMIT 1"
-				,MS_APP_ID
-				,$ar_log['ext_user_id']
-			));
-			
+
+				FROM login_contact AS lc
+
+				LEFT JOIN LATERAL (
+					SELECT
+						ex_u.*
+					FROM notifications.ext_users AS ex_u
+					WHERE ex_u.app_id = $1
+						AND ex_u.ext_contact_id = lc.contact_id
+					ORDER BY ex_u.id DESC
+					LIMIT 1
+				) AS ex_u ON true
+
+				LEFT JOIN LATERAL (
+					SELECT
+						max_u.*
+					FROM notifications.max_users AS max_u
+					WHERE max_u.contact_id = lc.contact_id
+					ORDER BY max_u.id DESC
+					LIMIT 1
+				) AS max_u ON true
+
+				LEFT JOIN entity_contacts AS u_ct
+					ON u_ct.entity_type = 'users'
+					AND u_ct.contact_id = lc.contact_id
+
+				LEFT JOIN contacts AS ct
+					ON ct.id = u_ct.contact_id
+
+				LEFT JOIN users AS usr
+					ON usr.id = u_ct.entity_id
+
+				LEFT JOIN users_dialog AS u
+					ON usr.id = u.id
+
+				WHERE ex_u.id IS NOT NULL
+					OR max_u.id IS NOT NULL
+
+				LIMIT 1",
+				[ MS_APP_ID, $ar_log['ext_user_id'] ]
+			);	
+
 			//Если одно совпадение - берем его, если более одного, ищем незабаненного, если нет - ошибка, есть - берм его
-			//
 			if (!is_array($ar) || !count($ar)){
-				//mark new user
-				/*
-				$this->getDbLinkMaster()->query(sprintf(
-					"SELECT notifications.reg_ext_user(%d, '%s'::jsonb) AS id",
-					MS_APP_ID,
-					sprintf(
-						'{"id":%s, "is_bot":false, "first_name":"%s", "username":"%s"}',
-						$auth_data['id'],
-						$auth_data['first_name'],
-						$auth_data['username']
-					)
-				));
-				*/
 				throw new Exception('Нет соответствия пользователя из Telergam!');
 				
 			}else if ($ar['banned']=='t'){
@@ -2133,10 +2144,8 @@ class User_Controller extends ControllerSQL{
 				}
 				
 				$_SESSION['width_type'] = $pm->getParamValue("width_type");
-				$_SESSION['tm_photo'] = $ar['tm_photo'];						
-				
-				if(isset($auth_data['photo_url'])){
-					$_SESSION['photo_url'] = $auth_data['photo_url'];
+				if(isset($ar['tm_photo'])){
+					$_SESSION['tm_photo'] = $ar['tm_photo'];
 				}
 				
 				//Этот контакт будет базовым для смены ролей, запомним, что через него залогинились!
@@ -2246,7 +2255,7 @@ class User_Controller extends ControllerSQL{
 				add_notification_from_contact_max($link, $this->getExtVal($pm,'tel'), $txt, 'max_auth', NULL, $ar['ext_contact_id']);
 			} else if($ar["tp"] == "tm"){
 				//not tm!!!
-				add_notification_from_contact_tm($link, $this->getExtVal($pm,'tel'), $txt, 'tm_auth', NULL, $ar['ext_contact_id']);
+				add_notification_from_contact_sms($link, $this->getExtVal($pm,'tel'), $txt, 'tm_auth', NULL, $ar['ext_contact_id']);
 			}
 
 			$tm_logins = $link->query_first(sprintf(
@@ -2314,88 +2323,136 @@ class User_Controller extends ControllerSQL{
 	 * Генерация нового кода
 	 * TODO: make maximum incorrect call count, then wait
 	 */
-	public function tm_check_tel($pm){
-		if(isset($_SESSION["user_tel_login_incorrect_count"]) && 
-		$_SESSION["user_tel_login_incorrect_count"] > self::USER_TM_LOGIN_MAX_INCORRECT_COUNT 
-		){
-			if(isset($_SESSION["user_tel_login_incorrect_time"]) &&
+	public function tm_check_tel($pm) {
+		$tel = $this->getExtVal($pm, 'tel');
+
+		if (
+			isset($_SESSION["user_tel_login_incorrect_count"]) &&
+			$_SESSION["user_tel_login_incorrect_count"] >= self::USER_TM_LOGIN_MAX_INCORRECT_COUNT
+		) {
+			if (
+				isset($_SESSION["user_tel_login_incorrect_time"]) &&
 				time() - $_SESSION["user_tel_login_incorrect_time"] < self::USER_TM_LOGIN_WAIT_SEC
-			){
+			) {
 				throw new Exception("Слишком много неправильных ответов");
-				$_SESSION["user_tel_login_incorrect_time"] = time();
 			}
+
+			unset($_SESSION["user_tel_login_incorrect_count"]);
 			unset($_SESSION["user_tel_login_incorrect_time"]);
 		}
 
-		$ar_log = $this->getDbLink()->query_first(sprintf(
+		$ar_log = $this->getDbLink()->query_first(
 			"SELECT
 				l.*,
-				(l.exp_date_time < now()::timestampTZ) AS regen_expired,
-				(l.code_exp_date_time < now()::timestampTZ) AS code_expired,
-				round(EXTRACT(epoch FROM l.exp_date_time - now()::timestampTZ)) AS left_time
+				(l.exp_date_time < now()::timestamptz) AS regen_expired,
+				(l.code_exp_date_time < now()::timestamptz) AS code_expired,
+				round(EXTRACT(epoch FROM l.exp_date_time - now()::timestamptz)) AS left_time
 			FROM notifications.tm_logins AS l
-			WHERE l.tel = %s AND app_id=%d",
-			$this->getExtDbVal($pm,'tel'),
-			MS_APP_ID
-		));
-		
+			WHERE l.tel = $1 AND app_id = $2",
+			[ $this->getExtVal($pm, 'tel'), MS_APP_ID ]
+		);
+
 		$code_exists = FALSE;
 		$left_time = 0;
 
 		$link = $this->getDbLinkMaster();
 
-		if(is_array($ar_log) && count($ar_log) && $ar_log['code_expired']=='t'){
-			//есть, но умер
-			$link->query(sprintf(
-				"DELETE FROM notifications.tm_logins WHERE tel = %s AND app_id=%d",
-				$this->getExtDbVal($pm,'tel'),
-				MS_APP_ID
-			));				
-			
-		}else if(is_array($ar_log)  &&  count($ar_log) && $ar_log['regen_expired']!='t'){
-			//еще живой
+		if (is_array($ar_log) && count($ar_log) && $ar_log['code_expired'] == 't') {
+			$link->query(
+				"DELETE FROM notifications.tm_logins WHERE tel = $1 AND app_id = $2",
+				[ $this->getExtVal($pm, 'tel'), MS_APP_ID ]
+			);
+		} else if (is_array($ar_log) && count($ar_log) && $ar_log['regen_expired'] != 't') {
 			$code_exists = TRUE;
 			$left_time = intval($ar_log['left_time']);
 		}
 
-		$ar = $link->query_first(sprintf(
-			"SELECT
-				u.tm_first_name AS first_name,
-				encode(u_o.tm_photo,'base64') AS tm_photo
-			FROM notifications.ext_users_photo_list AS u
-			LEFT JOIN notifications.ext_users AS u_o ON u_o.id = u.id
-			WHERE u.app_id = %d
-				AND u.ext_contact_id=(SELECT ct.id FROM contacts AS ct WHERE ct.tel=%s LIMIT 1)"
-			,MS_APP_ID
-			,$this->getExtDbVal($pm,'tel')
-		));
+		$ar = $link->query_first(
+			"
+			WITH contact AS (
+				SELECT
+					ct.id AS contact_id
+				FROM contacts AS ct
+				WHERE ct.tel = $2
+				LIMIT 1
+			)
+			SELECT
+				COALESCE(NULLIF(mu.first_name, ''), NULLIF(eu.first_name, '')) AS first_name,
+				eu.tm_photo,
+				mu.photo_url,
+				c.contact_id
+			FROM contact AS c
+			LEFT JOIN LATERAL (
+				SELECT
+					u.username AS first_name,
+					u.avatar_url AS photo_url
+				FROM notifications.max_users AS u
+				WHERE u.contact_id = c.contact_id
+				ORDER BY u.id DESC
+				LIMIT 1
+			) AS mu ON true
+			LEFT JOIN LATERAL (
+				SELECT
+					u.tm_first_name AS first_name,
+					encode(u_o.tm_photo, 'base64') AS tm_photo
+				FROM notifications.ext_users_photo_list AS u
+				LEFT JOIN notifications.ext_users AS u_o ON u_o.id = u.id
+				WHERE u.app_id = $1
+					AND u.ext_contact_id = c.contact_id
+				ORDER BY u.id DESC
+				LIMIT 1
+			) AS eu ON true
+			",
+			[ MS_APP_ID, $tel ]
+		);
 
-		if(!is_array($ar) || !count($ar)){
-			if(!isset($_SESSION["user_tel_login_incorrect_count"])){
+		if (!is_array($ar) || !count($ar)) {
+			if (!isset($_SESSION["user_tel_login_incorrect_count"])) {
 				$_SESSION["user_tel_login_incorrect_count"] = 0;
 				$_SESSION["user_tel_login_incorrect_time"] = time();
 			}
+
 			$_SESSION["user_tel_login_incorrect_count"]++;
+
 			throw new Exception(self::ER_USER_NOT_DEFIND);
 		}
+
 		unset($_SESSION["user_tel_login_incorrect_count"]);
 		unset($_SESSION["user_tel_login_incorrect_time"]);
-		
+
+		$photoData = $ar["tm_photo"];
+		$photoCacheFile = OUTPUT_PATH.md5('max_photo_'.$ar["contact_id"]);
+
+		if (isset($ar["photo_url"]) && !isset($ar["tm_photo"]) && !file_exists($photoCacheFile)) {
+			$photoRawData = file_get_contents($ar["photo_url"]);
+
+			if ($photoRawData !== FALSE) {
+				$photoData = base64_encode($photoRawData);
+				file_put_contents($photoCacheFile, $photoData);
+				$_SESSION["tm_photo"] = $photoRawData;
+			}
+
+		} else if (isset($ar["photo_url"]) && !isset($ar["tm_photo"]) && file_exists($photoCacheFile)) {
+			$photoData = file_get_contents($photoCacheFile);
+			$_SESSION["tm_photo"] = base64_decode($photoData);
+		}
+
 		$this->addModel(new ModelVars(
-			array('id'=>'TmUserData_Model',
-				'values'=>array(
-					new Field('first_name',DT_STRING, array('value'=>$ar['first_name']))					
-					,new Field('duration_sec',DT_INT, array('value'=>self::TM_REGEN_DURATION_SEC))
-					,new Field('tel_duration_sec',DT_INT, array('value'=>self::TM_TEL_DURATION_SEC))
-					,new Field('tel',DT_STRING, array('value'=>$this->getExtVal($pm,'tel')))
-					,new Field('tm_photo',DT_STRING, array('value'=>$ar['tm_photo']))
-					,new Field('code_exists',DT_BOOL, array('value'=>$code_exists))
-					,new Field('left_time',DT_INT, array('value'=>$left_time))
+			array(
+				'id' => 'TmUserData_Model',
+				'values' => array(
+					new Field('first_name', DT_STRING, array('value' => $ar['first_name'])),
+					new Field('duration_sec', DT_INT, array('value' => self::TM_REGEN_DURATION_SEC)),
+					new Field('tel_duration_sec', DT_INT, array('value' => self::TM_TEL_DURATION_SEC)),
+					new Field('tel', DT_STRING, array('value' => $tel)),
+					new Field('tm_photo', DT_STRING, array('value' => $photoData)),
+					new Field('code_exists', DT_BOOL, array('value' => $code_exists)),
+					new Field('left_time', DT_INT, array('value' => $left_time))
 				)
 			)
-		));				
-	}
-	
+		));
+	}	
+
 	public function set_param($pm){
 		$name = $this->getExtVal($pm,'name');
 		$val = $this->getExtVal($pm,'val');

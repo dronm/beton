@@ -208,7 +208,8 @@ tr.grid_foot{
 
 .logotype{
 	margin-top: 2px;
-	height: 48px;/*16*/
+	height: 23px;/*48*/
+	width: 80px;
 }
 
 .dialogForm{
@@ -377,6 +378,7 @@ table,tr,td.noBorder{
 	position:relative;
 	left:2%;
 	width:98%  !important;
+	display: block;
 }
 
 input[type="number"] {
@@ -552,10 +554,51 @@ tfoot td{
 
 .order_make_grid{
 	margin-bottom:15px;
+	table-layout: fixed;
+	word-wrap: break-word;
 }
 
 .order_make_grid tr{
 	cursor:pointer;
+}
+#OrderMakeList\:order_make_grid\:order_make_grid\:head\:quant_rest {
+	width: 60px;
+}
+#OrderMakeList\:order_make_grid\:order_make_grid\:head\:comment_text {
+	width: 135px;
+}
+#OrderMakeList\:order_make_grid\:order_make_grid\:head\:destinations_ref {
+	width: 110px;
+}
+#OrderMakeList\:order_make_grid\:order_make_grid\:head\:concrete_types_ref {
+	width: 60px;
+}
+#OrderMakeList\:order_make_grid\:order_make_grid\:head\:descr {
+	width: 140px;
+}
+#OrderMakeList\:order_make_grid\:order_make_grid\:head\:clients_ref{
+	width: 200px;
+}
+#OrderMakeList\:order_make_grid\:order_make_grid\:head\:quant{
+	width: 60px;
+}
+#OrderMakeList\:order_make_grid\:order_make_grid\:head\:f_val{
+	width: 30px;
+}
+#OrderMakeList\:order_make_grid\:order_make_grid\:head\:w_val{
+	width: 30px;
+}
+#OrderMakeList\:order_make_grid\:order_make_grid\:head\:date_time_time{
+	width: 60px;
+}
+#OrderMakeList\:order_make_grid\:order_make_grid\:head\:total{
+	width: 80px;
+}
+#OrderMakeList\:order_make_grid\:order_make_grid\:head\:payed{
+	width: 60px;
+}
+#OrderMakeList\:order_make_grid\:order_make_grid\:head\:phone_cel{
+	width: 140px;
 }
 
 /* .order_make_grid  */
@@ -950,12 +993,27 @@ select {
 	color: #E7411B;	
 }
 #totContainer{
+	/*
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: flex-start;
 	padding: 0px;
 	margin-bottom: 5px;	
+	*/
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	align-items: flex-start;
+	gap: 4px 10px;
+	padding: 0;
+	margin-bottom: 5px;
+}
+
+#totContainer .ordListParamCont {
+	white-space: nowrap;
+	flex: 0 0 auto;
 }
 
 .tmInvite:hover{

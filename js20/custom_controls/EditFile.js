@@ -160,7 +160,7 @@ EditFile.prototype.getFileControls = function(){
  * @param {json|file|FileList} v
  */
 EditFile.prototype.setValue = function(v){	
-	debugger
+	// debugger
 	this.m_files = [];
 	this.getElement("file").getNode().value="";
 	
@@ -329,7 +329,7 @@ EditFile.prototype.addFile =  function(fileInf){
 	if (this.m_showPic && fileInf.dataBase64){		
 		var max_dim_exist = (this.m_maxWidth && this.m_maxHeight);
 		var self = this;
-		var pic_ctrl = new Control(file_id+"-preview","TEMPLATE",{
+		var pic_ctrl = new Control(file_id+"-preview","IMG",{
 			"attrs":{
 				"src":"data:image/png;base64, "+fileInf.dataBase64
 			},
@@ -485,7 +485,7 @@ EditFile.prototype.fileAdded = function(){
 			});
 		}
 		else{
-			fl.file_id = CommonHelper.uniqid();
+			fl.file_id = this.m_multipleFiles? CommonHelper.uniqid() : "1";
 			this.m_files.push(fl);
 			ctrls_to_add[fl.name] = {
 				"id":fl.file_id,

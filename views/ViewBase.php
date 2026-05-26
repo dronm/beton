@@ -600,6 +600,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/controls/GridColumn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controls/GridColumn.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controls/GridColumnBool.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controls/GridColumnBool.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controls/GridColumnPhone.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controls/GridColumnPhone.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/controls/GridColumnPicture.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controls/GridColumnPicture.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controls/GridColumnEmail.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controls/GridColumnEmail.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controls/GridColumnFloat.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controls/GridColumnFloat.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controls/GridColumnByte.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controls/GridColumnByte.js')) ));
@@ -1458,8 +1459,10 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/views/ProductionReportList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ProductionReportList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/ProductionReportDialog_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ProductionReportDialog_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/FuelConsumptionSchemaList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/FuelConsumptionSchemaList_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/views/FuelConsumptionSchemaDetailList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/FuelConsumptionSchemaDetailList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/MaxUserList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/MaxUserList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/MaxOutMessageList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/MaxOutMessageList_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/views/VehicleFuelConsumptionSchemaDetailList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/VehicleFuelConsumptionSchemaDetailList_View.js')) ));
 		
 		$this->addJsModel(new ModelJavaScript('js20/forms/ViewList_Form.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/forms/ViewList_Form.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/forms/MainMenuConstructor_Form.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/forms/MainMenuConstructor_Form.js')) ));
@@ -2214,6 +2217,9 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/models/BuhDocShipment_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/BuhDocShipment_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/OrderForBuhList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/OrderForBuhList_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/ShipmentForBuhList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ShipmentForBuhList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/VehicleFuelConsumptionSchemaDetail_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/VehicleFuelConsumptionSchemaDetail_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/controllers/VehicleFuelConsumptionSchemaDetail_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/VehicleFuelConsumptionSchemaDetail_Controller.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/VehicleFuelConsumptionSchemaDetailList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/VehicleFuelConsumptionSchemaDetailList_Model.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

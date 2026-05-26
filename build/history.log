@@ -1765,13 +1765,26 @@ MAX info in Order
 1.00414
 1) New report driver work hours
 
-1.00415
+1.00415 2026-05-06
 transp_nakl_operator_sgn
 transp_nakl_driver_sgn
 ConcreteTypeList_View +ref_1c, fill list with ref, correct 1c method.
 DriverWorkTimeReport +print +download excel file
 ProductionReport +transfers
 OrderForTranspNaklList_View async query.
+
+1.00416 2026-05-26
+1) Attachment_Controller: preview, changed all methods
+2) VehicleDialog_View
+3) User->tm_check_code(), tm_check_tel()
+//ignoreLSN parameter
+ControllerSQL->addNewModel(), ControllerSQL->addNewModelWithParams()
+ControllerDb->getReadDbLink($ignoreLSN=FALSE) ControllerDb->getDbLink($ignoreLSN=FALSE)
+ModelSQL->query($query,$toXML=TRUE,$queryParams=NULL)
+4) LoginTM_View.js redirect when logged, changed to reload()
+
+
+
 
 Order_Controller->get_make_orders_form() is too slow, 3.5s
 TODO: invite to Telegram from saved orders?
@@ -1782,16 +1795,16 @@ Still big latency (1000-3000). No latency without cloud server
 What to change in the first place:
 - Offline mode. Finish
 - Document transfer to accountant system. Finish.
-- Openstreetmap blocked message. CHECK
+X Openstreetmap blocked message. CHECK
 - all messages are coming to all clients.
 - Отобразить, если остлось Х км до базы какой-то знак
 - Передвигаемое окно звонка и не модальное
 - OSAGO, KASKO add files to documents
 
-+ Connector. Remember, send LSN. Server must send lsn after every post (insert, update...) login
+X Connector. Remember, send LSN. Server must send lsn after every post (insert, update...) login
 	must take into considiration the lsn position when accepting a get request.
-+ Set SrvConnector LSN from web socket.
-+ Connector. Retry logic.
+X Set SrvConnector LSN from web socket.
+X Connector. Retry logic.
 
 
 ЧТо НАДО

@@ -28,7 +28,7 @@ function FuelConsumptionSchemaList_View(id,options){
 		"editInline":true,
 		"editWinClass":null,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
-			"cmdInsert":false,
+			"cmdInsert":true,
 			"cmdEdit":true,
 			"cmdDelete":true,
 			"exportFileName" :"СхемыРасходаГСМ",
@@ -49,7 +49,7 @@ function FuelConsumptionSchemaList_View(id,options){
 									"detailViewClass":FuelConsumptionSchemaDetailList_View,
 									"detailViewOptions":{
 										"detailFilters":{
-											"ConcreteCostList_Model":[
+											"FuelConsumptionSchemaDetailList_Model":[
 												{
 												"masterFieldId":"id",
 												"field":"fuel_consumption_schema_id",

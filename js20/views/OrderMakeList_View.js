@@ -5,10 +5,12 @@ function OrderMakeList_View(id,options){
 
 	this.m_lowResDevice = (window.getWidthType()=="sm");
 	options.templateOptions = options.templateOptions || {};	
-	options.templateOptions.showChart = !this.m_lowResDevice;
+	options.templateOptions.showChart = true;//!this.m_lowResDevice;
+	options.templateOptions.lowResDevice = this.m_lowResDevice;
+	options.templateOptions.notLowResDevice = !this.m_lowResDevice;
 	options.templateOptions.showGridHeaders = !this.m_lowResDevice;
 	
-	this.m_showProductionSites = !this.m_lowResDevice;
+	this.m_showProductionSites = true;//!this.m_lowResDevice;
 	options.templateOptions.showProductionSites = this.m_showProductionSites;
 	
 //alert("getWidthType="+window.getWidthType())	
@@ -68,7 +70,8 @@ function OrderMakeList_View(id,options){
 	options.addElement = function(){
 
 		//plant load control
-		if(!this.m_lowResDevice){
+		// if(!this.m_lowResDevice){
+		if(options.templateOptions.showChart){
 			this.addElement(new PlantLoadGraphControl(id+":plant_load_graph",{
 				"model":options.models.Graph_Model
 			}));

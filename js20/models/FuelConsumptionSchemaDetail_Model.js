@@ -66,7 +66,8 @@ function FuelConsumptionSchemaDetail_Model(options){
 	filed_options.alias = 'Расход на 100 км';
 	filed_options.autoInc = false;	
 	
-	options.fields.quant_distance = new FieldInt("quant_distance",filed_options);
+	options.fields.quant_distance = new FieldFloat("quant_distance",filed_options);
+	options.fields.quant_distance.getValidator().setMaxLength('15');
 	
 				
 	
@@ -75,7 +76,8 @@ function FuelConsumptionSchemaDetail_Model(options){
 	filed_options.alias = 'Расход на 1 час';
 	filed_options.autoInc = false;	
 	
-	options.fields.quant_time = new FieldInt("quant_time",filed_options);
+	options.fields.quant_time = new FieldFloat("quant_time",filed_options);
+	options.fields.quant_time.getValidator().setMaxLength('15');
 	
 			
 		FuelConsumptionSchemaDetail_Model.superclass.constructor.call(this,id,options);

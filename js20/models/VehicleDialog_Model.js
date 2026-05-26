@@ -301,6 +301,15 @@ function VehicleDialog_Model(options){
 	
 	options.fields.fuel_consumption_schema_ref = new FieldJSON("fuel_consumption_schema_ref",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.attachments_list = new FieldJSON("attachments_list",filed_options);
+	
 			
 		VehicleDialog_Model.superclass.constructor.call(this,id,options);
 }

@@ -4,7 +4,7 @@
 	(id,c,f,t,section,descr,limited)
 	VALUES (
 	'10058',
-	'FuelConsumptionSchema',
+	'FuelConsumptionSchema_Controller',
 	'get_list',
 	'FuelConsumptionSchemaList',
 	'Справочники',

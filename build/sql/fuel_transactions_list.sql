@@ -18,3 +18,4 @@ CREATE OR REPLACE VIEW fuel_transactions_list AS
 	ORDER BY t.id desc
 	;
 
+

@@ -4,11 +4,12 @@
 function VehicleMileageList_View(id,options){	
 
 	options = options || {};
-	options.HEAD_TITLE = "Пробег транспортного средства";
+	options.HEAD_TITLE = options.detail? undefined : "Пробег транспортного средства";
 
 	VehicleMileageList_View.superclass.constructor.call(this,id,options);
 	
-	var model = (options.models && options.models.VehicleMileageList_Model)? options.models.VehicleMileageList_Model : new VehicleMileageList_Model();
+	var model = (options.models && options.models.VehicleMileageList_Model)? 
+		options.models.VehicleMileageList_Model : new VehicleMileageList_Model();
 	var contr = new VehicleMileage_Controller();
 	
 	var constants = {"grid_refresh_interval":null};
@@ -16,7 +17,7 @@ function VehicleMileageList_View(id,options){
 
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
-	var self = this;
+
 	this.addElement(new GridAjx(id+":grid",{
 		"model":model,
 		"controller":contr,

@@ -14,6 +14,8 @@ DECLARE
 BEGIN	
 	IF TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') THEN
 	
+		/*
+		//removed on 2026-05-25
 		IF NEW.date_time::date >= '2024-05-07' THEN
 			--only if it is not fully shipped!
 			SELECT coalesce(SUM(quant), 0) <> NEW.quant INTO v_f FROM shipments WHERE order_id = NEW.id;
@@ -39,6 +41,7 @@ BEGIN
 				END IF;
 			END IF;	
 		END IF;
+		*/
 	
 		IF TG_OP = 'INSERT' OR (TG_OP='UPDATE'
 			AND NEW.phone_cel<>''
@@ -69,6 +72,8 @@ BEGIN
 		RETURN NEW;
 		
 	ELSIF TG_WHEN='AFTER' AND TG_OP='DELETE' THEN
+		/*
+		//removed on 2026-05-25
 		IF OLD.date_time::date >= '2024-05-07' THEN
 			IF current_database() = 'bereg' AND OLD.client_id = (const_konkrid_client_val()->'keys'->>'id')::int THEN
 				INSERT INTO konkrid.replicate_events
@@ -88,13 +93,11 @@ BEGIN
 			
 			END IF;
 		END IF;	
+		*/
 	
 		RETURN OLD;
 	END IF;	
 	
 END;
 $BODY$;
-
-ALTER FUNCTION public.order_after_process()
-    OWNER TO ;
 
