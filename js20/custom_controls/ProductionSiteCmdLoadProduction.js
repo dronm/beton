@@ -52,8 +52,9 @@ ProductionSiteCmdLoadProduction.prototype.setGrid = function(v){
 
 ProductionSiteCmdLoadProduction.prototype.downloadProduction = function(){
 	this.m_grid.setModelToCurrentRow();
-	var f = this.m_grid.getModel().getFields();
-	var id = f.id.getValue();
+	const f = this.m_grid.getModel().getFields();
+	const productionSiteId = f.id.getValue();
+	const active = f.active.getValue();
 
 	var self = this;
 	this.m_view = new View("dialog:cont",{
@@ -73,16 +74,15 @@ ProductionSiteCmdLoadProduction.prototype.downloadProduction = function(){
 		"onClickCancel":function(){
 			self.closeSelect();
 		},
-		"onClickOk":(function(productionSiteId){
+		"onClickOk":(function(productionSiteId, newApp){
 			return function(){	
-				var pr = self.m_view.getElement("production_id").getValue();
-				if(!pr){
+				const productionId = self.m_view.getElement("production_id").getValue();
+				if(!productionId){
 					throw Error("Не задан номер производства!");
 				}
-				self.closeSelect(productionSiteId,pr);
+				self.closeSelect(productionSiteId, productionId, newApp);
 			}
-		})(id)
-		
+		})(productionSiteId, (active===false))
 	});
 	
 	this.m_form.open();
@@ -90,7 +90,7 @@ ProductionSiteCmdLoadProduction.prototype.downloadProduction = function(){
 	
 }
 
-ProductionSiteCmdLoadProduction.prototype.closeSelect = function(productionSiteId,productionId){
+ProductionSiteCmdLoadProduction.prototype.closeSelect = function(productionSiteId, productionId, newApp){
 	if(this.m_view){
 		this.m_view.delDOM()	
 		delete this.m_view;
@@ -100,9 +100,34 @@ ProductionSiteCmdLoadProduction.prototype.closeSelect = function(productionSiteI
 		delete this.m_form;
 	}	
 	
-	if(productionSiteId&&productionId){
-		var pm = (new Production_Controller()).getPublicMethod("check_production");
-		var self = this;
+	if(!productionSiteId || !productionId){
+		return;
+	}
+
+	if(newApp === true){
+		const app = window.getApp();
+		if(!app){
+			throw new Error("app object not defined");
+		}
+		const srv = app.getAppSrv();
+		if(!srv){
+			throw new Error("Сервер событий не определен");
+		}
+		if(!srv.connActive()){
+			throw new Error("Соединение с сервером не активно");
+		}
+
+		const cmd = {
+
+		};
+		srv.m_connection.send(
+			JSON.stringify(cmd)
+		);
+		window.showTempNote("Отправлена команда на загрузку производства: "+productionId, null, 5000);
+
+	}else{
+		//for new client app just need to send web socket query
+		const pm = (new Production_Controller()).getPublicMethod("check_production");
 		
 		pm.setFieldValue("production_site_id",productionSiteId);
 		pm.setFieldValue("production_id",productionId);
@@ -118,3 +143,13 @@ ProductionSiteCmdLoadProduction.prototype.closeSelect = function(productionSiteI
 	}
 }
 
+const normalizePath = (path) => {
+	return path.startsWith("/") ? path : `/${path}`;
+};
+
+const buildHttpUrl = (config, path) => {
+	return `${config.httpScheme}://${config.address}${normalizePath(path)}`;
+};
+
+ProductionSiteCmdLoadProduction.prototype.sendCommandToElkonApp = async function(cmd, queryId, body){
+}

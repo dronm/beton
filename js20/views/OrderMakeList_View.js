@@ -156,8 +156,16 @@ function OrderMakeList_View(id,options){
 		}));
 		
 		//vehicles
-		this.addElement(new VehicleScheduleMakeOrderGrid(id+":veh_schedule_grid",{"model":options.models.VehicleScheduleMakeOrderList_Model}));
+		this.addElement(new VehicleScheduleMakeOrderGrid(id+":veh_schedule_grid",{
+			"model":options.models.VehicleScheduleMakeOrderList_Model
+		}));
 		
+		//special vehicles
+		/*
+		this.addElement(new SpecialVehicleMakeOrderGrid(id+":veh_special_grid",{
+			"model":options.models.VehicleScheduleMakeOrderList_Model
+		}));*/
+
 		//features_grid		
 		var model = options.models.VehFeaturesOnDateList_Model;	
 		this.addElement(new Grid(id+":features_grid",{

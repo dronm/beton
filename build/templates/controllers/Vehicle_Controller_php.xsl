@@ -23,8 +23,11 @@ require_once(FRAME_WORK_PATH.'basic_classes/CondParamsSQL.php');
 require_once('common/SMSService.php');
 
 require_once(FUNC_PATH.'VehicleRoute.php');
+require_once(ABSOLUTE_PATH.'functions/Beton.php');
 
 class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
+
+	const ER_PERIOD_NOT_ALLOWED = 'Запрещено просматривать период!';
 
 	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
 		parent::__construct($dbLinkMaster, $dbLink);<xsl:apply-templates/>
@@ -459,6 +462,139 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			$cond->getValForDb('date','ge',DT_DATETIME)
 			),
 			'ModelVars'
+		);	
+	}
+
+	public function run_tracker_command($pm) {
+		$cmd = (string)$this->getExtVal($pm, 'cmd');
+		$tracker_id = (string)$this->getExtVal($pm, 'tracker_id');
+
+		$allowed_commands = [
+			'imeiStatus' => true,
+			'transmitCoords' => true,
+			'updateSoftware' => true,
+			'updateSoftwareForce' => true,
+			'reset' => true,
+			'downloadSettingsFromWebConf' => true,
+			'sendSettingsToWebConf' => true
+		];
+
+		if (!isset($allowed_commands[$cmd])) {
+			throw new Exception(sprintf("command %s not defined", $cmd));
+		}
+
+		if ($tracker_id === '' || !preg_match('/^[A-Za-z0-9._:-]{1,64}$/', $tracker_id)) {
+			throw new Exception("invalid tracker ID");
+		}
+
+		$servers = array_filter(array_map('trim', explode(',', TEL_SERVERS)));
+
+		if (count($servers) === 0) {
+			throw new Exception("no tracker servers configured");
+		}
+
+		$last_error = null;
+
+		foreach ($servers as $srv) {
+			$result = $this->execute_tracker_shell_command($srv, $cmd, $tracker_id);
+
+			if ($result['exec_error'] !== '') {
+				$last_error = [
+					'server' => $srv,
+					'err' => $result['exec_error'],
+					'exit_code' => $result['exit_code'],
+					'raw' => $result['raw'],
+				];
+
+				continue;
+			}
+
+			$raw = trim($result['raw']);
+
+			if ($raw === '') {
+				$last_error = [
+					'server' => $srv,
+					'err' => 'Empty response from command',
+					'exit_code' => $result['exit_code'],
+				];
+
+				continue;
+			}
+
+			$json = json_decode($raw, true);
+
+			if (json_last_error() === JSON_ERROR_NONE &amp;&amp; is_array($json)) {
+				$err = isset($json['err']) ? (string)$json['err'] : '';
+
+				if ($err !== '' &amp;&amp; stripos($err, 'not connected') !== false) {
+					$last_error = [
+						'server' => $srv,
+						'err' => $err,
+					];
+
+					continue;
+				}
+
+				header('Content-Type: application/json; charset=utf-8');
+				echo $raw;
+
+				return;
+			}
+
+			if ($raw === 'OK') {
+				echo "OK";
+				return;
+			}
+
+			$last_error = [
+				'server' => $srv,
+				'err' => 'Invalid response from command',
+				'raw' => $raw,
+			];
+		}
+
+		throw new Exception('Tracker is not connected to any configured server or command failed');
+	}
+
+	private function execute_tracker_shell_command($srv, $cmd, $tracker_id) {
+		$shell_cmd = escapeshellcmd(TEL_SERVER_SCRIPT)
+			. ' ' . escapeshellarg($srv)
+			. ' ' . escapeshellarg(TEL_SERVER_KEY)
+			. ' ' . escapeshellarg($cmd)
+			. ' ' . escapeshellarg($tracker_id)
+			. ' 2&gt;&amp;1';
+
+		$output = [];
+		$exit_code = 0;
+
+		exec($shell_cmd, $output, $exit_code);
+
+		$raw = trim(implode("\n", $output));
+
+		return [
+			'raw' => $raw,
+			'exit_code' => $exit_code,
+			'exec_error' => $exit_code === 0 ? '' : 'Command failed',
+		];
+	}
+
+	public function get_special_vehicles_list($pm){
+		$dt = (!$pm->getParamValue('date'))? time() : ($this->getExtVal($pm,'date')+Beton::shiftStartTime());
+		$date_from = Beton::shiftStart($dt);
+		$date_to = Beton::shiftEnd($date_from);
+		
+		//06/10/21 check restrictions
+		if(!Beton::viewRestricted($date_from, $date_to)){
+			throw new Exception(self::ER_PERIOD_NOT_ALLOWED);
+		}
+
+		$this->addNewModel(sprintf(
+			"SELECT * 
+			FROM special_vehicles_list",
+			date('Y-m-d H:i:s',$date_from),
+			date('Y-m-d H:i:s',$date_to)
+			),
+			'SpecialVehicleList_Model'
 		);	
 	}
 }

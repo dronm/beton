@@ -70,10 +70,11 @@ function ProductionSiteForEditList_View(id,options){
 							"sort":"asc"							
 						})
 						,new GridCellHead(id+":grid:head:active",{
-							"value":"Активен",
+							"value":"ПО не установлено",
 							"columns":[
 								new GridColumnBool({
-									"field":model.getField("active")
+									"field":model.getField("active"),
+									"showFalse": false
 								})
 							]
 						})

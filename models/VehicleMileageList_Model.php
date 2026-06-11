@@ -8,6 +8,7 @@
 
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
@@ -59,6 +60,16 @@ class VehicleMileageList_Model extends ModelSQLBeton{
 						
 		$f_mileage=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"mileage",$f_opts);
 		$this->addField($f_mileage);
+		//********************
+		
+		//*** Field timing ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Время работы';
+		$f_opts['id']="timing";
+						
+		$f_timing=new FieldSQLTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"timing",$f_opts);
+		$this->addField($f_timing);
 		//********************
 		
 		//*** Field users_ref ***

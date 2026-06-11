@@ -2,19 +2,21 @@
 
 -- DROP FUNCTION public.vehicle_mileage(in_vehicle_tracker varchar(15), in_date_from timestampTZ, in_date_to timestampTZ);
 
+-- returns mileage in km for a given vehicle tracker and period
+
 CREATE OR REPLACE FUNCTION public.vehicle_mileage(in_vehicle_tracker varchar(15), in_date_from timestampTZ, in_date_to timestampTZ)
   RETURNS numeric AS
 $BODY$
 	WITH sorted_data AS (
 	    SELECT
-		car_id,
-		period,
-		ST_SetSRID(ST_MakePoint(lon, lat), 4326) AS geom,
-		LEAD( ST_SetSRID(ST_MakePoint(lon, lat), 4326) ) OVER (
-		    PARTITION BY car_id ORDER BY period
-		) AS next_geom
+			car_id,
+			period,
+			ST_SetSRID(ST_MakePoint(lon, lat), 4326) AS geom,
+			LEAD( ST_SetSRID(ST_MakePoint(lon, lat), 4326) ) OVER (
+				PARTITION BY car_id ORDER BY period
+			) AS next_geom
 	    FROM
-		public.car_tracking
+			public.car_tracking
 	    WHERE
 	    	car_id = in_vehicle_tracker
 	    	AND gps_valid = 1
@@ -23,13 +25,13 @@ $BODY$
 	),
 	distances AS (
 	    SELECT
-		car_id,
-		period,
-		ST_Distance(geom::geography, next_geom::geography) AS mileage
+			car_id,
+			period,
+			ST_Distance(geom::geography, next_geom::geography) AS mileage
 	    FROM
-		sorted_data
+			sorted_data
 	    WHERE
-		next_geom IS NOT NULL
+			next_geom IS NOT NULL
 	)
 	SELECT
 	    SUM(mileage) / 1000 AS mileage_km -- Convert meters to kilometers

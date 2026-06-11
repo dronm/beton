@@ -45,6 +45,8 @@ function Vehicle_Controller(options){
 	this.add_get_stops_at_dest();
 	this.add_get_total_shipped();
 	this.add_vehicle_list_report();
+	this.add_get_special_vehicles_list();
+	this.add_run_tracker_command();
 		
 }
 extend(Vehicle_Controller,ControllerObjServer);
@@ -524,6 +526,9 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldJSON("fuel_consumption_schema_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("attachments_list",f_opts));
 }
 
 			Vehicle_Controller.prototype.addGetObject = function(){
@@ -841,6 +846,48 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldString("templ",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Vehicle_Controller.prototype.add_get_special_vehicles_list = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_special_vehicles_list',opts);
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldDate("date",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Vehicle_Controller.prototype.add_run_tracker_command = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('run_tracker_command',opts);
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		options.maxlength = "50";
+	
+		pm.addField(new FieldString("cmd",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		options.maxlength = "15";
+	
+		pm.addField(new FieldString("tracker_id",options));
 	
 			
 	this.addPublicMethod(pm);

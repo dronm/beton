@@ -567,6 +567,7 @@
 <li><a href="#VehicleFuelConsumptionSchemaDetailList_Model">VehicleFuelConsumptionSchemaDetailList_Model</a></li>
 <li><a href="#FuelConsumption_Model">FuelConsumption_Model</a></li>
 <li><a href="#BuhNakl_Model">BuhNakl_Model</a></li>
+<li><a href="#SpecialVehicleList_Model">SpecialVehicleList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -5264,6 +5265,37 @@
 <p>Type:String</p>
 <p>Required:
 								Нет</p>
+</div>
+</div>
+<h2>get_special_vehicles_list</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>date</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Date</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
+<h2>run_tracker_command</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>cmd</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Да</p>
+<p>Length:50</p>
+</div>
+<h3>tracker_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Да</p>
+<p>Length:15</p>
 </div>
 </div>
 </div>
@@ -23562,6 +23594,72 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="SpecialVehicleList_Model" class="content_box">
+<h1>SpecialVehicleList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>vehicles_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>tracker_id</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>make</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>tracker_no_signal</h2>
+<div>Type:Bool</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mileage</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>timing</h2>
+<div>Type:Time</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>fuel_flow_start</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>fuel_flow_in</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>fuel_flow_out</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>fuel_flow_end</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="SpecialistRequest_Model" class="content_box">
 <h1>SpecialistRequest_Model</h1>
 <div class="content_item">
@@ -26164,6 +26262,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>timing</h2>
+<div>Type:Time</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>user_id</h2>
 <div>Type:Int</div>
 <div>Primary key:</div>
@@ -26196,6 +26300,12 @@
 <div>Precision:</div>
 <h2>mileage</h2>
 <div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>timing</h2>
+<div>Type:Time</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

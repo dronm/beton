@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-05-26 06:36:13</lastBuild></version>
+		<lastBuild>2026-06-11 05:50:22</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -322,6 +322,7 @@
 		<version dateOpen="2026-04-24 11:33:08" dateClose="2026-04-24 14:52:00">1.00414</version>
 		<version dateOpen="2026-04-27 09:13:07" dateClose="2026-05-05 18:01:31">1.00415</version>
 		<version dateOpen="2026-05-06 08:06:48" dateClose="2026-05-26 06:36:39">1.00416</version>
+		<version dateOpen="2026-05-27 11:50:27" dateClose="2026-06-11 05:50:47">1.00417</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1186,6 +1187,7 @@
 			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id" required="TRUE" alias="ТС"/>
 			<field id="for_date" dataType="DateTimeTZ" alias="Дата"/>
 			<field id="mileage" dataType="Int" alias="Пробег"/>
+			<field id="timing" dataType="Time" alias="Время работы"/>
 			<field id="user_id" dataType="Int" refTable="users" refField="id" dbRequired="TRUE" alias="Who set value"/>
 			<index id="vehicle_mileages_idx" unique="TRUE">
 				<field id="vehicle_id"/>
@@ -1197,6 +1199,7 @@
 			<field id="vehicle_id" dataType="Int" alias="ТС"/>
 			<field id="for_date" dataType="DateTimeTZ" alias="Дата"/>
 			<field id="mileage" dataType="Int" alias="Пробег"/>
+			<field id="timing" dataType="Time" alias="Время работы"/>
 			<field id="users_ref" dataType="JSON" alias="Who set value"/>
 		</model>
 		<model id="Driver" parent="ModelSQLBeton" dataTable="drivers" virtual="FALSE">
@@ -5797,6 +5800,18 @@
 			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id" required="TRUE"/>
 			<field id="quant" dataType="Int" alias="Количество" required="TRUE"/>
 		</model>
+		<model id="SpecialVehicleList" parent="ModelSQLDOC" dataTable="special_vehicles_list" virtual="TRUE">
+			<field id="vehicles_ref" dataType="JSON" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="tracker_id" dataType="String"/>
+			<field id="make" dataType="String"/>
+			<field id="tracker_no_signal" dataType="Bool"/>
+			<field id="mileage" dataType="Float"/>
+			<field id="timing" dataType="Time"/>
+			<field id="fuel_flow_start" dataType="Int"/>
+			<field id="fuel_flow_in" dataType="Int"/>
+			<field id="fuel_flow_out" dataType="Int"/>
+			<field id="fuel_flow_end" dataType="Int"/>
+		</model>
 	</models>
 	<constants>
 		<constant id="doc_per_page_count" name="Количество документов на странице" descr="Количество документов на странице в журнале документов" dataType="Int" defaultValue="60" autoload="TRUE"/>
@@ -6003,6 +6018,13 @@
 			<publicMethod id="get_total_shipped"/>
 			<publicMethod id="vehicle_list_report" condFields="TRUE">
 				<field id="templ" dataType="String"/>
+			</publicMethod>
+			<publicMethod id="get_special_vehicles_list">
+				<field id="date" dataType="Date"/>
+			</publicMethod>
+			<publicMethod id="run_tracker_command">
+				<field id="cmd" dataType="String" length="50" required="TRUE"/>
+				<field id="tracker_id" dataType="String" length="15" required="TRUE"/>
 			</publicMethod>
 		</controller>
 		<controller id="VehicleMileage" parentId="ControllerSQL" state="TRUE" noState="FALSE">
@@ -8084,6 +8106,7 @@
 		<permission type="allow" controllerId="RawMaterial" methodId="get_material_actions_list" roleId="weighing"/>
 		<permission type="allow" controllerId="UserChat" methodId="all" roleId="weighing"/>
 		<permission type="allow" controllerId="DOCMaterialProcurement" methodId="get_list" roleId="weighing"/>
+		<permission type="allow" controllerId="ConnectElkonCheck" methodId="connected" roleId="weighing"/>
 	</permissions>
 	<views>
 		<view id="10000" c="User_Controller" t="UserList" f="get_list" section="Справочники" descr="Пользователи"/>
@@ -9206,6 +9229,7 @@
 		<jsScript file="js20/custom_controls/MatCorrectGrid.js"/>
 		<jsScript file="js20/custom_controls/TelListGrid.js"/>
 		<jsScript file="js20/custom_controls/VehicleScheduleMakeOrderGrid.js"/>
+		<jsScript file="js20/custom_controls/SpecialVehicleMakeOrderGrid.js"/>
 		<jsScript file="js20/custom_controls/MaterialMakeOrderGrid.js"/>
 		<jsScript file="js20/custom_controls/OwnerListGrid.js"/>
 		<jsScript file="js20/custom_controls/InsuranceListGrid.js"/>
@@ -9268,6 +9292,7 @@
 		<jsScript file="js20/custom_controls/MAXInviteBtn.js"/>
 		<jsScript file="js20/custom_controls/DriverWorkTimeReport_View.js"/>
 		<jsScript file="js20/custom_controls/BuhDocItemGrid.js"/>
+		<jsScript file="js20/custom_controls/TrackerManager.js"/>
 		<jsScript file="js20/views/rs_ru.js"/>
 		<jsScript file="js20/views/rs_common_ru.js"/>
 		<!--openLayers-->

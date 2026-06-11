@@ -29,8 +29,11 @@ require_once(FRAME_WORK_PATH.'basic_classes/CondParamsSQL.php');
 require_once('common/SMSService.php');
 
 require_once(FUNC_PATH.'VehicleRoute.php');
+require_once(ABSOLUTE_PATH.'functions/Beton.php');
 
 class Vehicle_Controller extends ControllerSQL{
+
+	const ER_PERIOD_NOT_ALLOWED = 'Запрещено просматривать период!';
 
 	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
 		parent::__construct($dbLinkMaster, $dbLink);
@@ -740,6 +743,37 @@ class Vehicle_Controller extends ControllerSQL{
 			
 		$this->addPublicMethod($pm);
 
+			
+		$pm = new PublicMethod('get_special_vehicles_list');
+		
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtDate('date',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('run_tracker_command');
+		
+				
+	$opts=array();
+	
+		$opts['length']=50;
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtString('cmd',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=15;
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtString('tracker_id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
 		
 	}
 	
@@ -1172,6 +1206,109 @@ class Vehicle_Controller extends ControllerSQL{
 			$cond->getValForDb('date','ge',DT_DATETIME)
 			),
 			'ModelVars'
+		);	
+	}
+
+	public function run_tracker_command($pm) {
+		$cmd = (string)$this->getExtVal($pm, 'cmd');
+		$tracker_id = (string)$this->getExtVal($pm, 'tracker_id');
+
+		$allowed_commands = [
+			'imeiStatus' => true,
+			'transmitCoords' => true,
+			'updateSoftware' => true,
+			'updateSoftwareForce' => true,
+			'reset' => true,
+			'downloadSettingsFromWebConf' => true,
+			'sendSettingsToWebConf' => true
+		];
+
+		if (!isset($allowed_commands[$cmd])) {
+			throw new Exception(sprintf("command %s not defined", $cmd));
+		}
+
+		if ($tracker_id === '' || !preg_match('/^[A-Za-z0-9._:-]{1,64}$/', $tracker_id)) {
+			throw new Exception("invalid tracker ID");
+		}
+
+		$servers = array_filter(array_map('trim', explode(',', TEL_SERVERS)));
+
+		if (count($servers) === 0) {
+			throw new Exception("no tracker servers configured");
+		}
+
+		foreach ($servers as $srv) {
+			$result = $this->execute_tracker_shell_command($srv, $cmd, $tracker_id);
+
+			if ($result['exec_error'] !== '') {
+				throw new Exception($result['exec_error']);
+			}
+
+			$raw = trim($result['raw']);
+
+			if ($raw === '') {
+				continue;
+			}
+			if(stripos($raw, 'not connected') !== false){
+				continue;
+			}
+
+			/* header('Content-Type: text/plain'); */
+			/* echo trim($raw); */
+
+			$this->addModel(new ModelVars(
+				array('id'=>'TelSrv',
+					'values'=>array(
+						new Field('resp',DT_STRING,
+							array('value'=>$raw))
+						)
+					)
+				)
+			);
+			return;
+		}
+
+		throw new Exception('Tracker is not connected to any configured server or command failed');
+	}
+
+	private function execute_tracker_shell_command($srv, $cmd, $tracker_id) {
+		$shell_cmd = escapeshellcmd(TEL_SERVER_SCRIPT)
+			. ' ' . escapeshellarg($srv)
+			. ' ' . escapeshellarg(TEL_SERVER_KEY)
+			. ' ' . escapeshellarg($cmd)
+			. ' ' . escapeshellarg($tracker_id)
+			. ' 2>&1';
+		$output = [];
+		$exit_code = 0;
+
+		exec($shell_cmd, $output, $exit_code);
+
+		$raw = trim(implode("\n", $output));
+
+		return [
+			'raw' => $raw,
+			'exit_code' => $exit_code,
+			'exec_error' => $exit_code === 0 ? '' : 'Command failed',
+		];
+	}
+
+	public function get_special_vehicles_list($pm){
+		$dt = (!$pm->getParamValue('date'))? time() : ($this->getExtVal($pm,'date')+Beton::shiftStartTime());
+		$date_from = Beton::shiftStart($dt);
+		$date_to = Beton::shiftEnd($date_from);
+		
+		//06/10/21 check restrictions
+		if(!Beton::viewRestricted($date_from, $date_to)){
+			throw new Exception(self::ER_PERIOD_NOT_ALLOWED);
+		}
+
+		$this->addNewModel(sprintf(
+			"SELECT * 
+			FROM special_vehicles_list",
+			date('Y-m-d H:i:s',$date_from),
+			date('Y-m-d H:i:s',$date_to)
+			),
+			'SpecialVehicleList_Model'
 		);	
 	}
 }

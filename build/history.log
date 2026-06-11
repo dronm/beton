@@ -1784,6 +1784,11 @@ ModelSQL->query($query,$toXML=TRUE,$queryParams=NULL)
 4) LoginTM_View.js redirect when logged, changed to reload()
 
 
+1.00417 2026-06-11
+1) weighing/lab worker interfaces, make grid column sizes.
+2) error when not logged
+3) Login name/password page.
+
 
 
 Order_Controller->get_make_orders_form() is too slow, 3.5s

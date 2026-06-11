@@ -62,6 +62,15 @@ function VehicleMileageList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Время работы';
+	filed_options.autoInc = false;	
+	
+	options.fields.timing = new FieldTime("timing",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Who set value';
 	filed_options.autoInc = false;	
 	

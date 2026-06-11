@@ -1604,6 +1604,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/MatCorrectGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/MatCorrectGrid.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/TelListGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/TelListGrid.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/VehicleScheduleMakeOrderGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/VehicleScheduleMakeOrderGrid.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/SpecialVehicleMakeOrderGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/SpecialVehicleMakeOrderGrid.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/MaterialMakeOrderGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/MaterialMakeOrderGrid.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/OwnerListGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/OwnerListGrid.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/InsuranceListGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/InsuranceListGrid.js')) ));
@@ -1666,6 +1667,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/MAXInviteBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/MAXInviteBtn.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/DriverWorkTimeReport_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/DriverWorkTimeReport_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/BuhDocItemGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/BuhDocItemGrid.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/TrackerManager.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/TrackerManager.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/rs_ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/rs_ru.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/rs_common_ru.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/rs_common_ru.js')) ));
 		

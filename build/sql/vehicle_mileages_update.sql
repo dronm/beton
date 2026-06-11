@@ -51,12 +51,17 @@ BEGIN
             );
 
             -- Insert the new mileage record into the table
-            INSERT INTO vehicle_mileages (vehicle_id, for_date, user_id, mileage)
+            INSERT INTO vehicle_mileages (vehicle_id, for_date, user_id, mileage, timing)
             VALUES (
                 vehicle.vehicle_id,
                 end_time,
                 new_user_id,
-                vehicle.mileage + new_mileage
+				vehicle.mileage + new_mileage,
+				vehicle_timing(
+					vehicle.vehicle_id,
+					get_shift_start(end_time),
+					end_time
+				)
             );
 
             -- Update the vehicle's mileage and increment the start time

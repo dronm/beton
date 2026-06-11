@@ -120,6 +120,10 @@ $permissions = array();
 				
 					$permissions['Vehicle_Controller_vehicle_list_report']=TRUE;
 				
+					$permissions['Vehicle_Controller_get_special_vehicles_list']=TRUE;
+				
+					$permissions['Vehicle_Controller_run_tracker_command']=TRUE;
+				
 					$permissions['VehicleMileage_Controller_insert']=TRUE;
 				
 					$permissions['VehicleMileage_Controller_update']=TRUE;

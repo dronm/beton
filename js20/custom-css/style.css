@@ -378,7 +378,7 @@ table,tr,td.noBorder{
 	position:relative;
 	left:2%;
 	width:98%  !important;
-	display: block;
+	/* display: block; */
 }
 
 input[type="number"] {
@@ -1608,4 +1608,101 @@ tr.deleted_row {
 	background: #16a34a;
 	border-radius: 999px;
 	transition: width 0.3s ease;
+}
+
+/* for weighing */
+#OrderMakeForWeighingList\:order_make_grid th, td {
+	border: solid #000;
+	border-width: 1px 1px;
+	line-height:1em;
+	margin: 0;
+	padding:0.2em;
+	border-spacing: 0;
+}
+
+#OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:quant_rest {
+	width: 60px;
+}
+#OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:comment_text {
+	width: 150px;
+}
+#OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:destinations_ref {
+	width: 140px;
+}
+#OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:concrete_types_ref {
+	width: 60px;
+}
+#OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:descr {
+	width: 180px;
+}
+#OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:clients_ref{
+	width: 230px;
+}
+#OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:quant{
+	width: 60px;
+}
+#OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:f_val{
+	width: 30px;
+}
+#OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:w_val{
+	width: 30px;
+}
+#OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:date_time_time{
+	width: 60px;
+}
+#OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:phone_cel{
+	width: 140px;
+}
+#OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:unload_type{
+	width: 220px;
+}
+
+/* for lab */
+#OrderMakeForLabList\:order_make_grid th, td {
+	border: solid #000;
+	border-width: 1px 1px;
+	line-height:1em;
+	margin: 0;
+	padding:0.2em;
+	border-spacing: 0;
+}
+
+#OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:quant_rest {
+	width: 60px;
+}
+#OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:comment_text {
+	width: 130px;
+}
+#OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:destinations_ref {
+	width: 120px;
+}
+#OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:concrete_types_ref {
+	width: 60px;
+}
+#OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:descr {
+	width: 180px;
+}
+#OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:clients_ref{
+	width: 230px;
+}
+#OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:quant{
+	width: 60px;
+}
+#OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:f_val{
+	width: 30px;
+}
+#OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:w_val{
+	width: 30px;
+}
+#OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:date_time_time{
+	width: 60px;
+}
+#OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:phone_cel{
+	width: 140px;
+}
+#OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:unload_type{
+	width: 180px;
+}
+#OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:is_needed{
+	width: 80px;
 }

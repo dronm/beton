@@ -118,6 +118,8 @@ $permissions = array();
 			
 			$permissions['DOCMaterialProcurement_Controller_get_list']=TRUE;
 		
+			$permissions['ConnectElkonCheck_Controller_connected']=TRUE;
+		
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }
 ?>

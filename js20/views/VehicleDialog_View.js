@@ -149,6 +149,11 @@ function VehicleDialog_View(id,options){
 	this.addElement(new VehicleMileageList_View(id+":mileage_list",{
 		"detail":true
 	}));		
+	this.addElement(new TrackerManager(id+":tracker_manager",{
+		"getTrackerId": function(){
+			return self.m_model.getFieldValue("tracker_id");
+		}
+	}));		
 	/*
 	this.addElement(new RAFuelFlowList_View(id+":ra_fuel_flow_list",{
 		"detail":true
