@@ -1512,12 +1512,12 @@ AppBeton.prototype.probeServerHealth = function() {
 
 // elkon app functions
 AppBeton.prototype.normalizePath = (path) => {
-	return path.startsWith("/") ? path : `/${path}`;
+	return path.startsWith("/") ? path : "/"+path;
 };
 
 AppBeton.prototype.sendCommandToElkon = async function(cmd, queryId, body) {
 	const path = '/api-post/elkon-production-cmd/' + cmd;
-	const url = `${this.m_elkonSrv}${this.normalizePath(path)}`;
+	const url = this.m_elkonSrv+this.normalizePath(path);
 
 	const token = "";
 	const response = await fetch(url, {
@@ -1525,7 +1525,7 @@ AppBeton.prototype.sendCommandToElkon = async function(cmd, queryId, body) {
 		headers: {
 			"Content-Type": "application/json",
 			"Query-Id": queryId,
-			"Cookie": `_s=${token}`,
+			"Cookie": "_s="+token,
 		},
 		body
 	});
@@ -1533,6 +1533,6 @@ AppBeton.prototype.sendCommandToElkon = async function(cmd, queryId, body) {
 	const bodyResp = await response.text();
 
 	if (!response.ok) {
-		throw new Error(`fetch-config failed: HTTP ${response.status}; body: ${bodyResp}`);
+		throw new Error("fetch-config failed: HTTP:"+response.status+"; body:"+bodyResp);
 	}
 }

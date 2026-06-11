@@ -1792,6 +1792,9 @@ ModelSQL->query($query,$toXML=TRUE,$queryParams=NULL)
 1.00418 2026-06-11
 1) AppBeton.js sendCommandToElkon() missed token
 
+1.00419 2026-06-11
+AppBeton.prototype.normalizePath
+
 
 Order_Controller->get_make_orders_form() is too slow, 3.5s
 TODO: invite to Telegram from saved orders?
