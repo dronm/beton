@@ -144,11 +144,11 @@ ProductionSiteCmdLoadProduction.prototype.closeSelect = function(productionSiteI
 }
 
 const normalizePath = (path) => {
-	return path.startsWith("/") ? path : `/${path}`;
+	return path.startsWith("/") ? path : "/"+path;
 };
 
 const buildHttpUrl = (config, path) => {
-	return `${config.httpScheme}://${config.address}${normalizePath(path)}`;
+	return config.httpScheme+"://"+config.address+normalizePath(path);
 };
 
 ProductionSiteCmdLoadProduction.prototype.sendCommandToElkonApp = async function(cmd, queryId, body){

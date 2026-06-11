@@ -247,9 +247,10 @@ InsuranceListGrid.prototype.delRow = function(rowNode){
 
 InsuranceListGrid.prototype.genAttContainer = function(insId, attachment){
 	const self = this;
-	return new ControlContainer(`att_doc_id_${self.m_dataType}_${insId}_cont`,"DIV",{
+	const imgId = `att_doc_id_${self.m_dataType}_${insId}`;
+	return new ControlContainer(imgId+"_cont","DIV",{
 		"elements": [
-			new Control(`att_doc_id_${self.m_dataType}_${insId}`,"IMG",{
+			new Control(imgId,"IMG",{
 				"attrs":{
 					"src": "data:image/png;base64, "+attachment.dataBase64,
 					"width": "50px",
