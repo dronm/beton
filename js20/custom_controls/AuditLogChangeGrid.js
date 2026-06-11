@@ -93,7 +93,7 @@ extend(AuditLogChangeGrid, GridAjx);
 AuditLogChangeGrid.prototype.fieldDescr = function(descr, objDescr){
 	if(objDescr != undefined && objDescr.length){
 		//object field
-		return `${objDescr} (ИД:${descr})`;
+		return objDescr +"(ИД:"+descr;
 	}
 	if(descr == undefined){
 		return "";
