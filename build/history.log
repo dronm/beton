@@ -1789,6 +1789,8 @@ ModelSQL->query($query,$toXML=TRUE,$queryParams=NULL)
 2) error when not logged
 3) Login name/password page.
 
+1.00418 2026-06-11
+1) AppBeton.js sendCommandToElkon() missed token
 
 
 Order_Controller->get_make_orders_form() is too slow, 3.5s

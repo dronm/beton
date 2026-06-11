@@ -1519,12 +1519,13 @@ AppBeton.prototype.sendCommandToElkon = async function(cmd, queryId, body) {
 	const path = '/api-post/elkon-production-cmd/' + cmd;
 	const url = `${this.m_elkonSrv}${this.normalizePath(path)}`;
 
+	const token = "";
 	const response = await fetch(url, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 			"Query-Id": queryId,
-			Cookie: `_s=${token}`,
+			"Cookie": `_s=${token}`,
 		},
 		body
 	});
