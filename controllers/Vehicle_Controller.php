@@ -29,7 +29,6 @@ require_once(FRAME_WORK_PATH.'basic_classes/CondParamsSQL.php');
 require_once('common/SMSService.php');
 
 require_once(FUNC_PATH.'VehicleRoute.php');
-require_once(ABSOLUTE_PATH.'functions/Beton.php');
 
 class Vehicle_Controller extends ControllerSQL{
 
@@ -223,6 +222,18 @@ class Vehicle_Controller extends ControllerSQL{
 				$f_params['alias']='Тип владения';
 			
 				$param = new FieldExtEnum('ownership_type',',','preperty,leasing,rent'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			
+				$f_params['alias']='Тип владения';
+			$param = new FieldExtText('map_picture'
+				,$f_params);
+		$pm->addParam($param);
+		
+			$f_params = array();
+			$param = new FieldExtBool('deleted'
 				,$f_params);
 		$pm->addParam($param);
 		
@@ -423,6 +434,18 @@ class Vehicle_Controller extends ControllerSQL{
 				$f_params['alias']='Тип владения';
 			
 				$param = new FieldExtEnum('ownership_type',',','preperty,leasing,rent'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			
+				$f_params['alias']='Тип владения';
+			$param = new FieldExtText('map_picture'
+				,$f_params);
+			$pm->addParam($param);
+		
+			$f_params=array();
+			$param = new FieldExtBool('deleted'
 				,$f_params);
 			$pm->addParam($param);
 		
@@ -1237,35 +1260,64 @@ class Vehicle_Controller extends ControllerSQL{
 			throw new Exception("no tracker servers configured");
 		}
 
+		$last_error = null;
+
 		foreach ($servers as $srv) {
 			$result = $this->execute_tracker_shell_command($srv, $cmd, $tracker_id);
 
 			if ($result['exec_error'] !== '') {
-				throw new Exception($result['exec_error']);
+				$last_error = [
+					'server' => $srv,
+					'err' => $result['exec_error'],
+					'exit_code' => $result['exit_code'],
+					'raw' => $result['raw'],
+				];
+
+				continue;
 			}
 
 			$raw = trim($result['raw']);
 
 			if ($raw === '') {
-				continue;
-			}
-			if(stripos($raw, 'not connected') !== false){
+				$last_error = [
+					'server' => $srv,
+					'err' => 'Empty response from command',
+					'exit_code' => $result['exit_code'],
+				];
+
 				continue;
 			}
 
-			/* header('Content-Type: text/plain'); */
-			/* echo trim($raw); */
+			$json = json_decode($raw, true);
 
-			$this->addModel(new ModelVars(
-				array('id'=>'TelSrv',
-					'values'=>array(
-						new Field('resp',DT_STRING,
-							array('value'=>$raw))
-						)
-					)
-				)
-			);
-			return;
+			if (json_last_error() === JSON_ERROR_NONE && is_array($json)) {
+				$err = isset($json['err']) ? (string)$json['err'] : '';
+
+				if ($err !== '' && stripos($err, 'not connected') !== false) {
+					$last_error = [
+						'server' => $srv,
+						'err' => $err,
+					];
+
+					continue;
+				}
+
+				header('Content-Type: application/json; charset=utf-8');
+				echo $raw;
+
+				return;
+			}
+
+			if ($raw === 'OK') {
+				echo "OK";
+				return;
+			}
+
+			$last_error = [
+				'server' => $srv,
+				'err' => 'Invalid response from command',
+				'raw' => $raw,
+			];
 		}
 
 		throw new Exception('Tracker is not connected to any configured server or command failed');
@@ -1278,6 +1330,7 @@ class Vehicle_Controller extends ControllerSQL{
 			. ' ' . escapeshellarg($cmd)
 			. ' ' . escapeshellarg($tracker_id)
 			. ' 2>&1';
+
 		$output = [];
 		$exit_code = 0;
 
@@ -1292,24 +1345,16 @@ class Vehicle_Controller extends ControllerSQL{
 		];
 	}
 
-	public function get_special_vehicles_list($pm){
-		$dt = (!$pm->getParamValue('date'))? time() : ($this->getExtVal($pm,'date')+Beton::shiftStartTime());
-		$date_from = Beton::shiftStart($dt);
-		$date_to = Beton::shiftEnd($date_from);
+	public function get_special_vehicles_list($pm) {
+		$dateForDb = $this->getExtDbVal($pm, 'date');
 		
-		//06/10/21 check restrictions
-		if(!Beton::viewRestricted($date_from, $date_to)){
-			throw new Exception(self::ER_PERIOD_NOT_ALLOWED);
-		}
-
-		$this->addNewModel(sprintf(
-			"SELECT * 
-			FROM special_vehicles_list",
-			date('Y-m-d H:i:s',$date_from),
-			date('Y-m-d H:i:s',$date_to)
+		$this->addNewModel(
+			sprintf(
+				"SELECT * FROM special_vehicles_list_get_or_create(%s::timestamp)",
+				$dateForDb
 			),
 			'SpecialVehicleList_Model'
-		);	
+		);
 	}
 }
 ?>

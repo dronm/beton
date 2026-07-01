@@ -133,6 +133,7 @@
 			</div>
 		{{/productionBases}}		
 		
+		{{#notLowResDevice}}		
 		<div id="{{id}}:vehAssignCont" class="panel panel-default draggable">
 			{{#showGridHeaders}}
 			<div class="panel-heading">
@@ -155,6 +156,7 @@
 				</div>
 			</div>			
 		</div>
+		{{/notLowResDevice}}		
 		
 		<div id="{{id}}:vehAllCont" class="panel panel-default draggable">
 			{{#showGridHeaders}}
@@ -180,6 +182,29 @@
 			</div>	
 		</div>			
 		
+		<div id="{{id}}:vehSpecialCont" class="panel panel-default draggable">
+			{{#showGridHeaders}}
+			<div class="panel-heading">
+				<h6 class="panel-title">Спецтехника
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:vehSpecialTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>
+			{{/showGridHeaders}}
+			<div class="panel-body">
+				<div class="row order-l-grid">		
+					<div id="{{id}}:veh_special_grid" class="row">
+					</div>	
+				</div>
+			</div>			
+		</div>
+
 		<div id="{{id}}:vehFeatureCont" class="panel panel-default draggable">
 			{{#showGridHeaders}}
 			<div class="panel-heading">

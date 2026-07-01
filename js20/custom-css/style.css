@@ -672,7 +672,7 @@ tr.veh_out_from_shift{
 tr.veh_out{
 	background-color:#CEB9D6;
 }
-veh_no_tracker_data{
+tr.veh_no_tracker_data{
 	color: red;
 	font-weight:bolder;
 	font-size:120%;
@@ -685,6 +685,17 @@ tr.veh_no_tracker{
 
 tr.veh_in_make_list{
 	cursor:pointer;
+}
+
+td.veh_no_tracker_data{
+	color: red;
+	font-weight:bolder;
+	font-size:120%;
+}
+td.veh_no_tracker{
+	color: blue;
+	font-weight:bolder;
+	font-size:120%;
 }
 #VehicleScheduleReport_Model td.on_shift{
 	background-color:#CDFFD7;

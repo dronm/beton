@@ -12,7 +12,6 @@ function AppBeton(options) {
 	options.lang = "rus";
 	options.paginationClass = Pagination;
 
-	this.m_elkonSrv = "https://eurobeton.katren.org/eurobeton";
 
 	this.setColorClass(options.servVars.color_palette || this.COLOR_CLASS);
 
@@ -30,6 +29,8 @@ extend(AppBeton, App);
 
 AppBeton.prototype.DEF_phoneEditMask = "7-(999)-999-99-99";
 AppBeton.prototype.ER_PERIOD_NOT_ALLOWED = "Запрещено просматривать данный период!";
+
+AppBeton.prototype.ELKON_DEBUG_SRV = "https://eurobeton.katren.org/";
 
 AppBeton.prototype.FILE_MIME_TYPES = {
 	'audio/x-mpeg': 'mpega',
@@ -1516,16 +1517,16 @@ AppBeton.prototype.normalizePath = (path) => {
 };
 
 AppBeton.prototype.sendCommandToElkon = async function(cmd, queryId, body) {
-	const path = '/api-post/elkon-production-cmd/' + cmd;
-	const url = this.m_elkonSrv+this.normalizePath(path);
+	const base = (this.m_servVars.debug == "1")?
+		this.ELKON_DEBUG_SRV : this.m_servVars.basePath;
+	const url = this.normalizePath(base) + "eurobeton/api-post/elkon-production-cmd/" + cmd
 
-	const token = "";
 	const response = await fetch(url, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 			"Query-Id": queryId,
-			"Cookie": "_s="+token,
+			"Cookie": "_s="+this.m_servVars.token,
 		},
 		body
 	});

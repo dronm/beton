@@ -147,7 +147,3 @@ CREATE OR REPLACE VIEW public.vehicle_states_all AS
 	LEFT JOIN contacts AS ct ON ct.id = e_ct.contact_id
 	;		
 	--WHERE vs.schedule_date=in_date
-
-
-ALTER TABLE public.vehicle_states_all OWNER TO ;
-

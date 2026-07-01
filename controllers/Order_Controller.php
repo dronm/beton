@@ -1764,6 +1764,14 @@ class Order_Controller extends ControllerSQL{
 		$this->addModel(Shipment_Controller::getAssigningModel($dbLink, NULL, NULL));
 	}
 
+	//adds special vehicle model
+	public function addSpecialVehicleModel($dateForDb){
+		$this->addNewModel(
+			sprintf("SELECT * FROM special_vehicles_list(%s)", $dateForDb),
+			'SpecialVehicleList_Model'
+		);					
+	}
+
 	public static function add_production_bases($dbLink){
 		if(!isset($_SESSION['production_bases']) || !count($_SESSION['production_bases'])){
 			$_SESSION['production_bases'] = [];
@@ -2540,6 +2548,11 @@ class Order_Controller extends ControllerSQL{
 		);
 		
 		return TRUE;
+	}
+
+	public function get_specialist_vehicle_list($pm){
+		$dateForDb = $this->getExtDbVal($pm, 'date');
+		this->addSpecialVehicleModel($dateForDb);
 	}
 }
 ?>

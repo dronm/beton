@@ -9,11 +9,10 @@ $BODY$
 DECLARE
 	reg_fuel_flow ra_fuel_flow%ROWTYPE;	
 BEGIN
-END;
 	IF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
 
 		reg_fuel_flow.date_time		= NEW.date_time;
-		reg_fuel_flow.deb			= FALSE;
+		reg_fuel_flow.deb			= TRUE;
 		reg_fuel_flow.doc_type  	= 'fuel_transactions'::doc_types;
 		reg_fuel_flow.doc_id  		= NEW.id;
 		reg_fuel_flow.vehicle_id	= NEW.vehicle_id;
@@ -56,6 +55,7 @@ END;
 	
 		RETURN OLD;
 	END IF;
+END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;

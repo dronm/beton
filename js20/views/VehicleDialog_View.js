@@ -7,177 +7,198 @@ function VehicleDialog_View(id,options){
 	options.controller = new Vehicle_Controller();
 	options.model = options.models.VehicleDialog_Model;
 	
-	VehicleDialog_View.superclass.constructor.call(this,id,options);
 	
 	const self = this;
 
-	this.addElement(new EditString(id+":plate",{
-		"labelCaption":"Рег.номер:",
-		"maxLength":"6",
-		"required":true
-	}));	
-	this.addElement(new EditString(id+":plate_region",{
-		"labelCaption":"Регион номера:",
-		"maxLength":"3"
-	}));	
-	this.addElement(new EditFloat(id+":load_capacity",{
-		"precision":"2",
-		"labelCaption":"Грузоподъемность:"
-	}));	
-	this.addElement(new DriverEditRef(id+":driver"));	
-	
-	this.addElement(new VehicleOwnerEdit(id+":official_owner"), {
-		labelCaption: "Официальный владелец:",
-		title: "Официальный владелец для транспортной накладной"
-	});	
+	options.addElement = function(){
+		this.addElement(new EditString(id+":plate",{
+			"labelCaption":"Рег.номер:",
+			"maxLength":"6",
+			"required":true
+		}));	
+		this.addElement(new EditString(id+":plate_region",{
+			"labelCaption":"Регион номера:",
+			"maxLength":"3"
+		}));	
+		this.addElement(new EditFloat(id+":load_capacity",{
+			"precision":"2",
+			"labelCaption":"Грузоподъемность:"
+		}));	
+		this.addElement(new DriverEditRef(id+":driver"));	
+		
+		this.addElement(new VehicleOwnerEdit(id+":official_owner"), {
+			labelCaption: "Официальный владелец:",
+			title: "Официальный владелец для транспортной накладной"
+		});	
 
-	this.addElement(new MakeEdit(id+":make"));	
-	
-	this.addElement(new FeatureEdit(id+":feature"));	
-	
-	this.addElement(new GPSTrackerRef(id+":tracker_id"));	
-	
-	this.addElement(new EditString(id+":sim_id",{
-		"maxLength":"20",
-		"labelCaption":"Идентификатор СИМ карты:",
-		"enabled":false
-	}));	
+		this.addElement(new MakeEdit(id+":make"));	
+		
+		this.addElement(new FeatureEdit(id+":feature"));	
+		
+		this.addElement(new GPSTrackerRef(id+":tracker_id"));	
 
-	this.addElement(new EditString(id+":fuel_card_id",{
-		"labelCaption":"Топливная карта:",
-	}));	
+		this.addElement(new EditString(id+":map_picture", {
+			"labelCaption": "Представление на карте:",
+			"title":"Картинка на карте",
+			"maxLength": "500"
+		}));	
+		
+		this.addElement(new EditString(id+":sim_id",{
+			"maxLength":"20",
+			"labelCaption":"Идентификатор СИМ карты:",
+			"enabled":false
+		}));	
 
-	this.addElement(new EditPhone(id+":sim_number",{
-		"labelCaption":"Номер телефона СИМ карты:",
-		"enabled":false
-	}));	
+		this.addElement(new EditString(id+":fuel_card_id",{
+			"labelCaption":"Топливная карта:",
+		}));	
 
-	this.addElement(new EditDateTime(id+":tracker_last_dt",{
-		"labelCaption":"Последние данные трэкера:",
-		"enabled":false
-	}));	
+		this.addElement(new EditPhone(id+":sim_number",{
+			"labelCaption":"Номер телефона СИМ карты:",
+			"enabled":false
+		}));	
 
-	this.addElement(new EditNum(id+":tracker_sat_num",{
-		"labelCaption":"Количество спутников:",
-		"enabled":false
-	}));	
+		this.addElement(new EditDateTime(id+":tracker_last_dt",{
+			"labelCaption":"Последние данные трэкера:",
+			"enabled":false
+		}));	
 
-	this.addElement(new OwnerListGrid(id+":owners",{
-	}));	
-	this.addElement(new InsuranceListGrid(id+":insurance_osago",{
-		"dataType": "vehicle_insurance_osago"
-	}));	
-	this.addElement(new InsuranceListGrid(id+":insurance_kasko",{
-		"dataType": "vehicle_insurance_kasko"
-	}));	
+		this.addElement(new EditNum(id+":tracker_sat_num",{
+			"labelCaption":"Количество спутников:",
+			"enabled":false
+		}));	
 
-	this.addElement(new LeasorEdit(id+":leasor",{
-	}));	
-	this.addElement(new EditMoney(id+":leasing_total",{
-		"labelCaption":"Сумма по договору:"
-	}));	
+		this.addElement(new OwnerListGrid(id+":owners",{
+		}));	
+		this.addElement(new InsuranceListGrid(id+":insurance_osago",{
+			"dataType": "vehicle_insurance_osago"
+		}));	
+		this.addElement(new InsuranceListGrid(id+":insurance_kasko",{
+			"dataType": "vehicle_insurance_kasko"
+		}));	
 
-	this.addElement(new EditDate(id+":leasing_contract_date",{
-		"labelCaption":"Дата договора:",
-	}));	
-	this.addElement(new EditString(id+":leasing_contract_num",{
-		"maxLength":"100",
-		"labelCaption":"Номер договора:",
-	}));	
+		this.addElement(new LeasorEdit(id+":leasor",{
+		}));	
+		this.addElement(new EditMoney(id+":leasing_total",{
+			"labelCaption":"Сумма по договору:"
+		}));	
 
-	//insurance filling
-	this.addElement(new Client1cEdit(id+":insurance_issuer",{
-	}));	
-	this.addElement(new BuhRBP1cEdit(id+":insurance_rbp",{
-	}));	
-	this.addElement(new ButtonCmd(id+":cmdAddOnRBPKASKO",{
-		"caption":"Добавить КАСКО",
-		"onClick":function(){
-			self.cmdAddOnRBPKASKO();
-		}
-	}));	
-	this.addElement(new ButtonCmd(id+":cmdAddOnRBPOSAGO",{
-		"caption":"Добавить ОСАГО",
-		"onClick":function(){
-			self.cmdAddOnRBPOSAGO();
-		}
-	}));	
+		this.addElement(new EditDate(id+":leasing_contract_date",{
+			"labelCaption":"Дата договора:",
+		}));	
+		this.addElement(new EditString(id+":leasing_contract_num",{
+			"maxLength":"100",
+			"labelCaption":"Номер договора:",
+		}));	
 
-	this.addElement(new EditString(id+":leasor_pp",{
-		"maxLength":"20",
-		"labelCaption":"Номер п/п:",
-		"placeholder":"Номер платежного поручения",
-		"title":"Номер платежного поручения лизингодателя для заполнения"
-	}));	
-	this.addElement(new ButtonCmd(id+":cmdFillOnPP",{
-		"caption":"Заполнить по п/п",
-		"onClick":function(){
-			self.cmdFillOnPP();
-		}
-	}));		
+		//insurance filling
+		this.addElement(new Client1cEdit(id+":insurance_issuer",{
+		}));	
+		this.addElement(new BuhRBP1cEdit(id+":insurance_rbp",{
+		}));	
+		this.addElement(new ButtonCmd(id+":cmdAddOnRBPKASKO",{
+			"caption":"Добавить КАСКО",
+			"onClick":function(){
+				self.cmdAddOnRBPKASKO();
+			}
+		}));	
+		this.addElement(new ButtonCmd(id+":cmdAddOnRBPOSAGO",{
+			"caption":"Добавить ОСАГО",
+			"onClick":function(){
+				self.cmdAddOnRBPOSAGO();
+			}
+		}));	
 
-	this.addElement(new EditInt(id+":ord_num",{
-		"labelCaption":"Порядковый номер:",
-	}));	
+		this.addElement(new EditString(id+":leasor_pp",{
+			"maxLength":"20",
+			"labelCaption":"Номер п/п:",
+			"placeholder":"Номер платежного поручения",
+			"title":"Номер платежного поручения лизингодателя для заполнения"
+		}));	
+		this.addElement(new ButtonCmd(id+":cmdFillOnPP",{
+			"caption":"Заполнить по п/п",
+			"onClick":function(){
+				self.cmdFillOnPP();
+			}
+		}));		
 
-	this.addElement(new EditInt(id+":weight_t",{
-		"labelCaption":"Масса, тонн:",
-	}));	
-	
-	this.addElement(new EditString(id+":vin",{
-		"labelCaption":"VIN:",
-		"maxLength": 17
-	}));	
+		this.addElement(new EditInt(id+":ord_num",{
+			"labelCaption":"Порядковый номер:",
+		}));	
 
-	this.addElement(new EditString(id+":reg_doc",{
-		"labelCaption":"Свидетельство о регистрации:",
-		"maxLength": 500
-	}));	
+		this.addElement(new EditInt(id+":weight_t",{
+			"labelCaption":"Масса, тонн:",
+		}));	
+		
+		this.addElement(new EditString(id+":vin",{
+			"labelCaption":"VIN:",
+			"maxLength": 17
+		}));	
 
-	this.addElement(new Enum_ownership_types(id+":ownership_type",{
-		"labelCaption":"Тип владениея:"
-	}));	
+		this.addElement(new EditString(id+":reg_doc",{
+			"labelCaption":"Свидетельство о регистрации:",
+			"maxLength": 500
+		}));	
 
-	this.addElement(new FuelConsumptionSchemaEdit(id+":fuel_consumption_schema_ref",{ 
-		"labelCaption": "Общая схема расхода ГСМ:"
-	}));	
+		this.addElement(new Enum_ownership_types(id+":ownership_type",{
+			"labelCaption":"Тип владениея:"
+		}));	
 
-	this.addElement(new VehicleFuelConsumptionSchemaDetailList_View(id+":vehicle_fuel_consumption_schema_details_list",{
-		"detail":true
-	}));		
+		this.addElement(new FuelConsumptionSchemaEdit(id+":fuel_consumption_schema_ref",{ 
+			"labelCaption": "Общая схема расхода ГСМ:"
+		}));	
 
-	this.addElement(new VehicleMileageList_View(id+":mileage_list",{
-		"detail":true
-	}));		
-	this.addElement(new TrackerManager(id+":tracker_manager",{
-		"getTrackerId": function(){
-			return self.m_model.getFieldValue("tracker_id");
-		}
-	}));		
-	/*
-	this.addElement(new RAFuelFlowList_View(id+":ra_fuel_flow_list",{
-		"detail":true
-	}));		
-	*/
-	//****************************************************	
-	
-	this.addElement(new EditFile(id+":attachments_list",{
-		"maxWidth":"150",
-		"maxHeight":"150",
-		"multipleFiles":true
-		,"showHref":true
-		,"showPic":true
-		,"onDeleteFile":function(fileId,callBack){
-			self.m_attachManager.deleteAttachment(fileId,callBack);
-		}
-		,"onFileAdded":function(fileId){
-			self.m_attachManager.addAttachment(fileId);
-		}
-		,"onDownload":function(fileId){
-			self.m_attachManager.downloadAttachment(fileId);
-		}
-		,"allowedFileExtList":"jpeg,png,jpg,pdf"
-	}));	
+		this.addElement(new VehicleFuelConsumptionSchemaDetailList_View(id+":vehicle_fuel_consumption_schema_details_list",{
+			"detail":true
+		}));		
+
+		this.addElement(new VehicleMileageList_View(id+":mileage_list",{
+			"detail":true
+		}));		
+		this.addElement(new TrackerManager(id+":tracker_manager",{
+			"getTrackerId": function(){
+				return self.m_model.getFieldValue("tracker_id");
+			}
+		}));		
+
+		this.addElement(new EditSwitcher(id+":deleted",{
+			"labelCaption":"Не используется:",
+		}));
+		/*
+		this.addElement(new RAFuelFlowList_View(id+":ra_fuel_flow_list",{
+			"detail":true
+		}));		
+		*/
+		//****************************************************	
+		
+		this.addElement(new EditFile(id+":attachments_list",{
+			"maxWidth":"150",
+			"maxHeight":"150",
+			"multipleFiles":true
+			,"showHref":true
+			,"showPic":true
+			,"onDeleteFile":function(fileId,callBack){
+				self.m_attachManager.deleteAttachment(fileId,callBack);
+			}
+			,"onFileAdded":function(fileId){
+				self.m_attachManager.addAttachment(fileId);
+			}
+			,"onDownload":function(fileId){
+				self.m_attachManager.downloadAttachment(fileId);
+			}
+			,"allowedFileExtList":"jpeg,png,jpg,pdf"
+		}));	
+
+		this.addElement(new ButtonHistory(id+":cmdHistory",{
+			tableName: "vehicles",
+			visible: false, //disabled at start
+			getRecordId: () => {
+				return self.getElement("id").getValue();
+			}
+		}));				
+	}
+
+	VehicleDialog_View.superclass.constructor.call(this,id,options);
 
 	//upload documents
 	this.m_attachManager = new AttachmentManager({
@@ -202,7 +223,9 @@ function VehicleDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("leasing_contract_num"),"fieldId":"leasing_contract_num"})
 		,new DataBinding({"control":this.getElement("leasing_contract_date"),"fieldId":"leasing_contract_date"})
 		,new DataBinding({"control":this.getElement("feature")})
+		,new DataBinding({"control":this.getElement("deleted")})
 		,new DataBinding({"control":this.getElement("tracker_id")})
+		,new DataBinding({"control":this.getElement("map_picture")})
 		,new DataBinding({"control":this.getElement("sim_id")})
 		,new DataBinding({"control":this.getElement("fuel_card_id")})
 		,new DataBinding({"control":this.getElement("sim_number")})
@@ -237,7 +260,9 @@ function VehicleDialog_View(id,options){
 		,new CommandBinding({"control":this.getElement("vin")})
 		,new CommandBinding({"control":this.getElement("reg_doc")})
 		,new CommandBinding({"control":this.getElement("ownership_type")})
+		,new CommandBinding({"control":this.getElement("deleted")})
 		,new CommandBinding({"control":this.getElement("tracker_id")})
+		,new CommandBinding({"control":this.getElement("map_picture")})
 		,new CommandBinding({"control":this.getElement("ord_num")})
 		,new CommandBinding({"control":this.getElement("weight_t")})		
 		,new CommandBinding({"control":this.getElement("fuel_card_id")})		
@@ -276,6 +301,10 @@ extend(VehicleDialog_View,ViewObjectAjx);
 VehicleDialog_View.prototype.onGetData = function(resp,cmd){
 	VehicleDialog_View.superclass.onGetData.call(this,resp,cmd);
 	
+	if(cmd == "edit"){
+		this.getElement("cmdHistory").setVisible(true);
+	}
+
 	if(window.getApp().getServVar("role_id")=="vehicle_owner"){
 		this.setEnabled(false);
 		this.getControlOK().setEnabled(true);

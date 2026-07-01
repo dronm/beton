@@ -379,7 +379,7 @@ extend(User_Controller,ControllerObjServer);
 	
 		options.alias = "Пароль";
 	
-		options.maxlength = "20";
+		options.maxlength = "50";
 	
 		pm.addField(new FieldPassword("pwd",options));
 	

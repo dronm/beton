@@ -310,6 +310,24 @@ function VehicleDialog_Model(options){
 	
 	options.fields.attachments_list = new FieldJSON("attachments_list",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Тип владения';
+	filed_options.autoInc = false;	
+	
+	options.fields.map_picture = new FieldText("map_picture",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.deleted = new FieldBool("deleted",filed_options);
+	
 			
 		VehicleDialog_Model.superclass.constructor.call(this,id,options);
 }

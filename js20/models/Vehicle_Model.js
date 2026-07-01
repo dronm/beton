@@ -288,6 +288,24 @@ function Vehicle_Model(options){
 	options.fields.ownership_type = new FieldEnum("ownership_type",filed_options);
 	filed_options.enumValues = 'preperty,leasing,rent';
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Тип владения';
+	filed_options.autoInc = false;	
+	
+	options.fields.map_picture = new FieldText("map_picture",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.deleted = new FieldBool("deleted",filed_options);
+	
 			
 			
 			

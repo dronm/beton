@@ -2222,6 +2222,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/models/VehicleFuelConsumptionSchemaDetail_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/VehicleFuelConsumptionSchemaDetail_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controllers/VehicleFuelConsumptionSchemaDetail_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/VehicleFuelConsumptionSchemaDetail_Controller.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/VehicleFuelConsumptionSchemaDetailList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/VehicleFuelConsumptionSchemaDetailList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/SpecialVehicleList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/SpecialVehicleList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/FuelConsumption_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/FuelConsumption_Model.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

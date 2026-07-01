@@ -23,7 +23,6 @@ require_once(FRAME_WORK_PATH.'basic_classes/CondParamsSQL.php');
 require_once('common/SMSService.php');
 
 require_once(FUNC_PATH.'VehicleRoute.php');
-require_once(ABSOLUTE_PATH.'functions/Beton.php');
 
 class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 
@@ -578,24 +577,16 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		];
 	}
 
-	public function get_special_vehicles_list($pm){
-		$dt = (!$pm->getParamValue('date'))? time() : ($this->getExtVal($pm,'date')+Beton::shiftStartTime());
-		$date_from = Beton::shiftStart($dt);
-		$date_to = Beton::shiftEnd($date_from);
+	public function get_special_vehicles_list($pm) {
+		$dateForDb = $this->getExtDbVal($pm, 'date');
 		
-		//06/10/21 check restrictions
-		if(!Beton::viewRestricted($date_from, $date_to)){
-			throw new Exception(self::ER_PERIOD_NOT_ALLOWED);
-		}
-
-		$this->addNewModel(sprintf(
-			"SELECT * 
-			FROM special_vehicles_list",
-			date('Y-m-d H:i:s',$date_from),
-			date('Y-m-d H:i:s',$date_to)
+		$this->addNewModel(
+			sprintf(
+				"SELECT * FROM special_vehicles_list_get_or_create(%s::timestamp)",
+				$dateForDb
 			),
 			'SpecialVehicleList_Model'
-		);	
+		);
 	}
 }
 <![CDATA[?>]]>

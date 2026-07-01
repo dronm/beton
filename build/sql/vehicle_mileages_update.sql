@@ -59,7 +59,7 @@ BEGIN
 				vehicle.mileage + new_mileage,
 				vehicle_timing(
 					vehicle.vehicle_id,
-					get_shift_start(end_time),
+					get_shift_start(end_time::timestamp without time zone),
 					end_time
 				)
             );

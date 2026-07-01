@@ -1796,6 +1796,13 @@ ModelSQL->query($query,$toXML=TRUE,$queryParams=NULL)
 AppBeton.prototype.normalizePath
 
 
+1.00422 2026-07-02
+1) Vehicle_Controller->get_special_vehicles_list()
+js20/custom_controls/SpecialVehicleMakeOrderGrid.js
+special_vehicles_list sql functions and materialized view
+
+
+
 Order_Controller->get_make_orders_form() is too slow, 3.5s
 TODO: invite to Telegram from saved orders?
 Still big latency (1000-3000). No latency without cloud server

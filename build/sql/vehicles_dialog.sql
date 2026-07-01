@@ -127,7 +127,10 @@ CREATE OR REPLACE VIEW public.vehicles_dialog AS
 		attachments_for_key(v.id, 'vehicles') AS attachments_list,
 		fuel_consumption_schema_ref(fc) AS fuel_consumption_schema_ref,
 
-		v.ownership_type
+		v.ownership_type,
+
+		v.map_picture,
+		v.deleted
 		
 	FROM vehicles v
 	LEFT JOIN drivers dr ON dr.id = v.driver_id

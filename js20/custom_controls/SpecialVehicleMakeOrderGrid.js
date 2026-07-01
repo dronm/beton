@@ -14,13 +14,17 @@
 function SpecialVehicleMakeOrderGrid(id,options){
 	options = options || {};	
 	
+	this.m_readPublicMethod = (new Vehicle_Controller()).getPublicMethod("get_special_vehicles_list");
+	this.setDate(options.date);
+
 	var self = this;
-	var model = options.model;	
+	var model = new SpecialVehicleList_Model();	
 	CommonHelper.merge(options,{
 		"model":model,
+		"keyIds":["id"],
 		"className":"table-bordered table-responsive table-make_order veh_special_grid",		
 		"attrs":{"style":"width:100%;"},
-		"readPublicMethod":(new Vehicle_Controller()).getPublicMethod("get_special_vehicles_list"),
+		"readPublicMethod": this.m_readPublicMethod,
 		"editInline":false,
 		"editWinClass":null,
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
@@ -37,7 +41,8 @@ function SpecialVehicleMakeOrderGrid(id,options){
 			"filters":null,
 			"variantStorage":null,
 			"addCustomCommandsAfter":function(commands){
-				// commands.push(new VehicleScheduleGridCmdSetFree(id+":grid:cmd:setFree",{"showCmdControl":false}));
+				commands.push(new VehicleScheduleGridCmdShowPosition(id+":grid:cmd:showPos",{"showCmdControl":false}));
+				commands.push(new VehicleScheduleGridCmdShowVehicle(id+":grid:cmd:showVeh",{"showCmdControl":false}));
 			}
 		}),
 		"popUpMenu":new PopUpMenu(),
@@ -47,11 +52,11 @@ function SpecialVehicleMakeOrderGrid(id,options){
 				var m = this.getModel();
 				if(m.getFieldValue("no_tracker")){
 					opts.title="Нет оборудования мониторинга";
-					opts.className+=(opts.className.length? " ":"")+"no_tracker";
+					opts.className+=(opts.className.length? " ":"")+"veh_no_tracker";
 				}
-				else if(m.getFieldValue("tracker_no_data")){
-					opts.title="Нет сигнала";
-					opts.className+=(opts.className.length? " ":"")+"tracker_no_data";
+				else if(m.getFieldValue("tracker_no_signal")){
+					opts.title="Нет сигнала более 8 часов";
+					opts.className+=(opts.className.length? " ":"")+"veh_no_tracker_data";
 				}
 			}				
 		},
@@ -66,6 +71,7 @@ function SpecialVehicleMakeOrderGrid(id,options){
 					"elements":[
 						new GridCellHead(id+":veh_special_grid:head:vehicles_ref",{
 							"value":"Номер",
+							"colAttrs": {"align": "center"},
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("vehicles_ref"),
@@ -96,27 +102,72 @@ function SpecialVehicleMakeOrderGrid(id,options){
 						,new GridCellHead(id+":veh_special_grid:head:make",{
 							"value":"Марка",
 							"title":"Марка ТС",
-							"colAttrs":{"align":"center"},
+							"colAttrs":{"align":"left"},
 							"columns":[
-								new GridColumn({"field":model.getField("make")})
+								new GridColumn({
+									"field":model.getField("make"),
+									"formatFunction":(function(gridCont){
+										return function(f, cell){
+											const vehMake = f.make.getValue();
+											const vehPict = f.map_picture.getValue();
+											const iSrc = vehPict? TRACK_CONSTANTS.IMG_PATH+vehPict: TRACK_CONSTANTS.VEH_IMG;
+											const iNode = document.createElement("IMG");
+											iNode.width = "20";
+											iNode.height = "20";
+											iNode.src = iSrc;
+											cell.m_node.appendChild(iNode);
+
+											if(vehMake && vehMake.length){
+												const tNode = document.createElement("SPAN");
+												tNode.textContent = vehMake;
+												cell.m_node.appendChild(tNode);
+											}
+											return "";
+										}
+									})(self)
+								})
 							]
 						})
 						,new GridCellHead(id+":veh_special_grid:head:mileage",{
-							"value":"Пробег",
+							"value":"Км",
 							"title":"Пробег ТС за смену",
-								"colAttrs,":{"align":"center"},
+							"colAttrs":{"align":"center"},
 							"columns":[
-								new GridColumn({"field":model.getField("mileage")})
+								new GridColumn({
+									"field":model.getField("mileage"),
+									"formatFunction":(function(gridCont){
+										return function(f, cell){
+											const km = f.mileage.getValue();
+											if(km === 0){
+												return ""
+											}
+											return km;
+										}
+									})(self)
+								})
 							]
 						})
 						,new GridCellHead(id+":veh_special_grid:head:timing",{
 							"value":"Время",
 							"title":"Время работы ТС за смену",
-								"colAttrs,":{"align":"center"},
+							"colAttrs":{"align":"center"},
 							"columns":[
-								new GridColumn({"field":model.getField("timing")})
+								new GridColumn({
+									"field":model.getField("timing"),
+									"formatFunction":(function(gridCont){
+										return function(f, cell){
+											const tm = f.timing.getValue();
+											const parts = tm.split(":");
+											if(parts.length>=3){
+												return parts[0]+":"+parts[1];
+											}
+											return "";
+										}
+									})(self)
+								})
 							]
 						})
+						/*
 						,new GridCellHead(id+":veh_schedule_grid:head:fuel_flow_start",{
 							"value":"Ост.нач.",
 							"title":"Остаток топлива на начало смены",
@@ -141,12 +192,24 @@ function SpecialVehicleMakeOrderGrid(id,options){
 								new GridColumn({"field":model.getField("fuel_flow_out")})
 							]
 						})
+						*/
 						,new GridCellHead(id+":veh_schedule_grid:head:fuel_flow_end",{
 							"value":"Ост.кон.",
 							"title":"Остаток топлива на конец смены",
 							"colAttrs":{"align":"center"},
 							"columns":[
-								new GridColumn({"field":model.getField("fuel_flow_end")})
+								new GridColumn({
+									"field":model.getField("fuel_flow_end"),
+									"formatFunction":(function(gridCont){
+										return function(f, cell){
+											const fuel = f.fuel_flow_end.getValue();
+											if(fuel === 0){
+												return ""
+											}
+											return fuel;
+										}
+									})(self)
+								})
 							]
 						})
 					]
@@ -154,8 +217,8 @@ function SpecialVehicleMakeOrderGrid(id,options){
 			]
 		}),
 		"pagination":null,
-		"autoRefresh":false,
-		"refreshInterval":null,
+		"autoRefresh":true,
+		"refreshInterval":1 * 60 * 1000,
 		"rowSelect":true,
 		"selectedRowClass":"order_current_row",
 		"navigate":true,
@@ -224,5 +287,9 @@ SpecialVehicleMakeOrderGrid.prototype.showVehicleInfo = function(ctrl, vehID){
 			}
 		})(this)
 	});
+}
+
+SpecialVehicleMakeOrderGrid.prototype.setDate = function(dt){
+	this.m_readPublicMethod.setFieldValue("date", dt);
 }
 

@@ -56,7 +56,7 @@ BEGIN
 			reg_act.doc_id				= NEW.id;
 			reg_act.production_base_id	= NEW.production_base_id;
 			reg_act.material_id			= NEW.material_id;
-			reg_act.quant				= NEW.quant_net;
+			reg_act.quant				= COALESCE(NEW.quant_net, 0);
 			PERFORM ra_materials_add_act(reg_act);	
 			
 			SELECT dif_store INTO v_dif_store FROM raw_materials WHERE id=NEW.material_id;

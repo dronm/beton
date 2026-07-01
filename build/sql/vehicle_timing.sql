@@ -1,13 +1,11 @@
--- Function: public.vehicle_timing(in_vehicle_id int, in_date_from timestampTZ, in_date_to timestampTZ);
-
--- DROP FUNCTION public.vehicle_timing(in_vehicle_id int, in_date_from timestampTZ, in_date_to timestampTZ);
+DROP FUNCTION IF EXISTS public.vehicle_timing(int, timestamptz, timestamptz);
 
 CREATE OR REPLACE FUNCTION public.vehicle_timing(
 	in_vehicle_id int,
 	in_date_from timestamptz,
 	in_date_to timestamptz
 )
-RETURNS time AS
+RETURNS interval AS
 $BODY$
 	WITH params AS (
 		SELECT
@@ -40,7 +38,8 @@ $BODY$
 		INNER JOIN tracker AS t
 			ON t.tracker_id = ct.car_id
 		CROSS JOIN params AS p
-		WHERE ct.period >= p.date_from
+		WHERE
+			ct.period >= p.date_from
 			AND ct.period < p.date_to
 	),
 	points AS (
@@ -71,17 +70,14 @@ $BODY$
 		CROSS JOIN params AS p
 	)
 	SELECT
-		(
-			'00:00:00'::time
-			+
-			coalesce(
-				sum(segment_to - segment_from) FILTER (
-					WHERE engine_on = '1'
-						AND segment_to > segment_from
-				),
-				interval '0'
-			)
-		)::time
+		coalesce(
+			sum(segment_to - segment_from) FILTER (
+				WHERE
+					engine_on = '1'
+					AND segment_to > segment_from
+			),
+			interval '0 seconds'
+		)
 	FROM segments;
 $BODY$
 LANGUAGE sql

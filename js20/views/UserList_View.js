@@ -15,12 +15,12 @@ function UserList_View(id,options){
 		"deleted":{
 			"binding":new CommandBinding({
 				"control":new EditSwitcher(id+":filter-ctrl-banned",{
-					"labelCaption":"Не показывать удаленные:",
+					"labelCaption":"Только не заблокированные:",
 					"contClassName":"form-group-filter",
 					"checked":false
 				}),
 				"field":new FieldBool("banned")}),
-			"sign":"e",
+			"sign":"ne",
 			"falseValueNoFilter":true
 		}
 	};

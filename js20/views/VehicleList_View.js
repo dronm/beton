@@ -11,6 +11,20 @@ function VehicleList_View(id,options){
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
 	
+	let filters = {
+		"deleted":{
+			"binding":new CommandBinding({
+				"control":new EditSwitcher(id+":filter-ctrl-deleted",{
+					"labelCaption":"Только не удаленные:",
+					"contClassName":"form-group-filter",
+					"checked":false
+				}),
+				"field":new FieldBool("deleted")}),
+			"sign":"ne",
+			"falseValueNoFilter":true
+		}
+	};
+
 	var is_v_owner = (window.getApp().getServVar("role_id")=="vehicle_owner");
 	
 	var popup_menu = new PopUpMenu();
@@ -20,7 +34,17 @@ function VehicleList_View(id,options){
 		"controller":contr,
 		"editInline":false,
 		"editWinClass":VehicleDialog_Form,
+		"onEventSetRowOptions":function(rowOpts){
+			if(this.getModel().getFieldValue("deleted")){
+				rowOpts.attrs = rowOpts.attrs || {};
+				rowOpts.attrs["class"] = rowOpts.attrs["class"] || "";
+				rowOpts.attrs["class"]+= rowOpts.attrs["class"]==""? "":" ";
+				rowOpts.attrs["class"]+= "deleted_row";
+				rowOpts.attrs.title = "Элемент удален";
+			}
+		},
 		"commands":new GridCmdContainerAjx(id+":grid:cmd",{
+			"filters":filters,
 			"cmdDelete":!is_v_owner,
 			"cmdInsert":!is_v_owner,
 			"cmdCopy":!is_v_owner,

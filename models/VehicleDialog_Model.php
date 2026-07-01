@@ -13,6 +13,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLEnum.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
@@ -317,6 +318,24 @@ class VehicleDialog_Model extends ModelSQLBeton{
 						
 		$f_attachments_list=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"attachments_list",$f_opts);
 		$this->addField($f_attachments_list);
+		//********************
+		
+		//*** Field map_picture ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Тип владения';
+		$f_opts['id']="map_picture";
+						
+		$f_map_picture=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"map_picture",$f_opts);
+		$this->addField($f_map_picture);
+		//********************
+		
+		//*** Field deleted ***
+		$f_opts = array();
+		$f_opts['id']="deleted";
+						
+		$f_deleted=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"deleted",$f_opts);
+		$this->addField($f_deleted);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

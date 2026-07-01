@@ -225,6 +225,18 @@ extend(Vehicle_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Тип владения";
+	var field = new FieldText("map_picture",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldBool("deleted",options);
+	
+	pm.addField(field);
+	
 	pm.addField(new FieldInt("ret_id",{}));
 	
 	
@@ -407,6 +419,18 @@ extend(Vehicle_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+	var options = {};
+	options.alias = "Тип владения";
+	var field = new FieldText("map_picture",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	
+	var field = new FieldBool("deleted",options);
+	
+	pm.addField(field);
+	
 	
 }
 
@@ -529,6 +553,12 @@ extend(Vehicle_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldJSON("attachments_list",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Тип владения";
+	pm.addField(new FieldText("map_picture",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldBool("deleted",f_opts));
 }
 
 			Vehicle_Controller.prototype.addGetObject = function(){

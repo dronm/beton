@@ -71,7 +71,8 @@ Weather.prototype.delDOM = function(){
 
 Weather.prototype.setData = function(model){
 	if(model&&model.getNextRow()){
-		this.getNode().innerHTML = model.getFieldValue("content");
+		const cont = model.getFieldValue("content");
+		this.getNode().innerHTML = cont? cont : "";
 		
 		this.m_contentDetails = model.getFieldValue("content_details");
 		

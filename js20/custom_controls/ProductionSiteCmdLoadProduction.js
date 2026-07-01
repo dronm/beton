@@ -105,6 +105,7 @@ ProductionSiteCmdLoadProduction.prototype.closeSelect = function(productionSiteI
 	}
 
 	if(newApp === true){
+		//for new client app just need to send web socket query
 		const app = window.getApp();
 		if(!app){
 			throw new Error("app object not defined");
@@ -126,7 +127,6 @@ ProductionSiteCmdLoadProduction.prototype.closeSelect = function(productionSiteI
 		window.showTempNote("Отправлена команда на загрузку производства: "+productionId, null, 5000);
 
 	}else{
-		//for new client app just need to send web socket query
 		const pm = (new Production_Controller()).getPublicMethod("check_production");
 		
 		pm.setFieldValue("production_site_id",productionSiteId);
@@ -143,13 +143,6 @@ ProductionSiteCmdLoadProduction.prototype.closeSelect = function(productionSiteI
 	}
 }
 
-const normalizePath = (path) => {
-	return path.startsWith("/") ? path : "/"+path;
-};
-
-const buildHttpUrl = (config, path) => {
-	return config.httpScheme+"://"+config.address+normalizePath(path);
-};
-
 ProductionSiteCmdLoadProduction.prototype.sendCommandToElkonApp = async function(cmd, queryId, body){
+	this.getApp().sendCommandToElkon(cmd, queryId, null);
 }

@@ -671,8 +671,6 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			//user logged
 			$pubKey = trim($log_ar['pub_key']);
 		}
-
-		LSNPosition::add($sess_db_link);
 	}
 	
 	private function do_login($pm,&amp;$pubKey,&amp;$pwd){		
@@ -746,6 +744,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$pwd = '';
 		$this->do_login($pm,$pubKey,$pwd);
 		$this->add_auth_model($pubKey,session_id(),md5($pwd),$this->calc_session_expiration_time());
+		LSNPosition::add($this->getDbLinkMaster());
 	}
 
 	public function login_refresh($pm){	
@@ -819,6 +818,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		}
 		
 		$this->add_auth_model($pub_key,$new_sess_id,$u_pwd_ar['u_pwd_hash'],$this->calc_session_expiration_time());
+		LSNPosition::add($this->getDbLinkMaster());
 	}
 
 	/**
@@ -1126,7 +1126,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					)
 				)
 			));		
-			
+			LSNPosition::add($this->getDbLinkMaster());
 		}
 		else{
 			throw new Exception(ERR_AUTH);
@@ -1307,6 +1307,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				$_SESSION['photo_url'] = $auth_data['photo_url'];
 			}
 			$this->add_auth_model($pubKey, session_id(), md5($ar['pwd']), $this->calc_session_expiration_time());
+			LSNPosition::add($this->getDbLinkMaster());
 		}
 	}
 
@@ -1353,7 +1354,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			throw new Exception('Сформируйте новый код авторизации!');
 			
 		}else if(is_array($ar_log) &amp;&amp; count($ar_log) &amp;&amp; $ar_log['code']!=$this->getExtVal($pm,'code')
-		&& intval($ar_log['tries']) &gt; 0){
+		&amp;&amp; intval($ar_log['tries']) &gt; 0){
 			$this->getDbLinkMaster()->query(
 				"UPDATE notifications.tm_logins
 				SET tries = tries - 1
@@ -1495,6 +1496,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				$this->add_auth_model($pubKey, session_id(), md5($ar['pwd']), $this->calc_session_expiration_time());
 			}
 			$this->getDbLinkMaster()->query('COMMIT');
+			LSNPosition::add($this->getDbLinkMaster());
 			
 		}catch(Exception $e){
 			$this->getDbLinkMaster()->query('ROLLBACK');
@@ -1915,6 +1917,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 					)
 				));		
 			}
+			//new method to add lsn
+			LSNPosition::add($this->getDbLinkMaster());
 		}
 	}
 	

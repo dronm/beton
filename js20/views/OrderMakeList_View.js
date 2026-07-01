@@ -84,6 +84,11 @@ function OrderMakeList_View(id,options){
 					return;
 				}
 				window.setGlobalWait(true);
+
+				const specVehGrid = self.getElement("veh_special_grid");
+				specVehGrid.setDate(dateTime);
+				specVehGrid.onRefresh();
+
 				self.refresh(function(){
 					window.setGlobalWait(false);
 				}, true);
@@ -160,11 +165,10 @@ function OrderMakeList_View(id,options){
 			"model":options.models.VehicleScheduleMakeOrderList_Model
 		}));
 		
-		//special vehicles
-		/*
+		//special vehicles, special update with interval
 		this.addElement(new SpecialVehicleMakeOrderGrid(id+":veh_special_grid",{
-			"model":options.models.VehicleScheduleMakeOrderList_Model
-		}));*/
+			"date": init_dt
+		}));
 
 		//features_grid		
 		var model = options.models.VehFeaturesOnDateList_Model;	

@@ -308,9 +308,9 @@ Map_View.prototype.setFollowVehicle = function(v){
 					,{"id":"Vehicle.route_redraw."+this.m_curTrackerId}
 				]
 				,"onEvent":function(json){
-					console.log("json=",json)
+					//console.log("json=",json)
 					if(json.eventId && json.eventId == "Vehicle.route_redraw."+self.m_curTrackerId){
-						console.log("Redraw route!!!")
+						//console.log("Redraw route!!!")
 						if(json.params.long_route_rest===true){
 							self.fetchGuessedRoute("Маршрут перестроен");
 							
@@ -449,9 +449,9 @@ Map_View.prototype.getModelRow = function(model){
 Map_View.prototype.updateVehiclePosition = function(rowStruc){
 	//all fields marker.id=Vehicle ID
 	var marker = new MapCarMarker(rowStruc);
-//console.log("Map_View.prototype.updateVehiclePosition ID="+marker.id)	
 
-	marker.image = TRACK_CONSTANTS.VEH_IMG;
+	console.log("updateVehiclePosition",rowStruc)
+	marker.image = rowStruc.map_picture? TRACK_CONSTANTS.IMG_PATH+rowStruc.map_picture : TRACK_CONSTANTS.VEH_IMG;
 	marker.imageScale = 0.8;
 	this.m_vehicles.removeVehicle(marker.id);
 	this.m_vehicles.addVehicle(marker,null,true,false);

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-06-11 06:13:26</lastBuild></version>
+		<lastBuild>2026-07-01 13:44:37</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -327,6 +327,7 @@
 		<version dateOpen="2026-06-11 06:08:26" dateClose="2026-06-11 06:08:40">1.00419</version>
 		<version dateOpen="2026-06-11 06:13:20" dateClose="2026-06-11 06:13:29">1.00420</version>
 		<version dateOpen="2026-06-11 06:21:43" dateClose="2026-06-11 06:21:59">1.00421</version>
+		<version dateOpen="2026-06-16 10:32:23" dateClose="2026-07-01 13:44:59">1.00422</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -1138,6 +1139,8 @@
 			<field id="fuel_card_id" dataType="Text" alias="Номер топливной карты"/>
 			<field id="fuel_consumption_schema_id" dataType="Int" refTable="fuel_consumption_schema" refField="id"/>
 			<field id="ownership_type" dataType="Enum" enumId="ownership_types" alias="Тип владения"/>
+			<field id="map_picture" dataType="Text" alias="Тип владения"/>
+			<field id="deleted" dataType="Bool"/>
 			<index id="vehicles_plate_idx" unique="TRUE">
 				<expression>lower(plate)</expression>
 			</index>
@@ -1184,6 +1187,8 @@
 			<field id="reg_doc" dataType="Text"/>
 			<field id="fuel_consumption_schema_ref" dataType="JSON"/>
 			<field id="attachments_list" dataType="JSON"/>
+			<field id="map_picture" dataType="Text" alias="Тип владения"/>
+			<field id="deleted" dataType="Bool"/>
 			<globalFilter id="vehicle_owner_list" fieldId="vehicle_owners_ar"/>
 		</model>
 		<model id="VehicleMileage" parent="ModelSQLBeton" dataTable="vehicle_mileages" virtual="FALSE">
@@ -5796,6 +5801,8 @@
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="date_time" dataType="DateTime" alias="Период" required="TRUE"/>
 			<field id="vehicle_id" dataType="Int" refTable="vehicles" refField="id" required="TRUE"/>
+			<field id="mileage" dataType="Int"/>
+			<field id="timing" dataType="Interval"/>
 			<field id="quant" dataType="Int" alias="Количество" required="TRUE"/>
 		</model>
 		<model id="BuhNakl" parent="ModelSQLDOC" dataTable="fuel_consumptions" virtual="FALSE">
@@ -5805,16 +5812,19 @@
 			<field id="quant" dataType="Int" alias="Количество" required="TRUE"/>
 		</model>
 		<model id="SpecialVehicleList" parent="ModelSQLDOC" dataTable="special_vehicles_list" virtual="TRUE">
-			<field id="vehicles_ref" dataType="JSON" primaryKey="TRUE" autoInc="FALSE"/>
+			<field id="id" dataType="Int" primaryKey="TRUE"/>
+			<field id="vehicles_ref" dataType="JSON"/>
 			<field id="tracker_id" dataType="String"/>
 			<field id="make" dataType="String"/>
 			<field id="tracker_no_signal" dataType="Bool"/>
-			<field id="mileage" dataType="Float"/>
-			<field id="timing" dataType="Time"/>
+			<field id="no_tracker" dataType="Bool"/>
+			<field id="mileage" dataType="Int"/>
+			<field id="timing" dataType="String"/>
 			<field id="fuel_flow_start" dataType="Int"/>
 			<field id="fuel_flow_in" dataType="Int"/>
 			<field id="fuel_flow_out" dataType="Int"/>
 			<field id="fuel_flow_end" dataType="Int"/>
+			<field id="map_picture" dataType="Text"/>
 		</model>
 	</models>
 	<constants>
@@ -9853,6 +9863,8 @@
 		<jsScript file="js20/models/VehicleFuelConsumptionSchemaDetail_Model.js"/>
 		<jsScript file="js20/controllers/VehicleFuelConsumptionSchemaDetail_Controller.js"/>
 		<jsScript file="js20/models/VehicleFuelConsumptionSchemaDetailList_Model.js"/>
+		<jsScript file="js20/models/SpecialVehicleList_Model.js"/>
+		<jsScript file="js20/models/FuelConsumption_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

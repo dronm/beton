@@ -13,6 +13,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLEnum.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDate.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/ModelOrderSQL.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLArray.php');
@@ -298,6 +299,24 @@ class Vehicle_Model extends ModelSQLBeton{
 						
 		$f_ownership_type=new FieldSQLEnum($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ownership_type",$f_opts);
 		$this->addField($f_ownership_type);
+		//********************
+		
+		//*** Field map_picture ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Тип владения';
+		$f_opts['id']="map_picture";
+						
+		$f_map_picture=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"map_picture",$f_opts);
+		$this->addField($f_map_picture);
+		//********************
+		
+		//*** Field deleted ***
+		$f_opts = array();
+		$f_opts['id']="deleted";
+						
+		$f_deleted=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"deleted",$f_opts);
+		$this->addField($f_deleted);
 		//********************
 	
 		$order = new ModelOrderSQL();		

@@ -403,7 +403,7 @@ class User_Controller extends ControllerSQL{
 	$opts=array();
 	
 		$opts['alias']='Пароль';
-		$opts['length']=20;				
+		$opts['length']=50;				
 		$pm->addParam(new FieldExtPassword('pwd',$opts));
 	
 				
@@ -1344,8 +1344,6 @@ class User_Controller extends ControllerSQL{
 			//user logged
 			$pubKey = trim($log_ar['pub_key']);
 		}
-
-		LSNPosition::add($sess_db_link);
 	}
 	
 	private function do_login($pm,&$pubKey,&$pwd){		
@@ -1419,6 +1417,8 @@ class User_Controller extends ControllerSQL{
 		$pwd = '';
 		$this->do_login($pm,$pubKey,$pwd);
 		$this->add_auth_model($pubKey,session_id(),md5($pwd),$this->calc_session_expiration_time());
+		LSNPosition::add($this->getDbLinkMaster());
+		//file_put_contents(OUTPUT_PATH.'lsn.txt',$_SESSION["last_lsn_position"]);
 	}
 
 	public function login_refresh($pm){	
@@ -1492,6 +1492,7 @@ class User_Controller extends ControllerSQL{
 		}
 		
 		$this->add_auth_model($pub_key,$new_sess_id,$u_pwd_ar['u_pwd_hash'],$this->calc_session_expiration_time());
+		LSNPosition::add($this->getDbLinkMaster());
 	}
 
 	/**
@@ -1799,7 +1800,7 @@ class User_Controller extends ControllerSQL{
 					)
 				)
 			));		
-			
+			LSNPosition::add($this->getDbLinkMaster());
 		}
 		else{
 			throw new Exception(ERR_AUTH);
@@ -1916,7 +1917,7 @@ class User_Controller extends ControllerSQL{
 		}
 		
 		//match ext_users to our users
-		$ar = $this->getDbLink()->query_first(
+		$ar = $this->getDbLink()->query_first(sprintf(
 			"SELECT 
 				u.*,
 				usr.pwd AS pwd,
@@ -1934,12 +1935,26 @@ class User_Controller extends ControllerSQL{
 			LEFT JOIN client_tels AS ct ON ct.id = (ex_u.ext_obj->'keys'->>'id')::int
 			LEFT JOIN users AS usr ON format_cel_standart(usr.phone_cel) = format_cel_standart(ct.tel)
 			LEFT JOIN users_dialog AS u ON usr.id = u.id
-			WHERE ex_u.app_id = $1 AND ex_u.tm_user->>'id' = $2 
-			LIMIT 1",
-			[ MS_APP_ID, $auth_data['id'] ]
-		);
+			WHERE ex_u.app_id = %d AND ex_u.tm_user->>'id' = '%s'
+			LIMIT 1"
+			,MS_APP_ID
+			,$auth_data['id']
+		));
 		
 		if (!is_array($ar) || !count($ar)){
+			//mark new user
+			/*
+			$this->getDbLinkMaster()->query(sprintf(
+				"SELECT notifications.reg_ext_user(%d, '%s'::jsonb) AS id",
+				MS_APP_ID,
+				sprintf(
+					'{"id":%s, "is_bot":false, "first_name":"%s", "username":"%s"}',
+					$auth_data['id'],
+					$auth_data['first_name'],
+					$auth_data['username']
+				)
+			));
+			*/
 			throw new Exception('Нет соответствия пользователя из Telergam!');
 			
 		}else if ($ar['banned']=='t'){
@@ -1966,6 +1981,7 @@ class User_Controller extends ControllerSQL{
 				$_SESSION['photo_url'] = $auth_data['photo_url'];
 			}
 			$this->add_auth_model($pubKey, session_id(), md5($ar['pwd']), $this->calc_session_expiration_time());
+			LSNPosition::add($this->getDbLinkMaster());
 		}
 	}
 
@@ -2154,6 +2170,7 @@ class User_Controller extends ControllerSQL{
 				$this->add_auth_model($pubKey, session_id(), md5($ar['pwd']), $this->calc_session_expiration_time());
 			}
 			$this->getDbLinkMaster()->query('COMMIT');
+			LSNPosition::add($this->getDbLinkMaster());
 			
 		}catch(Exception $e){
 			$this->getDbLinkMaster()->query('ROLLBACK');
@@ -2251,6 +2268,7 @@ class User_Controller extends ControllerSQL{
 			$code = gen_pwd(3, "NUM");
 			
 			$txt = 'Код авторизации: '.$code;
+			//TODO: make user selector: login_notification_types: tm/max/sms
 			if($ar["tp"] == "max"){
 				add_notification_from_contact_max($link, $this->getExtVal($pm,'tel'), $txt, 'max_auth', NULL, $ar['ext_contact_id']);
 			} else if($ar["tp"] == "tm"){
@@ -2420,7 +2438,7 @@ class User_Controller extends ControllerSQL{
 		unset($_SESSION["user_tel_login_incorrect_count"]);
 		unset($_SESSION["user_tel_login_incorrect_time"]);
 
-		$photoData = $ar["tm_photo"];
+		$photoData = $ar["tm_photo"]; //encoded base64
 		$photoCacheFile = OUTPUT_PATH.md5('max_photo_'.$ar["contact_id"]);
 
 		if (isset($ar["photo_url"]) && !isset($ar["tm_photo"]) && !file_exists($photoCacheFile)) {
@@ -2431,7 +2449,6 @@ class User_Controller extends ControllerSQL{
 				file_put_contents($photoCacheFile, $photoData);
 				$_SESSION["tm_photo"] = $photoRawData;
 			}
-
 		} else if (isset($ar["photo_url"]) && !isset($ar["tm_photo"]) && file_exists($photoCacheFile)) {
 			$photoData = file_get_contents($photoCacheFile);
 			$_SESSION["tm_photo"] = base64_decode($photoData);
@@ -2452,7 +2469,7 @@ class User_Controller extends ControllerSQL{
 			)
 		));
 	}	
-
+	
 	public function set_param($pm){
 		$name = $this->getExtVal($pm,'name');
 		$val = $this->getExtVal($pm,'val');
@@ -2574,6 +2591,8 @@ class User_Controller extends ControllerSQL{
 					)
 				));		
 			}
+			//new method to add lsn
+			LSNPosition::add($this->getDbLinkMaster());
 		}
 	}
 	
