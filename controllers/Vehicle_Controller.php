@@ -1350,7 +1350,7 @@ class Vehicle_Controller extends ControllerSQL{
 		
 		$this->addNewModel(
 			sprintf(
-				"SELECT * FROM special_vehicles_list_get_or_create(%s::timestamp)",
+				"SELECT * FROM special_vehicles_list(%s::timestamp)",
 				$dateForDb
 			),
 			'SpecialVehicleList_Model'

@@ -15,5 +15,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION sessions_process() OWNER TO ;
-

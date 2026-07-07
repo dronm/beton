@@ -328,6 +328,7 @@
 		<version dateOpen="2026-06-11 06:13:20" dateClose="2026-06-11 06:13:29">1.00420</version>
 		<version dateOpen="2026-06-11 06:21:43" dateClose="2026-06-11 06:21:59">1.00421</version>
 		<version dateOpen="2026-06-16 10:32:23" dateClose="2026-07-01 13:44:59">1.00422</version>
+		<version dateOpen="2026-07-07 05:04:32" dateClose="2026-07-07 05:19:16">1.00423</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
