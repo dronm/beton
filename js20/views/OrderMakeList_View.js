@@ -8,7 +8,7 @@ function OrderMakeList_View(id,options){
 	options.templateOptions.showChart = true;//!this.m_lowResDevice;
 	options.templateOptions.lowResDevice = this.m_lowResDevice;
 	options.templateOptions.notLowResDevice = !this.m_lowResDevice;
-	options.templateOptions.showGridHeaders = !this.m_lowResDevice;
+	options.templateOptions.showGridHeaders = true;//!this.m_lowResDevice;
 	
 	this.m_showProductionSites = true;//!this.m_lowResDevice;
 	options.templateOptions.showProductionSites = this.m_showProductionSites;
@@ -407,9 +407,12 @@ OrderMakeList_View.prototype.onRefreshResponse = function(resp){
 			grid.onGetData();
 		}
 	}	
-	//chart
-	if(resp.modelExists("Graph_Model") && !this.m_lowResDevice){
-		this.getElement("plant_load_graph").setModel(resp.getModel("Graph_Model"));
+	//chart  && !this.m_lowResDevice
+	if(resp.modelExists("Graph_Model")){
+		const chartCtrl = this.getElement("plant_load_graph");
+		if(chartCtrl){
+			chartCtrl.setModel(resp.getModel("Graph_Model"));
+		}
 	}
 
 	//cement + stors + mat total + assigning

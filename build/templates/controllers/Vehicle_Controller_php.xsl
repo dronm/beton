@@ -580,13 +580,13 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	public function get_special_vehicles_list($pm) {
 		$dateForDb = $this->getExtDbVal($pm, 'date');
 		
-		$this->addNewModel(
-			sprintf(
+		$query = sprintf(
 				"SELECT * FROM special_vehicles_list_get_or_create(%s::timestamp)",
 				$dateForDb
-			),
-			'SpecialVehicleList_Model'
-		);
+			);
+		$model = new ModelSQL($this->getDbLinkMaster(), array('id'=>"SpecialVehicleList_Model"));
+		$model->query($query, TRUE);
+		$this->addModel($model);
 	}
 }
 <![CDATA[?>]]>

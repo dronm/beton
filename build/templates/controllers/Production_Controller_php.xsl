@@ -65,14 +65,6 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 	}
 
 
-/*
-
-UPDATE public.production_sites
-   SET elkon_connection='{"databaseName":"Santral","userName":"andreymikhalevich","userPassword":"wimaf2020ii42","host":"192.168.1.12","port":59900,"logLevel":9}'::JSONB
- WHERE id=2;
-
-*/
-
 	private static function get_con_id($prodSiteId){
 		return 'srv_'.$prodSiteId;
 	}

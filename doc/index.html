@@ -84,6 +84,7 @@
 <li><a href="#Login_Controller">Login_Controller</a></li>
 <li><a href="#LoginDevice_Controller">LoginDevice_Controller</a></li>
 <li><a href="#LoginDeviceBan_Controller">LoginDeviceBan_Controller</a></li>
+<li><a href="#MacAddressList_Controller">MacAddressList_Controller</a></li>
 <li><a href="#MainMenu_Controller">MainMenu_Controller</a></li>
 <li><a href="#MainMenuConstructor_Controller">MainMenuConstructor_Controller</a></li>
 <li><a href="#MainMenuContent_Controller">MainMenuContent_Controller</a></li>
@@ -143,6 +144,7 @@
 <li><a href="#ShipmentForOwnerCostHeader_Controller">ShipmentForOwnerCostHeader_Controller</a></li>
 <li><a href="#ShipmentMedia_Controller">ShipmentMedia_Controller</a></li>
 <li><a href="#ShipmentTimeNorm_Controller">ShipmentTimeNorm_Controller</a></li>
+<li><a href="#ShipmentWeight_Controller">ShipmentWeight_Controller</a></li>
 <li><a href="#SiteFeedBack_Controller">SiteFeedBack_Controller</a></li>
 <li><a href="#SpecialistRequest_Controller">SpecialistRequest_Controller</a></li>
 <li><a href="#SrvStatistics_Controller">SrvStatistics_Controller</a></li>
@@ -182,6 +184,7 @@
 <li><a href="#VehicleTotRepItemValue_Controller">VehicleTotRepItemValue_Controller</a></li>
 <li><a href="#View_Controller">View_Controller</a></li>
 <li><a href="#Weather_Controller">Weather_Controller</a></li>
+<li><a href="#Workplace_Controller">Workplace_Controller</a></li>
 </ul>
 <div class="section-title">Models</div>
 <ul>
@@ -568,6 +571,11 @@
 <li><a href="#FuelConsumption_Model">FuelConsumption_Model</a></li>
 <li><a href="#BuhNakl_Model">BuhNakl_Model</a></li>
 <li><a href="#SpecialVehicleList_Model">SpecialVehicleList_Model</a></li>
+<li><a href="#ShipmentWeight_Model">ShipmentWeight_Model</a></li>
+<li><a href="#ShipmentWeightList_Model">ShipmentWeightList_Model</a></li>
+<li><a href="#Workplace_Model">Workplace_Model</a></li>
+<li><a href="#WorkplaceList_Model">WorkplaceList_Model</a></li>
+<li><a href="#MacAddressList_Model">MacAddressList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -2413,6 +2421,19 @@
 <a href="#LoginDeviceBan_Model">Model: LoginDeviceBan_Model</a><h2>get_list</h2>
 <a href="#LoginDeviceBan_Model">Model: LoginDeviceBan_Model</a><h2>get_object</h2>
 <a href="#LoginDeviceBan_Model">Model: LoginDeviceBan_Model</a>
+</div>
+</div>
+<div id="MacAddressList_Controller" class="content_box">
+<h1>MacAddressList_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#MacAddressList_Model">Model: MacAddressList_Model</a><h2>update</h2>
+<a href="#MacAddressList_Model">Model: MacAddressList_Model</a><h2>delete</h2>
+<a href="#MacAddressList_Model">Model: MacAddressList_Model</a><h2>get_list</h2>
+<a href="#MacAddressList_Model">Model: MacAddressList_Model</a><h2>get_object</h2>
+<a href="#MacAddressList_Model">Model: MacAddressList_Model</a>
 </div>
 </div>
 <div id="MainMenu_Controller" class="content_box">
@@ -4340,6 +4361,16 @@
 <a href="#ShipmentTimeNorm_Model">Model: ShipmentTimeNorm_Model</a>
 </div>
 </div>
+<div id="ShipmentWeight_Controller" class="content_box">
+<h1>ShipmentWeight_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>get_list</h2>
+<a href="#ShipmentWeightList_Model">Model: ShipmentWeightList_Model</a><h2>get_object</h2>
+<a href="#ShipmentWeightList_Model">Model: ShipmentWeightList_Model</a>
+</div>
+</div>
 <div id="SiteFeedBack_Controller" class="content_box">
 <h1>SiteFeedBack_Controller</h1>
 <div class="content_item">
@@ -5799,6 +5830,19 @@
 <p>Методы:</p>
 <h2>get_current</h2>
 <a href="#Weather_Model">Model: Weather_Model</a>
+</div>
+</div>
+<div id="Workplace_Controller" class="content_box">
+<h1>Workplace_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#Workplace_Model">Model: Workplace_Model</a><h2>update</h2>
+<a href="#Workplace_Model">Model: Workplace_Model</a><h2>delete</h2>
+<a href="#Workplace_Model">Model: Workplace_Model</a><h2>get_list</h2>
+<a href="#WorkplaceList_Model">Model: WorkplaceList_Model</a><h2>get_object</h2>
+<a href="#WorkplaceList_Model">Model: WorkplaceList_Model</a>
 </div>
 </div>
 <div id="About_Model" class="content_box">
@@ -9827,6 +9871,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>last_modif_user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>last_modif_users_ref</h2>
 <div>Type:JSON</div>
 <div>Primary key:</div>
@@ -9835,6 +9885,12 @@
 <div>Precision:</div>
 <h2>last_modif_date_time</h2>
 <div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>weigh_app</h2>
+<div>Type:Bool</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -12844,6 +12900,24 @@
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="MacAddressList_Model" class="content_box">
+<h1>MacAddressList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mac_address</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:17</div>
 <div>Precision:</div>
 </div>
 </div>
@@ -23468,6 +23542,96 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="ShipmentWeight_Model" class="content_box">
+<h1>ShipmentWeight_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>shipment_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_gross</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+<h2>quant_net</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+</div>
+</div>
+<div id="ShipmentWeightList_Model" class="content_box">
+<h1>ShipmentWeightList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>shipment_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicles_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>destinations_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>orders_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ship_date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_gross</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+<h2>quant_net</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+</div>
+</div>
 <div id="ShippedVehicleList_Model" class="content_box">
 <h1>ShippedVehicleList_Model</h1>
 <div class="content_item">
@@ -27494,6 +27658,78 @@
 <div>Precision:</div>
 <h2>content_details</h2>
 <div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="Workplace_Model" class="content_box">
+<h1>Workplace_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>name</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>tel_ext</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:5</div>
+<div>Precision:</div>
+<h2>mac_addresses</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="WorkplaceList_Model" class="content_box">
+<h1>WorkplaceList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>name</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>tel_ext</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:5</div>
+<div>Precision:</div>
+<h2>mac_addresses</h2>
+<div>Type:JSONB</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>users_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>

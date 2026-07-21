@@ -1952,6 +1952,30 @@ $permissions = array();
 				
 					$permissions['BuhDoc_Controller_new_doc']=TRUE;
 				
+					$permissions['ShipmentWeight_Controller_get_list']=TRUE;
+				
+					$permissions['ShipmentWeight_Controller_get_object']=TRUE;
+				
+					$permissions['Workplace_Controller_insert']=TRUE;
+				
+					$permissions['Workplace_Controller_update']=TRUE;
+				
+					$permissions['Workplace_Controller_delete']=TRUE;
+				
+					$permissions['Workplace_Controller_get_list']=TRUE;
+				
+					$permissions['Workplace_Controller_get_object']=TRUE;
+				
+					$permissions['MacAddressList_Controller_insert']=TRUE;
+				
+					$permissions['MacAddressList_Controller_update']=TRUE;
+				
+					$permissions['MacAddressList_Controller_delete']=TRUE;
+				
+					$permissions['MacAddressList_Controller_get_list']=TRUE;
+				
+					$permissions['MacAddressList_Controller_get_object']=TRUE;
+				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }
 ?>

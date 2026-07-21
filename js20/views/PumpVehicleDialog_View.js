@@ -27,6 +27,7 @@ function PumpVehicleDialog_View(id,options){
 		}));	
 		
 		this.addElement(new VehicleOwnerEdit(id+":vehicle_owners_ref",{
+			"enabled": false
 		}));
 			
 		this.addElement(new PumpVehiclePriceListGrid(id+":pump_prices",{

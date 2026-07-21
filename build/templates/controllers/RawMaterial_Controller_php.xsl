@@ -31,6 +31,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 
 	const ERR_UPLOAD_NOT_ALLOWED_FOR_PERIOD = "Запрещена загрузка в данном периоде";
 
+	const SELF_SHIP_MATERIAL_MARKER = "Бетон САМОВЫВОЗ";
+
 	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
 		parent::__construct($dbLinkMaster, $dbLink);<xsl:apply-templates/>
 	}
@@ -78,6 +80,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	/*public function update_procurement($pm){
 	}*/
 
+	// new working method
 	public function load_procurement($pm){
 		$link_master = $this->getDbLinkMaster();
 		$link = $this->getDbLink();
@@ -159,6 +162,62 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	
 	}
 	
+	private function loadSelfShipWeightError($error){
+		error_log("loadSelfShipWeight: ".$error);
+	}
+
+	public function loadSelfShipWeight($pm, $doc){
+		$link_master = $this->getDbLinkMaster();
+		try{
+			//doc				
+			$quant_gross = ($doc->quant_gross=='0')? 0:$doc->quant_gross/1000;
+			$quant_net = ($doc->quant_net=='0')? 0:$doc->quant_net/1000;
+			$plate = trim($doc->vehicle_plate);
+			if($plate == ""){
+				throw new Exception("loadSelfShipWeight: vehicle plate not set");
+			}
+			$plate = mb_strtolower(mb_substr($plate, 1, 3)); //normalized plate
+
+			//find vehicle
+			$veh_res = $link_master->query_first(
+				"SELECT 
+					v.id AS vehicle_id,
+					sh.id AS shipment_id
+				FROM vehicles AS v
+				LEFT JOIN vehicle_schedules AS sch ON sch.schedule_date = $1::date AND sch.vehicle_id = v.id
+				LEFT JOIN LATERAL (
+					SELECT *
+					FROM shipments
+					WHERE vehicle_schedule_id = sch.id
+					  AND date_time &lt; $2::timestamp
+					ORDER BY date_time ASC
+					LIMIT 1
+				) sh ON TRUE
+				WHERE v.plate ilike $3 AND sh.id IS NOT NULL
+				LIMIT 1", 
+				[ $doc->date_time, $doc->date_time, '%'.$plate.'%' ]
+			);
+			if($veh_res === false || $veh_res === null || !is_array($veh_res) || !count($veh_res) || !isset($veh_res["shipment_id"])){
+				throw new Exception("vehicle shipment not found by plate:".$plate. ', time:'.$doc->date_time);
+			}
+
+			$link_master->query(
+				"INSERT INTO shipment_weights
+				(shipment_id, date_time, quant_gross, quant_net)
+				VALUES ($1, $2, $3, $4)
+				ON CONFLICT (shipment_id) DO UPDATE SET
+					date_time = EXCLUDED.date_time,
+					quant_net = EXCLUDED.quant_net,
+					quant_gross = EXCLUDED.quant_gross
+				", 
+				[$veh_res["shipment_id"], $doc->date_time, $quant_gross, $quant_net]
+			);
+		}catch (Exception $e){
+			$this->loadSelfShipWeightError($e->getMessage());
+		}
+	}
+
+	//actual upload procurement active function.
 	public function loadProcurementDocument($pm, $doc){
 	
 		if(
@@ -166,6 +225,12 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		|| strtolower(trim($doc->material))=='бетон'
 		|| trim($doc->material)==''
 		){
+			return;
+		}
+
+		if( trim($doc->material) == self::SELF_SHIP_MATERIAL_MARKER ){
+			//different logic
+			$this->loadSelfShipWeight($pm, $doc);
 			return;
 		}
 		

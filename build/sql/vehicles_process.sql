@@ -73,6 +73,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION public.vehicles_process()
-  OWNER TO ;
-

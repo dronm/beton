@@ -1,0 +1,22 @@
+-- View: shipment_weights_list
+
+-- DROP VIEW shipment_weights_list;
+
+CREATE OR REPLACE VIEW shipment_weights_list AS 
+	SELECT
+		sh.id AS shipment_id,
+		sh.quant,
+		vehicles_ref(v) AS vehicles_ref,
+		destinations_ref(dest) AS destinations_ref,
+		sh.ship_date_time,
+		shw.date_time,
+		shw.quant_gross,
+		shw.quant_net
+	FROM shipment_weights shw
+	LEFT JOIN shipments sh ON shw.shipment_id = sh.id
+	LEFT JOIN orders o ON o.id = sh.order_id
+	LEFT JOIN vehicle_schedules AS vsch ON vsch.id = sh.vehicle_schedule_id
+	LEFT JOIN vehicles AS v ON v.id = vsch.vehicle_id
+	LEFT JOIN destinations AS dest ON dest.id = o.destination_id
+	
+	ORDER BY sh.ship_date_time DESC;

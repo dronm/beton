@@ -1802,6 +1802,10 @@ js20/custom_controls/SpecialVehicleMakeOrderGrid.js
 special_vehicles_list sql functions and materialized view
 
 
+1.00424
+1) Mobile expandable panels
+2) RawMaterial_Controller->loadSelfShipWeight()
+added a new table shipment_weights
 
 Order_Controller->get_make_orders_form() is too slow, 3.5s
 TODO: invite to Telegram from saved orders?

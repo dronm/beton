@@ -301,6 +301,7 @@ function DOCMaterialProcurementDialog_Model(options){
 	options.fields.users_ref = new FieldJSON("users_ref",filed_options);
 	
 			
+			
 				
 	
 	var filed_options = {};
@@ -310,6 +311,7 @@ function DOCMaterialProcurementDialog_Model(options){
 	
 	options.fields.last_modif_users_ref = new FieldJSON("last_modif_users_ref",filed_options);
 	
+			
 			
 		DOCMaterialProcurementDialog_Model.superclass.constructor.call(this,id,options);
 }

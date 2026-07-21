@@ -565,7 +565,7 @@ tfoot td{
 	width: 60px;
 }
 #OrderMakeList\:order_make_grid\:order_make_grid\:head\:comment_text {
-	width: 135px;
+	width: 130px;
 }
 #OrderMakeList\:order_make_grid\:order_make_grid\:head\:destinations_ref {
 	width: 110px;
@@ -577,6 +577,9 @@ tfoot td{
 	width: 140px;
 }
 #OrderMakeList\:order_make_grid\:order_make_grid\:head\:clients_ref{
+	width: 200px;
+}
+#OrderMakeList\:order_make_grid\:order_make_grid\:head\:unload_type{
 	width: 200px;
 }
 #OrderMakeList\:order_make_grid\:order_make_grid\:head\:quant{
@@ -1635,7 +1638,7 @@ tr.deleted_row {
 	width: 60px;
 }
 #OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:comment_text {
-	width: 150px;
+	width: 130px;
 }
 #OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:destinations_ref {
 	width: 140px;
@@ -1648,6 +1651,9 @@ tr.deleted_row {
 }
 #OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:clients_ref{
 	width: 230px;
+}
+#OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:unload_type{
+	width: 200px;
 }
 #OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:quant{
 	width: 60px;
@@ -1696,6 +1702,9 @@ tr.deleted_row {
 #OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:clients_ref{
 	width: 230px;
 }
+#OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:unload_type{
+	width: 200px;
+}
 #OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:quant{
 	width: 60px;
 }
@@ -1716,4 +1725,36 @@ tr.deleted_row {
 }
 #OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:is_needed{
 	width: 80px;
+}
+
+/* added on 2026-07-17 */
+.panel-heading {
+	position: relative;
+	padding-right: 45px;
+}
+
+@media (max-width: 768px) {
+	.panel-heading > .heading-elements {
+		display: block !important;
+		position: absolute;
+		top: 50%;
+		right: 15px;
+		margin-top: -10px;
+	}
+
+	.panel-heading > .heading-elements .icons-list {
+		display: block;
+		margin: 0;
+		padding: 0;
+	}
+
+	.panel-heading > .heading-elements .icons-list > li {
+		display: block;
+	}
+
+	.panel-heading > .heading-elements [data-action="collapse"] {
+		display: block !important;
+		width: 20px;
+		height: 20px;
+	}
 }

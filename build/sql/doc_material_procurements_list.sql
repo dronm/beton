@@ -32,7 +32,9 @@ CREATE OR REPLACE VIEW doc_material_procurements_list AS
 	users_ref(u) AS users_ref,
 	doc.comment_text,
 	users_ref(u_last) AS last_modif_users_ref,
-	doc.last_modif_date_time
+	doc.last_modif_date_time,
+	doc.last_modif_user_id,
+	doc.weigh_app
 	
    FROM doc_material_procurements doc
      LEFT JOIN suppliers sup ON sup.id = doc.supplier_id

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-07-01 13:44:37</lastBuild></version>
+		<lastBuild>2026-07-21 05:57:25</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -329,6 +329,7 @@
 		<version dateOpen="2026-06-11 06:21:43" dateClose="2026-06-11 06:21:59">1.00421</version>
 		<version dateOpen="2026-06-16 10:32:23" dateClose="2026-07-01 13:44:59">1.00422</version>
 		<version dateOpen="2026-07-07 05:04:32" dateClose="2026-07-07 05:19:16">1.00423</version>
+		<version dateOpen="2026-07-17 09:06:37" dateClose="2026-07-21 05:57:48">1.00424</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -2666,8 +2667,10 @@
 			<field id="doc_quant_gross" dataType="Float" length="19" alias="Брутто по документам" precision="2"/>
 			<field id="users_ref" dataType="JSON" alias="Автор"/>
 			<field id="comment_text" dataType="Text" alias="Автор"/>
+			<field id="last_modif_user_id" dataType="Int" alias="Кто последний вносил изменения"/>
 			<field id="last_modif_users_ref" dataType="JSON" alias="Кто последний вносил изменения"/>
 			<field id="last_modif_date_time" dataType="DateTimeTZ" alias="Время последнего изменения"/>
+			<field id="weigh_app" dataType="Bool" defaultValue="FALSE"/>
 		</model>
 		<model id="DOCMaterialProcurementDriverList" parent="ModelSQLDOC" dataTable="doc_material_procurements_driver_list" virtual="TRUE">
 			<field id="driver" dataType="String" primaryKey="TRUE" alias="Водитель"/>
@@ -5827,6 +5830,41 @@
 			<field id="fuel_flow_end" dataType="Int"/>
 			<field id="map_picture" dataType="Text"/>
 		</model>
+		<model id="ShipmentWeight" parent="ModelSQLBeton" dataTable="shipment_weights" virtual="FALSE">
+			<field id="shipment_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE" refTable="shipments" refField="id" required="TRUE" alias="Код"/>
+			<field id="date_time" dataType="DateTime" alias="Дата" required="TRUE"/>
+			<field id="quant_gross" dataType="Float" length="19" alias="Брутто" precision="2"/>
+			<field id="quant_net" dataType="Float" length="19" alias="Нетто" precision="2"/>
+		</model>
+		<model id="ShipmentWeightList" parent="ModelSQLBeton" dataTable="shipment_weights_list" virtual="TRUE">
+			<field id="shipment_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE" refTable="shipments" refField="id" required="TRUE" alias="Код"/>
+			<field id="quant" dataType="Int" alias="Код"/>
+			<field id="vehicles_ref" dataType="JSON" alias="ТС"/>
+			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
+			<field id="orders_ref" dataType="JSON" alias="Заявка"/>
+			<field id="ship_date_time" dataType="DateTime" alias="Дата" required="TRUE"/>
+			<field id="date_time" dataType="DateTime" alias="Дата" required="TRUE"/>
+			<field id="quant_gross" dataType="Float" length="19" alias="Брутто" precision="2"/>
+			<field id="quant_net" dataType="Float" length="19" alias="Нетто" precision="2"/>
+		</model>
+		<model id="Workplace" parent="ModelSQLBeton" dataTable="workplaces" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" dbRequired="TRUE" alias="Код"/>
+			<field id="name" dataType="Text" alias="Дата" required="TRUE"/>
+			<field id="tel_ext" dataType="String" length="5" alias="Добавочный номер"/>
+			<field id="mac_addresses" dataType="JSONB"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id"/>
+		</model>
+		<model id="WorkplaceList" parent="ModelSQLBeton" dataTable="workplaces_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" dbRequired="TRUE" alias="Код"/>
+			<field id="name" dataType="Text" alias="Дата" required="TRUE"/>
+			<field id="tel_ext" dataType="String" length="5" alias="Добавочный номер"/>
+			<field id="mac_addresses" dataType="JSONB"/>
+			<field id="users_ref" dataType="JSON"/>
+		</model>
+		<model id="MacAddressList" parentJS="ModelJSON" virtual="TRUE" server="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="mac_address" dataType="String" length="17"/>
+		</model>
 	</models>
 	<constants>
 		<constant id="doc_per_page_count" name="Количество документов на странице" descr="Количество документов на странице в журнале документов" dataType="Int" defaultValue="60" autoload="TRUE"/>
@@ -7990,6 +8028,24 @@
 				<field id="order_ids" dataType="Text"/>
 			</publicMethod>
 		</controller>
+		<controller id="ShipmentWeight" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="get_list" modelId="ShipmentWeightList"/>
+			<publicMethod id="get_object" modelId="ShipmentWeightList"/>
+		</controller>
+		<controller id="Workplace" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="Workplace"/>
+			<publicMethod id="update" modelId="Workplace"/>
+			<publicMethod id="delete" modelId="Workplace"/>
+			<publicMethod id="get_list" modelId="WorkplaceList"/>
+			<publicMethod id="get_object" modelId="WorkplaceList"/>
+		</controller>
+		<controller id="MacAddressList" parentIdJS="ControllerObjClient" server="FALSE">
+			<publicMethod id="insert" modelId="MacAddressList"/>
+			<publicMethod id="update" modelId="MacAddressList"/>
+			<publicMethod id="delete" modelId="MacAddressList"/>
+			<publicMethod id="get_list" modelId="MacAddressList"/>
+			<publicMethod id="get_object" modelId="MacAddressList"/>
+		</controller>
 	</controllers>
 	<permissions>
 		<permission type="allow" controllerId="all" methodId="all" roleId="owner"/>
@@ -8179,6 +8235,7 @@
 		<view id="10057" c="UserAllowedMaterialCorrection_Controller" t="UserAllowedMaterialCorrectionList" f="get_list" section="Справочники" descr="Список пользователей с разрешенным правом редактирования данных по материалам"/>
 		<view id="10058" c="FuelConsumptionSchema" t="FuelConsumptionSchemaList" f="get_list" section="Справочники" descr="Схемы расхода топлива"/>
 		<view id="10059" c="VehicleFuelConsumptionSchema" t="VehicleFuelConsumptionSchemaList" f="get_list" section="Справочники" descr="Схемы расхода топлива ТС"/>
+		<view id="10060" c="Workplace" t="WorkplaceList" f="get_list" section="Справочники" descr="Рабочие места"/>
 		<view id="20000" c="Order_Controller" t="OrderList" f="get_list" section="Документы" descr="Заявки"/>
 		<view id="20001" c="OrderPump_Controller" t="OrderPumpList" f="get_list" section="Документы" descr="Заявки (насосы)"/>
 		<view id="20002" c="Shipment_Controller" t="ShipmentList" f="get_list" section="Документы" descr="Отгрузки"/>
@@ -8252,6 +8309,7 @@
 		<view id="30044" c="MaxUser_Controller" t="MaxUserList" f="get_list" section="Формы" descr="Соответствия пользователей в MAX"/>
 		<view id="30045" c="MaxOutMessage_Controller" t="MaxOutMessageList" f="get_list" section="Формы" descr="Исходящие сообщения MAX"/>
 		<view id="30046" t="OrderForBuhList" section="Формы" descr="Заявки для формирования накладных в 1с"/>
+		<view id="30047" t="ShipmentWeightList" section="Формы" descr="Взвешивание отгрузок"/>
 		<view id="50001" t="VehicleStopsReport" section="Отчеты" descr="Стоянки ТС"/>
 		<view id="50002" t="VehicleScheduleReportAll" section="Отчеты" descr="Печать графиков"/>
 		<view id="50003" t="RouteToDestAvgTimeRep" section="Отчеты" descr="Среднее время до объектов"/>
@@ -8429,6 +8487,8 @@
 		<serverTemplate id="FuelConsumptionSchemaList" class="list"/>
 		<serverTemplate id="FuelConsumptionSchemaDetailList" class="list"/>
 		<serverTemplate id="VehicleFuelConsumptionSchemaDetailList" class="list"/>
+		<serverTemplate id="ShipmentWeightList" class="list"/>
+		<serverTemplate id="WorkplaceList" class="list"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="js20/tmpl/FatalException.html"/>
@@ -9098,6 +9158,9 @@
 		<jsScript file="js20/views/MaxUserList_View.js"/>
 		<jsScript file="js20/views/MaxOutMessageList_View.js"/>
 		<jsScript file="js20/views/VehicleFuelConsumptionSchemaDetailList_View.js"/>
+		<jsScript file="js20/views/ShipmentWeightList_View.js"/>
+		<jsScript file="js20/views/WorkplaceList_View.js"/>
+		<jsScript file="js20/views/WorkplaceDialog_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="js20/forms/ViewList_Form.js"/>
 		<jsScript file="js20/forms/MainMenuConstructor_Form.js"/>
@@ -9143,6 +9206,7 @@
 		<jsScript file="js20/forms/VehicleTotRepItem_Form.js"/>
 		<jsScript file="js20/forms/ProductionReportDialog_Form.js"/>
 		<jsScript file="js20/forms/FuelConsumptionSchemaList_Form.js"/>
+		<jsScript file="js20/forms/WorkplaceDialog_Form.js"/>
 		<!--custom controls-->
 		<jsScript file="js20/tmpl/App.templates.js" compressed="FALSE" standalone="FALSE"/>
 		<jsScript file="js20/custom_controls/EditDateInlineValidation.js"/>
@@ -9308,6 +9372,7 @@
 		<jsScript file="js20/custom_controls/DriverWorkTimeReport_View.js"/>
 		<jsScript file="js20/custom_controls/BuhDocItemGrid.js"/>
 		<jsScript file="js20/custom_controls/TrackerManager.js"/>
+		<jsScript file="js20/custom_controls/MacAddressListGrid.js"/>
 		<jsScript file="js20/views/rs_ru.js"/>
 		<jsScript file="js20/views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -9866,6 +9931,14 @@
 		<jsScript file="js20/models/VehicleFuelConsumptionSchemaDetailList_Model.js"/>
 		<jsScript file="js20/models/SpecialVehicleList_Model.js"/>
 		<jsScript file="js20/models/FuelConsumption_Model.js"/>
+		<jsScript file="js20/models/ShipmentWeight_Model.js"/>
+		<jsScript file="js20/controllers/ShipmentWeight_Controller.js"/>
+		<jsScript file="js20/models/ShipmentWeightList_Model.js"/>
+		<jsScript file="js20/models/Workplace_Model.js"/>
+		<jsScript file="js20/controllers/Workplace_Controller.js"/>
+		<jsScript file="js20/models/WorkplaceList_Model.js"/>
+		<jsScript file="js20/models/MacAddressList_Model.js"/>
+		<jsScript file="js20/controllers/MacAddressList_Controller.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>
