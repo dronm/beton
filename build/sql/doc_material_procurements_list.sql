@@ -46,7 +46,3 @@ CREATE OR REPLACE VIEW doc_material_procurements_list AS
      LEFT JOIN users AS u_last ON u_last.id = doc.last_modif_user_id
      
   ORDER BY doc.date_time DESC;
-
-ALTER TABLE doc_material_procurements_list
-  OWNER TO beton;
-

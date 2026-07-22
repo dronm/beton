@@ -565,7 +565,7 @@ tfoot td{
 	width: 60px;
 }
 #OrderMakeList\:order_make_grid\:order_make_grid\:head\:comment_text {
-	width: 130px;
+	width: 200px;
 }
 #OrderMakeList\:order_make_grid\:order_make_grid\:head\:destinations_ref {
 	width: 110px;
@@ -580,7 +580,7 @@ tfoot td{
 	width: 200px;
 }
 #OrderMakeList\:order_make_grid\:order_make_grid\:head\:unload_type{
-	width: 200px;
+	width: 130px;
 }
 #OrderMakeList\:order_make_grid\:order_make_grid\:head\:quant{
 	width: 60px;
@@ -1638,7 +1638,7 @@ tr.deleted_row {
 	width: 60px;
 }
 #OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:comment_text {
-	width: 130px;
+	width: 200px;
 }
 #OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:destinations_ref {
 	width: 140px;
@@ -1653,7 +1653,7 @@ tr.deleted_row {
 	width: 230px;
 }
 #OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:unload_type{
-	width: 200px;
+	width: 130px;
 }
 #OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:quant{
 	width: 60px;
@@ -1670,9 +1670,6 @@ tr.deleted_row {
 #OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:phone_cel{
 	width: 140px;
 }
-#OrderMakeForWeighingList\:order_make_grid\:order_make_grid\:head\:unload_type{
-	width: 220px;
-}
 
 /* for lab */
 #OrderMakeForLabList\:order_make_grid th, td {
@@ -1688,7 +1685,7 @@ tr.deleted_row {
 	width: 60px;
 }
 #OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:comment_text {
-	width: 130px;
+	width: 200px;
 }
 #OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:destinations_ref {
 	width: 120px;
@@ -1703,7 +1700,7 @@ tr.deleted_row {
 	width: 230px;
 }
 #OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:unload_type{
-	width: 200px;
+	width: 130px;
 }
 #OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:quant{
 	width: 60px;
@@ -1719,9 +1716,6 @@ tr.deleted_row {
 }
 #OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:phone_cel{
 	width: 140px;
-}
-#OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:unload_type{
-	width: 180px;
 }
 #OrderMakeForLabList\:order_make_grid\:order_make_grid\:head\:is_needed{
 	width: 80px;

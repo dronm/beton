@@ -22,7 +22,7 @@ BEGIN
 
 		UPDATE users
 		SET tel_ext = NULL
-		WHERE user_id = OLD.user_id;
+		WHERE id = OLD.user_id;
 
 		UPDATE contacts AS c
 		SET tel_ext = NULL
@@ -50,12 +50,12 @@ BEGIN
 			)
 			SELECT
 				NEW.user_id,
-				item.mac_address->>'mac_address'
+				BTRIM(row_item->'fields'->>'mac_address')
 			FROM jsonb_array_elements(
-				COALESCE(NEW.mac_addresses, '[]'::jsonb)
-			) AS item(mac_address)
+				COALESCE(NEW.mac_addresses->'rows', '[]'::jsonb)
+			) AS rows(row_item)
 			WHERE NULLIF(
-				BTRIM(item.mac_address->>'mac_address'),
+				BTRIM(row_item->'fields'->>'mac_address'),
 				''
 			) IS NOT NULL;
 		END IF;
@@ -67,7 +67,7 @@ BEGIN
 	IF NEW.user_id IS NOT NULL THEN
 		UPDATE users
 		SET tel_ext = NEW.tel_ext
-		WHERE user_id = NEW.user_id;
+		WHERE id = NEW.user_id;
 
 		UPDATE contacts AS c
 		SET tel_ext = NEW.tel_ext

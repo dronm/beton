@@ -268,7 +268,7 @@ extend(OrderMakeList_View,View);
 
 OrderMakeList_View.prototype.COL_CLIENT_LEN = 20;
 OrderMakeList_View.prototype.COL_DEST_LEN = 10;
-OrderMakeList_View.prototype.COL_COMMENT_LEN = 15;
+OrderMakeList_View.prototype.COL_COMMENT_LEN = 23; //used to be 15
 OrderMakeList_View.prototype.COL_DESCR_LEN = 15;
 OrderMakeList_View.prototype.COL_DRIVER_LEN = 10;
 OrderMakeList_View.prototype.COL_PUMP_VEH_LEN = 10;

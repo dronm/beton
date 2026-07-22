@@ -113,14 +113,12 @@ function OrderMakeGrid(id,options){
 							var unl_t = fields.unload_type.getValue();
 							if(unl_t=="band"||unl_t=="pump"){
 								var cmt = fields.pump_vehicle_comment.getValue();
-								//String.fromCharCode(10)+
 								res+= (unl_t=="band"? "Лента":"Насос")+":"+String.fromCharCode(10);
 								res+= window.getApp().formatCell(fields.pump_vehicle_owners_ref,cell,self.m_listView.COL_PUMP_VEH_LEN-4);
 								var l = fields.pump_vehicle_length.getValue();
 								if(l){
-									res+="("+l+((cmt&&cmt.length)? ","+cmt:"")+")";
-								}
-								else if(cmt&&cmt.length){
+									res+="("+l+((cmt && cmt.length)? ","+cmt.substr(0,3):"")+")";
+								} else if(cmt && cmt.length){
 									res+="("+cmt+")";
 								}
 							}
@@ -255,7 +253,7 @@ function OrderMakeGrid(id,options){
 								res = window.getApp().formatCell(fields.pump_vehicle_owners_ref,cell,self.m_listView.COL_PUMP_VEH_LEN-4);
 								var l = fields.pump_vehicle_length.getValue();
 								if(l){
-									res+="("+l+((cmt&&cmt.length)? ","+cmt:"")+")";
+									res+="("+l+((cmt&&cmt.length)? ","+cmt.substr(0,3):"")+")";
 								}
 								else if(cmt&&cmt.length){
 									res+="("+cmt+")";

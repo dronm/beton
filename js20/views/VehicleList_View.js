@@ -12,6 +12,16 @@ function VehicleList_View(id,options){
 	window.getApp().getConstantManager().get(constants);
 	
 	let filters = {
+		"vin":{
+			"binding":new CommandBinding({
+				"control":new EditString(id+":filter-ctrl-vin",{
+					"labelCaption":"VIN:",
+					"contClassName":"form-group-filter",
+					"maxLenght": "17"
+				}),
+				"field":new FieldString("vin")}),
+			"sign":"e"
+		},
 		"deleted":{
 			"binding":new CommandBinding({
 				"control":new EditSwitcher(id+":filter-ctrl-deleted",{
@@ -77,8 +87,8 @@ function VehicleList_View(id,options){
 							"sortable":true
 						})						
 						,new GridCellHead(id+":grid:head:load_capacity",{
-							"value":"Грузоподъемность",
-							"colAttrs":{"align":"right"},
+							"value":"Грузопод.",
+							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumn({									
 									"field":model.getField("load_capacity")
@@ -110,6 +120,14 @@ function VehicleList_View(id,options){
 								})
 							],
 							"sortable":true
+						})						
+						,is_v_owner? null:new GridCellHead(id+":grid:head:fuel_card_id",{
+							"value":"Топл.карта",
+							"columns":[
+								new GridColumn({
+									"field":model.getField("fuel_card_id")
+								})
+							]
 						})						
 						,is_v_owner? null:new GridCellHead(id+":grid:head:tracker_id",{
 							"value":"Трэкер",

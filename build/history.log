@@ -1807,6 +1807,14 @@ special_vehicles_list sql functions and materialized view
 2) RawMaterial_Controller->loadSelfShipWeight()
 added a new table shipment_weights
 
+1.00425
+1) comment 200chars, pump_type 130 in a MakeOrderGrid
+2) fuel_card_id in VehicleList for searching
+
+php-redis
+
+
+
 Order_Controller->get_make_orders_form() is too slow, 3.5s
 TODO: invite to Telegram from saved orders?
 Still big latency (1000-3000). No latency without cloud server

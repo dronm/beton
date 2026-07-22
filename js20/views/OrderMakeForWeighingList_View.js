@@ -172,7 +172,7 @@ extend(OrderMakeForWeighingList_View,View);
 OrderMakeForWeighingList_View.prototype.TABLE_CLASS = "table-bordered table-responsive table-striped table-make_order";
 OrderMakeForWeighingList_View.prototype.COL_CLIENT_LEN = 20;
 OrderMakeForWeighingList_View.prototype.COL_DEST_LEN = 10;
-OrderMakeForWeighingList_View.prototype.COL_COMMENT_LEN = 15;
+OrderMakeForWeighingList_View.prototype.COL_COMMENT_LEN = 23;
 OrderMakeForWeighingList_View.prototype.COL_DESCR_LEN = 15;
 OrderMakeForWeighingList_View.prototype.COL_DRIVER_LEN = 10;
 OrderMakeForWeighingList_View.prototype.COL_PUMP_VEH_LEN = 10;
