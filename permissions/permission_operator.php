@@ -124,6 +124,12 @@ $permissions = array();
 				
 					$permissions['Vehicle_Controller_run_tracker_command']=TRUE;
 				
+					$permissions['Vehicle_Controller_fuel_report']=TRUE;
+				
+					$permissions['Vehicle_Controller_get_fuel_documents']=TRUE;
+				
+					$permissions['Vehicle_Controller_get_stops_at_dest']=TRUE;
+				
 					$permissions['VehicleMileage_Controller_insert']=TRUE;
 				
 					$permissions['VehicleMileage_Controller_update']=TRUE;
@@ -1882,6 +1888,16 @@ $permissions = array();
 				
 					$permissions['FuelTransaction_Controller_import_data']=TRUE;
 				
+					$permissions['FuelCorrection_Controller_insert']=TRUE;
+				
+					$permissions['FuelCorrection_Controller_update']=TRUE;
+				
+					$permissions['FuelCorrection_Controller_delete']=TRUE;
+				
+					$permissions['FuelCorrection_Controller_get_list']=TRUE;
+				
+					$permissions['FuelCorrection_Controller_get_object']=TRUE;
+				
 					$permissions['ProductionReport_Controller_insert']=TRUE;
 				
 					$permissions['ProductionReport_Controller_update']=TRUE;
@@ -1965,6 +1981,18 @@ $permissions = array();
 					$permissions['Workplace_Controller_get_list']=TRUE;
 				
 					$permissions['Workplace_Controller_get_object']=TRUE;
+				
+					$permissions['Workplace_Controller_complete']=TRUE;
+				
+					$permissions['WorkplaceSchedule_Controller_insert']=TRUE;
+				
+					$permissions['WorkplaceSchedule_Controller_update']=TRUE;
+				
+					$permissions['WorkplaceSchedule_Controller_delete']=TRUE;
+				
+					$permissions['WorkplaceSchedule_Controller_get_list']=TRUE;
+				
+					$permissions['WorkplaceSchedule_Controller_get_object']=TRUE;
 				
 					$permissions['MacAddressList_Controller_insert']=TRUE;
 				

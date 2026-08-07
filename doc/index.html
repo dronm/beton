@@ -71,6 +71,7 @@
 <li><a href="#FuelConsumption_Controller">FuelConsumption_Controller</a></li>
 <li><a href="#FuelConsumptionSchema_Controller">FuelConsumptionSchema_Controller</a></li>
 <li><a href="#FuelConsumptionSchemaDetail_Controller">FuelConsumptionSchemaDetail_Controller</a></li>
+<li><a href="#FuelCorrection_Controller">FuelCorrection_Controller</a></li>
 <li><a href="#FuelTransaction_Controller">FuelTransaction_Controller</a></li>
 <li><a href="#GPSTracker_Controller">GPSTracker_Controller</a></li>
 <li><a href="#GornyiCarrierMatch_Controller">GornyiCarrierMatch_Controller</a></li>
@@ -185,6 +186,7 @@
 <li><a href="#View_Controller">View_Controller</a></li>
 <li><a href="#Weather_Controller">Weather_Controller</a></li>
 <li><a href="#Workplace_Controller">Workplace_Controller</a></li>
+<li><a href="#WorkplaceSchedule_Controller">WorkplaceSchedule_Controller</a></li>
 </ul>
 <div class="section-title">Models</div>
 <ul>
@@ -557,6 +559,9 @@
 <li><a href="#AuditLogChange_Model">AuditLogChange_Model</a></li>
 <li><a href="#FuelTransaction_Model">FuelTransaction_Model</a></li>
 <li><a href="#FuelTransactionList_Model">FuelTransactionList_Model</a></li>
+<li><a href="#FuelCorrection_Model">FuelCorrection_Model</a></li>
+<li><a href="#FuelCorrectionList_Model">FuelCorrectionList_Model</a></li>
+<li><a href="#FuelFlowBalanceList_Model">FuelFlowBalanceList_Model</a></li>
 <li><a href="#ProductionReport_Model">ProductionReport_Model</a></li>
 <li><a href="#ProductionReportList_Model">ProductionReportList_Model</a></li>
 <li><a href="#ProductionReportDialog_Model">ProductionReportDialog_Model</a></li>
@@ -575,6 +580,9 @@
 <li><a href="#ShipmentWeightList_Model">ShipmentWeightList_Model</a></li>
 <li><a href="#Workplace_Model">Workplace_Model</a></li>
 <li><a href="#WorkplaceList_Model">WorkplaceList_Model</a></li>
+<li><a href="#WorkplaceSchedule_Model">WorkplaceSchedule_Model</a></li>
+<li><a href="#WorkplaceScheduleList_Model">WorkplaceScheduleList_Model</a></li>
+<li><a href="#VehicleFuelDocument_Model">VehicleFuelDocument_Model</a></li>
 <li><a href="#MacAddressList_Model">MacAddressList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
@@ -2104,6 +2112,19 @@
 <a href="#FuelConsumptionSchemaDetail_Model">Model: FuelConsumptionSchemaDetail_Model</a><h2>get_list</h2>
 <a href="#FuelConsumptionSchemaDetailList_Model">Model: FuelConsumptionSchemaDetailList_Model</a><h2>get_object</h2>
 <a href="#FuelConsumptionSchemaDetailList_Model">Model: FuelConsumptionSchemaDetailList_Model</a>
+</div>
+</div>
+<div id="FuelCorrection_Controller" class="content_box">
+<h1>FuelCorrection_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#FuelCorrection_Model">Model: FuelCorrection_Model</a><h2>update</h2>
+<a href="#FuelCorrection_Model">Model: FuelCorrection_Model</a><h2>delete</h2>
+<a href="#FuelCorrection_Model">Model: FuelCorrection_Model</a><h2>get_list</h2>
+<a href="#FuelCorrectionList_Model">Model: FuelCorrectionList_Model</a><h2>get_object</h2>
+<a href="#FuelCorrectionList_Model">Model: FuelCorrectionList_Model</a>
 </div>
 </div>
 <div id="FuelTransaction_Controller" class="content_box">
@@ -5329,6 +5350,36 @@
 <p>Length:15</p>
 </div>
 </div>
+<h2>fuel_report</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>templ</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Нет</p>
+</div>
+<h3>inline</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
+<h2>get_fuel_documents</h2>
+<a href="#VehicleFuelDocument_Model">Model: VehicleFuelDocument_Model</a><h2>get_stops_at_dest</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>templ</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Нет</p>
+</div>
+</div>
 </div>
 </div>
 <div id="VehicleDriverForSchedGen_Controller" class="content_box">
@@ -5842,7 +5893,21 @@
 <a href="#Workplace_Model">Model: Workplace_Model</a><h2>delete</h2>
 <a href="#Workplace_Model">Model: Workplace_Model</a><h2>get_list</h2>
 <a href="#WorkplaceList_Model">Model: WorkplaceList_Model</a><h2>get_object</h2>
+<a href="#WorkplaceList_Model">Model: WorkplaceList_Model</a><h2>complete</h2>
 <a href="#WorkplaceList_Model">Model: WorkplaceList_Model</a>
+</div>
+</div>
+<div id="WorkplaceSchedule_Controller" class="content_box">
+<h1>WorkplaceSchedule_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#WorkplaceSchedule_Model">Model: WorkplaceSchedule_Model</a><h2>update</h2>
+<a href="#WorkplaceSchedule_Model">Model: WorkplaceSchedule_Model</a><h2>delete</h2>
+<a href="#WorkplaceSchedule_Model">Model: WorkplaceSchedule_Model</a><h2>get_list</h2>
+<a href="#WorkplaceScheduleList_Model">Model: WorkplaceScheduleList_Model</a><h2>get_object</h2>
+<a href="#WorkplaceScheduleList_Model">Model: WorkplaceScheduleList_Model</a>
 </div>
 </div>
 <div id="About_Model" class="content_box">
@@ -11709,6 +11774,120 @@
 <div>Precision:</div>
 <h2>quant_time</h2>
 <div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="FuelCorrection_Model" class="content_box">
+<h1>FuelCorrection_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_correction</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="FuelCorrectionList_Model" class="content_box">
+<h1>FuelCorrectionList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicles_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_correction</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="FuelFlowBalanceList_Model" class="content_box">
+<h1>FuelFlowBalanceList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>vehicles_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_beg</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_deb</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_kred</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_end</h2>
+<div>Type:Int</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -26440,6 +26619,78 @@
 <div>Precision:2</div>
 </div>
 </div>
+<div id="VehicleFuelDocument_Model" class="content_box">
+<h1>VehicleFuelDocument_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:Date</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>doc_type</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>source_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_deb</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_kred</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>total</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>mileage</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>timing</h2>
+<div>Type:Time</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>card_id</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>transaction_id</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="VehicleMakeList_Model" class="content_box">
 <h1>VehicleMakeList_Model</h1>
 <div class="content_item">
@@ -26522,8 +26773,14 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>distance</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>timing</h2>
-<div>Type:Time</div>
+<div>Type:String</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -27736,6 +27993,66 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="WorkplaceSchedule_Model" class="content_box">
+<h1>WorkplaceSchedule_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>workplace_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>for_date</h2>
+<div>Type:Date</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="WorkplaceScheduleList_Model" class="content_box">
+<h1>WorkplaceScheduleList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>for_date</h2>
+<div>Type:Date</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>workplaces_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>users_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="call_types" class="content_box">
 <h1>call_types</h1>
 <div class="content_item">
@@ -27803,6 +28120,8 @@
 <h2>fuel_transactions</h2>
 <div>Description:</div>
 <h2>fuel_consumptions</h2>
+<div>Description:</div>
+<h2>fuel_corrections</h2>
 <div>Description:</div>
 </div>
 </div>

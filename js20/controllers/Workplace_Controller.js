@@ -29,6 +29,7 @@ function Workplace_Controller(options){
 	this.addDelete();
 	this.addGetList();
 	this.addGetObject();
+	this.addComplete();
 		
 }
 extend(Workplace_Controller,ControllerObjServer);
@@ -166,6 +167,16 @@ extend(Workplace_Controller,ControllerObjServer);
 	
 	pm.addField(new FieldString("mode"));
 	pm.addField(new FieldString("lsn"));
+}
+
+			Workplace_Controller.prototype.addComplete = function(){
+	Workplace_Controller.superclass.addComplete.call(this);
+	
+	var f_opts = {};
+	f_opts.alias = "";
+	var pm = this.getComplete();
+	pm.addField(new FieldText("name",f_opts));
+	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");	
 }
 
 		

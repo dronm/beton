@@ -155,6 +155,10 @@ function VehicleDialog_View(id,options){
 		this.addElement(new VehicleMileageList_View(id+":mileage_list",{
 			"detail":true
 		}));		
+		this.addElement(new VehicleFuelDocument_View(id+":fuel_documents",{
+			"detail":true
+		}));
+
 		this.addElement(new TrackerManager(id+":tracker_manager",{
 			"getTrackerId": function(){
 				return self.m_model.getFieldValue("tracker_id");
@@ -278,6 +282,14 @@ function VehicleDialog_View(id,options){
 			return self.m_model.getFieldValue("id");
 		}]
 	});		
+
+	this.addDetailDataSet({
+		"control":this.getElement("fuel_documents").getElement("grid"),
+		"controlFieldId": ["vehicle_id"],
+		"value": [function(){
+			return self.m_model.getFieldValue("id");
+		}]
+	});
 
 	this.addDetailDataSet({
 		"control":this.getElement("vehicle_fuel_consumption_schema_details_list").getElement("grid"),

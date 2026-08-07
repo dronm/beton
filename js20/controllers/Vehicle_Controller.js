@@ -47,6 +47,9 @@ function Vehicle_Controller(options){
 	this.add_vehicle_list_report();
 	this.add_get_special_vehicles_list();
 	this.add_run_tracker_command();
+	this.add_fuel_report();
+	this.add_get_fuel_documents();
+	this.add_get_stops_at_dest();
 		
 }
 extend(Vehicle_Controller,ControllerObjServer);
@@ -918,6 +921,80 @@ extend(Vehicle_Controller,ControllerObjServer);
 		options.maxlength = "15";
 	
 		pm.addField(new FieldString("tracker_id",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Vehicle_Controller.prototype.add_fuel_report = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('fuel_report',opts);
+	
+	pm.addField(new FieldInt(this.PARAM_COUNT));
+	pm.addField(new FieldInt(this.PARAM_FROM));
+	pm.addField(new FieldString(this.PARAM_COND_FIELDS));
+	pm.addField(new FieldString(this.PARAM_COND_SGNS));
+	pm.addField(new FieldString(this.PARAM_COND_VALS));
+	pm.addField(new FieldString(this.PARAM_COND_ICASE));
+	pm.addField(new FieldString(this.PARAM_ORD_FIELDS));
+	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
+	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
+	pm.addField(new FieldString(this.PARAM_FIELD_LSN));
+
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("templ",options));
+	
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldInt("inline",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Vehicle_Controller.prototype.add_get_fuel_documents = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_fuel_documents',opts);
+	
+	pm.addField(new FieldInt(this.PARAM_COUNT));
+	pm.addField(new FieldInt(this.PARAM_FROM));
+	pm.addField(new FieldString(this.PARAM_COND_FIELDS));
+	pm.addField(new FieldString(this.PARAM_COND_SGNS));
+	pm.addField(new FieldString(this.PARAM_COND_VALS));
+	pm.addField(new FieldString(this.PARAM_COND_ICASE));
+	pm.addField(new FieldString(this.PARAM_ORD_FIELDS));
+	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
+	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
+	pm.addField(new FieldString(this.PARAM_FIELD_LSN));
+
+	this.addPublicMethod(pm);
+}
+
+			Vehicle_Controller.prototype.add_get_stops_at_dest = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_stops_at_dest',opts);
+	
+	pm.addField(new FieldInt(this.PARAM_COUNT));
+	pm.addField(new FieldInt(this.PARAM_FROM));
+	pm.addField(new FieldString(this.PARAM_COND_FIELDS));
+	pm.addField(new FieldString(this.PARAM_COND_SGNS));
+	pm.addField(new FieldString(this.PARAM_COND_VALS));
+	pm.addField(new FieldString(this.PARAM_COND_ICASE));
+	pm.addField(new FieldString(this.PARAM_ORD_FIELDS));
+	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
+	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
+	pm.addField(new FieldString(this.PARAM_FIELD_LSN));
+
+				
+	
+	var options = {};
+	
+		pm.addField(new FieldString("templ",options));
 	
 			
 	this.addPublicMethod(pm);

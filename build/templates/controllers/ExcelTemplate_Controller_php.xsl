@@ -274,7 +274,11 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 			$paramArrayMainQueryVal = $paramArray;
 			$paramArrayImgQueryVal = $paramArray;
 		}
+
+		$dbLink->query("BEGIN");
+		$dbLink->query("SET LOCAL lc_time = 'ru_RU.UTF-8'"); //set locale for russian month names
 		$ar_data = $dbLink->query_first(vsprintf($sql_query_text,$paramArrayMainQueryVal));
+		$dbLink->query("COMMIT");
 	
 		if(!is_array($ar_data) || !count($ar_data)){
 			throw new Exception($erEmpty);

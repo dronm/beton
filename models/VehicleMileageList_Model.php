@@ -8,7 +8,7 @@
 
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
-require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLTime.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
  
@@ -55,11 +55,21 @@ class VehicleMileageList_Model extends ModelSQLBeton{
 		//*** Field mileage ***
 		$f_opts = array();
 		
-		$f_opts['alias']='Пробег';
+		$f_opts['alias']='Одометр';
 		$f_opts['id']="mileage";
 						
 		$f_mileage=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"mileage",$f_opts);
 		$this->addField($f_mileage);
+		//********************
+		
+		//*** Field distance ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Пробег';
+		$f_opts['id']="distance";
+						
+		$f_distance=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"distance",$f_opts);
+		$this->addField($f_distance);
 		//********************
 		
 		//*** Field timing ***
@@ -68,7 +78,7 @@ class VehicleMileageList_Model extends ModelSQLBeton{
 		$f_opts['alias']='Время работы';
 		$f_opts['id']="timing";
 						
-		$f_timing=new FieldSQLTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"timing",$f_opts);
+		$f_timing=new FieldSQLString($this->getDbLink(),$this->getDbName(),$this->getTableName(),"timing",$f_opts);
 		$this->addField($f_timing);
 		//********************
 		

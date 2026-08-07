@@ -11,23 +11,25 @@ DECLARE
 BEGIN
 	IF (TG_WHEN='AFTER' AND (TG_OP='INSERT' OR TG_OP='UPDATE') ) THEN
 
-		reg_fuel_flow.date_time		= NEW.date_time;
-		reg_fuel_flow.deb			= TRUE;
-		reg_fuel_flow.doc_type  	= 'fuel_transactions'::doc_types;
-		reg_fuel_flow.doc_id  		= NEW.id;
-		reg_fuel_flow.vehicle_id	= NEW.vehicle_id;
-		reg_fuel_flow.quant			= NEW.quant;
-		PERFORM ra_fuel_flow_add_act(reg_fuel_flow);	
-			 
-		--Event support
-		PERFORM pg_notify(
-				'FuelFlow.change'
-			,json_build_object(
-				'params',json_build_object(
-					'cond_date',NEW.date_time::date
-				)
-			)::text
-		);
+		IF NEW.vehicle_id IS NOT NULL THEN
+			reg_fuel_flow.date_time		= NEW.date_time;
+			reg_fuel_flow.deb			= TRUE;
+			reg_fuel_flow.doc_type  	= 'fuel_transactions'::doc_types;
+			reg_fuel_flow.doc_id  		= NEW.id;
+			reg_fuel_flow.vehicle_id	= NEW.vehicle_id;
+			reg_fuel_flow.quant			= NEW.quant;
+			PERFORM ra_fuel_flow_add_act(reg_fuel_flow);	
+				 
+			--Event support
+			PERFORM pg_notify(
+					'FuelFlow.change'
+				,json_build_object(
+					'params',json_build_object(
+						'cond_date',NEW.date_time::date
+					)
+				)::text
+			);
+		END IF;
 			
 		RETURN NEW;
 		

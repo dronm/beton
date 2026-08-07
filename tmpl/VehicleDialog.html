@@ -28,6 +28,9 @@
 			<li>
 				<a href="#tracker" data-toggle="tab" aria-expanded="false">Трэкер,пробег</a>
 			</li>
+			<li>
+				<a href="#fuel" data-toggle="tab" aria-expanded="false">Топливо</a>
+			</li>
 		</ul>
 	</div>
 
@@ -141,6 +144,22 @@
 						</div>
 					</div>
 
+					<div class="panel">
+						<div class="panel-heading">
+							<h4 class="panel-title">Управление трэкером</h4>
+						</div>
+						<div id="{{id}}:tracker_manager"/>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="tab-pane fade" id="fuel">
+			<div class="panel panel-body userDialogTab">
+				<div class="panel">
+					<div class="panel-heading">
+						<h4 class="panel-title">Топливо</h4>
+					</div>
 
 					<div class="panel">
 						<div class="panel-heading">
@@ -155,12 +174,16 @@
 					</div>
 					<div class="panel">
 						<div class="panel-heading">
-							<h4 class="panel-title">Управление трэкером</h4>
+							<h4 class="panel-title">Документы</h4>
 						</div>
-						<div id="{{id}}:tracker_manager"/>
+						<div class="panel-body">
+							<div id="{{id}}:fuel_documents"/>
+						</div>
 					</div>
+
 				</div>
 			</div>
 		</div>
+
 	</div>
 </div>	

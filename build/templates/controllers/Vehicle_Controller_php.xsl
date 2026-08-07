@@ -24,6 +24,10 @@ require_once('common/SMSService.php');
 
 require_once(FUNC_PATH.'VehicleRoute.php');
 
+require_once(FUNC_PATH.'vehicle_mileage_osrm/vehicle_track_osrm.php');
+
+require_once(USER_MODELS_PATH.'VehicleFuelDocument_Model.php');
+
 class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 
 	const ER_PERIOD_NOT_ALLOWED = 'Запрещено просматривать период!';
@@ -319,17 +323,83 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			)
 			,'ZoneList_Model'
 		);
-		//track
-		$this->addNewModel(sprintf(
-			"SELECT * FROM vehicles_get_track(%d,%s,%s,%s)",
-			$this->getExtDbVal($pm,'id'),
-			$this->getExtDbVal($pm,'dt_from'),
-			$this->getExtDbVal($pm,'dt_to'),
-			$this->getExtDbVal($pm,'stop_dur')
+		<!-- //track -->
+		<!-- $this->addNewModel(sprintf( -->
+		<!-- 	"SELECT * FROM vehicles_get_track(%d,%s,%s,%s)", -->
+		<!-- 	$this->getExtDbVal($pm,'id'), -->
+		<!-- 	$this->getExtDbVal($pm,'dt_from'), -->
+		<!-- 	$this->getExtDbVal($pm,'dt_to'), -->
+		<!-- 	$this->getExtDbVal($pm,'stop_dur') -->
+		<!-- 	), -->
+		<!-- 	'TrackData_Model' -->
+		<!-- );				 -->
+		<!-- return; -->
+		$qId = $this->getDbLink()->query(
+			sprintf(
+				'SELECT * FROM vehicles_get_track(%d, %s, %s, %s)',
+				$this->getExtDbVal($pm, 'id'),
+				$this->getExtDbVal($pm, 'dt_from'),
+				$this->getExtDbVal($pm, 'dt_to'),
+				$this->getExtDbVal($pm, 'stop_dur'),
 			),
-			'TrackData_Model'
-		);				
+		);
+
+		$trackRows = [];
+		$trackPoints = [];
+
+		while ($row = $this->getDbLink()->fetch_array($qId)) {
+			$point = vehicleTrackDecodePosDataPoint(
+				$row['pos_data'],
+			);
+
+			/*
+			 * Preserve the same structure returned by the PostgreSQL function.
+			 * pos_data is temporarily stored as the decoded point object.
+			 */
+			$trackRows[] = [
+				'id' => (int) $row['id'],
+				'plate' => $row['plate'],
+				'feature' => $row['feature'],
+				'owner' => $row['owner'],
+				'make' => $row['make'],
+				'tracker_id' => $row['tracker_id'],
+				'pos_data' => $point,
+			];
+
+			$trackPoints[] = $point;
+		}
+
+		/*
+		 * Match the complete track.
+		 *
+		 * vehicleTrackMatchPoints() internally divides the track into several
+		 * OSRM requests when the point count exceeds the configured maximum.
+		 */
+		$matchedPoints = vehicleTrackMatchPoints($trackPoints);
+
+		/*
+		 * Put each matched point back into its corresponding PostgreSQL result row.
+		 */
+		foreach ($trackRows as $index => &amp;$trackRow) {
+			if (isset($matchedPoints[$index])) {
+				$trackRow['pos_data'] = $matchedPoints[$index];
+			}
+		}
+		$model = new Model(array("id" => "TrackData_Model"));
+		foreach ($trackRows as $index => &amp;$pos) {
+			$fields = array();
+			array_push($fields, new Field('id', DT_STRING,array('value'=>(string) $pos["id"])));
+			array_push($fields, new Field('plate', DT_STRING,array('value'=>(string) $pos["plate"])));
+			array_push($fields, new Field('feature', DT_STRING,array('value'=>(string) $pos["feature"])));
+			array_push($fields, new Field('owner', DT_STRING,array('value'=>(string) $pos["owner"])));
+			array_push($fields, new Field('make', DT_STRING,array('value'=>(string) $pos["make"])));
+			array_push($fields, new Field('tracker_id', DT_STRING,array('value'=>(string) $pos["tracker_id"])));
+			array_push($fields, new Field('pos_data', DT_STRING,array('value'=>(string) json_encode($pos["pos_data"]))));
+			$model->insert($fields);
+		}		
+		$this->addModel($model);
 	}
+
 	public function get_tool_tip($pm){
 		$link = $this->getDbLink();
 		
@@ -587,6 +657,49 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$model = new ModelSQL($this->getDbLinkMaster(), array('id'=>"SpecialVehicleList_Model"));
 		$model->query($query, TRUE);
 		$this->addModel($model);
+	}
+
+	public function get_fuel_documents($pm){
+		$this->setListModelId('VehicleFuelDocument_Model');
+		parent::get_list($pm);
+	}
+
+	public function fuel_report($pm){
+		$cond = new CondParamsSQL($pm,$this->getDbLink());
+		$vehicle_id = ($cond->paramExists('vehicle_id','e'))?
+			$cond->getValForDb('vehicle_id','e',DT_INT) : 0;
+
+		$dt_from = $cond->getValForDb('date_time','ge',DT_DATETIME);
+		$dt_to = $cond->getValForDb('date_time','ge',DT_DATETIME);
+
+		$this->addNewModel(
+			sprintf("SELECT
+						vehicles_ref->>'descr' AS vehicle_plate,
+						quant_beg,
+						quant_deb,
+						quant_kred,
+						quant_end
+				FROM fuel_flow_report(
+				%s,
+				%s,
+				%d
+			)",
+			$dt_from,
+			$dt_to,
+			$vehicle_id),
+			'VehicleFuelReport_Model'
+		);
+
+		$this->addNewModel(
+			sprintf(
+			"SELECT
+				format_period_rus(%s::date,%s::date,NULL) AS period_descr
+			",
+			$dt_from,
+			$dt_to
+			),
+		'Head_Model'
+		);		
 	}
 }
 <![CDATA[?>]]>

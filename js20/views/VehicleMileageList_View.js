@@ -20,6 +20,7 @@ function VehicleMileageList_View(id,options){
 
 	this.addElement(new GridAjx(id+":grid",{
 		"model":model,
+		"keyIds":["id"],
 		"controller":contr,
 		"editInline":true,
 		"editWinClass":null,
@@ -43,10 +44,34 @@ function VehicleMileageList_View(id,options){
 							"sort":"desc"							
 						})
 						,new GridCellHead(id+":grid:head:mileage",{
-							"value":"Пробег",
+							"value":"Одометр",
+							"colAttrs":{"align":"center"},
 							"columns":[
 								new GridColumn({
 									"field":model.getField("mileage")
+								})
+							]
+						})
+						,new GridCellHead(id+":grid:head:distance",{
+							"value":"Расстояние, км.",
+							"colAttrs":{"align":"center"},
+							"columns":[
+								new GridColumn({
+									"field":model.getField("distance"),
+									"ctrlEdit":false
+								})
+							]
+						})
+						,new GridCellHead(id+":grid:head:timing",{
+							"value":"Время работы двигателя",
+							"colAttrs":{"align":"center"},
+							"columns":[
+								new GridColumn({
+									"field":model.getField("timing"),
+									"ctrlEdit":false,
+									"formatFunction": function(f,cell){
+										return f.timing.getValue();
+									},
 								})
 							]
 						})
@@ -55,6 +80,7 @@ function VehicleMileageList_View(id,options){
 							"columns":[
 								new GridColumnRef({
 									"field":model.getField("users_ref"),
+									"ctrlBindFieldId": "user_id",
 									"ctrlClass":UserEditRef,
 									"ctrlEdit": false,
 									"ctrlOptions":{

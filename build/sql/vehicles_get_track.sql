@@ -29,6 +29,8 @@ CREATE OR REPLACE FUNCTION public.vehicles_get_track(
 	  	heading numeric,
 	  	lon double precision,
 	  	lat double precision
+		engine_on bool,
+		hdop numeric(5,2)
 	*/  	
 	) AS
 $BODY$
@@ -63,7 +65,9 @@ BEGIN
 				'voltage',	tr.voltage,
 				'heading',	tr.heading,
 				'lon',		tr.lon,
-				'lat',		tr.lat
+				'lat',		tr.lat,
+				'engine_on',tr.engine_on='1',
+				'hdop',		tr.hdop
 			) AS pos_data
 		FROM car_tracking AS tr
 		LEFT JOIN vehicles as v ON v.tracker_id=tr.car_id
@@ -127,6 +131,3 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
-ALTER FUNCTION public.vehicles_get_track(integer, timestamp without time zone, timestamp without time zone, interval)
-  OWNER TO ;
-

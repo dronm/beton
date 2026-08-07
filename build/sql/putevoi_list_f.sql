@@ -2,7 +2,7 @@
 
 -- Function: putevoi_list_f(in_vehicle_id int, in_date date)
 
-DROP FUNCTION putevoi_list_f(in_vehicle_id int, in_date date);
+--DROP FUNCTION putevoi_list_f(in_vehicle_id int, in_date date);
 
 CREATE OR REPLACE FUNCTION putevoi_list_f(in_vehicle_id int, in_date date)
   RETURNS table(
@@ -77,12 +77,33 @@ CREATE OR REPLACE FUNCTION putevoi_list_f(in_vehicle_id int, in_date date)
 	zad5_ezd text,
 	zad5_baza text,
 	
-	vrem_rab text 
+	vrem_rab text,
+	topl_nach int,
+	topl_kon int,
+	topl_prih int
   ) AS
 $BODY$
 	WITH
 	shift AS (
 		SELECT d1, d2 FROM get_shift_bounds(in_date) AS (d1 timestamp, d2 timestamp)
+	),
+	fuel_beg AS (
+		SELECT quant FROM rg_fuel_flow_balance( (SELECT d1 FROM shift), ARRAY[in_vehicle_id])
+	),
+	fuel_act AS (
+		SELECT 
+			sum(CASE WHEN f.deb THEN f.quant ELSE 0 END) AS deb,
+			sum(CASE WHEN f.deb THEN 0 ELSE f.quant END) AS kred
+		FROM ra_fuel_flow AS f
+		WHERE f.vehicle_id = in_vehicle_id
+			AND f.date_time BETWEEN (SELECT d1 from shift) AND (SELECT d2 from shift)
+	),
+	fuel_end AS (
+		SELECT
+			coalesce( (SELECT quant FROM fuel_beg), 0) +
+			coalesce( (SELECT deb FROM fuel_act), 0) -
+			coalesce( (SELECT kred FROM fuel_act), 0)
+		AS val
 	),
 	tasks AS (
 		SELECT
@@ -280,8 +301,12 @@ $BODY$
 		
 		coalesce(
 			to_char((SELECT date_time FROM ret_to_base) - (SELECT ship_date_time FROM depart), 'HH24:MI')
-		, '') AS vrem_rab
+		, '') AS vrem_rab, 
 		
+		coalesce((SELECT quant FROM fuel_beg), 0) AS topl_nach,
+		coalesce((SELECT val FROM fuel_end), 0) AS topl_kon,
+		coalesce((SELECT deb FROM fuel_act), 0) AS topl_prih
+
 	FROM schedule AS sch
 	LEFT JOIN vehicles AS vh ON vh.id = sch.vehicle_id
 	LEFT JOIN drivers AS dr ON dr.id = sch.driver_id
@@ -289,4 +314,3 @@ $BODY$
 	; 
 $BODY$
 LANGUAGE sql IMMUTABLE COST 100;
-ALTER FUNCTION putevoi_list_f(in_vehicle_id int, in_date date) OWNER TO ;

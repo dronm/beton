@@ -501,7 +501,11 @@ class ExcelTemplate_Controller extends ControllerSQL{
 		}
 /* file_put_contents(OUTPUT_PATH.'print.txt', var_export($paramArrayMainQueryVal, true).PHP_EOL, FILE_APPEND); */
 /* throw new Exception($sql_query_text); */
+
+		$dbLink->query("BEGIN");
+		$dbLink->query("SET LOCAL lc_time = 'ru_RU.UTF-8'");
 		$ar_data = $dbLink->query_first(vsprintf($sql_query_text,$paramArrayMainQueryVal));
+		$dbLink->query("COMMIT");
 	
 		if(!is_array($ar_data) || !count($ar_data)){
 			throw new Exception($erEmpty);

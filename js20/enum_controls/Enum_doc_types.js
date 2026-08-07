@@ -48,6 +48,9 @@ checked:(options.defaultValue&&options.defaultValue=="fuel_transactions")}
 ,{"value":"fuel_consumptions",
 "descr":this.multyLangValues[window.getApp().getLocale()+"_"+"fuel_consumptions"],
 checked:(options.defaultValue&&options.defaultValue=="fuel_consumptions")}
+,{"value":"fuel_corrections",
+"descr":this.multyLangValues[window.getApp().getLocale()+"_"+"fuel_corrections"],
+checked:(options.defaultValue&&options.defaultValue=="fuel_corrections")}
 ];
 	
 	Enum_doc_types.superclass.constructor.call(this,id,options);
@@ -66,6 +69,7 @@ Enum_doc_types.prototype.multyLangValues = {"ru_order":"Заявка"
 ,"ru_material_movement":"Перемещение материалов"
 ,"ru_fuel_transactions":"Транзакции по топливным картам"
 ,"ru_fuel_consumptions":"расход топлива"
+,"ru_fuel_corrections":"Корректировка остатка топлива"
 };
 
 

@@ -51,23 +51,34 @@ function vehicleMileageParseUtcTimestamp(string $value): DateTimeImmutable
 	return $dateTime->setTimezone(new DateTimeZone('UTC'));
 }
 
-function vehicleMileageFirstDbRow(mixed $result): array
+function vehicleMileageQueryRows(object $dbLink, string $sql): array
 {
-	if (!is_array($result)) {
-		throw new RuntimeException('Database query did not return an array.');
+	if (!method_exists($dbLink, 'query')) {
+		throw new RuntimeException(
+			'The database wrapper must provide query(string $sql).',
+		);
 	}
 
-	if (array_key_exists('points_json', $result)) {
-		return $result;
+	if (!method_exists($dbLink, 'fetch_array')) {
+		throw new RuntimeException(
+			'The database wrapper must provide fetch_array($queryId).',
+		);
 	}
 
-	$firstRow = reset($result);
+	$queryId = $dbLink->query($sql);
+	$rows = [];
 
-	if (is_array($firstRow)) {
-		return $firstRow;
+	while ($row = $dbLink->fetch_array($queryId)) {
+		if (!is_array($row)) {
+			throw new RuntimeException(
+				'Database fetch_array() returned an invalid row.',
+			);
+		}
+
+		$rows[] = $row;
 	}
 
-	throw new RuntimeException('Unexpected database query result format.');
+	return $rows;
 }
 
 function vehicleMileageQueryFirst(object $dbLink, string $sql): array
@@ -76,19 +87,21 @@ function vehicleMileageQueryFirst(object $dbLink, string $sql): array
 		$row = $dbLink->query_first($sql);
 
 		if (!is_array($row)) {
-			throw new RuntimeException('Database query_first() did not return an array.');
+			throw new RuntimeException(
+				'Database query_first() did not return a row.',
+			);
 		}
 
 		return $row;
 	}
 
-	if (!method_exists($dbLink, 'query')) {
-		throw new RuntimeException(
-			'The database wrapper must provide query_first() or query().',
-		);
+	$rows = vehicleMileageQueryRows($dbLink, $sql);
+
+	if ($rows === []) {
+		throw new RuntimeException('Database query returned no rows.');
 	}
 
-	return vehicleMileageFirstDbRow($dbLink->query($sql));
+	return $rows[0];
 }
 
 /**

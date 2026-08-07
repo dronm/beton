@@ -15,3 +15,4 @@ CREATE OR REPLACE VIEW workplaces_list AS
 	
 	ORDER BY t.name;
 
+

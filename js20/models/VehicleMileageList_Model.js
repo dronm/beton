@@ -53,7 +53,7 @@ function VehicleMileageList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
-	filed_options.alias = 'Пробег';
+	filed_options.alias = 'Одометр';
 	filed_options.autoInc = false;	
 	
 	options.fields.mileage = new FieldInt("mileage",filed_options);
@@ -62,10 +62,19 @@ function VehicleMileageList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Пробег';
+	filed_options.autoInc = false;	
+	
+	options.fields.distance = new FieldInt("distance",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Время работы';
 	filed_options.autoInc = false;	
 	
-	options.fields.timing = new FieldTime("timing",filed_options);
+	options.fields.timing = new FieldString("timing",filed_options);
 	
 				
 	

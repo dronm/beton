@@ -23,8 +23,3 @@ $BODY$
 $BODY$
   LANGUAGE sql VOLATILE CALLED ON NULL INPUT
   COST 100;
-ALTER FUNCTION rg_fuel_flow_balance(
-	IN in_vehicle_id_ar int[]
-	)
- OWNER TO beton;
-

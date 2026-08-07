@@ -86,6 +86,7 @@
 ,"ru_material_movement":"Перемещение материалов"
 ,"ru_fuel_transactions":"Транзакции по топливным картам"
 ,"ru_fuel_consumptions":"расход топлива"
+,"ru_fuel_corrections":"Корректировка остатка топлива"
 }
 
 		,"reg_types":{"ru_material":"Учет материалов"

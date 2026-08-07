@@ -31,6 +31,7 @@ BEGIN
 		IF NOT NEW.deb THEN
 			v_delta_quant = -1 * v_delta_quant;
 		END IF;
+		-- raise exception 'v_delta_quant=%, OLD.quant=%',v_delta_quant, OLD.quant;
 		v_loop_rg_period = CALC_DATE_TIME;
 		v_calc_interval = rg_calc_interval('fuel_flow'::reg_types);
 		LOOP

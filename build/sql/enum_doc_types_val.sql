@@ -12,6 +12,12 @@
 		WHEN $1='cement_silo_reset'::doc_types AND $2='ru'::locales THEN 'Обнуление силоса'
 		WHEN $1='cement_silo_balance_reset'::doc_types AND $2='ru'::locales THEN 'Обнуление остатка силоса'
 		WHEN $1='material_movement'::doc_types AND $2='ru'::locales THEN 'Перемещение материалов'
+		WHEN $1='fuel_transactions'::doc_types AND $2='ru'::locales THEN 'Транзакции по топливным картам'
+		WHEN $1='fuel_consumptions'::doc_types AND $2='ru'::locales THEN 'расход топлива'
+		WHEN $1='fuel_corrections'::doc_types AND $2='ru'::locales THEN 'Корректировка остатка топлива'
 		ELSE ''
 		END;		
 	$$ LANGUAGE sql;	
+		
+
+

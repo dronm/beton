@@ -113,7 +113,3 @@ BEGIN
 	);	
 END;
 $BODY$;
-
-ALTER FUNCTION public.rg_total_recalc_materials()
-    OWNER TO beton;
-

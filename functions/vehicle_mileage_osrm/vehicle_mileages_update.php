@@ -36,52 +36,6 @@ function vehicleMileagesCronPgBool(mixed $value): bool
 }
 
 /**
- * Normalize the custom database wrapper result to a list of rows.
- *
- * Supported formats:
- *
- * [
- *     ['vehicle_id' => 1, ...],
- *     ['vehicle_id' => 2, ...],
- * ]
- *
- * and a single associative row:
- *
- * [
- *     'vehicle_id' => 1,
- *     ...
- * ]
- */
-function vehicleMileagesCronRows(mixed $result): array
-{
-	if (!is_array($result)) {
-		throw new RuntimeException('Database query did not return an array.');
-	}
-
-	if ($result === []) {
-		return [];
-	}
-
-	if (!array_is_list($result)) {
-		return [$result];
-	}
-
-	$rows = [];
-
-	foreach ($result as $row) {
-		if (!is_array($row)) {
-			throw new RuntimeException(
-				'Database query returned an invalid row.',
-			);
-		}
-
-		$rows[] = $row;
-	}
-
-	return $rows;
-}
-
-/**
  * Parse a PostgreSQL timestamptz value while preserving its UTC offset.
  */
 function vehicleMileagesCronParseTimestamp(string $value): DateTimeImmutable
@@ -179,7 +133,8 @@ function vehicleMileagesCronContext(object $dbLink): array
  */
 function vehicleMileagesCronVehicles(object $dbLink): array
 {
-	$result = $dbLink->query(
+	return vehicleMileageQueryRows(
+		$dbLink,
 		<<<'SQL'
 			SELECT DISTINCT ON (vm.vehicle_id)
 				vm.vehicle_id,
@@ -197,8 +152,6 @@ function vehicleMileagesCronVehicles(object $dbLink): array
 				vm.for_date DESC
 			SQL,
 	);
-
-	return vehicleMileagesCronRows($result);
 }
 
 /**

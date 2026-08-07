@@ -56,13 +56,13 @@ BEGIN
 		TA_PERIOD
 		,rg.vehicle_id
 		,rg.quant
-		FROM rg_materials AS rg
+		FROM rg_fuel_flow AS rg
 		WHERE (
 		rg.quant<>0
 		)
 		AND (rg.date_time=NEW_PERIOD-REG_INTERVAL)
 	);
-	DELETE FROM rg_materials WHERE (date_time>NEW_PERIOD)
+	DELETE FROM rg_fuel_flow WHERE (date_time>NEW_PERIOD)
 	AND (date_time<>TA_PERIOD);
 	--set new period
 	UPDATE rg_calc_periods SET date_time = NEW_PERIOD
@@ -70,5 +70,4 @@ BEGIN
 END
 $BODY$
 LANGUAGE plpgsql VOLATILE COST 100;
-ALTER FUNCTION rg_fuel_flow_set_custom_period(IN in_new_period timestamp without time zone) OWNER TO beton;
 

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-07-22 07:29:29</lastBuild></version>
+		<lastBuild>2026-08-07 09:15:55</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -332,6 +332,7 @@
 		<version dateOpen="2026-07-17 09:06:37" dateClose="2026-07-21 05:57:48">1.00424</version>
 		<version dateOpen="2026-07-22 07:29:18" dateClose="2026-07-22 07:29:51">1.00425</version>
 		<version dateOpen="2026-07-22 20:06:11" dateClose="2026-07-22 20:06:50">1.00426</version>
+		<version dateOpen="2026-07-23 18:06:05" dateClose="2026-08-07 09:16:11">1.00427</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -565,6 +566,9 @@
 			</value>
 			<value id="fuel_consumptions">
 				<ru descr="расход топлива"/>
+			</value>
+			<value id="fuel_corrections">
+				<ru descr="Корректировка остатка топлива"/>
 			</value>
 		</enum>
 		<enum id="reg_types">
@@ -1211,8 +1215,9 @@
 			<field id="id" dataType="Int" dbRequired="TRUE" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="vehicle_id" dataType="Int" alias="ТС"/>
 			<field id="for_date" dataType="DateTimeTZ" alias="Дата"/>
-			<field id="mileage" dataType="Int" alias="Пробег"/>
-			<field id="timing" dataType="Time" alias="Время работы"/>
+			<field id="mileage" dataType="Int" alias="Одометр"/>
+			<field id="distance" dataType="Int" alias="Пробег"/>
+			<field id="timing" dataType="String" alias="Время работы"/>
 			<field id="users_ref" dataType="JSON" alias="Who set value"/>
 		</model>
 		<model id="Driver" parent="ModelSQLBeton" dataTable="drivers" virtual="FALSE">
@@ -5667,6 +5672,40 @@
 			<field id="quant" dataType="Int" defaultValue="0"/>
 			<field id="total" dataType="Float" length="15" precision="2" defaultValue="0"/>
 		</model>
+		<model id="FuelCorrection" parent="ModelSQLBeton" dataTable="fuel_corrections" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="date_time" dataType="DateTime" required="TRUE"/>
+			<field id="vehicle_id" dataType="Int"/>
+			<field id="quant" dataType="Int" defaultValue="0"/>
+			<field id="quant_correction" dataType="Int" defaultValue="0"/>
+			<index id="fuel_corrections_period_idx">
+				<field id="date_time"/>
+			</index>
+			<index id="fuel_corrections_card_idx">
+				<field id="vehicle_id"/>
+			</index>
+		</model>
+		<model id="FuelCorrectionList" parent="ModelSQLBeton" dataTable="fuel_corrections_list" virtual="TRUE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
+			<field id="date_time" dataType="DateTime" required="TRUE"/>
+			<field id="vehicle_id" dataType="Int"/>
+			<field id="vehicles_ref" dataType="JSON"/>
+			<field id="quant" dataType="Int" defaultValue="0"/>
+			<field id="quant_correction" dataType="Int" defaultValue="0"/>
+			<index id="fuel_corrections_period_idx">
+				<field id="date_time"/>
+			</index>
+			<index id="fuel_corrections_card_idx">
+				<field id="vehicle_id"/>
+			</index>
+		</model>
+		<model id="FuelFlowBalanceList" parent="ModelSQLBeton" dataTable="fuel_flow_balance_list" virtual="TRUE">
+			<field id="vehicles_ref" dataType="JSON" primaryKey="TRUE"/>
+			<field id="quant_beg" dataType="Int"/>
+			<field id="quant_deb" dataType="Int"/>
+			<field id="quant_kred" dataType="Int"/>
+			<field id="quant_end" dataType="Int"/>
+		</model>
 		<model id="ProductionReport" parent="ModelSQLBeton" dataTable="production_reports" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
 			<field id="shift_from" dataType="DateTime" required="TRUE"/>
@@ -5862,6 +5901,40 @@
 			<field id="tel_ext" dataType="String" length="5" alias="Добавочный номер"/>
 			<field id="mac_addresses" dataType="JSONB"/>
 			<field id="users_ref" dataType="JSON"/>
+		</model>
+		<model id="WorkplaceSchedule" parent="ModelSQLBeton" dataTable="workplace_schedules" virtual="FALSE">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" dbRequired="TRUE" alias="Код"/>
+			<field id="workplace_id" dataType="Int" refTable="workplaces" refField="id" required="TRUE"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id" required="TRUE"/>
+			<field id="for_date" dataType="Date" alias="Дата" required="TRUE"/>
+			<index id="workplace_schedules_for_date_idx">
+				<field id="for_date"/>
+			</index>
+		</model>
+		<model id="WorkplaceScheduleList" parent="ModelSQLBeton" dataTable="workplace_schedules_list" virtual="TRUE">
+			<defaultOrder>
+				<field id="for_date"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" dbRequired="TRUE" alias="Код"/>
+			<field id="for_date" dataType="Date" alias="Дата" required="TRUE"/>
+			<field id="workplaces_ref" dataType="JSON"/>
+			<field id="users_ref" dataType="JSON"/>
+		</model>
+		<model id="VehicleFuelDocument" parent="ModelSQLBeton" dataTable="vehicle_fuel_documents" virtual="TRUE">
+			<defaultOrder>
+				<field id="date_time" sortDirect="DESC"/>
+			</defaultOrder>
+			<field id="vehicle_id" dataType="Int" primaryKey="TRUE"/>
+			<field id="date_time" dataType="Date" alias="Дата" primaryKey="TRUE"/>
+			<field id="doc_type" dataType="Text"/>
+			<field id="source_id" dataType="Int"/>
+			<field id="quant_deb" dataType="Float"/>
+			<field id="quant_kred" dataType="Float"/>
+			<field id="total" dataType="Float"/>
+			<field id="mileage" dataType="Int"/>
+			<field id="timing" dataType="Time"/>
+			<field id="card_id" dataType="Text"/>
+			<field id="transaction_id" dataType="Text"/>
 		</model>
 		<model id="MacAddressList" parentJS="ModelJSON" virtual="TRUE" server="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE"/>
@@ -6080,6 +6153,14 @@
 			<publicMethod id="run_tracker_command">
 				<field id="cmd" dataType="String" length="50" required="TRUE"/>
 				<field id="tracker_id" dataType="String" length="15" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="fuel_report" condFields="TRUE">
+				<field id="templ" dataType="String"/>
+				<field id="inline" dataType="Int"/>
+			</publicMethod>
+			<publicMethod id="get_fuel_documents" condFields="TRUE" modelId="VehicleFuelDocument"/>
+			<publicMethod id="get_stops_at_dest" condFields="TRUE">
+				<field id="templ" dataType="String"/>
 			</publicMethod>
 		</controller>
 		<controller id="VehicleMileage" parentId="ControllerSQL" state="TRUE" noState="FALSE">
@@ -7975,6 +8056,13 @@
 				<field id="file_excel" dataType="Text"/>
 			</publicMethod>
 		</controller>
+		<controller id="FuelCorrection" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="FuelCorrection"/>
+			<publicMethod id="update" modelId="FuelCorrection"/>
+			<publicMethod id="delete" modelId="FuelCorrection"/>
+			<publicMethod id="get_list" modelId="FuelCorrectionList"/>
+			<publicMethod id="get_object" modelId="FuelCorrectionList"/>
+		</controller>
 		<controller id="ProductionReport" parentId="ControllerSQL" noState="FALSE">
 			<publicMethod id="insert" modelId="ProductionReport"/>
 			<publicMethod id="update" modelId="ProductionReport"/>
@@ -8040,6 +8128,14 @@
 			<publicMethod id="delete" modelId="Workplace"/>
 			<publicMethod id="get_list" modelId="WorkplaceList"/>
 			<publicMethod id="get_object" modelId="WorkplaceList"/>
+			<publicMethod id="complete" modelId="WorkplaceList" patternFieldId="name"/>
+		</controller>
+		<controller id="WorkplaceSchedule" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="WorkplaceSchedule"/>
+			<publicMethod id="update" modelId="WorkplaceSchedule"/>
+			<publicMethod id="delete" modelId="WorkplaceSchedule"/>
+			<publicMethod id="get_list" modelId="WorkplaceScheduleList"/>
+			<publicMethod id="get_object" modelId="WorkplaceScheduleList"/>
 		</controller>
 		<controller id="MacAddressList" parentIdJS="ControllerObjClient" server="FALSE">
 			<publicMethod id="insert" modelId="MacAddressList"/>
@@ -8267,6 +8363,8 @@
 		<view id="20028" c="OrderGarbage_Controller" t="OrderGarbageList" f="get_list" section="Документы" descr="Удаленные заявки"/>
 		<view id="20029" c="DOCMaterialMovement_Controller" t="DOCMaterialMovementList" f="get_list" section="Документы" descr="Перемещение материалов"/>
 		<view id="20030" c="ProductionReport_Controller" t="ProductionReportList" f="get_list" section="Документы" descr="Отчет производства за смену"/>
+		<view id="20031" c="FuelCorrection_Controller" t="FuelCorrectionList" f="get_list" section="Документы" descr="Журнал корректировок остатков топлива"/>
+		<view id="20032" c="WorkplaceSchedule_Controller" t="WorkplaceScheduleList" f="get_list" section="Документы" descr="Расписание работы пользователей"/>
 		<view id="30001" t="Map" section="Формы" descr="ТС на карте"/>
 		<view id="30002" t="ScheduleGen" section="Формы" descr="Формирование графиков работы"/>
 		<view id="30003" c="Order_Controller" t="OrderMakeList" f="get_make_orders_form" section="Формы" descr="Заявки онлайн"/>
@@ -8337,6 +8435,7 @@
 		<view id="50023" t="ShipmentDocRep" section="Отчеты" descr="Отгрузочные документы: путевой лист, ТТН"/>
 		<view id="50024" t="VehicleListReport" section="Отчеты" descr="Отчет по спику ТС (страховки, лизинг)"/>
 		<view id="50025" t="DriverWorkTimeReport" section="Отчеты" descr="Табель по водителям"/>
+		<view id="50026" t="RepVehicleFuelFlow" section="Отчеты" descr="Отчет по движению топлива"/>
 		<view id="40000" c="Constant_Controller" t="ConstantList" f="get_list" section="Константы" descr="Все константы"/>
 	</views>
 	<serverTemplates>
@@ -8491,6 +8590,9 @@
 		<serverTemplate id="VehicleFuelConsumptionSchemaDetailList" class="list"/>
 		<serverTemplate id="ShipmentWeightList" class="list"/>
 		<serverTemplate id="WorkplaceList" class="list"/>
+		<serverTemplate id="FuelCorrectionList" class="list"/>
+		<serverTemplate id="WorkplaceScheduleList" class="list"/>
+		<serverTemplate id="RepVehicleFuelFlow"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="js20/tmpl/FatalException.html"/>
@@ -9163,6 +9265,10 @@
 		<jsScript file="js20/views/ShipmentWeightList_View.js"/>
 		<jsScript file="js20/views/WorkplaceList_View.js"/>
 		<jsScript file="js20/views/WorkplaceDialog_View.js"/>
+		<jsScript file="js20/views/FuelCorrectionList_View.js"/>
+		<jsScript file="js20/views/WorkplaceScheduleList_View.js"/>
+		<jsScript file="js20/views/VehicleFuelDocument_View.js"/>
+		<jsScript file="js20/views/RepVehicleFuelFlow_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="js20/forms/ViewList_Form.js"/>
 		<jsScript file="js20/forms/MainMenuConstructor_Form.js"/>
@@ -9209,6 +9315,7 @@
 		<jsScript file="js20/forms/ProductionReportDialog_Form.js"/>
 		<jsScript file="js20/forms/FuelConsumptionSchemaList_Form.js"/>
 		<jsScript file="js20/forms/WorkplaceDialog_Form.js"/>
+		<jsScript file="js20/forms/WorkplaceList_Form.js"/>
 		<!--custom controls-->
 		<jsScript file="js20/tmpl/App.templates.js" compressed="FALSE" standalone="FALSE"/>
 		<jsScript file="js20/custom_controls/EditDateInlineValidation.js"/>
@@ -9375,6 +9482,7 @@
 		<jsScript file="js20/custom_controls/BuhDocItemGrid.js"/>
 		<jsScript file="js20/custom_controls/TrackerManager.js"/>
 		<jsScript file="js20/custom_controls/MacAddressListGrid.js"/>
+		<jsScript file="js20/custom_controls/WorkplaceEdit.js"/>
 		<jsScript file="js20/views/rs_ru.js"/>
 		<jsScript file="js20/views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -9941,6 +10049,13 @@
 		<jsScript file="js20/models/WorkplaceList_Model.js"/>
 		<jsScript file="js20/models/MacAddressList_Model.js"/>
 		<jsScript file="js20/controllers/MacAddressList_Controller.js"/>
+		<jsScript file="js20/models/FuelCorrection_Model.js"/>
+		<jsScript file="js20/models/FuelCorrectionList_Model.js"/>
+		<jsScript file="js20/controllers/FuelCorrection_Controller.js"/>
+		<jsScript file="js20/controllers/WorkplaceSchedule_Controller.js"/>
+		<jsScript file="js20/models/WorkplaceSchedule_Model.js"/>
+		<jsScript file="js20/models/WorkplaceScheduleList_Model.js"/>
+		<jsScript file="js20/models/VehicleFuelDocument_Model.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

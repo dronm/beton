@@ -13,9 +13,9 @@ function testVehicleMileageKmOsrm(): void
 	 * These timestamps are interpreted as UTC because they do not include
 	 * a timezone suffix.
 	 */
-	$carId = '862531042204801';
-	$dateFrom = '2026-07-20T01:00:00';
-	$dateTo = '2026-07-21T01:00:00';
+	$carId = '862531042204801';//'862531042204801';
+	$dateFrom = '2026-07-23T01:00:00';
+	$dateTo = '2026-07-24T01:00:00';
 
 	try {
 		$mileageKm = vehicleMileageKmOsrm(
