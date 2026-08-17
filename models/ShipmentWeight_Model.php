@@ -8,7 +8,9 @@
 
 require_once(FRAME_WORK_PATH.'basic_classes/ModelSQLBeton.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLInt.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLEnum.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
  
 class ShipmentWeight_Model extends ModelSQLBeton{
@@ -63,6 +65,64 @@ class ShipmentWeight_Model extends ModelSQLBeton{
 						
 		$f_quant_net=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"quant_net",$f_opts);
 		$this->addField($f_quant_net);
+		//********************
+		
+		//*** Field material ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Груз';
+		$f_opts['id']="material";
+						
+		$f_material=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"material",$f_opts);
+		$this->addField($f_material);
+		//********************
+		
+		//*** Field sender_name ***
+		$f_opts = array();
+		
+		$f_opts['alias']='ПунктОтправления';
+		$f_opts['id']="sender_name";
+						
+		$f_sender_name=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sender_name",$f_opts);
+		$this->addField($f_sender_name);
+		//********************
+		
+		//*** Field sender_client ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Отправитель';
+		$f_opts['id']="sender_client";
+						
+		$f_sender_client=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"sender_client",$f_opts);
+		$this->addField($f_sender_client);
+		//********************
+		
+		//*** Field unloading_warehouse ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Склад разгрузки';
+		$f_opts['id']="unloading_warehouse";
+						
+		$f_unloading_warehouse=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"unloading_warehouse",$f_opts);
+		$this->addField($f_unloading_warehouse);
+		//********************
+		
+		//*** Field ship_weighing_cause ***
+		$f_opts = array();
+		$f_opts['id']="ship_weighing_cause";
+						
+		$f_ship_weighing_cause=new FieldSQLEnum($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ship_weighing_cause",$f_opts);
+		$this->addField($f_ship_weighing_cause);
+		//********************
+		
+		//*** Field uploaded_at ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Дата';
+		$f_opts['id']="uploaded_at";
+						
+		$f_uploaded_at=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"uploaded_at",$f_opts);
+		$this->addField($f_uploaded_at);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

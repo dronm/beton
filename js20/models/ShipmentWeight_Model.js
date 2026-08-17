@@ -62,6 +62,61 @@ function ShipmentWeight_Model(options){
 	options.fields.quant_net = new FieldFloat("quant_net",filed_options);
 	options.fields.quant_net.getValidator().setMaxLength('19');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Груз';
+	filed_options.autoInc = false;	
+	
+	options.fields.material = new FieldText("material",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'ПунктОтправления';
+	filed_options.autoInc = false;	
+	
+	options.fields.sender_name = new FieldText("sender_name",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Отправитель';
+	filed_options.autoInc = false;	
+	
+	options.fields.sender_client = new FieldText("sender_client",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Склад разгрузки';
+	filed_options.autoInc = false;	
+	
+	options.fields.unloading_warehouse = new FieldText("unloading_warehouse",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.ship_weighing_cause = new FieldEnum("ship_weighing_cause",filed_options);
+	filed_options.enumValues = 'self_ship,redirection';
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Дата';
+	filed_options.autoInc = false;	
+	
+	options.fields.uploaded_at = new FieldDateTime("uploaded_at",filed_options);
+	
 		ShipmentWeight_Model.superclass.constructor.call(this,id,options);
 }
 extend(ShipmentWeight_Model,ModelXML);

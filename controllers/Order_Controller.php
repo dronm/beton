@@ -1553,7 +1553,8 @@ class Order_Controller extends ControllerSQL{
 			contact_id,
 			client_specification_id,
 			f_val,
-			w_val
+			w_val,
+			ref_1c
 		';
 
 		$link = $this->getDbLinkMaster();
@@ -1562,12 +1563,13 @@ class Order_Controller extends ControllerSQL{
 			$link->query(sprintf(
 				"INSERT INTO order_garbage
 					(%s,
-					last_modif_user_id, last_modif_date_time
+					last_modif_user_id, last_modif_date_time, order_id
 					)
 				SELECT 
 					%s,
 					%d,
-					now()
+					now(),
+					orders.id
 				FROM orders 
 				WHERE orders.id = %d"
 				,$fields, $fields

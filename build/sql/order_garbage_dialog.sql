@@ -1,6 +1,6 @@
 -- View: public.order_garbage_dialog
 
- DROP VIEW public.order_garbage_dialog;
+-- DROP VIEW public.order_garbage_dialog;
 
 CREATE OR REPLACE VIEW public.order_garbage_dialog AS 
 
@@ -89,7 +89,17 @@ CREATE OR REPLACE VIEW public.order_garbage_dialog AS
 		o.f_val,
 		o.w_val,
 		
-		debts.debt_total AS client_debt
+		debts.debt_total AS client_debt,
+
+		o.order_id,
+		o.ref_1c,
+		cl.ref_1c AS client_ref_1c,
+		(SELECT 
+			DATE_TRUNC('minute', dbt.update_date)
+		FROM client_debts AS dbt 
+		WHERE dbt.client_id = o.client_id
+		LIMIT 1
+		) AS client_debt_date
 		
 	FROM order_garbage o
 	LEFT JOIN clients cl ON cl.id = o.client_id
@@ -118,5 +128,3 @@ CREATE OR REPLACE VIEW public.order_garbage_dialog AS
 	
 	ORDER BY o.date_time;
 
-	
-ALTER TABLE public.order_garbage_dialog OWNER TO ;

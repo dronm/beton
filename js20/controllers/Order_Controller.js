@@ -550,6 +550,12 @@ extend(Order_Controller,ControllerObjServer);
 	var f_opts = {};
 	f_opts.alias = "Ссылка на справочник 1с";
 	pm.addField(new FieldJSONB("ref_1c",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Кто последний вносил изменения";
+	pm.addField(new FieldJSON("last_modif_users_ref",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Время последнего изменения";
+	pm.addField(new FieldDateTimeTZ("last_modif_date_time",f_opts));
 }
 
 			Order_Controller.prototype.addGetObject = function(){

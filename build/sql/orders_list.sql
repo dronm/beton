@@ -23,7 +23,9 @@ CREATE OR REPLACE VIEW orders_list AS
 		users_ref(u) AS users_ref,
 		o.user_id,
 		orders_ref(o) AS orders_ref,
-		contacts_ref(ct) AS contacts_ref		
+		contacts_ref(ct) AS contacts_ref,
+		o.last_modif_date_time,
+		users_ref(last_u) AS last_modif_users_ref
 		
    FROM orders o
    LEFT JOIN clients cl ON cl.id = o.client_id
@@ -31,6 +33,7 @@ CREATE OR REPLACE VIEW orders_list AS
    LEFT JOIN concrete_types concr ON concr.id = o.concrete_type_id
    LEFT JOIN contacts ct ON ct.id = o.contact_id
    LEFT JOIN users u ON u.id = o.user_id
+   LEFT JOIN users last_u ON last_u.id = o.last_modif_user_id
   ORDER BY o.date_time DESC;
 
 ALTER TABLE orders_list OWNER TO beton;

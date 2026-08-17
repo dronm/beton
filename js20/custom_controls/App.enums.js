@@ -132,5 +132,9 @@
 ,"ru_rent":"Аренда"
 }
 
+		,"ship_weighing_causes":{"ru_self_ship":"Самовывоз"
+,"ru_redirection":"Переадресация"
+}
+
 	
  };

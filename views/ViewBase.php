@@ -2250,6 +2250,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/models/WorkplaceSchedule_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/WorkplaceSchedule_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/WorkplaceScheduleList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/WorkplaceScheduleList_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/models/VehicleFuelDocument_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/VehicleFuelDocument_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/enum_controls/Enum_ship_weighing_causes.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/enum_controls/Enum_ship_weighing_causes.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/enum_controls/EnumGridColumn_ship_weighing_causes.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/enum_controls/EnumGridColumn_ship_weighing_causes.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

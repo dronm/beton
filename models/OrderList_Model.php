@@ -12,6 +12,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLString.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLText.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLFloat.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTime.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
  
@@ -207,6 +208,26 @@ class OrderList_Model extends ModelSQLBeton{
 						
 		$f_ref_1c=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ref_1c",$f_opts);
 		$this->addField($f_ref_1c);
+		//********************
+		
+		//*** Field last_modif_users_ref ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Кто последний вносил изменения';
+		$f_opts['id']="last_modif_users_ref";
+						
+		$f_last_modif_users_ref=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"last_modif_users_ref",$f_opts);
+		$this->addField($f_last_modif_users_ref);
+		//********************
+		
+		//*** Field last_modif_date_time ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Время последнего изменения';
+		$f_opts['id']="last_modif_date_time";
+						
+		$f_last_modif_date_time=new FieldSQLDateTimeTZ($this->getDbLink(),$this->getDbName(),$this->getTableName(),"last_modif_date_time",$f_opts);
+		$this->addField($f_last_modif_date_time);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	$this->setAggFunctions(

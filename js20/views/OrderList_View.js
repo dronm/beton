@@ -239,6 +239,24 @@ function OrderList_View(id,options){
 							],
 							"sortable":true							
 						})						
+						,new GridCellHead(id+":grid:head:last_modif",{
+							"value":"Посл.изменения",
+							"columns":[
+								new GridColumn({
+									"formatFunction":function(fields,gridCell){
+										let inf = "";
+										const user = fields.last_modif_users_ref.getValue();
+										const dt = fields.last_modif_date_time.getValue();
+										if(user && user.m_descr){
+											const dtDescr = DateHelper.format(dt, "d/m H:i");
+											inf = `${user.m_descr} (${dtDescr})`;
+										}
+										return inf;
+									}
+								})
+							],
+							"sortable":true							
+						})						
 					]
 				})
 			]
@@ -258,7 +276,7 @@ function OrderList_View(id,options){
 							"gridColumn":new GridColumnFloat({"id":"tot_quant"})
 						})
 						,new GridCell(id+":grid:foot:total_sp2",{
-							"colSpan":"6"
+							"colSpan":"7"
 						})												
 												
 					]

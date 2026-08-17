@@ -6,6 +6,8 @@ function OrderDialog_View(id,options){
 	options = options || {};
 	options.controller = options.controller || new Order_Controller();
 	options.model = options.model || ((options.models&&options.models.OrderDialog_Model)? options.models.OrderDialog_Model: new OrderDialog_Model());
+
+	this.m_isGarbage = options.isGarbage;
 	
 	options.cmdSave = false;
 
@@ -306,7 +308,8 @@ function OrderDialog_View(id,options){
 			tableName: "orders",
 			visible: false, //disabled at start
 			getRecordId: () => {
-				return self.getElement("id").getValue();
+				const fieldId = self.m_isGarbage? "order_id" : "id";
+				return self.getElement(fieldId).getValue();
 			}
 		}));				
 	}
@@ -911,6 +914,8 @@ OrderDialog_View.prototype.onGetData = function(resp,cmd){
 		this.getElement("calc").getElement("client_specification").getErrorControl().setLevel("info");
 		this.updateClientRef1cInfo();
 		this.updateOrder1cInfo();
+	}else if (this.m_isGarbage){
+		this.getElement("cmdHistory").setVisible(true);
 	}
 
 	if(cmd=="insert" || cmd=="copy"){

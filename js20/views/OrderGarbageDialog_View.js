@@ -5,6 +5,7 @@ function OrderGarbageDialog_View(id,options){
 	
 	options = options || {};
 	options.readOnly = true;
+	options.isGarbage = true;
 	options.model =  ((options.models && options.models.OrderGarbageDialog_Model)? options.models.OrderGarbageDialog_Model: new OrderGarbageDialog_Model());
 	options.controller = new OrderGarbage_Controller();
 	// options.template = window.getApp().getTemplate("OrderDialog_View");

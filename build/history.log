@@ -1811,6 +1811,11 @@ added a new table shipment_weights
 1) comment 200chars, pump_type 130 in a MakeOrderGrid
 2) fuel_card_id in VehicleList for searching
 
+1.00428
+Concrete weighing.
+
+
+
 What to check, implement:
 - php-redis, check logout
 - Vehicle->get_track(), pass result to osrm

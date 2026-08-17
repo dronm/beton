@@ -175,5 +175,9 @@
 	UNION ALL
 	SELECT *
 	FROM const_ping_elkon_interval_err_view
+	UNION ALL
+	SELECT *
+	FROM const_shipment_weigh_redirect_rate_view
 	ORDER BY name;
+	
 

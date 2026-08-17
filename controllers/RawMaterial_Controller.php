@@ -37,7 +37,8 @@ class RawMaterial_Controller extends ControllerSQL{
 
 	const ERR_UPLOAD_NOT_ALLOWED_FOR_PERIOD = "Запрещена загрузка в данном периоде";
 
-	const SELF_SHIP_MATERIAL_MARKER = "Бетон САМОВЫВОЗ";
+	const WEIGH_SHIP_MATERIAL_MARKER = "бетон ";
+	const SELF_SHIP_MATERIAL_MARKER = "самовывоз";
 
 	public function __construct($dbLinkMaster=NULL, $dbLink=NULL){
 		parent::__construct($dbLinkMaster, $dbLink);
@@ -771,11 +772,11 @@ class RawMaterial_Controller extends ControllerSQL{
 	
 	}
 	
-	private function loadSelfShipWeightError($error){
-		error_log("loadSelfShipWeight: ".$error);
+	private function loadShipWeightError($error){
+		error_log("loadShipWeight: ".$error);
 	}
 
-	public function loadSelfShipWeight($pm, $doc){
+	public function loadShipWeight($pm, $doc){
 		$link_master = $this->getDbLinkMaster();
 		try{
 			//doc				
@@ -783,7 +784,7 @@ class RawMaterial_Controller extends ControllerSQL{
 			$quant_net = ($doc->quant_net=='0')? 0:$doc->quant_net/1000;
 			$plate = trim($doc->vehicle_plate);
 			if($plate == ""){
-				throw new Exception("loadSelfShipWeight: vehicle plate not set");
+				throw new Exception("loadShipWeight: vehicle plate not set");
 			}
 			$plate = mb_strtolower(mb_substr($plate, 1, 3)); //normalized plate
 
@@ -810,19 +811,48 @@ class RawMaterial_Controller extends ControllerSQL{
 				throw new Exception("vehicle shipment not found by plate:".$plate. ', time:'.$doc->date_time);
 			}
 
+			$material = trim($doc->material);
+			$sender_client = isset($doc->sender_client)? trim($doc->sender_client) : "NULL";
+			$sender_name = trim($doc->sender_name);
+			$unloading_warehouse = isset($doc->unloading_warehouse)? trim($doc->unloading_warehouse) : "NULL";
+			$ship_weighing_cause = (str_contains(mb_strtolower($material), 'самовывоз')===TRUE)?
+				'self_ship' : 'redirection';
+
+throw new Exception("ship_weighing_cause:".$ship_weighing_cause);
 			$link_master->query(
 				"INSERT INTO shipment_weights
-				(shipment_id, date_time, quant_gross, quant_net)
-				VALUES ($1, $2, $3, $4)
+				(shipment_id, date_time, 
+				material, sender_name, sender_client, unloading_warehouse, 
+				ship_weighing_cause,
+				uploaded_at,
+				quant_gross, quant_net
+				)
+				VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8, $9)
 				ON CONFLICT (shipment_id) DO UPDATE SET
 					date_time = EXCLUDED.date_time,
+					material = EXCLUDED.material,
+					sender_name = EXCLUDED.sender_name,
+					sender_client = EXCLUDED.sender_client,
+					unloading_warehouse = EXCLUDED.unloading_warehouse,
+					ship_weighing_cause = EXCLUDED.ship_weighing_cause,
+					uploaded_at = NOW(),
 					quant_net = EXCLUDED.quant_net,
 					quant_gross = EXCLUDED.quant_gross
 				", 
-				[$veh_res["shipment_id"], $doc->date_time, $quant_gross, $quant_net]
+				[
+					$veh_res["shipment_id"], 
+					$doc->date_time, 
+					$material,
+					$sender_client,
+					$sender_name,
+					$unloading_warehouse,
+					$ship_weighing_cause,
+					$quant_gross, 
+					$quant_net
+				]
 			);
 		}catch (Exception $e){
-			$this->loadSelfShipWeightError($e->getMessage());
+			$this->loadShipWeightError($e->getMessage());
 		}
 	}
 
@@ -837,11 +867,12 @@ class RawMaterial_Controller extends ControllerSQL{
 			return;
 		}
 
-		if( trim($doc->material) == self::SELF_SHIP_MATERIAL_MARKER ){
-			//different logic
-			$this->loadSelfShipWeight($pm, $doc);
+		if( str_contains( mb_strtolower(trim($doc->material)), self::WEIGH_SHIP_MATERIAL_MARKER ) === TRUE ){
+			//different logic, add weighing
+			$this->loadShipWeight($pm, $doc);
 			return;
 		}
+throw new Exception("stop");
 		
 		$link = $this->getDbLink();
 		$link_master = $this->getDbLinkMaster();

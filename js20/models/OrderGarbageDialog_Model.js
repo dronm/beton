@@ -410,6 +410,42 @@ function OrderGarbageDialog_Model(options){
 	options.fields.client_debt = new FieldFloat("client_debt",filed_options);
 	options.fields.client_debt.getValidator().setMaxLength('15');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.order_id = new FieldInt("order_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Ссылка на справочник 1с';
+	filed_options.autoInc = false;	
+	
+	options.fields.ref_1c = new FieldJSONB("ref_1c",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.client_ref_1c = new FieldJSON("client_ref_1c",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.client_debt_date = new FieldDateTime("client_debt_date",filed_options);
+	
 		OrderGarbageDialog_Model.superclass.constructor.call(this,id,options);
 }
 extend(OrderGarbageDialog_Model,ModelXML);

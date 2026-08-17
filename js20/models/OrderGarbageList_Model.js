@@ -187,6 +187,51 @@ function OrderGarbageList_Model(options){
 	
 	options.fields.contacts_ref = new FieldJSON("contacts_ref",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.order_id = new FieldInt("order_id",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Ссылка на справочник 1с';
+	filed_options.autoInc = false;	
+	
+	options.fields.ref_1c = new FieldJSONB("ref_1c",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.users_ref = new FieldJSON("users_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Кто последний вносил изменения';
+	filed_options.autoInc = false;	
+	
+	options.fields.last_modif_users_ref = new FieldJSON("last_modif_users_ref",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Время последнего изменения';
+	filed_options.autoInc = false;	
+	
+	options.fields.last_modif_date_time = new FieldDateTimeTZ("last_modif_date_time",filed_options);
+	
 		OrderGarbageList_Model.superclass.constructor.call(this,id,options);
 }
 extend(OrderGarbageList_Model,ModelXML);

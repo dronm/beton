@@ -586,6 +586,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				WHEN m_user.id IS NOT NULL THEN ct.id
 				ELSE NULL
 			END AS mx_contact_id,
+			coalesce(orders.contact_id, ct.id) AS resp_contact_id,
 
 			CASE
 				WHEN e_user_d.tm_id IS NOT NULL THEN ct_d.id
@@ -595,6 +596,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				WHEN m_user_d.id IS NOT NULL THEN ct.id
 				ELSE NULL
 			END AS dr_mx_contact_id,
+			ct_d.id AS dr_contact_id,
 
 			orders.pump_vehicle_id IS NOT NULL as pump_exists
 			
@@ -620,8 +622,8 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		
 		$d_phone_exists = (strlen($ar['d_phone'])==10);
 		
-		//responsible person notification through MAX or TM
-		if (strlen($ar['phone_cel']) &amp;&amp; (isset($ar['tm_contact_id']) || isset($ar['mx_contact_id']) )){
+		//responsible person notification through MAX or SMS
+		if (strlen($ar['phone_cel']) &amp;&amp; isset($ar['resp_contact_id'] )){
 			$text = $ar['text'];
 			$text = str_replace('[quant]',$ar['quant'],$text);
 			$text = str_replace('[concrete]',$ar['concrete'],$text);
@@ -638,17 +640,21 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				$text.= ' '.ROUTE_HREF.$idForDb;
 			}
 					
+			/*
 			if(isset($ar["mx_contact_id"])){
 				add_notification_from_contact_max($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['mx_contact_id']);
 
 			} else if(isset($ar["tm_contact_id"])){
 				add_notification_from_contact_tm($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['tm_contact_id']);
 			}
+			*/
+
+			add_notification_from_contact($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['resp_contact_id']);
 		}
 
 		//notify pump driver if there is a pump in this order
 		/*
-		    Removed thid notification with 1.00330 build on 2024-05-29
+		    Removed this notification with 1.00330 build on 2024-05-29
 		if($ar['pump_exists'] == 't'){
 			//Вызываем новые SQL функции *_ct(), которые используют контакты, а не телефоны из таблиц!
 			$pump_sms_q_id = $dbLinkMaster->query(sprintf(

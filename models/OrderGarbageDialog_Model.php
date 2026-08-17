@@ -16,6 +16,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLTime.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLBool.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSON.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldSQLJSONB.php');
  
 class OrderGarbageDialog_Model extends ModelSQLBeton{
 	
@@ -379,6 +380,40 @@ class OrderGarbageDialog_Model extends ModelSQLBeton{
 						
 		$f_client_debt=new FieldSQLFloat($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_debt",$f_opts);
 		$this->addField($f_client_debt);
+		//********************
+		
+		//*** Field order_id ***
+		$f_opts = array();
+		$f_opts['id']="order_id";
+						
+		$f_order_id=new FieldSQLInt($this->getDbLink(),$this->getDbName(),$this->getTableName(),"order_id",$f_opts);
+		$this->addField($f_order_id);
+		//********************
+		
+		//*** Field ref_1c ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Ссылка на справочник 1с';
+		$f_opts['id']="ref_1c";
+						
+		$f_ref_1c=new FieldSQLJSONB($this->getDbLink(),$this->getDbName(),$this->getTableName(),"ref_1c",$f_opts);
+		$this->addField($f_ref_1c);
+		//********************
+		
+		//*** Field client_ref_1c ***
+		$f_opts = array();
+		$f_opts['id']="client_ref_1c";
+						
+		$f_client_ref_1c=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_ref_1c",$f_opts);
+		$this->addField($f_client_ref_1c);
+		//********************
+		
+		//*** Field client_debt_date ***
+		$f_opts = array();
+		$f_opts['id']="client_debt_date";
+						
+		$f_client_debt_date=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_debt_date",$f_opts);
+		$this->addField($f_client_debt_date);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
