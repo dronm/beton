@@ -17,6 +17,10 @@
 
 <xsl:template match="controller"><![CDATA[<?php]]>
 <xsl:call-template name="add_requirements"/>
+
+require_once(USER_MODELS_PATH.'ShipmentWeightSelfShipList_Model.php');
+require_once(USER_MODELS_PATH.'ShipmentWeightRedirectionList_Model.php');
+
 class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@parentId"/>{
 	public function __construct($dbLinkMaster=NULL,$dbLink=NULL){
 		parent::__construct($dbLinkMaster,$dbLink);<xsl:apply-templates/>
@@ -27,6 +31,18 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 </xsl:template>
 
 <xsl:template name="extra_methods">
+	public function get_self_ship_list($pm){
+		$this->setListModelId("ShipmentWeightSelfShipList_Model");
+		$model = new ShipmentWeightSelfShipList_Model($this->getDbLink());
+		$this->modelGetList($model, $pm);
+	}
+
+	public function get_redirection_list($pm){
+		$this->setListModelId("ShipmentWeightRedirectionList_Model");
+		$model = new ShipmentWeightRedirectionList_Model($this->getDbLink());
+		$this->modelGetList($model, $pm);
+	}
+
 </xsl:template>
 
 </xsl:stylesheet>

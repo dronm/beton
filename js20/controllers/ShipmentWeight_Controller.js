@@ -24,11 +24,190 @@ function ShipmentWeight_Controller(options){
 	ShipmentWeight_Controller.superclass.constructor.call(this,options);	
 	
 	//methods
+	this.addInsert();
+	this.addUpdate();
+	this.addDelete();
+	this.addGetList();
+	this.add_get_self_ship_list();
+	this.add_get_redirection_list();
 	this.addGetList();
 	this.addGetObject();
 		
 }
 extend(ShipmentWeight_Controller,ControllerObjServer);
+
+			ShipmentWeight_Controller.prototype.addInsert = function(){
+	ShipmentWeight_Controller.superclass.addInsert.call(this);
+	
+	var pm = this.getInsert();
+	
+	var options = {};
+	options.alias = "Код";options.primaryKey = true;options.required = true;
+	var field = new FieldInt("shipment_id",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Дата";options.required = true;
+	var field = new FieldDateTime("date_time",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Брутто";
+	var field = new FieldFloat("quant_gross",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Нетто";
+	var field = new FieldFloat("quant_net",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Груз";
+	var field = new FieldText("material",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "ПунктОтправления";
+	var field = new FieldText("sender_name",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Отправитель";
+	var field = new FieldText("sender_client",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Склад разгрузки";
+	var field = new FieldText("unloading_warehouse",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+		
+	options.enumValues = 'self_ship,redirection';
+	var field = new FieldEnum("ship_weighing_cause",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Номер";
+	var field = new FieldText("number",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Дата";
+	var field = new FieldDateTime("uploaded_at",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Комментарий";
+	var field = new FieldText("comment_text",options);
+	
+	pm.addField(field);
+	
+	
+}
+
+			ShipmentWeight_Controller.prototype.addUpdate = function(){
+	ShipmentWeight_Controller.superclass.addUpdate.call(this);
+	var pm = this.getUpdate();
+	
+	var options = {};
+	options.alias = "Код";options.primaryKey = true;
+	var field = new FieldInt("shipment_id",options);
+	
+	pm.addField(field);
+	
+	field = new FieldInt("old_shipment_id",{});
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Дата";
+	var field = new FieldDateTime("date_time",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Брутто";
+	var field = new FieldFloat("quant_gross",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Нетто";
+	var field = new FieldFloat("quant_net",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Груз";
+	var field = new FieldText("material",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "ПунктОтправления";
+	var field = new FieldText("sender_name",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Отправитель";
+	var field = new FieldText("sender_client",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Склад разгрузки";
+	var field = new FieldText("unloading_warehouse",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+		
+	options.enumValues = 'self_ship,redirection';
+	
+	var field = new FieldEnum("ship_weighing_cause",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Номер";
+	var field = new FieldText("number",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Дата";
+	var field = new FieldDateTime("uploaded_at",options);
+	
+	pm.addField(field);
+	
+	var options = {};
+	options.alias = "Комментарий";
+	var field = new FieldText("comment_text",options);
+	
+	pm.addField(field);
+	
+	
+}
+
+			ShipmentWeight_Controller.prototype.addDelete = function(){
+	ShipmentWeight_Controller.superclass.addDelete.call(this);
+	var pm = this.getDelete();
+	var options = {"required":true};
+	options.alias = "Код";	
+	pm.addField(new FieldInt("shipment_id",options));
+}
 
 			ShipmentWeight_Controller.prototype.addGetList = function(){
 	ShipmentWeight_Controller.superclass.addGetList.call(this);
@@ -52,26 +231,114 @@ extend(ShipmentWeight_Controller,ControllerObjServer);
 	f_opts.alias = "Код";
 	pm.addField(new FieldInt("shipment_id",f_opts));
 	var f_opts = {};
-	f_opts.alias = "Код";
-	pm.addField(new FieldInt("quant",f_opts));
-	var f_opts = {};
-	f_opts.alias = "ТС";
-	pm.addField(new FieldJSON("vehicles_ref",f_opts));
-	var f_opts = {};
-	f_opts.alias = "Объект";
-	pm.addField(new FieldJSON("destinations_ref",f_opts));
-	var f_opts = {};
-	f_opts.alias = "Заявка";
-	pm.addField(new FieldJSON("orders_ref",f_opts));
-	var f_opts = {};
 	f_opts.alias = "Дата";
 	pm.addField(new FieldDateTime("date_time",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Дата";
+	pm.addField(new FieldDateTime("ship_date_time",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Автомобиль";
+	pm.addField(new FieldJSON("vehicles_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("orders_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("destinations_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("quant",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Номер";
+	pm.addField(new FieldText("number",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Груз";
+	pm.addField(new FieldText("material",f_opts));
+	var f_opts = {};
+	f_opts.alias = "ПунктОтправления";
+	pm.addField(new FieldText("sender_name",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Брутто";
 	pm.addField(new FieldFloat("quant_gross",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Нетто";
 	pm.addField(new FieldFloat("quant_net",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Комментарий";
+	pm.addField(new FieldText("comment_text",f_opts));
+}
+
+			ShipmentWeight_Controller.prototype.add_get_self_ship_list = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_self_ship_list',opts);
+	
+	this.addPublicMethod(pm);
+}
+
+			ShipmentWeight_Controller.prototype.add_get_redirection_list = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_redirection_list',opts);
+	
+	this.addPublicMethod(pm);
+}
+
+			ShipmentWeight_Controller.prototype.addGetList = function(){
+	ShipmentWeight_Controller.superclass.addGetList.call(this);
+	
+	
+	
+	var pm = this.getGetList();
+	
+	pm.addField(new FieldInt(this.PARAM_COUNT));
+	pm.addField(new FieldInt(this.PARAM_FROM));
+	pm.addField(new FieldString(this.PARAM_COND_FIELDS));
+	pm.addField(new FieldString(this.PARAM_COND_SGNS));
+	pm.addField(new FieldString(this.PARAM_COND_VALS));
+	pm.addField(new FieldString(this.PARAM_COND_ICASE));
+	pm.addField(new FieldString(this.PARAM_ORD_FIELDS));
+	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
+	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
+	pm.addField(new FieldString(this.PARAM_FIELD_LSN));
+
+	var f_opts = {};
+	f_opts.alias = "Код";
+	pm.addField(new FieldInt("shipment_id",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Дата";
+	pm.addField(new FieldDateTime("date_time",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Дата";
+	pm.addField(new FieldDateTime("ship_date_time",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Автомобиль";
+	pm.addField(new FieldJSON("vehicles_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("orders_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("destinations_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldFloat("quant",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Номер";
+	pm.addField(new FieldText("number",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Груз";
+	pm.addField(new FieldText("material",f_opts));
+	var f_opts = {};
+	f_opts.alias = "ПунктОтправления";
+	pm.addField(new FieldText("sender_name",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Брутто";
+	pm.addField(new FieldFloat("quant_gross",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Нетто";
+	pm.addField(new FieldFloat("quant_net",f_opts));
+	var f_opts = {};
+	f_opts.alias = "Комментарий";
+	pm.addField(new FieldText("comment_text",f_opts));
 }
 
 			ShipmentWeight_Controller.prototype.addGetObject = function(){

@@ -1815,6 +1815,8 @@ added a new table shipment_weights
 Concrete weighing.
 
 
+1.00429
+1) ShipmentWeight, ShipmentWeightSelfShip, ShipmentWeightRedirection
 
 What to check, implement:
 - php-redis, check logout

@@ -115,6 +115,16 @@ class ShipmentWeight_Model extends ModelSQLBeton{
 		$this->addField($f_ship_weighing_cause);
 		//********************
 		
+		//*** Field number ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Номер';
+		$f_opts['id']="number";
+						
+		$f_number=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"number",$f_opts);
+		$this->addField($f_number);
+		//********************
+		
 		//*** Field uploaded_at ***
 		$f_opts = array();
 		
@@ -123,6 +133,16 @@ class ShipmentWeight_Model extends ModelSQLBeton{
 						
 		$f_uploaded_at=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"uploaded_at",$f_opts);
 		$this->addField($f_uploaded_at);
+		//********************
+		
+		//*** Field comment_text ***
+		$f_opts = array();
+		
+		$f_opts['alias']='Комментарий';
+		$f_opts['id']="comment_text";
+						
+		$f_comment_text=new FieldSQLText($this->getDbLink(),$this->getDbName(),$this->getTableName(),"comment_text",$f_opts);
+		$this->addField($f_comment_text);
 		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}

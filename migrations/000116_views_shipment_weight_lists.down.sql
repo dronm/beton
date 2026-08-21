@@ -1,0 +1,5 @@
+BEGIN;
+	DELETE FROM views WHERE id = '20033';
+	DELETE FROM views WHERE id = '20034';
+COMMIT;
+

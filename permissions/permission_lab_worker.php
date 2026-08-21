@@ -1968,9 +1968,41 @@ $permissions = array();
 				
 					$permissions['BuhDoc_Controller_new_doc']=TRUE;
 				
+					$permissions['ShipmentWeight_Controller_insert']=TRUE;
+				
+					$permissions['ShipmentWeight_Controller_update']=TRUE;
+				
+					$permissions['ShipmentWeight_Controller_delete']=TRUE;
+				
+					$permissions['ShipmentWeight_Controller_get_list']=TRUE;
+				
+					$permissions['ShipmentWeight_Controller_get_self_ship_list']=TRUE;
+				
+					$permissions['ShipmentWeight_Controller_get_redirection_list']=TRUE;
+				
 					$permissions['ShipmentWeight_Controller_get_list']=TRUE;
 				
 					$permissions['ShipmentWeight_Controller_get_object']=TRUE;
+				
+					$permissions['ShipmentWeightSelfShip_Controller_insert']=TRUE;
+				
+					$permissions['ShipmentWeightSelfShip_Controller_update']=TRUE;
+				
+					$permissions['ShipmentWeightSelfShip_Controller_delete']=TRUE;
+				
+					$permissions['ShipmentWeightSelfShip_Controller_get_list']=TRUE;
+				
+					$permissions['ShipmentWeightSelfShip_Controller_get_object']=TRUE;
+				
+					$permissions['ShipmentWeightRedirection_Controller_insert']=TRUE;
+				
+					$permissions['ShipmentWeightRedirection_Controller_update']=TRUE;
+				
+					$permissions['ShipmentWeightRedirection_Controller_delete']=TRUE;
+				
+					$permissions['ShipmentWeightRedirection_Controller_get_list']=TRUE;
+				
+					$permissions['ShipmentWeightRedirection_Controller_get_object']=TRUE;
 				
 					$permissions['Workplace_Controller_insert']=TRUE;
 				
@@ -2003,6 +2035,16 @@ $permissions = array();
 					$permissions['MacAddressList_Controller_get_list']=TRUE;
 				
 					$permissions['MacAddressList_Controller_get_object']=TRUE;
+				
+					$permissions['ShipmentWeightRedirectionPayment_Controller_insert']=TRUE;
+				
+					$permissions['ShipmentWeightRedirectionPayment_Controller_update']=TRUE;
+				
+					$permissions['ShipmentWeightRedirectionPayment_Controller_delete']=TRUE;
+				
+					$permissions['ShipmentWeightRedirectionPayment_Controller_get_list']=TRUE;
+				
+					$permissions['ShipmentWeightRedirectionPayment_Controller_get_object']=TRUE;
 				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

@@ -120,6 +120,10 @@ $permissions = array();
 		
 			$permissions['ConnectElkonCheck_Controller_connected']=TRUE;
 		
+			$permissions['ShipmentWeight_Controller_get_list']=TRUE;
+		
+			$permissions['ShipmentWeightRedirection_Controller_get_list']=TRUE;
+		
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }
 ?>

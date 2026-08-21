@@ -811,6 +811,7 @@ class RawMaterial_Controller extends ControllerSQL{
 				throw new Exception("vehicle shipment not found by plate:".$plate. ', time:'.$doc->date_time);
 			}
 
+			$num = trim($doc->number);
 			$material = trim($doc->material);
 			$sender_client = isset($doc->sender_client)? trim($doc->sender_client) : "NULL";
 			$sender_name = trim($doc->sender_name);
@@ -818,18 +819,19 @@ class RawMaterial_Controller extends ControllerSQL{
 			$ship_weighing_cause = (str_contains(mb_strtolower($material), 'самовывоз')===TRUE)?
 				'self_ship' : 'redirection';
 
-throw new Exception("ship_weighing_cause:".$ship_weighing_cause);
+//throw new Exception("ship_weighing_cause:".$ship_weighing_cause);
 			$link_master->query(
 				"INSERT INTO shipment_weights
 				(shipment_id, date_time, 
-				material, sender_name, sender_client, unloading_warehouse, 
+				number, material, sender_name, sender_client, unloading_warehouse, 
 				ship_weighing_cause,
 				uploaded_at,
 				quant_gross, quant_net
 				)
-				VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8, $9)
+				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), $9, $10)
 				ON CONFLICT (shipment_id) DO UPDATE SET
 					date_time = EXCLUDED.date_time,
+					number = EXCLUDED.number,
 					material = EXCLUDED.material,
 					sender_name = EXCLUDED.sender_name,
 					sender_client = EXCLUDED.sender_client,
@@ -842,6 +844,7 @@ throw new Exception("ship_weighing_cause:".$ship_weighing_cause);
 				[
 					$veh_res["shipment_id"], 
 					$doc->date_time, 
+					$num,
 					$material,
 					$sender_client,
 					$sender_name,
@@ -872,7 +875,6 @@ throw new Exception("ship_weighing_cause:".$ship_weighing_cause);
 			$this->loadShipWeight($pm, $doc);
 			return;
 		}
-throw new Exception("stop");
 		
 		$link = $this->getDbLink();
 		$link_master = $this->getDbLinkMaster();

@@ -112,11 +112,31 @@ function ShipmentWeight_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	filed_options.alias = 'Номер';
+	filed_options.autoInc = false;	
+	
+	options.fields.number = new FieldText("number",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Дата';
 	filed_options.autoInc = false;	
 	
 	options.fields.uploaded_at = new FieldDateTime("uploaded_at",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	filed_options.alias = 'Комментарий';
+	filed_options.autoInc = false;	
+	
+	options.fields.comment_text = new FieldText("comment_text",filed_options);
+	
+			
+			
 		ShipmentWeight_Model.superclass.constructor.call(this,id,options);
 }
 extend(ShipmentWeight_Model,ModelXML);

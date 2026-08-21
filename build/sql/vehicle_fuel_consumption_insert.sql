@@ -230,6 +230,7 @@ BEGIN
 
 	v_period_mileage := p_cumulative_mileage - v_previous_mileage;
 
+	/*
 	IF v_period_mileage < 0 THEN
 		RAISE EXCEPTION
 			'Cumulative mileage decreased for vehicle % at %: previous %, current %',
@@ -238,6 +239,7 @@ BEGIN
 			v_previous_mileage,
 			p_cumulative_mileage;
 	END IF;
+	*/
 
 	v_engine_hours :=
 		EXTRACT(EPOCH FROM v_timing)::numeric / 3600;

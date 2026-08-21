@@ -81,9 +81,15 @@ MaterialStoreForOrderList_View.prototype.setData = function(modelStores){
 			}
 		
 			cur_prod_site = modelStores.getFieldValue("production_sites_ref");
-			
+			let s_id;
+			if(cur_prod_site.getKey){
+				s_id = cur_prod_site.getKey("id");//modelStores.getFieldValue("id");
+			}else if(cur_prod_site.keys && cur_prod_site.keys.id){
+				s_id = cur_prod_site.keys.id;
+			}else{
+				continue;
+			}
 			var s_name = modelStores.getFieldValue("name");
-			var s_id = cur_prod_site.getKey("id");//modelStores.getFieldValue("id");
 		
 			if(!prod_site || prod_site.productionSiteId!=cur_prod_site.getKey("id")){
 				prod_site = {

@@ -146,6 +146,9 @@
 <li><a href="#ShipmentMedia_Controller">ShipmentMedia_Controller</a></li>
 <li><a href="#ShipmentTimeNorm_Controller">ShipmentTimeNorm_Controller</a></li>
 <li><a href="#ShipmentWeight_Controller">ShipmentWeight_Controller</a></li>
+<li><a href="#ShipmentWeightRedirection_Controller">ShipmentWeightRedirection_Controller</a></li>
+<li><a href="#ShipmentWeightRedirectionPayment_Controller">ShipmentWeightRedirectionPayment_Controller</a></li>
+<li><a href="#ShipmentWeightSelfShip_Controller">ShipmentWeightSelfShip_Controller</a></li>
 <li><a href="#SiteFeedBack_Controller">SiteFeedBack_Controller</a></li>
 <li><a href="#SpecialistRequest_Controller">SpecialistRequest_Controller</a></li>
 <li><a href="#SrvStatistics_Controller">SrvStatistics_Controller</a></li>
@@ -578,6 +581,9 @@
 <li><a href="#SpecialVehicleList_Model">SpecialVehicleList_Model</a></li>
 <li><a href="#ShipmentWeight_Model">ShipmentWeight_Model</a></li>
 <li><a href="#ShipmentWeightList_Model">ShipmentWeightList_Model</a></li>
+<li><a href="#ShipmentWeightSelfShipList_Model">ShipmentWeightSelfShipList_Model</a></li>
+<li><a href="#ShipmentWeightRedirectionList_Model">ShipmentWeightRedirectionList_Model</a></li>
+<li><a href="#ShipmentWeightRedirectionPayment_Model">ShipmentWeightRedirectionPayment_Model</a></li>
 <li><a href="#Workplace_Model">Workplace_Model</a></li>
 <li><a href="#WorkplaceList_Model">WorkplaceList_Model</a></li>
 <li><a href="#WorkplaceSchedule_Model">WorkplaceSchedule_Model</a></li>
@@ -4388,9 +4394,54 @@
 <div class="content_item">
 <p class="big"></p>
 <p>Методы:</p>
-<h2>get_list</h2>
+<h2>insert</h2>
+<a href="#ShipmentWeight_Model">Model: ShipmentWeight_Model</a><h2>update</h2>
+<a href="#ShipmentWeight_Model">Model: ShipmentWeight_Model</a><h2>delete</h2>
+<a href="#ShipmentWeight_Model">Model: ShipmentWeight_Model</a><h2>get_list</h2>
+<a href="#ShipmentWeightList_Model">Model: ShipmentWeightList_Model</a><h2>get_self_ship_list</h2>
+<a href="#ShipmentWeightSelfShipList_Model">Model: ShipmentWeightSelfShipList_Model</a><h2>get_redirection_list</h2>
+<a href="#ShipmentWeightRedirectionList_Model">Model: ShipmentWeightRedirectionList_Model</a><h2>get_list</h2>
 <a href="#ShipmentWeightList_Model">Model: ShipmentWeightList_Model</a><h2>get_object</h2>
 <a href="#ShipmentWeightList_Model">Model: ShipmentWeightList_Model</a>
+</div>
+</div>
+<div id="ShipmentWeightRedirection_Controller" class="content_box">
+<h1>ShipmentWeightRedirection_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#ShipmentWeight_Model">Model: ShipmentWeight_Model</a><h2>update</h2>
+<a href="#ShipmentWeight_Model">Model: ShipmentWeight_Model</a><h2>delete</h2>
+<a href="#ShipmentWeight_Model">Model: ShipmentWeight_Model</a><h2>get_list</h2>
+<a href="#ShipmentWeightRedirectionList_Model">Model: ShipmentWeightRedirectionList_Model</a><h2>get_object</h2>
+<a href="#ShipmentWeightRedirectionList_Model">Model: ShipmentWeightRedirectionList_Model</a>
+</div>
+</div>
+<div id="ShipmentWeightRedirectionPayment_Controller" class="content_box">
+<h1>ShipmentWeightRedirectionPayment_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#ShipmentWeightRedirectionPayment_Model">Model: ShipmentWeightRedirectionPayment_Model</a><h2>update</h2>
+<a href="#ShipmentWeightRedirectionPayment_Model">Model: ShipmentWeightRedirectionPayment_Model</a><h2>delete</h2>
+<a href="#ShipmentWeightRedirectionPayment_Model">Model: ShipmentWeightRedirectionPayment_Model</a><h2>get_list</h2>
+<a href="#ShipmentWeightRedirectionPayment_Model">Model: ShipmentWeightRedirectionPayment_Model</a><h2>get_object</h2>
+<a href="#ShipmentWeightRedirectionPayment_Model">Model: ShipmentWeightRedirectionPayment_Model</a>
+</div>
+</div>
+<div id="ShipmentWeightSelfShip_Controller" class="content_box">
+<h1>ShipmentWeightSelfShip_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#ShipmentWeight_Model">Model: ShipmentWeight_Model</a><h2>update</h2>
+<a href="#ShipmentWeight_Model">Model: ShipmentWeight_Model</a><h2>delete</h2>
+<a href="#ShipmentWeight_Model">Model: ShipmentWeight_Model</a><h2>get_list</h2>
+<a href="#ShipmentWeightSelfShipList_Model">Model: ShipmentWeightSelfShipList_Model</a><h2>get_object</h2>
+<a href="#ShipmentWeightSelfShipList_Model">Model: ShipmentWeightSelfShipList_Model</a>
 </div>
 </div>
 <div id="SiteFeedBack_Controller" class="content_box">
@@ -23858,8 +23909,20 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>number</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>uploaded_at</h2>
 <div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>comment_text</h2>
+<div>Type:Text</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -23876,19 +23939,19 @@
 <div>Required:TRUE</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>quant</h2>
-<div>Type:Int</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ship_date_time</h2>
+<div>Type:DateTime</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
 <h2>vehicles_ref</h2>
-<div>Type:JSON</div>
-<div>Primary key:</div>
-<div>Required:</div>
-<div>Length:</div>
-<div>Precision:</div>
-<h2>destinations_ref</h2>
 <div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
@@ -23900,16 +23963,34 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>ship_date_time</h2>
-<div>Type:DateTime</div>
+<h2>destinations_ref</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
-<div>Required:TRUE</div>
+<div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
-<h2>date_time</h2>
-<div>Type:DateTime</div>
+<h2>quant</h2>
+<div>Type:Float</div>
 <div>Primary key:</div>
-<div>Required:TRUE</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+<h2>number</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>material</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>sender_name</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
 <h2>quant_gross</h2>
@@ -23924,6 +24005,198 @@
 <div>Required:</div>
 <div>Length:19</div>
 <div>Precision:2</div>
+<h2>comment_text</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ShipmentWeightRedirectionList_Model" class="content_box">
+<h1>ShipmentWeightRedirectionList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>shipment_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicles_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>number</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>material</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>sender_name</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>sender_client</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_gross</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+<h2>quant_net</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+<h2>quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+<h2>comment_text</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>unloading_warehouse</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>amount</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:2</div>
+<h2>payment</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ShipmentWeightRedirectionPayment_Model" class="content_box">
+<h1>ShipmentWeightRedirectionPayment_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>shipment_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>created_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ShipmentWeightSelfShipList_Model" class="content_box">
+<h1>ShipmentWeightSelfShipList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>shipment_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicles_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>vehicle_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>date_time</h2>
+<div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>number</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>material</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>sender_name</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant_gross</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+<h2>quant_net</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:2</div>
+<h2>comment_text</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="ShippedVehicleList_Model" class="content_box">

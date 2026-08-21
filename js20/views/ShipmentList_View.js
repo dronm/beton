@@ -483,7 +483,7 @@ function ShipmentList_View(id,options){
 							"columns":[
 								new GridColumn({
 									"formatFunction": function(f){
-										console.log(f.upd_ref_1c)
+										//console.log(f.upd_ref_1c)
 										return "";
 										// if(f.upd_ref_1c === undefined || !("descr" in f.upd_ref_1c.descr)){
 										// 	return "";

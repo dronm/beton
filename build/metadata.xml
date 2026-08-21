@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-08-17 05:49:26</lastBuild></version>
+		<lastBuild>2026-08-18 08:24:49</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -334,6 +334,7 @@
 		<version dateOpen="2026-07-22 20:06:11" dateClose="2026-07-22 20:06:50">1.00426</version>
 		<version dateOpen="2026-07-23 18:06:05" dateClose="2026-08-07 09:16:11">1.00427</version>
 		<version dateOpen="2026-08-10 16:16:57" dateClose="2026-08-17 05:49:52">1.00428</version>
+		<version dateOpen="2026-08-18 08:38:57" dateClose="2026-08-21 06:01:16">1.00429</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -5903,18 +5904,76 @@
 			<field id="sender_client" dataType="Text" alias="Отправитель"/>
 			<field id="unloading_warehouse" dataType="Text" alias="Склад разгрузки"/>
 			<field id="ship_weighing_cause" dataType="Enum" enumId="ship_weighing_causes"/>
+			<field id="number" dataType="Text" alias="Номер"/>
 			<field id="uploaded_at" dataType="DateTime" alias="Дата"/>
+			<field id="comment_text" dataType="Text" alias="Комментарий"/>
+			<index id="shipment_weights_cause_idx">
+				<field id="ship_weighing_cause"/>
+			</index>
+			<index id="shipment_weights_date_time_idx">
+				<field id="date_time"/>
+			</index>
 		</model>
 		<model id="ShipmentWeightList" parent="ModelSQLBeton" dataTable="shipment_weights_list" virtual="TRUE">
 			<field id="shipment_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE" refTable="shipments" refField="id" required="TRUE" alias="Код"/>
-			<field id="quant" dataType="Int" alias="Код"/>
-			<field id="vehicles_ref" dataType="JSON" alias="ТС"/>
-			<field id="destinations_ref" dataType="JSON" alias="Объект"/>
-			<field id="orders_ref" dataType="JSON" alias="Заявка"/>
-			<field id="ship_date_time" dataType="DateTime" alias="Дата" required="TRUE"/>
-			<field id="date_time" dataType="DateTime" alias="Дата" required="TRUE"/>
+			<field id="date_time" dataType="DateTime" alias="Дата"/>
+			<field id="ship_date_time" dataType="DateTime" alias="Дата"/>
+			<field id="vehicles_ref" dataType="JSON" alias="Автомобиль"/>
+			<field id="orders_ref" dataType="JSON"/>
+			<field id="destinations_ref" dataType="JSON"/>
+			<field id="quant" dataType="Float" length="19" precision="2"/>
+			<field id="number" dataType="Text" alias="Номер"/>
+			<field id="material" dataType="Text" alias="Груз"/>
+			<field id="sender_name" dataType="Text" alias="ПунктОтправления"/>
 			<field id="quant_gross" dataType="Float" length="19" alias="Брутто" precision="2"/>
 			<field id="quant_net" dataType="Float" length="19" alias="Нетто" precision="2"/>
+			<field id="comment_text" dataType="Text" alias="Комментарий"/>
+		</model>
+		<model id="ShipmentWeightSelfShipList" parent="ModelSQLBeton" dataTable="shipment_weights_self_ship_list" virtual="TRUE">
+			<defaultOrder>
+				<field id="date_time" sortDirect="DESC"/>
+			</defaultOrder>
+			<field id="shipment_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE" refTable="shipments" refField="id" required="TRUE" alias="Код"/>
+			<field id="vehicles_ref" dataType="JSON"/>
+			<field id="vehicle_id" dataType="Int"/>
+			<field id="date_time" dataType="DateTime" alias="Дата" required="TRUE"/>
+			<field id="number" dataType="Text" alias="Номер"/>
+			<field id="material" dataType="Text" alias="Груз"/>
+			<field id="sender_name" dataType="Text" alias="ПунктОтправления"/>
+			<field id="quant_gross" dataType="Float" length="19" alias="Брутто" precision="2"/>
+			<field id="quant_net" dataType="Float" length="19" alias="Нетто" precision="2"/>
+			<field id="comment_text" dataType="Text" alias="Комментарий"/>
+		</model>
+		<model id="ShipmentWeightRedirectionList" parent="ModelSQLBeton" dataTable="shipment_weights_redirection_list" virtual="TRUE">
+			<defaultOrder>
+				<field id="date_time" sortDirect="DESC"/>
+			</defaultOrder>
+			<field id="shipment_id" dataType="Int" primaryKey="TRUE" autoInc="FALSE" refTable="shipments" refField="id" required="TRUE" alias="Код"/>
+			<field id="vehicles_ref" dataType="JSON"/>
+			<field id="vehicle_id" dataType="Int"/>
+			<field id="date_time" dataType="DateTime" alias="Дата" required="TRUE"/>
+			<field id="number" dataType="Text" alias="Номер"/>
+			<field id="material" dataType="Text" alias="Груз"/>
+			<field id="sender_name" dataType="Text" alias="ПунктОтправления"/>
+			<field id="sender_client" dataType="Text" alias="Отправитель"/>
+			<field id="quant_gross" dataType="Float" length="19" alias="Брутто" precision="2"/>
+			<field id="quant_net" dataType="Float" length="19" alias="Нетто" precision="2"/>
+			<field id="quant" dataType="Float" length="19" alias="Объем" precision="2"/>
+			<field id="comment_text" dataType="Text" alias="Комментарий"/>
+			<field id="unloading_warehouse" dataType="Text" alias="Склад разгрузки"/>
+			<field id="amount" dataType="Float" precision="2" alias="Деньги"/>
+			<field id="payment" dataType="JSON"/>
+		</model>
+		<model id="ShipmentWeightRedirectionPayment" parent="ModelSQLBeton" dataTable="shipment_weight_redirection_payments" virtual="FALSE">
+			<field id="shipment_id" dataType="Int" primaryKey="TRUE" required="TRUE"/>
+			<field id="user_id" dataType="Int" refTable="users" refField="id" dbRequired="TRUE"/>
+			<field id="created_at" dataType="DateTimeTZ" dbRequired="TRUE"/>
+			<index id="shipment_weight_redirection_payments_created_at">
+				<field id="created_at"/>
+			</index>
+			<index id="shipment_weight_redirection_payments_user_id">
+				<field id="user_id"/>
+			</index>
 		</model>
 		<model id="Workplace" parent="ModelSQLBeton" dataTable="workplaces" virtual="FALSE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" dbRequired="TRUE" alias="Код"/>
@@ -8148,8 +8207,28 @@
 			</publicMethod>
 		</controller>
 		<controller id="ShipmentWeight" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="ShipmentWeight"/>
+			<publicMethod id="update" modelId="ShipmentWeight"/>
+			<publicMethod id="delete" modelId="ShipmentWeight"/>
+			<publicMethod id="get_list" modelId="ShipmentWeightList"/>
+			<publicMethod id="get_self_ship_list" modelId="ShipmentWeightSelfShipList"/>
+			<publicMethod id="get_redirection_list" modelId="ShipmentWeightRedirectionList"/>
 			<publicMethod id="get_list" modelId="ShipmentWeightList"/>
 			<publicMethod id="get_object" modelId="ShipmentWeightList"/>
+		</controller>
+		<controller id="ShipmentWeightSelfShip" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="ShipmentWeight"/>
+			<publicMethod id="update" modelId="ShipmentWeight"/>
+			<publicMethod id="delete" modelId="ShipmentWeight"/>
+			<publicMethod id="get_list" modelId="ShipmentWeightSelfShipList"/>
+			<publicMethod id="get_object" modelId="ShipmentWeightSelfShipList"/>
+		</controller>
+		<controller id="ShipmentWeightRedirection" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="ShipmentWeight"/>
+			<publicMethod id="update" modelId="ShipmentWeight"/>
+			<publicMethod id="delete" modelId="ShipmentWeight"/>
+			<publicMethod id="get_list" modelId="ShipmentWeightRedirectionList"/>
+			<publicMethod id="get_object" modelId="ShipmentWeightRedirectionList"/>
 		</controller>
 		<controller id="Workplace" parentId="ControllerSQL" noState="FALSE">
 			<publicMethod id="insert" modelId="Workplace"/>
@@ -8172,6 +8251,13 @@
 			<publicMethod id="delete" modelId="MacAddressList"/>
 			<publicMethod id="get_list" modelId="MacAddressList"/>
 			<publicMethod id="get_object" modelId="MacAddressList"/>
+		</controller>
+		<controller id="ShipmentWeightRedirectionPayment" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="ShipmentWeightRedirectionPayment"/>
+			<publicMethod id="update" modelId="ShipmentWeightRedirectionPayment"/>
+			<publicMethod id="delete" modelId="ShipmentWeightRedirectionPayment"/>
+			<publicMethod id="get_list" modelId="ShipmentWeightRedirectionPayment"/>
+			<publicMethod id="get_object" modelId="ShipmentWeightRedirectionPayment"/>
 		</controller>
 	</controllers>
 	<permissions>
@@ -8305,6 +8391,8 @@
 		<permission type="allow" controllerId="UserChat" methodId="all" roleId="weighing"/>
 		<permission type="allow" controllerId="DOCMaterialProcurement" methodId="get_list" roleId="weighing"/>
 		<permission type="allow" controllerId="ConnectElkonCheck" methodId="connected" roleId="weighing"/>
+		<permission type="allow" controllerId="ShipmentWeight" methodId="get_list" roleId="weighing"/>
+		<permission type="allow" controllerId="ShipmentWeightRedirection" methodId="get_list" roleId="weighing"/>
 	</permissions>
 	<views>
 		<view id="10000" c="User_Controller" t="UserList" f="get_list" section="Справочники" descr="Пользователи"/>
@@ -8394,6 +8482,8 @@
 		<view id="20030" c="ProductionReport_Controller" t="ProductionReportList" f="get_list" section="Документы" descr="Отчет производства за смену"/>
 		<view id="20031" c="FuelCorrection_Controller" t="FuelCorrectionList" f="get_list" section="Документы" descr="Журнал корректировок остатков топлива"/>
 		<view id="20032" c="WorkplaceSchedule_Controller" t="WorkplaceScheduleList" f="get_list" section="Документы" descr="Расписание работы пользователей"/>
+		<view id="20033" c="ShipmentWeight_Controller" t="ShipmentWeightSelfShipList" f="get_self_ship_list" section="Документы" descr="Бетон самовывоз"/>
+		<view id="20034" c="ShipmentWeight_Controller" t="ShipmentWeightRedirectionList" f="get_redirection_list" section="Документы" descr="Переадресация"/>
 		<view id="30001" t="Map" section="Формы" descr="ТС на карте"/>
 		<view id="30002" t="ScheduleGen" section="Формы" descr="Формирование графиков работы"/>
 		<view id="30003" c="Order_Controller" t="OrderMakeList" f="get_make_orders_form" section="Формы" descr="Заявки онлайн"/>
@@ -8622,6 +8712,8 @@
 		<serverTemplate id="FuelCorrectionList" class="list"/>
 		<serverTemplate id="WorkplaceScheduleList" class="list"/>
 		<serverTemplate id="RepVehicleFuelFlow"/>
+		<serverTemplate id="ShipmentWeightRedirectionList" class="list"/>
+		<serverTemplate id="ShipmentWeightSelfShipList" class="list"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="js20/tmpl/FatalException.html"/>
@@ -9298,6 +9390,8 @@
 		<jsScript file="js20/views/WorkplaceScheduleList_View.js"/>
 		<jsScript file="js20/views/VehicleFuelDocument_View.js"/>
 		<jsScript file="js20/views/RepVehicleFuelFlow_View.js"/>
+		<jsScript file="js20/views/ShipmentWeightSelfShipList_View.js"/>
+		<jsScript file="js20/views/ShipmentWeightRedirectionList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="js20/forms/ViewList_Form.js"/>
 		<jsScript file="js20/forms/MainMenuConstructor_Form.js"/>
@@ -10087,6 +10181,12 @@
 		<jsScript file="js20/models/VehicleFuelDocument_Model.js"/>
 		<jsScript file="js20/enum_controls/Enum_ship_weighing_causes.js"/>
 		<jsScript file="js20/enum_controls/EnumGridColumn_ship_weighing_causes.js"/>
+		<jsScript file="js20/models/ShipmentWeightRedirectionPayment_Model.js"/>
+		<jsScript file="js20/controllers/ShipmentWeightRedirectionPayment_Controller.js"/>
+		<jsScript file="js20/models/ShipmentWeightSelfShipList_Model.js"/>
+		<jsScript file="js20/models/ShipmentWeightRedirectionList_Model.js"/>
+		<jsScript file="js20/controllers/ShipmentWeightSelfShip_Controller.js"/>
+		<jsScript file="js20/controllers/ShipmentWeightRedirection_Controller.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

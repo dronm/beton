@@ -1,0 +1,1 @@
+DROP TABLE shipment_weight_redirection_payments CASCADE;
