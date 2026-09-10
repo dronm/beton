@@ -33,7 +33,7 @@ SELECT
 	CASE
 		WHEN coalesce(v.tracker_id, '') = '' THEN FALSE
 		WHEN tr_last.period IS NULL THEN TRUE
-		ELSE now() - (tr_last.period+('5 hours'::interval)) > interval '8 hours'
+		ELSE now() - (tr_last.period+('5 hours'::interval)) > interval '48 hours'
 	END AS tracker_no_signal,
 
 	coalesce(v.tracker_id, '') = '' AS no_tracker,

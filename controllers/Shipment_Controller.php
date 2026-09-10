@@ -700,6 +700,30 @@ class Shipment_Controller extends ControllerSQL{
 		$this->addPublicMethod($pm);
 
 			
+		$pm = new PublicMethod('shipment_putevoi_list_on_period');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('vehicle_id',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtDate('period_from',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtDate('period_to',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
 		$pm = new PublicMethod('shipment_transp_nakl');
 		
 				
@@ -1558,12 +1582,13 @@ class Shipment_Controller extends ControllerSQL{
 				add_notification_from_contact_tm($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['tm_contact_id']);
 			}
 			*/
+
 			add_notification_from_contact($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['resp_contact_id']);
 		}
 
 		//notify pump driver if there is a pump in this order
 		/*
-		    Removed thid notification with 1.00330 build on 2024-05-29
+		    Removed this notification with 1.00330 build on 2024-05-29
 		if($ar['pump_exists'] == 't'){
 			//Вызываем новые SQL функции *_ct(), которые используют контакты, а не телефоны из таблиц!
 			$pump_sms_q_id = $dbLinkMaster->query(sprintf(
@@ -3063,6 +3088,164 @@ class Shipment_Controller extends ControllerSQL{
 				json_encode([ "txt" => $txt ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
 			]
 		);
+	}
+
+	public function shipment_putevoi_list_on_period($pm){
+		$db_link = $this->getDbLink();
+
+		$veh_id = (int)$this->getExtDbVal($pm, 'vehicle_id');
+
+		$ar_veh = $db_link->query_first(sprintf(
+			'SELECT 1 AS found FROM vehicles WHERE id = %d',
+			$veh_id
+		));
+
+		if(!is_array($ar_veh) || !isset($ar_veh['found'])){
+			throw new Exception('Транспортное средство не найдено!');
+		}
+
+		/* throw new Exception($this->getExtVal($pm, 'period_from')); */
+		$period_from = (new DateTime())->setTimestamp($this->getExtVal($pm, 'period_from'));
+		$period_to = (new DateTime())->setTimestamp($this->getExtVal($pm, 'period_to'));
+
+		if($period_from > $period_to){
+			throw new Exception('Начало периода не может быть больше конца периода!');
+		}
+
+		if(!class_exists('ZipArchive')){
+			throw new Exception('Расширение PHP ZIP не установлено!');
+		}
+
+		$zip_name = sprintf(
+			'ПЛЗаПериод_%d_%s_%s.zip',
+			$veh_id,
+			$period_from->format('Y-m-d'),
+			$period_to->format('Y-m-d')
+		);
+
+		$zip_fl = OUTPUT_PATH.uniqid('putevoi_', true).'.zip';
+
+		$zip = new ZipArchive();
+		$zip_opened = false;
+		$temp_files = array();
+		$file_count = 0;
+
+		$empty_error = 'Отгрузка не найдена!';
+
+		try{
+			$zip_result = $zip->open(
+				$zip_fl,
+				ZipArchive::CREATE | ZipArchive::OVERWRITE
+			);
+
+			if($zip_result !== true){
+				throw new Exception('Не удалось создать ZIP-архив!');
+			}
+
+			$zip_opened = true;
+
+			for(
+				$dt = $period_from;
+				$dt <= $period_to;
+				$dt = $dt->modify('+1 day')
+			){
+				$dt_value = $dt->format('Y-m-d');
+				$out_fl = '';
+				$fl_name = '';
+				try{
+					try{
+						ExcelTemplate_Controller::genFilledTemplate(
+							$db_link,
+							'Путевой лист ТС',
+
+							// The order must match the template SQL placeholders.
+							array($veh_id, $dt_value),
+
+							$empty_error,
+							$out_fl,
+							$fl_name
+						);
+					}catch(Exception $e){
+						// Empty dates are simply omitted from the archive.
+						if($e->getMessage() === $empty_error){
+							continue;
+						}
+
+						throw $e;
+					}
+
+					if(!is_string($out_fl) || !is_file($out_fl)){
+						throw new Exception(
+							sprintf('Не удалось сформировать файл за дату %s.', $dt_value)
+						);
+					}
+
+					$temp_files[] = $out_fl;
+
+					$entry_name = sprintf(
+						'Путевой лист ТС %s.xlsx',
+						$dt_value
+					);
+
+					if(!$zip->addFile($out_fl, $entry_name)){
+						throw new Exception(
+							sprintf('Не удалось добавить файл за дату %s в архив.', $dt_value)
+						);
+					}
+
+					$file_count++;
+				}finally{
+					// The file must remain until ZipArchive::close().
+					if(
+						is_string($out_fl)
+						&& $out_fl !== ''
+						&& is_file($out_fl)
+						&& !in_array($out_fl, $temp_files, true)
+					){
+						$temp_files[] = $out_fl;
+					}
+				}
+			}
+
+			if($file_count === 0){
+				throw new Exception('За указанный период отгрузки не найдены!');
+			}
+
+			if(!$zip->close()){
+				throw new Exception('Не удалось завершить создание ZIP-архива!');
+			}
+
+			$zip_opened = false;
+
+			$fl_mime = getMimeTypeOnExt($zip_name);
+
+			if(ob_get_level() > 0){
+				ob_clean();
+			}
+
+			downloadFile(
+				$zip_fl,
+				$fl_mime,
+				'attachment;',
+				$zip_name
+			);
+
+			return TRUE;
+		}finally{
+			if($zip_opened){
+				$zip->close();
+			}
+
+			foreach($temp_files as $temp_file){
+				if(is_file($temp_file)){
+					unlink($temp_file);
+				}
+			}
+
+			if(is_file($zip_fl)){
+				unlink($zip_fl);
+			}
+		}
 	}
 }
 ?>

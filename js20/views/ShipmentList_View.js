@@ -40,7 +40,7 @@ function ShipmentList_View(id,options){
 		"field":new FieldDateTime("ship_date_time")
 	});
 
-	var filters = {
+	const filters = {
 		"period":{
 			"binding":new CommandBinding({
 				"control":period_ctrl,

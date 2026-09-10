@@ -1818,6 +1818,21 @@ Concrete weighing.
 1.00429
 1) ShipmentWeight, ShipmentWeightSelfShip, ShipmentWeightRedirection
 
+
+1.00430
+operators_for_transp_nakl_schedules
+PutevoiListOnPeriod_View.js
+
+
+
+operators_for_transp_nakl add data support,
+change ttn.sql, putevoi_f_list.sql
+Shipment_Controller->check_1c_attrs_for_tn()
+->check_shipment_for_tn()
+
+
+
+
 What to check, implement:
 - php-redis, check logout
 - Vehicle->get_track(), pass result to osrm

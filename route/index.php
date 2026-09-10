@@ -2,7 +2,7 @@
 /**
  * Клиентская программа для отображения маршрутов
  * приходит 1 параметр - int ID отгрузки (shipment)
- * разу проверяем: если маршрут завершет или нет такого - ошибка
+ * Сразу проверяем: если маршрут завершет или нет такого - ошибка
  * https://docs.2gis.com/ru/maps/others/rasterjs/overview
  */
  
@@ -267,6 +267,8 @@ $htmp_cont = str_replace('{{routeRestLen}}', $route_rest_len, $htmp_cont);
 
 $htmp_cont = str_replace('{{is_client}}', $is_client? 'true':'false', $htmp_cont);
 	 
+$htmp_cont = str_replace('{{DOUBLE_GIS_KEY}}', DOUBLE_GIS_KEY, $htmp_cont);
+
 echo $htmp_cont;
 	 
 ?>

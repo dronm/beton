@@ -12,6 +12,33 @@ function ShipmentWeightSelfShipList_View(id,options){
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
 	
+	const period_ctrl = new EditPeriodDateShift(id+":filter-ctrl-period",{
+		"field":new FieldDateTime("date_time")
+	});
+
+	const filters = {
+		"period":{
+			"binding":new CommandBinding({
+				"control":period_ctrl,
+				"field":period_ctrl.getField()
+			}),
+			"bindings":[
+				{"binding":new CommandBinding({
+					"control":period_ctrl.getControlFrom(),
+					"field":period_ctrl.getField()
+					}),
+				"sign":"ge"
+				},
+				{"binding":new CommandBinding({
+					"control":period_ctrl.getControlTo(),
+					"field":period_ctrl.getField()
+					}),
+				"sign":"le"
+				}
+			]
+		}
+	};
+
 	var popup_menu = new PopUpMenu();
 	var pagClass = window.getApp().getPaginationClass();
 	this.addElement(new GridAjx(id+":grid",{
@@ -23,7 +50,9 @@ function ShipmentWeightSelfShipList_View(id,options){
 		"commands":new GridCmdContainerAjx(id+":grid:cmd", {
 			"cmdInsert": false,
 			"cmdEdit": true,
-			"cmdDelete": true
+			"cmdDelete": true,
+			"cmdFilter":true,
+			"filters":filters
 		}),		
 		"popUpMenu":popup_menu,
 		"head":new GridHead(id+"-grid:head",{

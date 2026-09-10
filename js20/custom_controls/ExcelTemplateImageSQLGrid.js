@@ -17,7 +17,19 @@ function ExcelTemplateImageSQLGrid(id,options){
 	});
 
 	var cells = [
-		new GridCellHead(id+":head:name",{
+		new GridCellHead(id+":head:sheet",{
+			"value":"Лист Excel",
+			"columns":[
+				new GridColumn({
+					"field":model.getField("sheet"),
+					"ctrlClass":EditString,
+					"ctrlOptions":{
+						"maxLength":100
+					}					
+				})
+			]
+		})
+		,new GridCellHead(id+":head:name",{
 			"value":"Ячейка картинки",
 			"columns":[
 				new GridColumn({

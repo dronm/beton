@@ -404,6 +404,8 @@ $permissions = array();
 				
 					$permissions['Shipment_Controller_shipment_putevoi_list']=TRUE;
 				
+					$permissions['Shipment_Controller_shipment_putevoi_list_on_period']=TRUE;
+				
 					$permissions['Shipment_Controller_shipment_transp_nakl']=TRUE;
 				
 					$permissions['Shipment_Controller_shipment_transp_nakl_all']=TRUE;
@@ -1827,6 +1829,16 @@ $permissions = array();
 					$permissions['OperatorForTranspNakl_Controller_get_list']=TRUE;
 				
 					$permissions['OperatorForTranspNakl_Controller_get_object']=TRUE;
+				
+					$permissions['OperatorForTranspNaklSchedule_Controller_insert']=TRUE;
+				
+					$permissions['OperatorForTranspNaklSchedule_Controller_update']=TRUE;
+				
+					$permissions['OperatorForTranspNaklSchedule_Controller_delete']=TRUE;
+				
+					$permissions['OperatorForTranspNaklSchedule_Controller_get_list']=TRUE;
+				
+					$permissions['OperatorForTranspNaklSchedule_Controller_get_object']=TRUE;
 				
 					$permissions['UserAllowedMaterialCorrection_Controller_insert']=TRUE;
 				

@@ -17,7 +17,19 @@ function ExcelTemplateFieldMatchGrid(id,options){
 	});
 
 	var cells = [
-		new GridCellHead(id+":head:field",{
+		new GridCellHead(id+":head:sheet",{
+			"value":"Лист Excel",
+			"columns":[
+				new GridColumn({
+					"field":model.getField("sheet"),
+					"ctrlClass":EditString,
+					"ctrlOptions":{
+						"maxLength":100
+					}					
+				})
+			]
+		})
+		,new GridCellHead(id+":head:field",{
 			"value":"Поле запроса",
 			"columns":[
 				new GridColumn({

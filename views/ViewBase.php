@@ -1472,6 +1472,8 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/views/RepVehicleFuelFlow_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/RepVehicleFuelFlow_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/ShipmentWeightSelfShipList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ShipmentWeightSelfShipList_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/views/ShipmentWeightRedirectionList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/ShipmentWeightRedirectionList_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/views/PutevoiListOnPeriod_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/PutevoiListOnPeriod_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/views/OperatorForTranspNaklScheduleList_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/views/OperatorForTranspNaklScheduleList_View.js')) ));
 		
 		$this->addJsModel(new ModelJavaScript('js20/forms/ViewList_Form.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/forms/ViewList_Form.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/forms/MainMenuConstructor_Form.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/forms/MainMenuConstructor_Form.js')) ));
@@ -2260,6 +2262,9 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/models/ShipmentWeightRedirectionList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/ShipmentWeightRedirectionList_Model.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controllers/ShipmentWeightSelfShip_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/ShipmentWeightSelfShip_Controller.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/controllers/ShipmentWeightRedirection_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/ShipmentWeightRedirection_Controller.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/OperatorForTranspNaklSchedule_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/OperatorForTranspNaklSchedule_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/models/OperatorForTranspNaklScheduleList_Model.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/models/OperatorForTranspNaklScheduleList_Model.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/controllers/OperatorForTranspNaklSchedule_Controller.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/controllers/OperatorForTranspNaklSchedule_Controller.js')) ));
 				
 			if (isset($_SESSION['scriptId'])){
 				$script_id = $_SESSION['scriptId'];

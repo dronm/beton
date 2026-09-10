@@ -21,7 +21,8 @@ var Route = {
 		DG.then(function () {						
 			self.m_map = DG.map('map', {
 			    center: self.m_vehicleCoords,
-			    zoom: TRACK_CONSTANTS.INI_ZOOM
+			    zoom: TRACK_CONSTANTS.INI_ZOOM,
+				key: params.DOUBLE_GIS_KEY
 			});
 
 			self.m_vehicleIcon = DG.icon({

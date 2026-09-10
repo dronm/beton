@@ -417,10 +417,11 @@ class ExcelTemplate_Controller extends ControllerSQL{
 			
 			$reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($reader_tp);
 			$spreadsheet = $reader->load($tmpl_fl);
-			$sheet = $spreadsheet->getActiveSheet();
 			
+			$defaultSheet = $spreadsheet->getActiveSheet();
 			//замены
 			$cell_matching = json_decode($ar['cell_matching']);
+			/*
 			foreach($cell_matching as $match){
 				if(isset($match->fields)){
 					$fields = $match->fields;
@@ -432,7 +433,46 @@ class ExcelTemplate_Controller extends ControllerSQL{
 					$sheet->setCellValue($fields->cell, $ar_data[$fields->field]);
 				}
 			}
-						
+			*/
+			$cell_matching = json_decode($ar['cell_matching']);
+
+			foreach($cell_matching as $match){
+				if(isset($match->fields)){
+					$fields = $match->fields;
+				}else{
+					$fields = $match;
+				}
+
+				$sheet = $defaultSheet;
+
+				if(
+					isset($fields->sheet)
+					&& is_string($fields->sheet)
+					&& strlen(trim($fields->sheet))
+				){
+					$sheetName = trim($fields->sheet);
+					$sheet = $spreadsheet->getSheetByName($sheetName);
+
+					if(is_null($sheet)){
+						throw new Exception(sprintf(
+							"Лист '%s' не найден в Excel-шаблоне!",
+							$sheetName
+						));
+					}
+				}
+
+				if(
+					isset($fields->field)
+					&& isset($fields->cell)
+					&& array_key_exists($fields->field, $ar_data)
+				){
+					$sheet->setCellValue(
+						$fields->cell,
+						$ar_data[$fields->field]
+					);
+				}
+			}		
+
 			$writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
 			$writer->save($out_fl);
 			$fl_mime = getMimeTypeOnExt($fl_info->name);
@@ -570,7 +610,8 @@ class ExcelTemplate_Controller extends ControllerSQL{
 						'h' => $fields->h,
 						'offset_y' => isset($fields->offset_y)? $fields->offset_y : 0,
 						'offset_x' => isset($fields->offset_x)? $fields->offset_x : 0,
-						'fileName' => $query_results[$fields->sql_query]
+						'fileName' => $query_results[$fields->sql_query],
+						'sheet' => isset($fields->sheet) ? $fields->sheet : NULL
 					));
 				}
 			}
@@ -579,7 +620,8 @@ class ExcelTemplate_Controller extends ControllerSQL{
 
 		$reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($reader_tp);
 		$spreadsheet = $reader->load($tmpl_fl);
-		$sheet = $spreadsheet->getActiveSheet();
+
+		$defaultSheet = $spreadsheet->getActiveSheet();
 		
 		//замены
 		$cell_matching = json_decode($ar['cell_matching']);
@@ -590,14 +632,31 @@ class ExcelTemplate_Controller extends ControllerSQL{
 				$fields = $match;
 			}
 			
+			$sheet = $defaultSheet;
+
+			if(
+				isset($fields->sheet)
+				&& is_string($fields->sheet)
+				&& strlen(trim($fields->sheet))
+			){
+				$sheetName = trim($fields->sheet);
+				$sheet = $spreadsheet->getSheetByName($sheetName);
+
+				if(is_null($sheet)){
+					throw new Exception(sprintf(
+						"Лист '%s' не найден в Excel-шаблоне!",
+						$sheetName
+					));
+				}
+			}
+
 			if(isset($fields->field) && isset($fields->cell) && isset($ar_data[$fields->field])){
 				$sheet->setCellValue($fields->cell, $ar_data[$fields->field]);
 			}
 		}
 
-		//image changes
+		/*
 		foreach($attachments as $att){
-			/* self::replaceImageByName($sheet, $att); */
 			$y = isset($att["offset_y"])? intval($att["offset_y"]) : 0;
 			$x = isset($att["offset_x"])? intval($att["offset_x"]) : 0;
 			$newDrawing = new Drawing();
@@ -609,7 +668,43 @@ class ExcelTemplate_Controller extends ControllerSQL{
 			$newDrawing->setCoordinates($att["coord"]);
 			$newDrawing->setWorksheet($sheet);
 		}
-					
+		*/
+
+		//image changes
+		foreach($attachments as $att){
+			// Preserve the original active sheet as the default.
+			$sheet = $defaultSheet;
+
+			if(
+				isset($att['sheet'])
+				&& is_string($att['sheet'])
+				&& strlen(trim($att['sheet']))
+			){
+				$sheetName = trim($att['sheet']);
+				$sheet = $spreadsheet->getSheetByName($sheetName);
+
+				if(is_null($sheet)){
+					throw new Exception(sprintf(
+						"Лист '%s' для изображения '%s' не найден в Excel-шаблоне!",
+						$sheetName,
+						$att['coord']
+					));
+				}
+			}
+
+			$y = isset($att['offset_y']) ? intval($att['offset_y']) : 0;
+			$x = isset($att['offset_x']) ? intval($att['offset_x']) : 0;
+
+			$newDrawing = new Drawing();
+			$newDrawing->setPath($att['fileName']);
+			$newDrawing->setHeight($att['h']);
+			$newDrawing->setWidth($att['w']);
+			$newDrawing->setOffsetY($y);
+			$newDrawing->setOffsetX($x);
+			$newDrawing->setCoordinates($att['coord']);
+			$newDrawing->setWorksheet($sheet);
+		}				
+
 		$writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
 		$writer->save($outFl);
 		

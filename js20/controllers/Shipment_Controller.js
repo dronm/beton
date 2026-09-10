@@ -44,6 +44,7 @@ function Shipment_Controller(options){
 	this.add_shipment_invoice();
 	this.add_shipment_ttn();
 	this.add_shipment_putevoi_list();
+	this.add_shipment_putevoi_list_on_period();
 	this.add_shipment_transp_nakl();
 	this.add_shipment_transp_nakl_all();
 	this.add_shipment_transp_nakl_on_list();
@@ -847,6 +848,38 @@ extend(Shipment_Controller,ControllerObjServer);
 		options.required = true;
 	
 		pm.addField(new FieldInt("id",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Shipment_Controller.prototype.add_shipment_putevoi_list_on_period = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('shipment_putevoi_list_on_period',opts);
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("vehicle_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldDate("period_from",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldDate("period_to",options));
 	
 			
 	this.addPublicMethod(pm);

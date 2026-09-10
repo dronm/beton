@@ -96,6 +96,7 @@
 <li><a href="#MaxOutMessage_Controller">MaxOutMessage_Controller</a></li>
 <li><a href="#MaxUser_Controller">MaxUser_Controller</a></li>
 <li><a href="#OperatorForTranspNakl_Controller">OperatorForTranspNakl_Controller</a></li>
+<li><a href="#OperatorForTranspNaklSchedule_Controller">OperatorForTranspNaklSchedule_Controller</a></li>
 <li><a href="#Order_Controller">Order_Controller</a></li>
 <li><a href="#OrderFromClient_Controller">OrderFromClient_Controller</a></li>
 <li><a href="#OrderGarbage_Controller">OrderGarbage_Controller</a></li>
@@ -590,6 +591,8 @@
 <li><a href="#WorkplaceScheduleList_Model">WorkplaceScheduleList_Model</a></li>
 <li><a href="#VehicleFuelDocument_Model">VehicleFuelDocument_Model</a></li>
 <li><a href="#MacAddressList_Model">MacAddressList_Model</a></li>
+<li><a href="#OperatorForTranspNaklSchedule_Model">OperatorForTranspNaklSchedule_Model</a></li>
+<li><a href="#OperatorForTranspNaklScheduleList_Model">OperatorForTranspNaklScheduleList_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -2853,6 +2856,19 @@
 <a href="#OperatorForTranspNaklList_Model">Model: OperatorForTranspNaklList_Model</a>
 </div>
 </div>
+<div id="OperatorForTranspNaklSchedule_Controller" class="content_box">
+<h1>OperatorForTranspNaklSchedule_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#OperatorForTranspNaklSchedule_Model">Model: OperatorForTranspNaklSchedule_Model</a><h2>update</h2>
+<a href="#OperatorForTranspNaklSchedule_Model">Model: OperatorForTranspNaklSchedule_Model</a><h2>delete</h2>
+<a href="#OperatorForTranspNaklSchedule_Model">Model: OperatorForTranspNaklSchedule_Model</a><h2>get_list</h2>
+<a href="#OperatorForTranspNaklScheduleList_Model">Model: OperatorForTranspNaklScheduleList_Model</a><h2>get_object</h2>
+<a href="#OperatorForTranspNaklScheduleList_Model">Model: OperatorForTranspNaklScheduleList_Model</a>
+</div>
+</div>
 <div id="Order_Controller" class="content_box">
 <h1>Order_Controller</h1>
 <div class="content_item">
@@ -4176,6 +4192,7 @@
 <a href="#ShipmentRep_Model">Model: ShipmentRep_Model</a><h2>shipment_invoice</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_ttn</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_putevoi_list</h2>
+<a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_putevoi_list_on_period</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_transp_nakl</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_transp_nakl_all</h2>
 <a href="#ModelSQL_Model">Model: ModelSQL_Model</a><h2>shipment_transp_nakl_on_list</h2>
@@ -11428,6 +11445,12 @@
 <div>Required:</div>
 <div>Length:20</div>
 <div>Precision:</div>
+<h2>sheet</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:100</div>
+<div>Precision:</div>
 </div>
 </div>
 <div id="ExcelTemplateImageSQL_Model" class="content_box">
@@ -11481,6 +11504,12 @@
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:5000</div>
+<div>Precision:</div>
+<h2>sheet</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:100</div>
 <div>Precision:</div>
 </div>
 </div>
@@ -14885,6 +14914,72 @@
 <h1>OperatorForTranspNaklList_Model</h1>
 <div class="content_item">
 <p>Поля:</p>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_sites_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>users_ref</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="OperatorForTranspNaklSchedule_Model" class="content_box">
+<h1>OperatorForTranspNaklSchedule_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>for_date</h2>
+<div>Type:Date</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>production_site_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="OperatorForTranspNaklScheduleList_Model" class="content_box">
+<h1>OperatorForTranspNaklScheduleList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>for_date</h2>
+<div>Type:Date</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>user_id</h2>
 <div>Type:Int</div>
 <div>Primary key:TRUE</div>

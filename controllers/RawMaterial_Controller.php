@@ -781,7 +781,7 @@ class RawMaterial_Controller extends ControllerSQL{
 		try{
 			//doc				
 			$quant_gross = ($doc->quant_gross=='0')? 0:$doc->quant_gross/1000;
-			$quant_net = ($doc->quant_net=='0')? 0:$doc->quant_net/1000;
+			$quant_net = ($doc->quant_net=='0')? 0:abs($doc->quant_net/1000);
 			$plate = trim($doc->vehicle_plate);
 			if($plate == ""){
 				throw new Exception("loadShipWeight: vehicle plate not set");

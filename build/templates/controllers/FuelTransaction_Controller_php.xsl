@@ -29,40 +29,46 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 <xsl:template name="extra_methods">
 
 	public function import_data($pm){
-		if(!isset($_FILES["file_excel"]["tmp_name"]) || 
-		!is_array($_FILES["file_excel"]["tmp_name"]) ||
-		$_FILES["file_excel"]["error"][0] !== UPLOAD_ERR_OK){
+		if(
+			!isset($_FILES["file_excel"]["tmp_name"])
+			|| !is_array($_FILES["file_excel"]["tmp_name"])
+			|| $_FILES["file_excel"]["error"][0] !== UPLOAD_ERR_OK
+		){
 			throw new Exception("Файл не найден или ошибка загрузки");
 		}
+
 		$tmp_name = $_FILES["file_excel"]["tmp_name"][0];
 		$user_name = $_FILES["file_excel"]["name"][0];
-		
-		// 3. Validate file extension
+
+		// Validate file extension
 		$allowed_extensions = ['xls', 'xlsx'];
 		$file_ext = strtolower(pathinfo($user_name, PATHINFO_EXTENSION));
+
 		if(!in_array($file_ext, $allowed_extensions)){
 			throw new Exception("Неподдерживаемый формат файла");
 		}
 
 		$csv_name = OUTPUT_PATH . uniqid('fuel_import_', true) . ".csv";
 
-		$cmd = sprintf("ssconvert %s %s", 
-			escapeshellarg($tmp_name), 
+		$cmd = sprintf(
+			"ssconvert %s %s",
+			escapeshellarg($tmp_name),
 			escapeshellarg($csv_name)
 		);
 
-		/* throw new Exception($cmd); */
 		$output = [];
 		$return_var = NULL;
+
 		exec($cmd, $output, $return_var);
 
-		if ($return_var !== 0 || !file_exists($csv_name)) {
-			@unlink($csv_name); // Clean up
+		if($return_var !== 0 || !file_exists($csv_name)){
+			@unlink($csv_name);
 			throw new Exception("Ошибка конвертирования файла");
 		}
 
 		try {
 			$handle = fopen($csv_name, "r");
+
 			if($handle === FALSE){
 				throw new Exception("Ошибка открытия CSV файла");
 			}
@@ -84,95 +90,239 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 
 			$queries = [];
 			$row = 0;
-			
-			while (($data = fgetcsv($handle, 10000, ",")) !== FALSE) {
-				if($row == 0){
-					$row++;
-					continue; // Skip header
+
+			while(($data = fgetcsv($handle, 10000, ",")) !== FALSE){
+				$row++;
+
+				// Skip header
+				if($row === 1){
+					continue;
 				}
 
 				$vals = [];
+
 				foreach($cols as $col_id => $col_ind){
-					$vals[$col_id] = isset($data[$col_ind]) ? trim($data[$col_ind]) : null;
+					$vals[$col_id] = isset($data[$col_ind])
+						? trim($data[$col_ind])
+						: null;
 				}
 
-				if($vals["ID"] == "Итого:"){
-					continue; //footer
-				}
-				/* file_put_contents(OUTPUT_PATH.'fuel.txt', var_export($vals, true)); */
+				/*
+				 * Skip completely empty rows.
+				 *
+				 * This must be done before checking required fields because
+				 * Excel/ssconvert may produce trailing empty CSV rows.
+				 */
+				$is_empty_row = true;
 
-				// Validate required fields
-				if(empty($vals["ID"]) || empty($vals["DATE"]) || empty($vals["CARD_ID"])){
-					throw new Exception("Не заполнены обязательные поля: Идентификатор, Период, Номер карты");
+				foreach($vals as $value){
+					if($value !== null &amp;&amp; $value !== ''){
+						$is_empty_row = false;
+						break;
+					}
 				}
 
-				// Prepare data
+				if($is_empty_row){
+					continue;
+				}
+
+				// Skip footer
+				if($vals["ID"] === "Итого:"){
+					continue;
+				}
+
+				/*
+				 * Validate required fields.
+				 *
+				 * Do not use empty() here because values such as "0"
+				 * are considered empty by PHP.
+				 */
+				$missing_fields = [];
+
+				if($vals["ID"] === null || $vals["ID"] === ''){
+					$missing_fields[] = "Идентификатор";
+				}
+
+				if($vals["DATE"] === null || $vals["DATE"] === ''){
+					$missing_fields[] = "Период";
+				}
+
+				if($vals["CARD_ID"] === null || $vals["CARD_ID"] === ''){
+					$missing_fields[] = "Номер карты";
+				}
+
+				if(count($missing_fields) > 0){
+					throw new Exception(
+						sprintf(
+							"Строка %d: не заполнены обязательные поля: %s",
+							$row,
+							implode(", ", $missing_fields)
+						)
+					);
+				}
+
 				$attrs = [
 					'fio' => $vals['FIO'] ?? '',
 					'azs' => $vals['AZS'] ?? '',
 					'supplier' => $vals['SUPPLIER'] ?? '',
+					'place' => $vals['PLACE'] ?? '',
 					'item' => $vals['ITEM'] ?? '',
-					'oper' => $vals['OPER'] ?? ''
+					'oper' => $vals['OPER'] ?? '',
+					'cur' => $vals['CUR'] ?? ''
 				];
 
-				//convert date to a compatible format
-				$date_obj = DateTime::createFromFormat('d.m.Y H:i:s', $vals["DATE"]);
-				if ($date_obj !== false) {
-					$vals["DATE"] = $date_obj->format('Y-m-d H:i:s');
-				} else {
-					// Handle invalid date - log error or use default
-					throw new Exception("failed to convert date to a database compatible format");
+				// Convert date to PostgreSQL-compatible format
+				$date_obj = DateTime::createFromFormat(
+					'd.m.Y H:i:s',
+					$vals["DATE"]
+				);
+
+				if($date_obj === false){
+					throw new Exception(
+						sprintf(
+							"Строка %d: неверный формат даты \"%s\"",
+							$row,
+							$vals["DATE"]
+						)
+					);
 				}
 
-				// Use prepared statement parameters
+				$date = $date_obj->format('Y-m-d H:i:s');
+
 				$queries[] = [
 					'transaction_id' => $vals["ID"],
-					'date' => $vals["DATE"],
-					'card_id' => $vals["CARD_ID"] ?? '',
-					'attrs' => json_encode($attrs, JSON_UNESCAPED_UNICODE),
-					'quant' => floatval(str_replace(',', '.', $vals["QUANT"] ?? 0)),
-					'total' => floatval(str_replace(',', '.', $vals["TOTAL"] ?? 0))
+					'date' => $date,
+					'card_id' => $vals["CARD_ID"],
+					'attrs' => json_encode(
+						$attrs,
+						JSON_UNESCAPED_UNICODE
+					),
+					'quant' => floatval(
+						str_replace(
+							',',
+							'.',
+							$vals["QUANT"] ?? 0
+						)
+					),
+					'total' => floatval(
+						str_replace(
+							',',
+							'.',
+							$vals["TOTAL"] ?? 0
+						)
+					)
 				];
-				
-				$row++;
 			}
+
 			fclose($handle);
-			
+			$handle = null;
+
 			@unlink($csv_name);
-/* file_put_contents(OUTPUT_PATH.'fuel.txt', var_export($queries, true)); */
-			// Database insertion with prepared statements
+
+			/*
+			 * Database insertion.
+			 */
 			$link = $this->getDbLinkMaster();
 			$link->query("BEGIN");
-			
+
 			try {
 				foreach($queries as $params){
-					/* file_put_contents(OUTPUT_PATH.'fuel.txt', var_export($params, true).PHP_EOL.PHP_EOL, FILE_APPEND); */
+					/*
+					 * Resolve vehicle before inserting the transaction.
+					 *
+					 * LIMIT 2 is enough because we only need to distinguish:
+					 * 0 vehicles
+					 * 1 vehicle
+					 * more than 1 vehicle
+					 */
+					$vehicle_res = $link->query(
+						"SELECT id
+						FROM vehicles
+						WHERE fuel_card_id = $1
+						ORDER BY id
+						LIMIT 2",
+						[
+							$params['card_id']
+						]
+					);
+
+					$vehicle_count = pg_num_rows($vehicle_res);
+
+					if($vehicle_count > 1){
+						throw new Exception(
+							sprintf(
+								"Для топливной карты %s найдено более одного автомобиля",
+								$params['card_id']
+							)
+						);
+					}
+
+					$vehicle_id = null;
+
+					if($vehicle_count === 1){
+						$vehicle_row = pg_fetch_assoc($vehicle_res);
+						$vehicle_id = (int)$vehicle_row['id'];
+					}
+
+					$insert_params = [
+						$params['transaction_id'],
+						$params['date'],
+						$params['card_id'],
+						$vehicle_id,
+						$params['attrs'],
+						$params['quant'],
+						$params['total']
+					];
+
 					$link->query(
-						"INSERT INTO fuel_transactions 
-						(transaction_id, date_time, card_id, vehicle_id, attrs, quant, total)
-						VALUES ($1, $2, $3,
-							(SELECT vh.id FROM vehicles AS vh WHERE vh.fuel_card_id = $3),
-							$4, $5, $6)
+						"INSERT INTO fuel_transactions (
+							transaction_id,
+							date_time,
+							card_id,
+							vehicle_id,
+							attrs,
+							quant,
+							total
+						)
+						VALUES (
+							$1,
+							$2,
+							$3,
+							$4,
+							$5,
+							$6,
+							$7
+						)
 						ON CONFLICT (transaction_id) DO UPDATE SET
+							date_time = EXCLUDED.date_time,
 							card_id = EXCLUDED.card_id,
 							vehicle_id = EXCLUDED.vehicle_id,
 							attrs = EXCLUDED.attrs,
 							quant = EXCLUDED.quant,
 							total = EXCLUDED.total",
-						$params
+						$insert_params
 					);
 				}
-				
+
 				$link->query("COMMIT");
-				
 			} catch(Exception $e){
 				$link->query("ROLLBACK");
-				throw new Exception("Ошибка записи в БД: " . $e->getMessage());
+
+				throw new Exception(
+					"Ошибка записи в БД: " . $e->getMessage(),
+					0,
+					$e
+				);
 			}
-			
 		} catch(Exception $e){
-			// Clean up on any error
-			if(file_exists($csv_name)) @unlink($csv_name);
+			if(isset($handle) &amp;&amp; is_resource($handle)){
+				fclose($handle);
+			}
+
+			if(file_exists($csv_name)){
+				@unlink($csv_name);
+			}
+
 			throw $e;
 		}
 	}

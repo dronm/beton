@@ -51,6 +51,16 @@ function ExcelTemplateFieldMatch_Model(options){
 	options.fields.cell = new FieldString("cell",filed_options);
 	options.fields.cell.getValidator().setMaxLength('20');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.sheet = new FieldString("sheet",filed_options);
+	options.fields.sheet.getValidator().setMaxLength('100');
+	
 		ExcelTemplateFieldMatch_Model.superclass.constructor.call(this,id,options);
 }
 extend(ExcelTemplateFieldMatch_Model,ModelJSON);

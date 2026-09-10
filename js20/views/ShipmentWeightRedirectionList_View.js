@@ -12,6 +12,32 @@ function ShipmentWeightRedirectionList_View(id,options){
 	var constants = {"doc_per_page_count":null,"grid_refresh_interval":null};
 	window.getApp().getConstantManager().get(constants);
 
+	const period_ctrl = new EditPeriodDateShift(id+":filter-ctrl-period",{
+		"field":new FieldDateTime("date_time")
+	});
+
+	const filters = {
+		"period":{
+			"binding":new CommandBinding({
+				"control":period_ctrl,
+				"field":period_ctrl.getField()
+			}),
+			"bindings":[
+				{"binding":new CommandBinding({
+					"control":period_ctrl.getControlFrom(),
+					"field":period_ctrl.getField()
+					}),
+				"sign":"ge"
+				},
+				{"binding":new CommandBinding({
+					"control":period_ctrl.getControlTo(),
+					"field":period_ctrl.getField()
+					}),
+				"sign":"le"
+				}
+			]
+		}
+	};
 	const self = this;
 
 	this.m_allowedRolesSetPayment = ["admin", "owner", "dispatcher"];
@@ -30,6 +56,8 @@ function ShipmentWeightRedirectionList_View(id,options){
 			"cmdInsert": false,
 			"cmdEdit": this.m_allowedRolesSetPayment.includes(this.m_roleId),
 			"cmdDelete": this.m_allowedRolesSetPayment.includes(this.m_roleId),
+			"cmdFilter":true,
+			"filters":filters
 		}),		
 		"popUpMenu":popup_menu,
 		"head":new GridHead(id+"-grid:head",{

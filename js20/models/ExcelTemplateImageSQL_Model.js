@@ -97,6 +97,16 @@ function ExcelTemplateImageSQL_Model(options){
 	options.fields.comment_text = new FieldString("comment_text",filed_options);
 	options.fields.comment_text.getValidator().setMaxLength('5000');
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.sheet = new FieldString("sheet",filed_options);
+	options.fields.sheet.getValidator().setMaxLength('100');
+	
 		ExcelTemplateImageSQL_Model.superclass.constructor.call(this,id,options);
 }
 extend(ExcelTemplateImageSQL_Model,ModelJSON);
