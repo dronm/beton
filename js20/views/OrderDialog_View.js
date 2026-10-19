@@ -138,8 +138,7 @@ function OrderDialog_View(id,options){
 			"required":true,
 			"onClear":function(){
 				self.getElement("client").getErrorControl().setValue("","info");
-				self.getElement("descr").reset();
-				self.onClearDescr();
+				self.getElement("contact_list").reset();
 				var calc_ctrl = self.getElement("calc");
 				if(calc_ctrl){
 					calc_ctrl.setClientSpec();
@@ -160,6 +159,13 @@ function OrderDialog_View(id,options){
 			"value":constants.def_order_unload_speed.getValue(),
 			"labelClassName":obj_bs_cl,
 			"editContClassName":("input-group "+window.getBsCol(2)),
+			"buttonOpen": new ButtonCtrl(id+":btn_open", {
+				"control": this,
+				"glyph": "glyphicon-menu-hamburger",
+				"onClick": function(){
+					self.showUnloadSpeedSchema();
+				}
+			}),
 			"events":{
 				"onchange":function(){
 					self.getElement("calc").recalcTotal();						
@@ -172,103 +178,26 @@ function OrderDialog_View(id,options){
 			}			
 		}));
 
-		var descr_ac_model = new ModelXML("OrderDescr_Model",{
-			"fields":{
-				"descr":new FieldString("descr"),
-				"phone_cel":new FieldString("phone_cel"),
-				//"langs_ref":new FieldJSON("langs_ref"),
-				//"clients_ref":new FieldJSON("clients_ref"),
-				//"client_tels_ref":new FieldJSON("client_tels_ref"),
-				"contact_id":new FieldInt("contact_id"),
-				"tm_id":new FieldInt("tm_id"),
-				"tm_exists":new FieldBool("tm_exists"),
-				"tm_activated":new FieldBool("tm_activated"),
-				"tm_photo":new FieldString("tm_photo"),
-				"max_data":new FieldJSON("max_data")
-			}
-		})
-		
-		
-		this.addElement(new EditString(id+":descr",{
-			"labelCaption":"Контакт:",
-			"labelClassName":obj_bs_cl,
-			"maxLength":500,
-			"cmdAutoComplete":true,
-			"acMinLengthForQuery":0,
-			"acController":options.readOnly? null : options.controller,
-			"acModel":descr_ac_model,
-			"acPublicMethod":options.readOnly? null : options.controller.getPublicMethod("complete_descr"),
-			"acPatternFieldId":"descr",
-			"acKeyFields":[descr_ac_model.getField("descr")],
-			"acDescrFunction":function(f){
-				const tm = (f.tm_exists.getValue() && f.tm_activated.getValue());
-				const mx = f.max_data? f.max_data.getValue() : undefined;
-				let msng = "СМС";
-				if(mx){
-					msng = "MAX";
-				}else if (tm){
-					msng = "Telegarm";
-				}
-				return f.descr.getValue()+" "+CommonHelper.maskFormat(f.phone_cel.getValue(), window.getApp().getPhoneEditMask()) + " ("+msng+")";
-			},
-			"acOnCompleteTextOut": function(textHTML,modelRow){
-				var pref = "";
-				if(modelRow){
-					if(modelRow.max_data && modelRow.max_data.getValue()){
-						const max_data = modelRow.max_data.getValue();
-						if(max_data.avatar_url){
-							pref = "<img class='contactPhoto' src='"+max_data.avatar_url+"'/img>";
-						}
-					}
-					if(pref == "" && modelRow.tm_photo.getValue()){
-						//Contact photo
-						pref = "<img class='contactPhoto' src='data:image/png;base64, "+modelRow.tm_photo.getValue()+"'/img>";
-					}
-				}
-				DOMHelper.delNodesOnClass("contactPhoto");
-				return pref + textHTML;
-			},			
-			"acICase":"1",
-			"acMid":"1",
-			"acEnabled":false,			
-			"onSelect":function(f){
-				self.onSelectDescr(f);
-			},
-			"onClear":function(){
-				self.onClearDescr();
-				self.m_selectedContactId = undefined;
-			},
-			"events":{
-				"blur":function(){
-					self.onLeaveContact();
-				}/*,
-				"change":function(){
-					//self.m_selectedContactId = undefined;
-					console.log("descr change")
-				}*/
-			},
-			"buttonSelect": new SendNotificationBtn(id+":btnSendNotif",{
-				"getRef":function(callBack){
-					self.getContactRef(callBack);
-				}
-			})
-		}));
+		this.addElement(new OrderContactList(id+":contact_list", {
+			"readOnly": this.m_readOnly,
+			"rowOptions": {"labelClassName": obj_bs_cl},
+			"formatFunction": function(fields){
+				// [] is authoritative; only a missing/null projection uses old fields.
+				var value = fields.contact_list && fields.contact_list.getValue();
+				if(value != null) return value;
+				var get = OrderContactEdit.fieldValue;
+				var name = get(fields, "descr"), tel = get(fields, "phone_cel");
+				if(!name && !tel) return [];
+				return [{
+					contact: {name: name || "", tel: tel || ""},
+					contact_id: get(fields, "contact_id"),
+					tm_exists: get(fields, "tm_exists"), tm_activated: get(fields, "tm_activated"),
+					tm_photo: get(fields, "tm_photo"), tm_id: get(fields, "tm_id"),
+					max_data: get(fields, "max_data")
+				}];
+ 			}
+ 		}));
 
-		this.addElement(new EditPhone(id+":phone_cel",{
-			"labelClassName":obj_bs_cl,
-			"labelCaption":"Телефон:",
-			"events":{
-				"blur":function(){
-					self.onLeaveContact();
-				},
-				"keyup":function(){
-					var v = self.getElement("phone_cel").getValue();
-					if(v && v.length==10){
-						self.onLeaveContact();
-					}
-				}
-			}
-		}));
 		/*
 		this.addElement(new LangEditRef(id+":lang",{
 			"labelClassName":obj_bs_cl,
@@ -335,8 +264,7 @@ function OrderDialog_View(id,options){
 		,new DataBinding({"control":this.getElement("calc").getElement("concrete_type"),"field":this.m_model.getField("concrete_types_ref")})
 		,new DataBinding({"control":this.getElement("calc").getElement("pump_vehicle"),"field":this.m_model.getField("pump_vehicles_ref")})
 		,new DataBinding({"control":this.getElement("calc").getElement("unload_type")})
-		,new DataBinding({"control":this.getElement("descr")})
-		,new DataBinding({"control":this.getElement("phone_cel")})
+		,new DataBinding({"control":this.getElement("contact_list")})
 		//,new DataBinding({"control":this.getElement("lang"),"field":this.m_model.getField("langs_ref")})
 		,new DataBinding({"control":this.getElement("user"),"field":this.m_model.getField("users_ref")})
 		,new DataBinding({"control":this.getElement("calc").getElement("destination_cost")})
@@ -350,6 +278,11 @@ function OrderDialog_View(id,options){
 	this.setDataBindings(r_bd);
 	
 	//write
+	if(!this.m_readOnly){
+		OrderContactList.configurePublicMethod(options.controller.getPublicMethod("insert"));
+		OrderContactList.configurePublicMethod(options.controller.getPublicMethod("update"));
+	}
+
 	if(this.m_readOnly){
 		this.setWriteBindings([
 			new CommandBinding({"control":this.getElement("comment_text")})
@@ -360,11 +293,6 @@ function OrderDialog_View(id,options){
 			new CommandBinding({
 				"func":function(pm){
 					self.setPublicMethodDateTime(pm);
-					if(self.m_selectedContactId){
-						pm.setFieldValue("contact_id", self.m_selectedContactId);
-					}else{
-						pm.unsetFieldValue("contact_id");
-					}
 					if(self.getTotalEditModified()){
 						pm.setFieldValue("total_edit",!self.m_model.getFieldValue("total_edit"));
 					}
@@ -386,8 +314,7 @@ function OrderDialog_View(id,options){
 			,new CommandBinding({"control":this.getElement("calc").getElement("concrete_type"),"fieldId":"concrete_type_id"})
 			,new CommandBinding({"control":this.getElement("calc").getElement("pump_vehicle"),"fieldId":"pump_vehicle_id"})
 			,new CommandBinding({"control":this.getElement("calc").getElement("unload_type")})
-			,new CommandBinding({"control":this.getElement("descr")})
-			,new CommandBinding({"control":this.getElement("phone_cel")})
+			,new CommandBinding({"control":this.getElement("contact_list")})
 			//,new CommandBinding({"control":this.getElement("lang"),"fieldId":"lang_id"})
 			,new CommandBinding({"control":this.getElement("user"),"fieldId":"user_id"})
 			,new CommandBinding({"control":this.getElement("calc").getElement("destination_cost"),"fieldId":"destination_price"})
@@ -411,242 +338,12 @@ function OrderDialog_View(id,options){
 }
 extend(OrderDialog_View,ViewObjectAjx);
 
-//contact_id value. Has no associated control field
-OrderDialog_View.prototype.m_selectedContactId;
-
 //callbacks
 OrderDialog_View.prototype.m_onChangeDate;
 OrderDialog_View.prototype.m_onChangeTime;
 
 OrderDialog_View.prototype.m_ref1c; //initialized from db, then changed
 OrderDialog_View.prototype.m_clientRef1c; 
-
-OrderDialog_View.prototype.showTMInvite = function(){
-	var tm_ctrl = this.getElement("descr").getErrorControl();
-	tm_ctrl.setValue("Пригласить в Telegram","info");
-	DOMHelper.addClass(tm_ctrl.getNode(), "tmInvite");
-	if(!this.m_onTMInviteClick){			
-		var self = this;
-		this.m_onTMInviteClick = function(){
-			self.onTMInviteClick();
-		}
-	}
-	EventHelper.add(tm_ctrl.getNode(), "click", this.m_onTMInviteClick);
-
-}
-
-OrderDialog_View.prototype.addMaxInviteToCont = function(invCont){
-	const self = this;
-	const invBtn = new MAXInviteBtn(this.getId()+":descr:error:maxInvite", {
-		"onClick": function(){
-			self.getContactRef(function(ref){
-				window.getApp().MAXInviteContact(ref, function(){
-					self.hideMsngInvite();
-				});
-			});
-		}
-	});
-	const qrBtn = new MAXShowQRBtn(this.getId()+":descr:error:maxShowQR", {"attrs": {"style":"margin-left: 3px;"}});
-	invCont.clear();
-	invCont.addElement(invBtn);
-	invCont.addElement(qrBtn);
-}
-
-OrderDialog_View.prototype.showMaxInvite = function(){
-	const invCont = this.getElement("descr").getInfoControls();
-	this.addMaxInviteToCont(invCont);
-	invCont.toDOM();
-}
-
-OrderDialog_View.prototype.showPhoto = function(ctrl, base64Data){
-	ctrl.popup(
-		'<div><img src="data:image/png;base64, '+base64Data+'"/></div>',
-		{"title":"Данные по контакту"}
-	);
-}
-OrderDialog_View.prototype.showPhotoFromUrl = function(ctrl, photoUrl){
-	ctrl.popup(
-		'<div><img src="'+photoUrl+'"/></div>',
-		{"title":"Данные по контакту"}
-	);
-}
-
-OrderDialog_View.prototype.showTMInf = function(activated, photo, tmId){
-	const infCont = this.getElement("descr").getInfoControls();
-	infCont.clear();
-
-	//container for tm+max
-	const msgCont = new ControlContainer(null, "DIV", {
-		"attrs":{
-			//"style": "margin-top: 5px; display: grid; grid-template-columns: 50% 50%; border-radius: 1.5rem;"
-			"style": "margin-top: 5px;",
-			"class": "row"
-		}
-	});
-
-	const tmCont = new ControlContainer(null, "DIV", {
-		"attrs":{
-			"class": "col-lg-2"
-		}
-	});
-	msgCont.addElement(tmCont);
-
-	if(photo && tmId){
-		const img = new Control(null, "IMG", {
-			"attrs": {
-				"class":"contactPhoto", 
-				"src": "data:image/png;base64, "+photo
-			}
-		});
-
-		this.photoDetail = new ToolTip({
-			"node": img.m_node,
-			"wait":2,
-			"onHover":(function(cont, id){
-				return function(event){
-					if(!cont.photoDetailData){
-						cont.photoDetailData = [];
-					}
-					if(!cont.photoDetailData[id]){
-						var pm = (new TmUser_Controller()).getPublicMethod("get_object");
-						pm.setFieldValue("id", id);
-						var ctrl = this;
-						pm.run({
-							"ok":function(resp){
-								var m = resp.getModel("TmUserDialog_Model");
-								if(m.getNextRow()){
-									cont.photoDetailData[id] = m.getFieldValue("tm_photo");
-									cont.showPhoto(ctrl, cont.photoDetailData[id]);
-								}
-							}																
-						});
-					}else{
-						cont.showPhoto(this, cont.photoDetailData[id]);
-					}													
-				}
-			})(this, tmId)
-		});
-	
-		// tm_ctrl.m_node.parentNode.insertBefore(img, tm_ctrl.m_node);
-		tmCont.addElement(img);
-	}
-
-	tmCont.addElement(new Control(null, "SPAN", {
-		"value": activated? "Пользователь Telegram" : "Сообщение отправлено, Telegram не активирован",
-		"attrs": {
-			"class": "help-block text-info"
-		}
-	}));
-
-
-	//max invite
-	const maxCont = new ControlContainer(null, "DIV", {
-		"attrs":{
-			"class": "col-lg-4"
-		}
-	});
-	this.addMaxInviteToCont(maxCont);
-	msgCont.addElement(maxCont);
-
-	infCont.addElement(msgCont);
-	infCont.toDOM();
-}
-
-OrderDialog_View.prototype.hideMsngInvite = function(){
-	const msng_ctrl = this.getElement("descr").getErrorControl();
-	msng_ctrl.setValue("","info");
-	if(this.m_onTMInviteClick){
-		EventHelper.add(msng_ctrl.getNode(), "click", this.m_onTMInviteClick);
-	}	
-	DOMHelper.delNodesOnClass("contactPhoto");
-
-	const inf_cont = this.getElement("descr").getInfoControls();
-	if(inf_cont.getCount()){
-		inf_cont.clear();
-		inf_cont.toDOM();
-	}
-}
-
-OrderDialog_View.prototype.showMAXInf = function(activated, avatarUrl, avatarBigUrl ){
-	var cont = this.getElement("descr").getInfoControls();
-	cont.clear();
-
-	if(avatarUrl && avatarUrl.length){
-		// var img = DOMHelper.elem("IMG", {"class":"contactPhoto", "src": avatarUrl, "widht": "35px", "height":"35px"});
-		const img = new Control(null, "IMG", 
-			{
-			"attrs":{
-				"class":"contactPhoto", 
-				"src": avatarUrl, "widht": "35px", "height":"35px"
-			}
-		});
-
-		this.photoDetail = new ToolTip({
-			"node": img.m_node,
-			"wait":2,
-			"onHover":(function(cont, avatarUrl){
-				return function(event){
-					cont.showPhotoFromUrl(this, avatarUrl);
-				}
-			})(this, avatarBigUrl)
-		});
-	
-		// mx_ctrl.m_node.parentNode.insertBefore(img, mx_ctrl.m_node);
-		cont.addElement(img);
-	}
-	cont.addElement(new Control(null, "SPAN", {
-		"value": activated? "Пользователь MAX" : "Сообщение отправлено, MAX не активирован",
-		"attrs": {
-			"class": "help-block text-info"
-		}
-	}));
-	cont.toDOM();
-}
-
-OrderDialog_View.prototype.onSelectDescr = function(f){
-	this.getElement("phone_cel").setValue(f.phone_cel.getValue());
-	//this.getElement("lang").setValue(f.langs_ref.getValue());
-	this.m_selectedContactId = f.contact_id.getValue();	
-	var descr = f.descr.getValue();
-	this.getElement("descr").setValue(descr);	
-
-	//messenger
-	if(descr && descr.length){
-		const max_data = f.max_data.getValue();
-		if(max_data){
-			this.showMAXInf(true, max_data.avatar_url, max_data.avatar_url);
-
-		}else if(f.tm_exists.getValue()){
-			this.showTMInf(f.tm_activated.getValue(), f.tm_photo.getValue(), f.tm_id.getValue());
-		}else{
-			this.showMaxInvite();
-		}
-	}
-}
-
-OrderDialog_View.prototype.onLeaveContact = function(){
-	//нет контакта, есть имя и тел
-	var descr = this.getElement("descr").getValue();
-	var phone_cel = this.getElement("phone_cel").getValue();
-	if(!this.m_selectedContactId && descr && descr.length && phone_cel && phone_cel.length==10){
-		//new contact
-		this.showMaxInvite();
-	}
-}
-
-OrderDialog_View.prototype.onClearDescr = function(f){
-	this.getElement("phone_cel").reset();
-	this.hideMsngInvite();
-}
-
-OrderDialog_View.prototype.onTMInviteClick = function(){
-	var self = this;
-	self.getContactRef(function(ref){
-		window.getApp().TMInviteContact(ref, function(){
-			self.hideMsngInvite();
-		});
-	});
-}
 
 OrderDialog_View.prototype.updateOrder1cInfo = function(){
 	//if ref_1c exists - show print info
@@ -707,15 +404,7 @@ OrderDialog_View.prototype.updateClientRef1cInfo = function(){
 
 // onSelectClient is called when a client is selected, it shows client previous shipment quants.
 OrderDialog_View.prototype.onSelectClient = function(f){
-	var ctrl;
-	ctrl = this.getElement("descr");
-	if(!ctrl.isNull()){
-		ctrl.setValue(f.descr.getValue());
-	}
-	ctrl = this.getElement("phone_cel");
-	if(!ctrl.isNull()){
-		ctrl.setValue(f.phone_cel.getValue());
-	}
+	this.getElement("contact_list").setSuggestedContact(f.descr.getValue(), f.phone_cel.getValue());
 	var inf;
 	if(f.quant.getValue()){
 		inf = DateHelper.format(f.date_time.getValue(),"d/m/y")+","+f.destinations_ref.getValue().getDescr()+","+f.concrete_types_ref.getValue().getDescr()+","+f.quant.getValue()+"м3";
@@ -778,27 +467,14 @@ OrderDialog_View.prototype.setPublicMethodDateTime = function(pm){
 }
 
 OrderDialog_View.prototype.setClientId = function(clientId){
-	var descr_ac = this.getElement("descr").getAutoComplete();
-	var dest_ac = this.getElement("calc").getElement("destination").getAutoComplete();
-	if(!descr_ac || !dest_ac){
-		return;
-	}
-	let descr_ac_pm = descr_ac.getPublicMethod();
-	let dest_ac_pm = dest_ac.getPublicMethod();
-	if(!descr_ac_pm || !dest_ac_pm){
-		return
-	}
+	this.getElement("contact_list").setClientId(clientId);
 
-	if(clientId){
-		descr_ac_pm.setFieldValue("client_id",clientId);
-		dest_ac_pm.setFieldValue("client_id",clientId);
+ 	var dest_ac = this.getElement("calc").getElement("destination").getAutoComplete();
+	var pm = dest_ac && dest_ac.getPublicMethod();
+	if(pm){
+		if(clientId) pm.setFieldValue("client_id", clientId);
+		else pm.getField("client_id").resetValue();
 	}
-	else{
-		descr_ac_pm.getField("client_id").resetValue();
-		dest_ac_pm.getField("client_id").resetValue();		
-	}
-	
-	descr_ac.setEnabled((clientId!==null));
 }
 
 OrderDialog_View.prototype.getClientDebtText = function(clientDebt, clientDebtDate){
@@ -837,6 +513,7 @@ OrderDialog_View.prototype.setClientDebt = function(clientDebt, clientDebtDate){
 }
 
 OrderDialog_View.prototype.onGetData = function(resp,cmd){
+	if(cmd === true) cmd = "copy"; // Legacy ViewAjx callers use true for copy.
 	OrderDialog_View.superclass.onGetData.call(this,resp,cmd);
 	
 	var m = this.getModel();
@@ -847,6 +524,8 @@ OrderDialog_View.prototype.onGetData = function(resp,cmd){
 	var f = m.getField("clients_ref");
 	if(!f.isNull() && f.getValue()){
 		this.setClientId(f.getValue().getKey());
+	} else{
+		this.setClientId(null);
 	}
 	
 	var ctrl_calc = this.getElement("calc");
@@ -892,13 +571,7 @@ OrderDialog_View.prototype.onGetData = function(resp,cmd){
 	this.getElement("user").getErrorControl().setValue("Время создания: "+DateHelper.format(m.getFieldValue("create_date_time"),"d/m/y H:i"),"warn");	
 	
 	//tm
-	this.m_selectedContactId = m.getFieldValue("contact_id");	
-	var descr = m.getFieldValue("descr");
-	if(descr && descr.length && !m.getFieldValue("tm_exists")){
-		this.showTMInvite();
-	}else if(descr && descr.length){
-		this.showTMInf(m.getFieldValue("tm_activated"), m.getFieldValue("tm_photo"), m.getFieldValue("tm_id"));
-	}
+	if(cmd == "copy") this.getElement("contact_list").prepareCopy();
 	
 	if(this.m_readOnly){
 		this.setEnabled(false);
@@ -925,43 +598,6 @@ OrderDialog_View.prototype.onGetData = function(resp,cmd){
 	}
 }
 
-OrderDialog_View.prototype.getContactRef = function(callBack){
-	var self = this;
-	if(!this.m_selectedContactId){
-		//no contact - create on descr + tel
-		var descr = this.getElement("descr").getValue();
-		if(!descr || !descr.length){
-			window.showTempError("Не указано имя прораба!",null,5000);
-			return;
-		}
-		var phone_cel = this.getElement("phone_cel").getValue();
-		if(!phone_cel || !phone_cel.length){
-			window.showTempError("Не указан телефон прораба!",null,5000);
-			return;
-		}
-		var pm = (new Contact_Controller()).getPublicMethod("upsert");
-		pm.setFieldValue("name", descr);
-		pm.setFieldValue("tel", phone_cel);
-		pm.run({
-			"ok":function(resp){
-				var m = resp.getModel("Ref_Model");
-				if(m.getNextRow()){
-					var r = m.getFieldValue("ref");
-					self.m_selectedContactId = r.getKey();
-					callBack(CommonHelper.unserialize(r));
-				}
-			}
-		});						
-	}else{
-		callBack(new RefType({
-			"keys": {"id": this.m_selectedContactId},
-			"descr": this.getElement("descr").getValue(),
-			"dataType": "contacts"
-			})
-		);
-	}
-}
-
 
 //model is ClientModel from complete_for_order method.
 OrderDialog_View.prototype.setRef1cForClient = function(clientId){
@@ -969,6 +605,18 @@ OrderDialog_View.prototype.setRef1cForClient = function(clientId){
 		DOMHelper.delNode("order_client_ref_1c");
 	}).open());
 }
+
+OrderDialog_View.prototype.onAfterUpsert = function(resp, initControls){
+	OrderDialog_View.superclass.onAfterUpsert.call(this, resp, initControls);
+	if(resp && resp.modelExists("OrderContactsSaved_Model")){
+		var saved = resp.getModel("OrderContactsSaved_Model");
+		if(saved.getNextRow()){
+			var value = saved.getFieldValue("contact_list");
+			if(this.getModel().fieldExists("contact_list")) this.getModel().getField("contact_list").setValue(value);
+			if(initControls) this.getElement("contact_list").setInitValue(value);
+		}
+	}
+};
 
 //returns current ref 1c: from database or newly selected
 OrderDialog_View.prototype.getRef1c = function(){
@@ -1032,5 +680,39 @@ OrderDialog_View.prototype.printOrder = function(){
 		})
 	}else{
 		this.printOrderCont();
+	}
+}
+OrderDialog_View.prototype.showUnloadSpeedSchema = function(){
+	this.m_unloadListView = new UnloadSpeedSchemaList_View(
+		this.getId()+":form:body:unloadSpeedSchema",{
+			"autoRefresh": true
+		}
+	);
+	
+	const self = this;
+	this.m_unloadListForm = new WindowFormModalBS(this.getId()+":form",{
+		"cmdCancel": false,
+		"cmdOk":true,
+		"controlOkCaption":"Закрыть",
+		"controlOkTitle":"Закрыть форму",
+		"onClickOk":function(){
+			self.closeSelect();
+		},				
+		"content":this.m_unloadListView,
+		"contentHead":"",
+		"dialogWidth":"30%"
+	});
+
+	this.m_unloadListForm.open();
+}
+
+OrderDialog_View.prototype.closeSelect = function(){
+	if (this.m_unloadListView){
+		this.m_unloadListView.delDOM();
+		delete this.m_unloadListView;
+	}
+	if (this.m_unloadListForm){
+		this.m_unloadListForm.close();
+		delete this.m_unloadListForm;
 	}
 }

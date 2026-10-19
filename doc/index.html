@@ -116,6 +116,7 @@
 <li><a href="#PumpPriceValue_Controller">PumpPriceValue_Controller</a></li>
 <li><a href="#PumpVehicle_Controller">PumpVehicle_Controller</a></li>
 <li><a href="#PumpVehiclePriceList_Controller">PumpVehiclePriceList_Controller</a></li>
+<li><a href="#PushSubscription_Controller">PushSubscription_Controller</a></li>
 <li><a href="#QualityPassport_Controller">QualityPassport_Controller</a></li>
 <li><a href="#Quarry_Controller">Quarry_Controller</a></li>
 <li><a href="#RAFuelFlow_Controller">RAFuelFlow_Controller</a></li>
@@ -164,6 +165,7 @@
 <li><a href="#TmOutMessage_Controller">TmOutMessage_Controller</a></li>
 <li><a href="#TmUser_Controller">TmUser_Controller</a></li>
 <li><a href="#TrackerZoneControl_Controller">TrackerZoneControl_Controller</a></li>
+<li><a href="#UnloadSpeedSchema_Controller">UnloadSpeedSchema_Controller</a></li>
 <li><a href="#User_Controller">User_Controller</a></li>
 <li><a href="#UserAllowedMaterialCorrection_Controller">UserAllowedMaterialCorrection_Controller</a></li>
 <li><a href="#UserChat_Controller">UserChat_Controller</a></li>
@@ -217,6 +219,9 @@
 <li><a href="#LoginDeviceBan_Model">LoginDeviceBan_Model</a></li>
 <li><a href="#Client_Model">Client_Model</a></li>
 <li><a href="#ClientList_Model">ClientList_Model</a></li>
+<li><a href="#ClientMergeSelection_Model">ClientMergeSelection_Model</a></li>
+<li><a href="#ClientMergeList_Model">ClientMergeList_Model</a></li>
+<li><a href="#ClientMergeSelectedList_Model">ClientMergeSelectedList_Model</a></li>
 <li><a href="#ClientDialog_Model">ClientDialog_Model</a></li>
 <li><a href="#Destination_Model">Destination_Model</a></li>
 <li><a href="#DestinationList_Model">DestinationList_Model</a></li>
@@ -593,6 +598,9 @@
 <li><a href="#MacAddressList_Model">MacAddressList_Model</a></li>
 <li><a href="#OperatorForTranspNaklSchedule_Model">OperatorForTranspNaklSchedule_Model</a></li>
 <li><a href="#OperatorForTranspNaklScheduleList_Model">OperatorForTranspNaklScheduleList_Model</a></li>
+<li><a href="#OrderContact_Model">OrderContact_Model</a></li>
+<li><a href="#UnloadSpeedSchema_Model">UnloadSpeedSchema_Model</a></li>
+<li><a href="#PushSubscription_Model">PushSubscription_Model</a></li>
 </ul>
 <div class="section-title">Enumerations</div>
 <ul>
@@ -1075,7 +1083,70 @@
 <a href="#ClientList_Model">Model: ClientList_Model</a><h2>get_object</h2>
 <a href="#ClientDialog_Model">Model: ClientDialog_Model</a><h2>complete</h2>
 <a href="#Client_Model">Model: Client_Model</a><h2>complete_for_order</h2>
-<a href="#OrderClient_Model">Model: OrderClient_Model</a><h2>union</h2>
+<a href="#OrderClient_Model">Model: OrderClient_Model</a><h2>get_merge_list</h2>
+<a href="#ClientMergeList_Model">Model: ClientMergeList_Model</a><h2>get_merge_selected</h2>
+<a href="#ClientMergeSelectedList_Model">Model: ClientMergeSelectedList_Model</a><h2>merge_select</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>client_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Да</p>
+</div>
+</div>
+<h2>merge_unselect</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>client_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Да</p>
+</div>
+</div>
+<h2>merge_clear_selection</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2"></div>
+<h2>merge_selected</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>main_client_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Да</p>
+</div>
+<h3>client_ids</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Да</p>
+</div>
+</div>
+<h2>merge</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>main_client_id</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Int</p>
+<p>Required:
+								Да</p>
+</div>
+<h3>client_ids</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:String</p>
+<p>Required:
+								Да</p>
+</div>
+</div>
+<h2>union</h2>
 <p>Arguments:</p>
 <div class="content_item content_item2">
 <h3>main_client_id</h3>
@@ -3538,6 +3609,63 @@
 <a href="#PumpVehiclePriceList_Model">Model: PumpVehiclePriceList_Model</a>
 </div>
 </div>
+<div id="PushSubscription_Controller" class="content_box">
+<h1>PushSubscription_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>get_vapid_public_key</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2"></div>
+<h2>get_status</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>endpoint</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Text</p>
+<p>Required:
+								Да</p>
+</div>
+</div>
+<h2>subscribe</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>endpoint</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Text</p>
+<p>Required:
+								Да</p>
+</div>
+<h3>p256dh</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Text</p>
+<p>Required:
+								Да</p>
+</div>
+<h3>auth</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Text</p>
+<p>Required:
+								Да</p>
+</div>
+</div>
+<h2>unsubscribe</h2>
+<p>Arguments:</p>
+<div class="content_item content_item2">
+<h3>endpoint</h3>
+<p></p>
+<div class="content_item content_item3">
+<p>Type:Text</p>
+<p>Required:
+								Да</p>
+</div>
+</div>
+</div>
+</div>
 <div id="QualityPassport_Controller" class="content_box">
 <h1>QualityPassport_Controller</h1>
 <div class="content_item">
@@ -4740,6 +4868,19 @@
 <a href="#TrackerZoneControl_Model">Model: TrackerZoneControl_Model</a><h2>get_list</h2>
 <a href="#TrackerZoneControlList_Model">Model: TrackerZoneControlList_Model</a><h2>get_object</h2>
 <a href="#TrackerZoneControlList_Model">Model: TrackerZoneControlList_Model</a>
+</div>
+</div>
+<div id="UnloadSpeedSchema_Controller" class="content_box">
+<h1>UnloadSpeedSchema_Controller</h1>
+<div class="content_item">
+<p class="big"></p>
+<p>Методы:</p>
+<h2>insert</h2>
+<a href="#UnloadSpeedSchema_Model">Model: UnloadSpeedSchema_Model</a><h2>update</h2>
+<a href="#UnloadSpeedSchema_Model">Model: UnloadSpeedSchema_Model</a><h2>delete</h2>
+<a href="#UnloadSpeedSchema_Model">Model: UnloadSpeedSchema_Model</a><h2>get_list</h2>
+<a href="#UnloadSpeedSchema_Model">Model: UnloadSpeedSchema_Model</a><h2>get_object</h2>
+<a href="#UnloadSpeedSchema_Model">Model: UnloadSpeedSchema_Model</a>
 </div>
 </div>
 <div id="User_Controller" class="content_box">
@@ -8184,6 +8325,102 @@
 <div>Type:JSONB</div>
 <div>Primary key:</div>
 <div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ClientMergeList_Model" class="content_box">
+<h1>ClientMergeList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>inn</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>phone_cel</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>orders_count</h2>
+<div>Type:BigInt</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ClientMergeSelectedList_Model" class="content_box">
+<h1>ClientMergeSelectedList_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>name</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>inn</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>phone_cel</h2>
+<div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>orders_count</h2>
+<div>Type:BigInt</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="ClientMergeSelection_Model" class="content_box">
+<h1>ClientMergeSelection_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>user_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>client_id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>selected_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
 <div>Length:</div>
 <div>Precision:</div>
 </div>
@@ -15426,6 +15663,30 @@
 <div>Precision:</div>
 </div>
 </div>
+<div id="OrderContact_Model" class="content_box">
+<h1>OrderContact_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>order_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>contact_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
 <div id="OrderDescr_Model" class="content_box">
 <h1>OrderDescr_Model</h1>
 <div class="content_item">
@@ -15756,6 +16017,12 @@
 <div>Precision:</div>
 <h2>client_debt_date</h2>
 <div>Type:DateTime</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>contact_list</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -16894,6 +17161,12 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+<h2>contact_list</h2>
+<div>Type:JSON</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
 <h2>ref_1c</h2>
 <div>Type:JSONB</div>
 <div>Primary key:</div>
@@ -17298,6 +17571,12 @@
 <div>Precision:</div>
 <h2>pump_vehicle_comment</h2>
 <div>Type:String</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>contact_list</h2>
+<div>Type:JSON</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -19032,6 +19311,84 @@
 <div>Precision:</div>
 <h2>min_order_time_interval</h2>
 <div>Type:Interval</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+</div>
+</div>
+<div id="PushSubscription_Model" class="content_box">
+<h1>PushSubscription_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>app_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>ext_contact_id</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>endpoint</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>p256dh</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>auth</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>user_agent</h2>
+<div>Type:Text</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>created_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>updated_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>last_seen_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>disabled_at</h2>
+<div>Type:DateTimeTZ</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>last_error</h2>
+<div>Type:Text</div>
 <div>Primary key:</div>
 <div>Required:</div>
 <div>Length:</div>
@@ -25684,6 +26041,30 @@
 <div>Required:</div>
 <div>Length:</div>
 <div>Precision:</div>
+</div>
+</div>
+<div id="UnloadSpeedSchema_Model" class="content_box">
+<h1>UnloadSpeedSchema_Model</h1>
+<div class="content_item">
+<p>Поля:</p>
+<h2>id</h2>
+<div>Type:Int</div>
+<div>Primary key:TRUE</div>
+<div>Required:</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>speed</h2>
+<div>Type:Int</div>
+<div>Primary key:</div>
+<div>Required:TRUE</div>
+<div>Length:</div>
+<div>Precision:</div>
+<h2>quant</h2>
+<div>Type:Float</div>
+<div>Primary key:</div>
+<div>Required:</div>
+<div>Length:19</div>
+<div>Precision:4</div>
 </div>
 </div>
 <div id="User_Model" class="content_box">

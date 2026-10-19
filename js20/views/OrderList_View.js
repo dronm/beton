@@ -222,10 +222,10 @@ function OrderList_View(id,options){
 							]
 						})
 						,new GridCellHead(id+":grid:head:phone_cel",{
-							"value":"Телефон",
+							"value":"Телефоны",
 							"columns":[
-								new GridColumnPhone({
-									"field":model.getField("phone_cel")
+								new GridColumnPhoneList({
+									"field":model.getField("contact_list")
 								})
 							]
 						})
@@ -234,7 +234,19 @@ function OrderList_View(id,options){
 							"value":"Прораб",
 							"columns":[
 								new GridColumn({
-									"field":model.getField("descr")
+									"formatFunction":function(f,gridCell){
+										let res = "";
+										const ct = f.contact_list.getValue();
+										if(ct && ct.length){
+											for (let i = 0; i<ct.length; i++){
+												if("contact" in ct[i]){
+													res+= (res=="")? "":", ";
+													res+= ct[i].contact["name"];
+												}
+											}
+										}
+										return res;
+									},
 								})
 							],
 							"sortable":true							

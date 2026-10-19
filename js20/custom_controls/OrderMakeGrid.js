@@ -317,10 +317,13 @@ function OrderMakeGrid(id,options){
 			,new GridCellHead(id+":order_make_grid:head:phone_cel",{
 				"value":"Телефон",
 				"columns":[
-					new GridColumnPhone({
+					new GridColumnPhoneList({
+						"field":model.getField("contact_list")
+					})
+					/*new GridColumnPhone({
 						"field":model.getField("phone_cel"),
 						"telExt":window.getApp().getServVar("tel_ext")
-					})
+					})*/
 				]
 			})
 			,new GridCellHead(id+":order_make_grid:head:descr",{
@@ -328,8 +331,20 @@ function OrderMakeGrid(id,options){
 				"columns":[
 					new GridColumn({
 						"field":model.getField("descr"),
-						"formatFunction":function(fields,cell){
-							return window.getApp().formatCell(fields.descr,cell,self.m_listView.COL_DESCR_LEN);
+						"formatFunction":function(f,cell){
+							return window.getApp().formatCell(f.descr,cell,self.m_listView.COL_DESCR_LEN);
+							/*let res = "";
+							const ct = f.contact_list.getValue();
+							if(ct && ct.length){
+								for (let i = 0; i<ct.length; i++){
+									if("contact" in ct[i]){
+										res+= (res=="")? "":", ";
+										res+= ct[i].contact["name"];
+									}
+								}
+							}
+							return window.getApp().formatCell(res,cell,self.m_listView.COL_DESCR_LEN);
+							*/
 						}										
 					})
 				]

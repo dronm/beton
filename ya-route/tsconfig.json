@@ -1,0 +1,28 @@
+{
+	"compilerOptions": {
+		"target": "ES2020",
+		"module": "none",
+		"lib": [
+			"ES2020",
+			"DOM"
+		],
+		"strict": true,
+		"noEmitOnError": true,
+		"forceConsistentCasingInFileNames": true,
+		"removeComments": false,
+		"outFile": "assets/route.js",
+		"types": []
+	},
+	"files": [
+		"src/yandex-global.d.ts",
+		"src/types.ts",
+		"src/data.ts",
+		"src/geo.ts",
+		"src/movement.ts",
+		"src/live.ts",
+		"src/api.ts",
+		"src/map.ts",
+		"src/loader.ts",
+		"src/main.ts"
+	]
+}

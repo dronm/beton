@@ -235,9 +235,7 @@ function add_notification_from_contact($linkMaster, $tel, $msg, $smsType, $docRe
 					'messages', jsonb_build_array(
 						jsonb_build_object(
 							'ext_contact_id', %d,
-							'tm', jsonb_build_object(
-								'text', %s
-							),
+							--'tm', jsonb_build_object('text', %s),
 							'max', jsonb_build_object(
 								'text', %s
 							),

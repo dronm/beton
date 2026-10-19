@@ -116,7 +116,26 @@ CREATE OR REPLACE VIEW public.orders_dialog AS
 		FROM client_debts AS dbt 
 		WHERE dbt.client_id = o.client_id
 		LIMIT 1
-		) AS client_debt_date
+		) AS client_debt_date,
+
+		coalesce(
+			(
+				SELECT json_agg(
+					json_build_object(
+						'id', oct.id,
+						'contact', json_build_object(
+							'name', oct_ct.name,
+							'tel', oct_ct.tel
+						)
+					)
+					ORDER BY oct.id
+				)
+				FROM public.order_contacts AS oct
+				JOIN public.contacts AS oct_ct ON oct_ct.id = oct.contact_id
+				WHERE oct.order_id = o.id
+			),
+			'[]'::json
+		) AS contact_list
 		
 	FROM orders o
 	LEFT JOIN clients cl ON cl.id = o.client_id

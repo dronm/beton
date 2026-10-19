@@ -1303,9 +1303,9 @@ AppBeton.prototype.MSG_DURATION = 10 * 1000;
 AppBeton.prototype.initWorkers = function() {
 	console.log('AppBeton.initWorkers');
 
-	//if ('serviceWorker' in navigator) {
-		//this.initServiceWorker();
-	//}
+	if ('serviceWorker' in navigator) {
+		this.initServiceWorker();
+	}
 
 	this.bindNetworkStatusEvents();
 };
@@ -1536,4 +1536,16 @@ AppBeton.prototype.sendCommandToElkon = async function(cmd, queryId, body) {
 	if (!response.ok) {
 		throw new Error("fetch-config failed: HTTP:"+response.status+"; body:"+bodyResp);
 	}
+}
+
+AppBeton.prototype.initOSMLayer = function() {
+	return new OpenLayers.Layer.OSM(
+		"OpenStreetMap",
+		"https://tile.openstreetmap.org/${z}/${x}/${y}.png",
+		{
+			tileOptions: {
+				crossOriginKeyword: null
+			}
+		}
+	);
 }

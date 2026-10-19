@@ -1,10 +1,367 @@
-.inf{
-	display:inline;
-	font-weight:bolder;
-	font-size:120%;
-	height:50px;
-}
-#showVehicle{
-	cursor:pointer;
+/* Presentation only. The 2GIS SDK, route.js and all PHP endpoints are unchanged. */
+:root {
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	color: #172f44;
+	background: #edf2f6;
+	font-synthesis: none;
+	--route-accent: #1766b3;
+	--route-muted: #596b79;
+	--route-border: #d8e1e8;
 }
 
+html {
+	min-height: 100%;
+}
+
+body {
+	margin: 0;
+}
+
+/* Scope sizing rules to the page chrome, not the SDK-generated map controls. */
+.route-app,
+.route-summary,
+.route-summary *,
+.route-map-shell,
+.route-footer,
+.route-error-card,
+.route-error-card * {
+	box-sizing: border-box;
+}
+
+.route-page {
+	height: 100vh;
+	height: 100dvh;
+}
+
+.route-app {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	width: 100%;
+	max-width: 1920px;
+	height: 100%;
+	min-height: 480px;
+	margin: 0 auto;
+	padding: 20px 24px 12px;
+	padding-right: max(24px, env(safe-area-inset-right));
+	padding-bottom: max(12px, env(safe-area-inset-bottom));
+	padding-left: max(24px, env(safe-area-inset-left));
+}
+
+.route-summary {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+	padding: 18px 22px;
+	border: 1px solid var(--route-border);
+	border-radius: 16px;
+	background: #fff;
+	box-shadow: 0 4px 20px #193c5506;
+}
+
+.route-vehicle {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	min-width: 0;
+}
+
+.route-vehicle-icon {
+	flex: 0 0 auto;
+	width: 58px;
+	height: 58px;
+	padding: 10px;
+	border-radius: 14px;
+	background: #edf5fb;
+	object-fit: contain;
+}
+
+.route-vehicle-copy {
+	min-width: 0;
+}
+
+.route-eyebrow {
+	margin: 0 0 5px;
+	color: var(--route-muted);
+	font-size: 12px;
+	font-weight: 400;
+	letter-spacing: .035em;
+	line-height: 1.5;
+}
+
+.route-eyebrow span {
+	white-space: nowrap;
+}
+
+.route-plate {
+	margin: 0;
+	font-size: clamp(22px, 2.2vw, 30px);
+	font-weight: 700;
+	letter-spacing: .035em;
+	line-height: 1.2;
+	overflow-wrap: anywhere;
+}
+
+.route-summary-actions {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	gap: 28px;
+}
+
+.route-metric {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 116px;
+	padding-left: 28px;
+	border-left: 1px solid var(--route-border);
+}
+
+.route-metric-label {
+	color: var(--route-muted);
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+#distanceToDest {
+	min-height: 33px;
+	font-size: 26px;
+	font-weight: 650;
+	font-variant-numeric: tabular-nums;
+	line-height: 1.25;
+	white-space: nowrap;
+}
+
+/* Do not invent a zero or an arrival state when the original code supplies no text. */
+#distanceToDest:empty::before {
+	content: "—";
+	color: var(--route-muted);
+}
+
+.route-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	min-height: 44px;
+	margin: 0;
+	padding: 11px 16px;
+	border: 1px solid var(--route-accent);
+	border-radius: 10px;
+	background: var(--route-accent);
+	color: #fff;
+	font: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.35;
+	text-align: center;
+	white-space: nowrap;
+	cursor: pointer;
+	touch-action: manipulation;
+}
+
+@media (hover: hover) {
+	.route-button:hover {
+		border-color: #115592;
+		background: #115592;
+	}
+}
+
+.route-button:active {
+	border-color: #0e477e;
+	background: #0e477e;
+}
+
+.route-button:focus-visible {
+	outline: 3px solid #398ad6;
+	outline-offset: 3px;
+}
+
+.route-button:disabled {
+	opacity: .55;
+	cursor: default;
+}
+
+/* Decorative icon only; the original button keeps its id and click handler. */
+.route-locate-icon {
+	position: relative;
+	display: inline-block;
+	flex: 0 0 auto;
+	width: 16px;
+	height: 16px;
+	border: 1.5px solid currentColor;
+	border-radius: 50%;
+}
+
+.route-locate-icon::before {
+	position: absolute;
+	inset: 4px;
+	border-radius: 50%;
+	background: currentColor;
+	content: "";
+}
+
+.route-map-shell {
+	position: relative;
+	flex: 1 1 0;
+	min-height: 280px;
+	border: 1px solid #ccd8e0;
+	border-radius: 16px;
+	background: #e0e7ec;
+	overflow: hidden;
+}
+
+#map.map {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	/* route.js sets a screen-based inline height. Override layout, not runtime logic. */
+	height: 100% !important;
+}
+
+.route-footer {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px 20px;
+	padding: 0 3px;
+	color: var(--route-muted);
+	font-size: 11px;
+	line-height: 1.5;
+}
+
+.route-footer > :last-child {
+	white-space: nowrap;
+}
+
+/* The SDK's controls, map layers, labels and attribution retain their own styles. */
+.route-error-page {
+	display: grid;
+	place-items: center;
+	min-height: 100vh;
+	min-height: 100dvh;
+	padding: 24px;
+	box-sizing: border-box;
+}
+
+.route-error-card {
+	width: 100%;
+	max-width: 520px;
+	padding: 40px;
+	border: 1px solid var(--route-border);
+	border-radius: 20px;
+	background: #fff;
+	box-shadow: 0 4px 20px #193c5506;
+	text-align: center;
+}
+
+.route-error-card .route-vehicle-icon {
+	display: block;
+	margin: 0 auto 20px;
+}
+
+.route-error-card .route-eyebrow {
+	margin-bottom: 8px;
+}
+
+.route-error-card #txt {
+	margin: 0;
+	font-size: clamp(22px, 3vw, 27px);
+	font-weight: 650;
+	line-height: 1.35;
+	overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+	.route-app {
+		gap: 10px;
+		min-height: 540px;
+		padding: 10px 10px 8px;
+		padding-right: max(10px, env(safe-area-inset-right));
+		padding-bottom: max(8px, env(safe-area-inset-bottom));
+		padding-left: max(10px, env(safe-area-inset-left));
+	}
+
+	.route-summary {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 15px;
+		padding: 15px;
+		border-radius: 12px;
+	}
+
+	.route-vehicle {
+		gap: 12px;
+	}
+
+	.route-vehicle-icon {
+		width: 46px;
+		height: 46px;
+		padding: 4px;
+		border-radius: 12px;
+	}
+
+	.route-eyebrow {
+		font-size: 11px;
+	}
+
+	.route-summary-actions {
+		justify-content: space-between;
+		gap: 12px;
+		padding-top: 12px;
+		border-top: 1px solid #e9eef2;
+	}
+
+	.route-metric {
+		min-width: 0;
+		padding: 0;
+		border: 0;
+	}
+
+	#distanceToDest {
+		min-height: 29px;
+		font-size: 23px;
+	}
+
+	.route-button {
+		gap: 8px;
+		padding: 11px 12px;
+		font-size: 13px;
+	}
+
+	.route-map-shell {
+		border-radius: 12px;
+	}
+
+	.route-footer {
+		gap: 8px;
+		font-size: 10px;
+	}
+
+	.route-error-page {
+		padding: 16px;
+	}
+
+	.route-error-card {
+		padding: 32px 24px;
+		border-radius: 16px;
+	}
+}
+
+@media (max-width: 370px) {
+	.route-eyebrow span {
+		display: block;
+	}
+
+	.route-summary {
+		padding: 13px;
+	}
+
+	.route-button {
+		font-size: 12px;
+	}
+}

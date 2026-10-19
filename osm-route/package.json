@@ -1,0 +1,21 @@
+{
+	"name": "shipment-route-osm",
+	"version": "1.0.0",
+	"private": true,
+	"description": "Standalone PHP shipment map with OpenLayers and the existing AppSrv WebSocket client",
+	"scripts": {
+		"build": "tsc -p tsconfig.json && php tools/format-generated.php",
+		"typecheck": "tsc -p tsconfig.json --noEmit",
+		"vendor": "php tools/vendor.php",
+		"test:frontend": "tsc -p tests/tsconfig.json && node .test-build/tests.js",
+		"test:php": "php tests/helpers.php && python3 tests/integration.py",
+		"test": "npm run test:frontend && npm run test:php",
+		"test:browser": "python3 tests/browser.py"
+	},
+	"dependencies": {
+		"ol": "10.10.0"
+	},
+	"devDependencies": {
+		"typescript": "5.8.3"
+	}
+}

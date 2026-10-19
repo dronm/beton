@@ -26,6 +26,20 @@ $permissions = array();
 				
 					$permissions['Client_Controller_complete_for_order']=TRUE;
 				
+					$permissions['Client_Controller_get_merge_list']=TRUE;
+				
+					$permissions['Client_Controller_get_merge_selected']=TRUE;
+				
+					$permissions['Client_Controller_merge_select']=TRUE;
+				
+					$permissions['Client_Controller_merge_unselect']=TRUE;
+				
+					$permissions['Client_Controller_merge_clear_selection']=TRUE;
+				
+					$permissions['Client_Controller_merge_selected']=TRUE;
+				
+					$permissions['Client_Controller_merge']=TRUE;
+				
 					$permissions['Client_Controller_union']=TRUE;
 				
 					$permissions['Client_Controller_set_duplicate_valid']=TRUE;
@@ -2057,6 +2071,24 @@ $permissions = array();
 					$permissions['ShipmentWeightRedirectionPayment_Controller_get_list']=TRUE;
 				
 					$permissions['ShipmentWeightRedirectionPayment_Controller_get_object']=TRUE;
+				
+					$permissions['UnloadSpeedSchema_Controller_insert']=TRUE;
+				
+					$permissions['UnloadSpeedSchema_Controller_update']=TRUE;
+				
+					$permissions['UnloadSpeedSchema_Controller_delete']=TRUE;
+				
+					$permissions['UnloadSpeedSchema_Controller_get_list']=TRUE;
+				
+					$permissions['UnloadSpeedSchema_Controller_get_object']=TRUE;
+				
+					$permissions['PushSubscription_Controller_get_vapid_public_key']=TRUE;
+				
+					$permissions['PushSubscription_Controller_get_status']=TRUE;
+				
+					$permissions['PushSubscription_Controller_subscribe']=TRUE;
+				
+					$permissions['PushSubscription_Controller_unsubscribe']=TRUE;
 				
 return array_key_exists($contrId.'_'.$methId,$permissions);
 }

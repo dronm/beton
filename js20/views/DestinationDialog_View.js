@@ -383,7 +383,8 @@ DestinationDialog_View.prototype.toDOM = function(parent){
 	DestinationDialog_View.superclass.toDOM.call(this,parent);
 
 	this.m_map = new OpenLayers.Map("map",{"controls":[]});
-	this.m_layer = new OpenLayers.Layer.OSM();		
+	const app = window.getApp();
+	this.m_layer = app.initOSMLayer();// new OpenLayers.Layer.OSM();		
 	
 	this.m_map.addLayer(this.m_layer);		
 	

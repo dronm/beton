@@ -145,7 +145,7 @@
 	<!-- [@default='FALSE']-->
 	<xsl:variable name="def_menu_item" select="//menuitem[@default='true']"/>
 	<xsl:if test="$def_menu_item">
-	if(window.location.href.indexOf("?") &lt; 0 || window.location.href.indexOf("token=") &gt;=0 || window.location.href.indexOf("?sid") &gt;=0) {
+	if(window.location.href.indexOf("?") &lt; 0 || window.location.href.indexOf("token=") &gt;= 0 || window.location.href.indexOf("?sid") &gt;=0) {
 		var iRef = DOMHelper.getElementsByAttr("true", CommonHelper.nd("side-menu"), "defaultItem",true,"A")[0];
 		application.showMenuItem(iRef,'<xsl:value-of select="$def_menu_item/@c"/>','<xsl:value-of select="$def_menu_item/@f"/>','<xsl:value-of select="$def_menu_item/@t"/>',null,'<xsl:value-of select="$def_menu_item/@viewdescr"/>');
 	}
@@ -206,7 +206,7 @@
 	//
 	window.scrollTo(0, 0);	
 				
-	<xsl:if test="count(/document/model[@id='AstCallCurrent_Model']/row) &gt;0">
+	<xsl:if test="count(/document/model[@id='AstCallCurrent_Model']/row) &gt; 0">
 	//console.log("WidthType="+window.getWidthType())
 	if(window.getWidthType()!="sm"){
 	//ВХОДЯЩИЙ ЗВОНОК!
@@ -215,12 +215,12 @@
 	view_opts.models.AstCallCurrent_Model = new AstCallCurrent_Model({"data":CommonHelper.longString(function () {/*
 			<xsl:copy-of select="/document/model[@id='AstCallCurrent_Model']"/>
 	*/})});	
-	<xsl:if test="count(/document/model[@id='AstCallClientCallHistoryList_Model']/row) &gt;0">
+	<xsl:if test="count(/document/model[@id='AstCallClientCallHistoryList_Model']/row) &gt; 0">
 	view_opts.models.AstCallClientCallHistoryList_Model = new AstCallClientCallHistoryList_Model({"data":CommonHelper.longString(function () {/*
 			<xsl:copy-of select="/document/model[@id='AstCallClientCallHistoryList_Model']"/>
 	*/})});	
 	</xsl:if>
-	<xsl:if test="count(/document/model[@id='AstCallClientShipHistoryList_Model']/row) &gt;0">
+	<xsl:if test="count(/document/model[@id='AstCallClientShipHistoryList_Model']/row) &gt; 0">
 	view_opts.models.AstCallClientShipHistoryList_Model = new AstCallClientShipHistoryList_Model({"data":CommonHelper.longString(function () {/*
 			<xsl:copy-of select="/document/model[@id='AstCallClientShipHistoryList_Model']"/>
 	*/})});	
@@ -343,7 +343,7 @@
 		var dd = DateHelper.dateStart(d);
 		dd = new Date(dd.getTime() + DateHelper.timeToMS(constants.first_shift_start_time.getValue()));
 		
-		if(dd.getTime()>d.getTime()){
+		if(dd.getTime() &gt; d.getTime()){
 			dd = new Date(dd.getTime() - 24*60*60*1000);
 		}
 		

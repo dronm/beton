@@ -29,9 +29,11 @@ require_once(FRAME_WORK_PATH.'basic_classes/CondParamsSQL.php');
 require_once('common/OSRMV5.php');
 
 //require_once('common/geo/yandex.php');
-require_once('common/geo/dadata.php');
+//require_once('common/geo/dadata.php');
+require_once(FUNC_PATH.'/VehicleRoute.php');
+require_once('common/geo/nominatim.php');
 
-require_once('common/geo/YndxReverseCode.php');
+//require_once('common/geo/YndxReverseCode.php');
 require_once('common/decodePolylineToArray.php');
 
 class Destination_Controller extends ControllerSQL{
@@ -425,6 +427,27 @@ class Destination_Controller extends ControllerSQL{
 		
 	}
 
+	private static function matchRouteToRoad(&$osrm, $encodedPoliline){	
+		$route_points = decodePolylineToArray($encodedPoliline);		
+		$osrm_points = array();
+		//convert to [string lon,lat] array FROM [lon,lat]
+		foreach($route_points as $pt){
+			array_push($osrm_points,str_replace(',','.',($pt[1]*10)).','.str_replace(',','.',($pt[0]*10)));
+		}
+		$osrm_route = $osrm->matchRoute(
+			$osrm_points
+			,'driving'
+			,array("geometries=polyline","overview=full","tidy=true")									
+		);
+		//overview = simplified (default), full, false
+		//tidy: true/false
+		//radius miters
+		if (!$osrm_route->matchings || !count($osrm_route->matchings) || !$osrm_route->matchings[count($osrm_route->matchings)-1]->geometry){
+			throw new Exception(self::ER_OSRM_ROUTE_QUERY);
+		}
+		return $osrm_route;
+	}
+
 	/**
 	 * need $inf['lat_pos'],$inf['lon_pos']
 	 */
@@ -466,7 +489,16 @@ class Destination_Controller extends ControllerSQL{
 			if (!$route->routes || !count($route->routes) || !$route->routes[0]->geometry){
 				throw new Exception(self::ER_OSRM_ROUTE_QUERY);
 			}
+			$route_geom = $route->routes[count($route->routes)-1]->geometry;
+			try{
+				$route_to_road = self::matchRouteToRoad($osrm, $route_geom);
+			}catch(Exception $e){				
+				throw new Exception($e->getMessage());
+			}
 
+			// Replace the original response with the GUI-compatible matched response.
+			$route = self::matchingToRoute($route_to_road);
+//file_put_contents(OUTPUT_PATH.'route.txt', var_export($route,TRUE));
 			$inf['routes'][$ar['id']] = array(
 				'id' => $ar['id']
 				,'name' => $ar['name']
@@ -561,10 +593,11 @@ class Destination_Controller extends ControllerSQL{
 		$addr['city'] = $address;
 		$addr_h = md5($addr['city']);
 		
-		if(!isset($_SESSION['get_coords_on_name_cash']) || !isset($_SESSION['get_coords_on_name_cash'][$addr_h])){
+		//if(!isset($_SESSION['get_coords_on_name_cash']) || !isset($_SESSION['get_coords_on_name_cash'][$addr_h])){
 		
-			//yandex
-			get_inf_on_address(DADATA_KEY, DADATA_SECRET, $addr, $inf);
+			//yandex, dadata
+			//get_inf_on_address(DADATA_KEY, DADATA_SECRET, $addr, $inf);
+			get_inf_on_address($addr, $inf);
 			
 			$this->make_route_to_zone($inf);
 			
@@ -576,10 +609,10 @@ class Destination_Controller extends ControllerSQL{
 				$_SESSION['get_coords_on_name_cash'] = array();
 			}
 			$_SESSION['get_coords_on_name_cash'][$addr_h] = $inf;
-		}
+		/*}
 		else{
 			$inf = $_SESSION['get_coords_on_name_cash'][$addr_h];
-		}
+		}*/
 	
 		return $inf;
 	}
@@ -992,6 +1025,129 @@ class Destination_Controller extends ControllerSQL{
 
 			$this->getDbLink()->query($q);
 		}
+	}
+
+	/**
+	 * Convert one complete OSRM matching into a route response
+	 * with two waypoints and one leg.
+	 *
+	 * Intended for:
+	 *   geometries=polyline
+	 *   steps=false
+	 *   annotations=false
+	 *
+	 * @param stdClass $match
+	 * @return stdClass
+	 * @throws RuntimeException
+	 */
+	private static function matchingToRoute($match)
+	{
+		if (!is_object($match)
+			|| !isset($match->code) || $match->code !== 'Ok'
+			|| !isset($match->matchings) || !is_array($match->matchings)
+			|| count($match->matchings) === 0
+		) {
+			throw new RuntimeException(
+				'OSRM: не удалось привязать маршрут к дороге.'
+			);
+		}
+
+		// Separate matchings are pieces of the trace, not alternative routes.
+		if (count($match->matchings) !== 1) {
+			throw new RuntimeException(
+				'OSRM: привязка разбила маршрут на несколько частей.'
+			);
+		}
+
+		$matched = $match->matchings[0];
+
+		if (!is_object($matched)
+			|| empty($matched->geometry) || !is_string($matched->geometry)
+			|| !isset(
+				$matched->distance,
+				$matched->duration,
+				$matched->weight,
+				$matched->weight_name
+			)
+			|| !isset($matched->legs) || !is_array($matched->legs)
+			|| count($matched->legs) === 0
+		) {
+			throw new RuntimeException(
+				'OSRM: некорректные данные привязанного маршрута.'
+			);
+		}
+
+		// Do not silently discard navigation instructions or annotations.
+		foreach ($matched->legs as $leg) {
+			if (!is_object($leg)
+				|| !empty($leg->steps)
+				|| isset($leg->annotation)
+			) {
+				throw new RuntimeException(
+					'OSRM: адаптер требует steps=false и annotations=false.'
+				);
+			}
+		}
+
+		if (!isset($match->tracepoints) || !is_array($match->tracepoints)
+			|| count($match->tracepoints) < 2
+		) {
+			throw new RuntimeException(
+				'OSRM: отсутствуют точки привязанного маршрута.'
+			);
+		}
+
+		$points = $match->tracepoints;
+		$waypoints = array();
+
+		// Use the actual first/last input points.
+		// Do not silently shorten the route when an endpoint was not matched.
+		foreach (
+			array($points[0], $points[count($points) - 1]) as $point
+		) {
+			if (!is_object($point)
+				|| !isset($point->matchings_index)
+				|| $point->matchings_index !== 0
+				|| !isset($point->location)
+				|| !is_array($point->location)
+				|| count($point->location) !== 2
+			) {
+				throw new RuntimeException(
+					'OSRM: начало или конец маршрута не удалось привязать.'
+				);
+			}
+
+			$waypoint = clone $point;
+
+			unset(
+				$waypoint->matchings_index,
+				$waypoint->waypoint_index,
+				$waypoint->alternatives_count
+			);
+
+			$waypoints[] = $waypoint;
+		}
+
+		$route = clone $matched;
+		unset($route->confidence);
+
+		// Preserve the original response shape:
+		// one leg covering the complete route between the two endpoints.
+		$route->legs = array(
+			(object) array(
+				'steps' => array(),
+				'weight' => $matched->weight,
+				'summary' => '',
+				'duration' => $matched->duration,
+				'distance' => $matched->distance
+			)
+		);
+
+		return (object) array(
+			'code' => 'Ok',
+			'routes' => array($route),
+			'waypoints' => $waypoints
+		);
 	}
 }
 ?>

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-09-10 18:19:31</lastBuild></version>
+		<lastBuild>2026-10-19 18:12:44</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -336,6 +336,7 @@
 		<version dateOpen="2026-08-10 16:16:57" dateClose="2026-08-17 05:49:52">1.00428</version>
 		<version dateOpen="2026-08-18 08:38:57" dateClose="2026-08-21 06:01:16">1.00429</version>
 		<version dateOpen="2026-08-31 11:13:26" dateClose="2026-09-10 18:19:53">1.00430</version>
+		<version dateOpen="2026-09-22 10:33:18" dateClose="2026-10-19 18:12:47">1.00431</version>
 	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
@@ -967,6 +968,36 @@
 			<field id="contact_ids" dataType="Text" alias="Ids for filter"/>
 			<field id="descr" dataType="JSON"/>
 			<field id="ref_1c_exists" dataType="Bool"/>
+		</model>
+		<model id="ClientMergeSelection" parent="ModelSQL" dataTable="client_merge_selections" virtual="FALSE">
+			<field id="user_id" dataType="Int" refTable="users" refField="id" required="TRUE" primaryKey="TRUE"/>
+			<field id="client_id" dataType="Int" refTable="clients" refField="id" required="TRUE" primaryKey="TRUE"/>
+			<field id="selected_at" dataType="DateTimeTZ" required="TRUE" defaultValue="CURRENT_TIMESTAMP"/>
+			<index id="client_merge_selections_client_id_idx">
+				<field id="client_id"/>
+			</index>
+		</model>
+		<model id="ClientMergeList" parent="ModelSQL" dataTable="client_merge_list" virtual="TRUE">
+			<defaultOrder>
+				<field id="name"/>
+				<field id="id"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
+			<field id="name" dataType="String" alias="Наименование"/>
+			<field id="inn" dataType="String" alias="ИНН"/>
+			<field id="phone_cel" dataType="String" alias="Телефон"/>
+			<field id="orders_count" dataType="BigInt" alias="Количество заявок"/>
+		</model>
+		<model id="ClientMergeSelectedList" parent="ModelSQL" dataTable="client_merge_list" virtual="TRUE">
+			<defaultOrder>
+				<field id="name"/>
+				<field id="id"/>
+			</defaultOrder>
+			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
+			<field id="name" dataType="String" alias="Наименование"/>
+			<field id="inn" dataType="String" alias="ИНН"/>
+			<field id="phone_cel" dataType="String" alias="Телефон"/>
+			<field id="orders_count" dataType="BigInt" alias="Количество заявок"/>
 		</model>
 		<model id="ClientDialog" parent="ModelSQLBeton" dataTable="clients_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="FALSE"/>
@@ -1620,6 +1651,7 @@
 			<field id="user_id" dataType="Int" sysCol="TRUE"/>
 			<field id="orders_ref" dataType="JSON" sysCol="TRUE"/>
 			<field id="contacts_ref" dataType="JSON" sysCol="TRUE"/>
+			<field id="contact_list" dataType="JSON" sysCol="TRUE"/>
 			<field id="ref_1c" dataType="JSONB" alias="Ссылка на справочник 1с"/>
 			<field id="last_modif_users_ref" dataType="JSON" alias="Кто последний вносил изменения"/>
 			<field id="last_modif_date_time" dataType="DateTimeTZ" alias="Время последнего изменения"/>
@@ -1741,6 +1773,7 @@
 			<field id="total" dataType="Float"/>
 			<field id="pump_vehicle_length" dataType="Int"/>
 			<field id="pump_vehicle_comment" dataType="String"/>
+			<field id="contact_list" dataType="JSON"/>
 		</model>
 		<model id="OrderDialog" parent="ModelSQLBeton" dataTable="orders_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -1789,6 +1822,7 @@
 			<field id="client_ref_1c" dataType="JSON"/>
 			<field id="ref_1c" dataType="JSON" alias="Ссылка на справочник 1с"/>
 			<field id="client_debt_date" dataType="DateTime"/>
+			<field id="contact_list" dataType="JSON"/>
 		</model>
 		<model id="OrderGarbageDialog" parent="ModelSQLBeton" dataTable="order_garbage_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>
@@ -6050,6 +6084,42 @@
 			<field id="production_sites_ref" dataType="JSON"/>
 			<field id="users_ref" dataType="JSON"/>
 		</model>
+		<model id="OrderContact" parent="ModelSQL" dataTable="order_contacts" virtual="FALSE" alias="Контакты заявок">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" dbRequired="TRUE" alias="Код"/>
+			<field id="order_id" dataType="Int" refTable="orders" refField="id"/>
+			<field id="contact_id" dataType="Int" refTable="contacts" refField="id"/>
+			<index id="order_contacts_order_id_contact_id_idx" unique="TRUE">
+				<field id="order_id"/>
+				<field id="contact_id"/>
+			</index>
+		</model>
+		<model id="UnloadSpeedSchema" parent="ModelSQL" dataTable="unload_speed_schema" virtual="FALSE" alias="Скорости разгрузки">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" dbRequired="TRUE" alias="Код"/>
+			<field id="speed" dataType="Int" required="TRUE"/>
+			<field id="quant" dataType="Float" length="19" precision="4" alias="Количество"/>
+		</model>
+		<model id="PushSubscription" parent="ModelSQL" dataTable="push_subscriptions" virtual="FALSE" dataSchema="notifications">
+			<field id="id" dataType="Int" primaryKey="TRUE" autoInc="TRUE" required="TRUE"/>
+			<field id="app_id" dataType="Int" refTable="apps" refField="id"/>
+			<field id="ext_contact_id" dataType="Int"/>
+			<field id="endpoint" dataType="Text" dbRequired="TRUE"/>
+			<field id="p256dh" dataType="Text" dbRequired="TRUE"/>
+			<field id="auth" dataType="Text" dbRequired="TRUE"/>
+			<field id="user_agent" dataType="Text" dbRequired="TRUE"/>
+			<field id="created_at" dataType="DateTimeTZ" dbRequired="TRUE" defaultValue="NOW()"/>
+			<field id="updated_at" dataType="DateTimeTZ" dbRequired="TRUE" defaultValue="NOW()"/>
+			<field id="last_seen_at" dataType="DateTimeTZ"/>
+			<field id="disabled_at" dataType="DateTimeTZ"/>
+			<field id="last_error" dataType="Text"/>
+			<index id="push_subscriptions_app_id_endpoint_idx" unique="TRUE">
+				<field id="app_id"/>
+				<field id="endpoint"/>
+			</index>
+			<index id="push_subscriptions_app_id_ext_contact_id_idx" unique="FALSE">
+				<field id="app_id"/>
+				<field id="ext_contact_id"/>
+			</index>
+		</model>
 	</models>
 	<constants>
 		<constant id="doc_per_page_count" name="Количество документов на странице" descr="Количество документов на странице в журнале документов" dataType="Int" defaultValue="60" autoload="TRUE"/>
@@ -6136,6 +6206,23 @@
 				<field id="name" dataType="String" required="TRUE"/>
 				<field id="ic" dataType="Int"/>
 				<field id="mid" dataType="Int"/>
+			</publicMethod>
+			<publicMethod id="get_merge_list" modelId="ClientMergeList" condFields="TRUE"/>
+			<publicMethod id="get_merge_selected" modelId="ClientMergeSelectedList" condFields="TRUE"/>
+			<publicMethod id="merge_select" requestType="post">
+				<field id="client_id" dataType="Int" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="merge_unselect" requestType="post">
+				<field id="client_id" dataType="Int" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="merge_clear_selection" requestType="post"/>
+			<publicMethod id="merge_selected" requestType="post">
+				<field id="main_client_id" dataType="Int" required="TRUE"/>
+				<field id="client_ids" dataType="String" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="merge" requestType="post">
+				<field id="main_client_id" dataType="Int" required="TRUE"/>
+				<field id="client_ids" dataType="String" required="TRUE"/>
 			</publicMethod>
 			<publicMethod id="union">
 				<field id="main_client_id" dataType="Int" required="TRUE"/>
@@ -6287,8 +6374,12 @@
 			<publicMethod id="get_object" modelId="OrderGarbageDialog"/>
 		</controller>
 		<controller id="Order" parentId="ControllerSQL" state="TRUE" noState="FALSE">
-			<publicMethod id="insert" modelId="Order"/>
-			<publicMethod id="update" modelId="Order"/>
+			<publicMethod id="insert" modelId="Order" requestType="post">
+				<field id="contact_list" dataType="JSON" alias="Контакты"/>
+			</publicMethod>
+			<publicMethod id="update" modelId="Order" requestType="post">
+				<field id="contact_list" dataType="JSON" alias="Контакты"/>
+			</publicMethod>
 			<publicMethod id="delete" modelId="Order"/>
 			<publicMethod id="get_list" modelId="OrderList"/>
 			<publicMethod id="get_object" modelId="OrderDialog"/>
@@ -8294,6 +8385,27 @@
 			<publicMethod id="get_list" modelId="ShipmentWeightRedirectionPayment"/>
 			<publicMethod id="get_object" modelId="ShipmentWeightRedirectionPayment"/>
 		</controller>
+		<controller id="UnloadSpeedSchema" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="insert" modelId="UnloadSpeedSchema"/>
+			<publicMethod id="update" modelId="UnloadSpeedSchema"/>
+			<publicMethod id="delete" modelId="UnloadSpeedSchema"/>
+			<publicMethod id="get_list" modelId="UnloadSpeedSchema"/>
+			<publicMethod id="get_object" modelId="UnloadSpeedSchema"/>
+		</controller>
+		<controller id="PushSubscription" parentId="ControllerSQL" noState="FALSE">
+			<publicMethod id="get_vapid_public_key"/>
+			<publicMethod id="get_status" requestType="post">
+				<field id="endpoint" dataType="Text" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="subscribe" requestType="post">
+				<field id="endpoint" dataType="Text" required="TRUE"/>
+				<field id="p256dh" dataType="Text" required="TRUE"/>
+				<field id="auth" dataType="Text" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="unsubscribe" requestType="post">
+				<field id="endpoint" dataType="Text" required="TRUE"/>
+			</publicMethod>
+		</controller>
 	</controllers>
 	<permissions>
 		<permission type="allow" controllerId="all" methodId="all" roleId="owner"/>
@@ -8442,6 +8554,7 @@
 		<view id="10009" c="Quarry_Controller" t="QuarryList" f="get_list" section="Справочники" descr="Карьеры"/>
 		<view id="10010" c="Lang_Controller" t="LangList" f="get_list" section="Справочники" descr="Языки"/>
 		<view id="10011" c="Client_Controller" t="ClientList" f="get_list" section="Справочники" descr="Клиенты"/>
+		<view id="10063" c="Client_Controller" t="ClientMerge" f="get_merge_list" section="Справочники" descr="Объединение клиентов"/>
 		<view id="10012" c="Destination_Controller" t="DestinationList" f="get_list" section="Справочники" descr="Объекты"/>
 		<view id="10013" c="PumpVehicle_Controller" t="PumpVehicleList" f="get_list" section="Справочники" descr="Насосы"/>
 		<view id="10014" c="PumpPrice_Controller" t="PumpPriceList" f="get_list" section="Справочники" descr="Прайсы насосов"/>
@@ -8486,7 +8599,8 @@
 		<view id="10058" c="FuelConsumptionSchema" t="FuelConsumptionSchemaList" f="get_list" section="Справочники" descr="Схемы расхода топлива"/>
 		<view id="10059" c="VehicleFuelConsumptionSchema_Controller" t="VehicleFuelConsumptionSchemaList" f="get_list" section="Справочники" descr="Схемы расхода топлива ТС"/>
 		<view id="10060" c="OperatorForTranspNaklSchedule_Controller" t="OperatorForTranspNaklScheduleList" f="get_list" section="Справочники" descr="График работы операторов для трансп.накл."/>
-		<view id="10060" c="Workplace" t="WorkplaceList" f="get_list" section="Справочники" descr="Рабочие места"/>
+		<view id="10061" c="Workplace" t="WorkplaceList" f="get_list" section="Справочники" descr="Рабочие места"/>
+		<view id="10062" c="UnloadSpeedSchema_Controller" t="UnloadSpeedSchemaList" f="get_list" section="Справочники" descr="Схема скорости разгрузки бетона"/>
 		<view id="20000" c="Order_Controller" t="OrderList" f="get_list" section="Документы" descr="Заявки"/>
 		<view id="20001" c="OrderPump_Controller" t="OrderPumpList" f="get_list" section="Документы" descr="Заявки (насосы)"/>
 		<view id="20002" c="Shipment_Controller" t="ShipmentList" f="get_list" section="Документы" descr="Отгрузки"/>
@@ -8621,6 +8735,7 @@
 		<serverTemplate id="ShipmentForOrderList"/>
 		<serverTemplate id="OrderPumpList"/>
 		<serverTemplate id="ClientList"/>
+		<serverTemplate id="ClientMerge"/>
 		<serverTemplate id="DestinationList"/>
 		<serverTemplate id="PumpVehicleList"/>
 		<serverTemplate id="PumpPriceList"/>
@@ -8747,6 +8862,7 @@
 		<serverTemplate id="VehicleFuelConsumptionSchemaDetailList" class="list"/>
 		<serverTemplate id="ShipmentWeightList" class="list"/>
 		<serverTemplate id="WorkplaceList" class="list"/>
+		<serverTemplate id="UnloadSpeedSchemaList" class="list"/>
 		<serverTemplate id="FuelCorrectionList" class="list"/>
 		<serverTemplate id="WorkplaceScheduleList" class="list"/>
 		<serverTemplate id="RepVehicleFuelFlow"/>
@@ -9005,6 +9121,7 @@
 		<jsScript file="js20/controls/GridColumn.js"/>
 		<jsScript file="js20/controls/GridColumnBool.js"/>
 		<jsScript file="js20/controls/GridColumnPhone.js"/>
+		<jsScript file="js20/controls/GridColumnPhoneList.js"/>
 		<jsScript file="js20/controls/GridColumnPicture.js"/>
 		<jsScript file="js20/controls/GridColumnEmail.js"/>
 		<jsScript file="js20/controls/GridColumnFloat.js"/>
@@ -9021,6 +9138,7 @@
 		<jsScript file="js20/controls/GridCellFoot.js"/>
 		<jsScript file="js20/controls/GridCellPhone.js"/>
 		<jsScript file="js20/controls/rs/GridCellPhone.rs_ru.js" resource="ru"/>
+		<jsScript file="js20/controls/GridCellPhoneList.js"/>
 		<jsScript file="js20/controls/GridCellDetailToggle.js"/>
 		<jsScript file="js20/controls/rs/GridCellDetailToggle.rs_ru.js" resource="ru"/>
 		<jsScript file="js20/controls/GridHead.js"/>
@@ -9266,6 +9384,7 @@
 		<jsScript file="js20/views/OrderGarbageDialog_View.js"/>
 		<jsScript file="js20/views/OrderMakeList_View.js"/>
 		<jsScript file="js20/views/ClientList_View.js"/>
+		<jsScript file="js20/views/ClientMerge_View.js"/>
 		<jsScript file="js20/views/ClientDialog_View.js"/>
 		<jsScript file="js20/views/ConcreteTypeList_View.js"/>
 		<jsScript file="js20/views/DestinationList_View.js"/>
@@ -9433,6 +9552,7 @@
 		<jsScript file="js20/views/ShipmentWeightRedirectionList_View.js"/>
 		<jsScript file="js20/views/PutevoiListOnPeriod_View.js"/>
 		<jsScript file="js20/views/OperatorForTranspNaklScheduleList_View.js"/>
+		<jsScript file="js20/views/UnloadSpeedSchemaList_View.js"/>
 		<!-- **** Forms *** -->
 		<jsScript file="js20/forms/ViewList_Form.js"/>
 		<jsScript file="js20/forms/MainMenuConstructor_Form.js"/>
@@ -9647,6 +9767,8 @@
 		<jsScript file="js20/custom_controls/TrackerManager.js"/>
 		<jsScript file="js20/custom_controls/MacAddressListGrid.js"/>
 		<jsScript file="js20/custom_controls/WorkplaceEdit.js"/>
+		<jsScript file="js20/custom_controls/OrderContactList.js"/>
+		<jsScript file="js20/custom_controls/OrderContactEdit.js"/>
 		<jsScript file="js20/views/rs_ru.js"/>
 		<jsScript file="js20/views/rs_common_ru.js"/>
 		<!--openLayers-->
@@ -9685,6 +9807,8 @@
 		<jsScript file="js20/models/UserDialog_Model.js"/>
 		<jsScript file="js20/models/Client_Model.js"/>
 		<jsScript file="js20/models/ClientList_Model.js"/>
+		<jsScript file="js20/models/ClientMergeList_Model.js"/>
+		<jsScript file="js20/models/ClientMergeSelectedList_Model.js"/>
 		<jsScript file="js20/models/ClientDialog_Model.js"/>
 		<jsScript file="js20/models/Destination_Model.js"/>
 		<jsScript file="js20/models/DestinationList_Model.js"/>
@@ -10231,6 +10355,10 @@
 		<jsScript file="js20/models/OperatorForTranspNaklSchedule_Model.js"/>
 		<jsScript file="js20/models/OperatorForTranspNaklScheduleList_Model.js"/>
 		<jsScript file="js20/controllers/OperatorForTranspNaklSchedule_Controller.js"/>
+		<jsScript file="js20/models/OrderContact_Model.js"/>
+		<jsScript file="js20/models/UnloadSpeedSchema_Model.js"/>
+		<jsScript file="js20/controllers/UnloadSpeedSchema_Controller.js"/>
+		<jsScript file="js20/controllers/PushSubscription_Controller.js"/>
 	</jsScripts>
 	<cssScripts>
 		<cssScript file="js20/assets/css/icons/icomoon/styles.css" compressed="TRUE" standalone="TRUE"/>

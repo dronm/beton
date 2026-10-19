@@ -1824,6 +1824,9 @@ operators_for_transp_nakl_schedules
 PutevoiListOnPeriod_View.js
 
 
+1.00431
+1) UnloadSpeedSchema: controller, model, menu entry.
+OrderDialog_View.js a button to unload_speed input.
 
 operators_for_transp_nakl add data support,
 change ttn.sql, putevoi_f_list.sql
@@ -1831,6 +1834,14 @@ Shipment_Controller->check_1c_attrs_for_tn()
 ->check_shipment_for_tn()
 
 
+1.00432
+feat(clients): add client merging with persistent per-user selections
+
+- Add a dedicated merge page with double-click selection
+- Persist selections per user and hide selected clients from the available list
+- Show order counts to help choose the main client
+- Transfer references and delete merged clients in one transaction
+- Reject stale selections and roll back on conflicting data
 
 
 What to check, implement:

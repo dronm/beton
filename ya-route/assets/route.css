@@ -1,0 +1,106 @@
+:root {
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	color: #172f44;
+	background: #edf2f6;
+	font-synthesis: none;
+	--accent: #1766b3;
+	--muted: #596b79;
+	--border: #d8e1e8;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body { height: 100vh; height: 100dvh; }
+button { font: inherit; cursor: pointer; touch-action: manipulation; }
+button:disabled { opacity: .5; cursor: default; }
+button:focus-visible, a:focus-visible, .map:focus-visible { outline: 3px solid #398ad6; outline-offset: 3px; }
+[hidden] { display: none !important; }
+.app { height: 100%; min-height: 560px; display: flex; flex-direction: column; max-width: 1920px; margin: 0 auto; padding: 20px 24px 10px; gap: 12px; }
+.summary { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 18px 22px; border: 1px solid var(--border); background: #fff; border-radius: 16px; box-shadow: 0 4px 20px #193c5506; }
+.vehicle { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.vehicle-icon { width: 58px; height: 58px; padding: 10px; object-fit: contain; background: #edf5fb; border-radius: 14px; }
+.eyebrow { color: var(--muted); font-size: 12px; letter-spacing: .045em; margin: 0 0 5px; }
+h1 { font-size: clamp(22px, 2.2vw, 30px); letter-spacing: .035em; line-height: 1.2; margin: 0; overflow-wrap: anywhere; }
+.metrics { display: flex; align-items: stretch; flex-shrink: 0; gap: 30px; }
+.metric { display: flex; flex-direction: column; gap: 4px; }
+.metric + .metric { border-left: 1px solid var(--border); padding-left: 30px; }
+.metric-label { color: var(--muted); font-size: 12px; }
+.metric strong { font-size: 26px; font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1.25; }
+.metric strong.time { font-size: 17px; padding-top: 6px; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--border); background: #fff; color: #213e57; padding: 10px 15px; min-height: 42px; border-radius: 10px; font-size: 14px; font-weight: 550; white-space: nowrap; }
+.button:hover:not(:disabled) { background: #e8f1f9; border-color: #aac8e1; }
+.button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.button.primary:hover:not(:disabled) { background: #115592; }
+.button.compact { min-height: 36px; padding: 7px 12px; }
+.button.follow[aria-pressed="true"] { color: #155b32; background: #e8f6ee; border-color: #acd6bb; }
+.follow-dot { width: 7px; height: 7px; border-radius: 50%; background: #a1afba; }
+[aria-pressed="true"] .follow-dot { background: #25925b; }
+.live-state { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 1px; min-width: 180px; }
+.status { font-size: 12px; color: var(--muted); }
+.status::before { display: inline-block; content: ""; width: 6px; height: 6px; background: #90a1ae; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+.status[data-kind="received"]::before { background: #268455; }
+.status[data-kind="error"] { color: #a1362b; }
+.status[data-kind="error"]::before { background: #a1362b; }
+.text-button { color: #466b89; background: none; border: 0; font-size: 12px; padding: 3px 0; text-decoration: underline; text-underline-offset: 2px; }
+.notice { padding: 10px 14px; border: 1px solid #dfc98f; background: #fff8e7; color: #665020; font-size: 13px; border-radius: 10px; }
+.notice[data-kind="error"] { border-color: #ecc4bc; color: #8f342b; background: #fff2ef; }
+.location-panel { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 14px; background: #e4eef7; border-radius: 10px; }
+.location-panel p { margin: 0; font-size: 13px; line-height: 1.45; }
+.map-shell { flex: 1 1 auto; position: relative; min-height: 280px; border-radius: 16px; overflow: hidden; border: 1px solid #ccd8e0; background: #e0e7ec; }
+.map { position: absolute; inset: 0; width: 100%; height: 100%; }
+.map-message { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; padding: 32px; color: #516578; background: #edf2f6; font-size: 15px; }
+.map-message p { max-width: 460px; line-height: 1.6; }
+.footer { display: flex; gap: 20px; flex-wrap: wrap; color: var(--muted); font-size: 11px; padding: 0 3px; }
+.footer > span { display: inline-flex; align-items: center; gap: 6px; }
+.footer-note { margin-left: auto; }
+.legend-route { display: inline-block; width: 18px; height: 3px; border-radius: 2px; background: #176bd1; }
+.legend-destination { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #188753; }
+.error-page { display: grid; place-items: center; padding: 24px; }
+.error-card { width: min(100%, 520px); border: 1px solid var(--border); background: #fff; border-radius: 20px; padding: 40px; text-align: center; }
+.error-card .eyebrow { margin-top: 20px; }
+.error-card h1 { font-size: 25px; letter-spacing: 0; }
+.error-card > p:last-child { color: var(--muted); font-size: 14px; line-height: 1.6; }
+@media (max-width: 760px) {
+	.app { padding: 10px 10px max(8px, env(safe-area-inset-bottom)); gap: 9px; min-height: 660px; }
+	.summary { align-items: flex-start; flex-direction: column; gap: 15px; padding: 15px; border-radius: 12px; }
+	.vehicle { gap: 12px; }
+	.vehicle-icon { width: 46px; height: 46px; padding: 4px; }
+	.eyebrow { font-size: 11px; }
+	.metrics { width: 100%; gap: 24px; padding-top: 12px; border-top: 1px solid #e9eef2; }
+	.metric + .metric { padding-left: 24px; }
+	.metric strong { font-size: 23px; }
+	.metric strong.time { font-size: 15px; padding-top: 5px; }
+	.toolbar { align-items: stretch; flex-direction: column; gap: 8px; }
+	.actions { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 6px; }
+	.button { padding: 10px 8px; font-size: 12px; }
+	.live-state { flex-direction: row; justify-content: space-between; align-items: center; min-width: 0; }
+	.location-panel { padding: 9px 10px; }
+	.location-panel p { font-size: 12px; }
+	.map-shell { border-radius: 12px; min-height: 270px; }
+	.footer { gap: 14px; font-size: 10px; }
+	.footer-note { display: none !important; }
+}
+@media (max-width: 370px) {
+	.eyebrow span { display: block; margin-top: 2px; }
+	.metrics { gap: 16px; }
+	.metric + .metric { padding-left: 16px; }
+	.button { font-size: 11px; }
+	.follow-dot { display: none; }
+}
+
+/* Only our own elements are styled. Never hide/alter the Yandex copyright UI. */
+.map-controls { position: absolute; left: 14px; top: 14px; display: grid; gap: 2px; padding: 3px; background: #ffffffd9; border: 1px solid #d8e1e8; border-radius: 10px; box-shadow: 0 3px 12px #193c5514; z-index: 10; }
+.map-controls button { border: 0; border-radius: 6px; background: #fff; color: #24425b; width: 38px; height: 38px; font-size: 24px; line-height: 1; }
+.map-controls button:hover { background: #e8f1f9; }
+.vehicle-marker { position: relative; width: 50px; height: 50px; transform: translate(-50%, -50%); display: grid; place-items: center; border: 2px solid #1766b3; background: #fff; border-radius: 50%; box-shadow: 0 3px 10px #18375030; }
+.vehicle-marker img { width: 38px; height: 38px; object-fit: contain; }
+.vehicle-marker-label { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; border-radius: 6px; border: 1px solid #d8e1e8; background: #fff; color: #172f44; font: 600 12px system-ui, sans-serif; padding: 4px 7px; box-shadow: 0 2px 6px #18375014; max-width: 230px; overflow: hidden; text-overflow: ellipsis; }
+.destination-marker { position: relative; width: 19px; height: 19px; transform: translate(-50%, -50%); border: 3px solid #fff; border-radius: 50%; background: #188753; box-shadow: 0 2px 6px #18375024; }
+.destination-marker span { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); white-space: nowrap; border-radius: 5px; background: #fffffff2; color: #184e35; font: 600 12px system-ui, sans-serif; padding: 3px 6px; }
+@media (max-width: 760px) {
+	.map-controls { left: 8px; top: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.button, .vehicle-marker, .destination-marker { transition: none; }
+}

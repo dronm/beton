@@ -12,7 +12,7 @@ LDFLAGS := -s -w \
 	-X main.commit=$(COMMIT) \
 	-X main.buildTime=$(BUILD_TIME)
 
-.PHONY: build release clean
+.PHONY: build release clean test
 
 build:
 	mkdir -p $(BIN_DIR)
@@ -24,3 +24,6 @@ release: clean
 
 clean:
 	rm -rf $(BIN_DIR) $(DIST_DIR)
+
+test:
+	go test ./...

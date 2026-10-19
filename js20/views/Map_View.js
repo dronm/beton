@@ -184,6 +184,9 @@ Map_View.prototype.toDOM = function(parent){
 	
 	this.m_map = new OpenLayers.Map("map",{"controls":[]});
 	//this.m_layer = new OpenLayers.Layer.OSM();		
+	//
+	const app = window.getApp();
+	/*
 	this.m_layer = new OpenLayers.Layer.OSM(
 		null,
 		null,
@@ -193,6 +196,8 @@ Map_View.prototype.toDOM = function(parent){
 			}
 		}
 	);
+	*/
+	this.m_layer = app.initOSMLayer();
 	
 	this.m_map.addLayer(this.m_layer);		
 	

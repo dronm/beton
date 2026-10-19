@@ -11,14 +11,16 @@ import (
 )
 
 type Service struct {
-	pool   *pgxpool.Pool
-	logger *slog.Logger
-	cfg    config.Config
+	beginTransaction func(context.Context) (pgxTx, error)
+	logger           *slog.Logger
+	cfg              config.Config
 }
 
 func New(pool *pgxpool.Pool, logger *slog.Logger, cfg config.Config) *Service {
 	return &Service{
-		pool:   pool,
+		beginTransaction: func(ctx context.Context) (pgxTx, error) {
+			return pool.Begin(ctx)
+		},
 		logger: logger,
 		cfg:    cfg,
 	}
@@ -32,7 +34,7 @@ func (s *Service) ProcessUpdate(ctx context.Context, raw []byte) error {
 
 	switch update.UpdateType {
 	case "bot_started":
-		return s.handleBotStarted(ctx, update, raw)
+		return s.handleBotStarted(ctx, update)
 	case "message_created":
 		return s.handleMessageCreated(ctx, update)
 	default:
@@ -42,7 +44,7 @@ func (s *Service) ProcessUpdate(ctx context.Context, raw []byte) error {
 }
 
 func (s *Service) beginTx(ctx context.Context) (pgxTx, error) {
-	tx, err := s.pool.Begin(ctx)
+	tx, err := s.beginTransaction(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("begin tx: %w", err)
 	}

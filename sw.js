@@ -1,5 +1,7 @@
-const SW_VERSION = '2026-04-20-1';
+const SW_VERSION = '2026-09-25-2';
 const CACHE_NAME = 'static-cache-v1.4';
+
+const OFFLINE_ENABLED = false;
 
 /*
 	* add this query to cache
@@ -69,6 +71,10 @@ self.addEventListener('install', event => {
 
 	self.skipWaiting();
 
+	if (!OFFLINE_ENABLED) {
+		return;
+	}
+
 	event.waitUntil(
 		(async () => {
 			const cache = await caches.open(CACHE_NAME);
@@ -89,17 +95,115 @@ self.addEventListener('activate', event => {
 
 	event.waitUntil(
 		(async () => {
-			await deleteOldCaches();
-			await deleteOutdatedDateRequests();
+			if (OFFLINE_ENABLED) {
+				await deleteOldCaches();
+				await deleteOutdatedDateRequests();
+			} else {
+				await deleteOfflineCaches();
+			}
+
 			await self.clients.claim();
-			swLog(LOG_LEVELS.DEBUG, 'activate done version:', SW_VERSION);
-		})()
+
+			swLog(
+				LOG_LEVELS.DEBUG,
+				'activate done version:',
+				SW_VERSION,
+			);
+		})(),
 	);
 });
 
+async function deleteOfflineCaches() {
+	const cacheNames = await caches.keys();
+
+	await Promise.all(
+		cacheNames
+			.filter(name => name.startsWith('static-cache-'))
+			.map(name => caches.delete(name)),
+	);
+
+	swLog(LOG_LEVELS.INFO, 'offline caches removed');
+}
+
+self.addEventListener('push', event => {
+	let data = {};
+
+	if (event.data) {
+		try {
+			data = event.data.json();
+		} catch (error) {
+			data = {
+				body: event.data.text(),
+			};
+		}
+	}
+
+	const title = data.title || 'Бетон';
+
+	const options = {
+		body: data.body || '',
+		icon: data.icon || new URL('img/favicon.ico', self.registration.scope).href,
+		tag: data.tag,
+		data: data.data || {},
+	};
+
+	event.waitUntil(
+		self.registration.showNotification(title, options),
+	);
+});
+
+self.addEventListener('notificationclick', event => {
+	event.notification.close();
+
+	const targetUrl =
+		event.notification.data &&
+		event.notification.data.url
+			? new URL(
+				event.notification.data.url,
+				self.registration.scope,
+			).href
+			: self.registration.scope;
+
+	event.waitUntil(
+		(async () => {
+			const windowClients = await self.clients.matchAll({
+				type: 'window',
+				includeUncontrolled: true,
+			});
+
+			for (const client of windowClients) {
+				if ('focus' in client) {
+					await client.focus();
+
+					if ('navigate' in client) {
+						await client.navigate(targetUrl);
+					}
+
+					return;
+				}
+			}
+
+			await self.clients.openWindow(targetUrl);
+		})(),
+	);
+});
 self.addEventListener('fetch', event => {
+	if (!OFFLINE_ENABLED) {
+		return;
+	}
+
 	const request = event.request;
 	const url = new URL(request.url);
+
+	// Keep the standalone shipment route outside this worker's cache/fallback logic.
+	if (
+		url.origin === self.location.origin &&
+		(url.pathname === '/osm-route' || url.pathname.startsWith('/osm-route/'))
+	) {
+		swLog(LOG_LEVELS.DEBUG, 'skip standalone route:', request.url);
+		// No respondWith(): let the browser handle the original request normally.
+		return;
+	}
 
 	swLog(LOG_LEVELS.DEBUG, 'fetch event:', request.method, request.url);
 

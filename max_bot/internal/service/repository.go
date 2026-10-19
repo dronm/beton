@@ -17,43 +17,15 @@ type pgxTx interface {
 	Commit(ctx context.Context) error
 }
 
-func (s *Service) getActivationForUpdate(ctx context.Context, tx pgxTx, token string) (*activationRow, error) {
-	var row activationRow
-	var contactID *int64
-
-	err := tx.QueryRow(ctx, `
-		SELECT
-			id,
-			contact_id,
-			used_at IS NOT NULL AS is_used,
-			(expires_at <= now()) AS is_expired
-		FROM notifications.max_user_activation_tokens
-		WHERE token = $1
-		FOR UPDATE
-	`, token).Scan(&row.ID, &contactID, &row.Used, &row.Expired)
-	if err != nil {
-		if err == pgx.ErrNoRows {
-			return nil, nil
-		}
-		return nil, fmt.Errorf("select activation token: %w", err)
-	}
-
-	row.ContactID = contactID
-	return &row, nil
-}
-
 func (s *Service) getExistingContactID(ctx context.Context, tx pgxTx, maxUserID int64) (*int64, error) {
-	var maxUserRowID int64
 	var contactID *int64
 
 	err := tx.QueryRow(ctx, `
-		SELECT
-			id,
-			contact_id
+		SELECT contact_id
 		FROM notifications.max_users
 		WHERE max_user_id = $1
 		LIMIT 1
-	`, maxUserID).Scan(&maxUserRowID, &contactID)
+	`, maxUserID).Scan(&contactID)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return nil, nil
@@ -62,23 +34,6 @@ func (s *Service) getExistingContactID(ctx context.Context, tx pgxTx, maxUserID 
 	}
 
 	return contactID, nil
-}
-
-func (s *Service) updateActivationAsUsed(ctx context.Context, tx pgxTx, activationID int64, maxUserID int64, chatID int64, rawUpdate []byte) error {
-	_, err := tx.Exec(ctx, `
-		UPDATE notifications.max_user_activation_tokens
-		SET
-			used_at = now(),
-			max_user_id = $2,
-			max_chat_id = $3,
-			raw_bot_started = $4::jsonb
-		WHERE id = $1
-	`, activationID, maxUserID, chatID, string(rawUpdate))
-	if err != nil {
-		return fmt.Errorf("update activation token: %w", err)
-	}
-
-	return nil
 }
 
 func (s *Service) upsertMaxUser(ctx context.Context, tx pgxTx, user *User, rawUser json.RawMessage, contactID *int64) error {

@@ -1,0 +1,25 @@
+{
+	"compilerOptions": {
+		"target": "ES2020",
+		"module": "none",
+		"lib": [
+			"ES2020",
+			"DOM"
+		],
+		"strict": true,
+		"noEmitOnError": true,
+		"outFile": "../.test-build/tests.js",
+		"types": []
+	},
+	"files": [
+		"../src/types.ts",
+		"../src/data.ts",
+		"../src/movement.ts",
+		"../src/geo.ts",
+		"../src/live.ts",
+		"../src/api.ts",
+		"movement.ts",
+		"geo.ts",
+		"tests.ts"
+	]
+}

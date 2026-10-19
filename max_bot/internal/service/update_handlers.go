@@ -5,20 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
-	"strings"
 )
 
 const (
 	replyBindOK        = "Ваш аккаунт MAX успешно привязан."
-	replyBindInvalid   = "Код активации недействителен. Запросите новую ссылку."
-	replyBindExpired   = "Срок действия кода истёк. Запросите новую ссылку."
-	replyBindUsed      = "Этот код уже был использован."
+	replyAlreadyBound  = "Ваш аккаунт MAX уже привязан."
 	replyNeedBind      = "Чтобы привязать ваш аккаунт MAX, пожалуйста, отправьте свой номер телефона кнопкой ниже."
 	replyPhoneNotFound = "Мы получили ваш номер, но не нашли его в базе контактов. Обратитесь в офис."
-	replyStartWithSMS  = "Для привязки откройте ссылку из SMS с кодом активации."
+	sharePhoneButton   = "Поделиться телефоном"
 )
 
-func (s *Service) handleBotStarted(ctx context.Context, update UpdateEnvelope, rawUpdate []byte) error {
+func (s *Service) handleBotStarted(ctx context.Context, update UpdateEnvelope) error {
 	user, err := parseUser(update.UserRaw)
 	if err != nil {
 		return err
@@ -30,11 +27,6 @@ func (s *Service) handleBotStarted(ctx context.Context, update UpdateEnvelope, r
 		return fmt.Errorf("bot_started has no valid chat_id")
 	}
 
-	token := ""
-	if update.Payload != nil {
-		token = strings.TrimSpace(*update.Payload)
-	}
-
 	tx, err := s.beginTx(ctx)
 	if err != nil {
 		return err
@@ -43,73 +35,35 @@ func (s *Service) handleBotStarted(ctx context.Context, update UpdateEnvelope, r
 		_ = tx.Rollback(ctx)
 	}()
 
-	if token == "" {
-		if err := s.upsertMaxUser(ctx, tx, user, update.UserRaw, nil); err != nil {
-			return err
-		}
-		if err := s.queueOutgoingText(ctx, tx, *update.ChatID, nil, replyStartWithSMS); err != nil {
-			return err
-		}
-		return tx.Commit(ctx)
-	}
-
-	activation, err := s.getActivationForUpdate(ctx, tx, token)
+	// A MAX profile alone is not a registration: it must have a contact_id.
+	// Read the link before refreshing the profile, and preserve it on upsert.
+	contactID, err := s.getExistingContactID(ctx, tx, user.UserID)
 	if err != nil {
 		return err
 	}
-
-	if activation == nil {
-		if err := s.upsertMaxUser(ctx, tx, user, update.UserRaw, nil); err != nil {
-			return err
-		}
-		if err := s.queueOutgoingText(ctx, tx, *update.ChatID, nil, replyBindInvalid); err != nil {
-			return err
-		}
-		return tx.Commit(ctx)
-	}
-
-	contactID := activation.ContactID
-
-	if activation.Used {
-		if err := s.upsertMaxUser(ctx, tx, user, update.UserRaw, contactID); err != nil {
-			return err
-		}
-		if err := s.queueOutgoingText(ctx, tx, *update.ChatID, contactID, replyBindUsed); err != nil {
-			return err
-		}
-		return tx.Commit(ctx)
-	}
-
-	if activation.Expired {
-		if err := s.upsertMaxUser(ctx, tx, user, update.UserRaw, contactID); err != nil {
-			return err
-		}
-		if err := s.queueOutgoingText(ctx, tx, *update.ChatID, contactID, replyBindExpired); err != nil {
-			return err
-		}
-		return tx.Commit(ctx)
-	}
-
 	if err := s.upsertMaxUser(ctx, tx, user, update.UserRaw, contactID); err != nil {
 		return err
 	}
 
-	if err := s.updateActivationAsUsed(ctx, tx, activation.ID, user.UserID, *update.ChatID, rawUpdate); err != nil {
-		return err
-	}
-
-	if err := s.queueOutgoingText(ctx, tx, *update.ChatID, contactID, replyBindOK); err != nil {
-		return err
+	// Activation/SMS payloads no longer participate in account linking.
+	if contactID == nil {
+		if err := s.queueOutgoingRequestContact(ctx, tx, *update.ChatID, nil, replyNeedBind, sharePhoneButton); err != nil {
+			return err
+		}
+	} else {
+		if err := s.queueOutgoingText(ctx, tx, *update.ChatID, contactID, replyAlreadyBound); err != nil {
+			return err
+		}
 	}
 
 	if err := tx.Commit(ctx); err != nil {
 		return err
 	}
 
-	s.logger.Info("user bound by bot_started",
+	s.logger.Info("bot started",
 		slog.Int64("max_user_id", user.UserID),
 		slog.Int64("chat_id", *update.ChatID),
-		slog.Any("contact_id", contactID),
+		slog.Bool("has_contact_id", contactID != nil),
 	)
 
 	return nil
@@ -136,15 +90,16 @@ func (s *Service) handleMessageCreated(ctx context.Context, update UpdateEnvelop
 		_ = tx.Rollback(ctx)
 	}()
 
-	if err := s.upsertMaxUser(ctx, tx, message.Sender, updateSenderRaw(message), nil); err != nil {
-		return err
-	}
-
 	contactID, err := s.getExistingContactID(ctx, tx, message.Sender.UserID)
 	if err != nil {
 		return err
 	}
 
+	if err := s.upsertMaxUser(ctx, tx, message.Sender, updateSenderRaw(message), contactID); err != nil {
+		return err
+	}
+
+	prompt := replyNeedBind
 	if contactID == nil && sharedPhone != nil {
 		foundContactID, err := s.findContactIDByPhone(ctx, tx, *sharedPhone)
 		if err != nil {
@@ -162,10 +117,8 @@ func (s *Service) handleMessageCreated(ctx context.Context, update UpdateEnvelop
 					return err
 				}
 			}
-		} else if chatID != nil {
-			if err := s.queueOutgoingText(ctx, tx, *chatID, nil, replyPhoneNotFound); err != nil {
-				return err
-			}
+		} else {
+			prompt = replyPhoneNotFound + "\n\n" + replyNeedBind
 		}
 	}
 
@@ -173,8 +126,10 @@ func (s *Service) handleMessageCreated(ctx context.Context, update UpdateEnvelop
 		return err
 	}
 
-	if contactID == nil && sharedPhone == nil && chatID != nil {
-		if err := s.queueOutgoingRequestContact(ctx, tx, *chatID, nil, replyNeedBind, "Поделиться телефоном"); err != nil {
+	// Prompt on every message while there is no linked contact, including
+	// /start and a shared phone that was not found in the contacts database.
+	if contactID == nil && chatID != nil {
+		if err := s.queueOutgoingRequestContact(ctx, tx, *chatID, nil, prompt, sharePhoneButton); err != nil {
 			return err
 		}
 	}

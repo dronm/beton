@@ -1,15 +1,15 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
+<!doctype html>
+<html lang="ru">
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 	<meta name="Author" content="{{AUTHOR}}"/>
 	<meta name="Keywords" content="{{KEYWORD}}"/>
 	<meta name="Description" content="{{DESCRIPTION}}"/>
 	
 	<link rel="icon" type="image/png" href="favicon.ico"/>
-	<link rel="stylesheet" href="style.css" type="text/css">
+	<link rel="stylesheet" href="style.css?style=20260922-1" type="text/css">
 	
 	<script src="https://maps.api.2gis.ru/2.0/loader.js?pkg=full&key={{DOUBLE_GIS_KEY}}"></script>
 	
@@ -24,16 +24,36 @@
 	
 </head>
 
-<body>
-	<div id="inf">
-		<div class="inf">Автомобиль: {{vehiclePlate}}</div>
-		<button id="showVehicle">Найти на карте</button>
-		<br/>
-		<div class="inf">До объекта: <span id="distanceToDest"/> </div>
-	</div>	
-	
-	<div id="map" class="map"></div>
-	
+<body class="route-page">
+	<main class="route-app">
+		<header id="inf" class="route-summary">
+			<div class="route-vehicle">
+				<img class="route-vehicle-icon" src="img/mixer.png" alt="" width="38" height="38"/>
+				<div class="route-vehicle-copy">
+					<p class="route-eyebrow">Отслеживание доставки <span>· № {{ID}}</span></p>
+					<h1 class="route-plate">{{vehiclePlate}}</h1>
+				</div>
+			</div>
+			<div class="route-summary-actions">
+				<div class="route-metric">
+					<span class="route-metric-label">До объекта</span>
+					<strong id="distanceToDest" aria-live="polite" aria-atomic="true"></strong>
+				</div>
+				<button id="showVehicle" class="route-button" type="button">
+					<span class="route-locate-icon" aria-hidden="true"></span>
+					Найти на карте
+				</button>
+			</div>
+		</header>
+		<section class="route-map-shell" aria-label="Карта маршрута">
+			<div id="map" class="map"></div>
+		</section>
+		<footer class="route-footer">
+			<span>Маршрут следования миксера</span>
+			<span>Карта 2ГИС</span>
+		</footer>
+	</main>
+
 	<script>	
 		window.onload = function() {
 			Route.init({

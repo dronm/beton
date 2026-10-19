@@ -1,0 +1,78 @@
+select contact_list,contacts_ref, descr, phone_cel from orders_list order by date_time desc limit 2;
+
+I got this old php/js project with bootstrap. I heavily use xslt styles to generate sql, php and js files.
+I use my own php and javascript libraries.
+The idea is like this: I have a build/medatata.xml file with all project objects. If I need a new
+model/controller/enum etc I modify the metadata.xml file, then run a build process that
+uses xslt styles to construct sql migrations, model, controller php and js files.
+I use templates to modify code:
+build/templates/controller/*_Controller_php.xsl
+build/templates/controller/*_Controller_js.xsl
+models practically never changes, but still there are templates:
+build/templates/models/*_Model_php.xsl
+build/templates/models/*_Model_js.xsl
+So real files live in controls and models, or for javascript files in js20/controls and js20/models.
+I never edit models/controllers files, just templates.
+I have a huge js library in js20/core and js20/controls.
+What javascript files are included in the project is also defind by the metadata.xml file.
+
+common.zip and osbe.zip are in php include directory. Common directory stores some common functions/libraries used
+in a project. OSBE folder contains php classes used for building the project.
+
+Please, analyse it. I periodically need to make some changes, add new models/controllers/methods.
+
+Right now I need a new method to Client controller. It should merge existing clients into one.
+I think about this scenario: a user have a page consiting of a ClientList_View and a list of 
+selected clients on top. He selects clients by clicking on them in the collection. The selected
+clients appear in the list. He can also set one client as "main" (radio next the selected clients).
+Then he presses a button, selected ids are sent to the server to Client_Controller.php method.
+These are tables that have client_id field that should be changed. Switch the existing value with the 
+selected "main" client id.
+orders
+order_garbage
+offer
+ast_calls
+client_tels
+specialist_requests
+client_valid_duplicates
+vehicle_owners
+vehicle_owner_clients
+vehicle_owner_concrete_prices
+client_destinations
+client_specifications
+quality_passports
+client_contracts_1c
+client_debts
+
+
+
+I projectJSFiles contains files from js20 prjecgt directory, these are all javascript files.
+md.zip is the metadata file for the whole project. All php/js controls/models/migrations are generated from it
+during a build process.
+I have recentely added a field to OrderList and OrderDialog models - contact_list. Earlier I used to
+have descr for person name and phone_cel for his phone, then I created contacts_ref jsonb column
+with a reference to contacts. Now, I have added a new table order_contacts. So I need to modify
+my edit view for orders - views/OrderDialog_View.js
+It has this line: 
+		this.addElement(new EditString(id+":descr",{
+This is where contact is created and attached when the view is called toDOM() method.
+Now, I need multiple contacts. I need a standalone class that accepts json value and renders
+contacts. Each contact should have a "Delete" button. The last contact should have a "Add" 
+button to add a new contact. 
+This class should be extended from ControlContainer class (find it in a library controls directory)
+that has an ability to hold multiple objects and to render them when toDOM() is called.
+I think I have examples of a similar container class in javascript files in custom_controls
+directory. Have a look, find the ones extended from ControlContainer, you will have a grip
+on how this works.
+
+*****************************************
+I need some corrections:
+- selected clients should disappear from the client collection, so I need some physical backend table for that
+with a per user or session selected clients.
+- clients should be selected by double click not by a single click as they are now.
+- I want to be able to see a number of orders each client have. 
+This query can be used to get the number of orders: select count(*) from orders where client_id=X; 
+So I need a different javascript view for that (not ClientList_View.js) and a different backend view, not clients_list.
+- For selected clients (on top) there should also be shown a number of orders this client has. So a user can assign a main client
+based on number of orders it has.
+

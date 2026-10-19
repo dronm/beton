@@ -42,6 +42,7 @@ require_once('common/MyDate.php');
 require_once(ABSOLUTE_PATH.'functions/Beton.php');
 require_once(ABSOLUTE_PATH.'functions/notifications.php');
 require_once(ABSOLUTE_PATH.'functions/checkPmPeriod.php');
+require_once(ABSOLUTE_PATH.'functions/OrderContacts.php');
 
 class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 
@@ -97,97 +98,127 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		$date_time, $concrete_type_id, $destination_id,
 		$lang_id, $pumpVehicleId, $order_update,
 		$ordersRef, $extContactId){
-		//SMS service		
-		if (SMS_ACTIVE &amp;&amp; !is_null($phone_cel) &amp;&amp; strlen($phone_cel)){
-			$dbLink = $this->getDbLink();
-			$dbLinkMaster = $this->getDbLinkMaster();
-			
-			//$ar_doc = $dbLinkMaster->query_first(sprintf("SELECT orders_ref(orders) AS orders_ref FROM orders WHERE id=%d",$id));
-			
-			if (strlen($phone_cel)){
-				//date + rout time
-				$date_time_str = NULL;
-				FieldSQLDateTime::formatForDb($date_time,$date_time_str);
-				$ar = $dbLink->query_first(sprintf(
-					"SELECT %s::timestamp + coalesce(time_route,'00:00'::time) AS date_time
-					FROM destinations
-					WHERE id=%d",
-					$date_time_str,$destination_id)
-				);
-				if ($ar){
-					$date_time = strtotime($ar['date_time']);
+
+		// The signature is retained for existing callers.
+		// $phone_cel and $extContactId no longer select recipients.
+		// $pumpVehicleId and $order_update remain unused, as before.
+
+		$sms_res_ok = 0;
+		$sms_res_str = 'Сервис SMS выключен.';
+
+		if(SMS_ACTIVE){
+			$link = $this->getDbLinkMaster();
+			$recipients = $this->getOrderMessageRecipients($id);
+			$sms_res_str = 'В заявке нет контактов с телефоном.';
+
+			if(count($recipients)){
+				if(!is_numeric($date_time)){
+					$date_time = strtotime((string)$date_time);
 				}
-				$lang_id = intval($lang_id);
-				$lang_id = ($lang_id==0)? 1:$lang_id;
-				$ar = $dbLink->query_first(sprintf(
-					"SELECT
-						pattern AS text
-					FROM sms_patterns
-					WHERE sms_type='%s'::sms_types AND lang_id=%d",
-					(floatval($quant)>0)? 'order':'order_cancel',
-					$lang_id					
+
+				if($date_time === FALSE){
+					throw new Exception('Некорректная дата заявки.');
+				}
+
+				$date_time = (int)$date_time;
+				$date_time_str = NULL;
+				FieldSQLDateTime::formatForDb($date_time, $date_time_str);
+
+				$ar = $link->query_first(sprintf(
+					"SELECT %s::timestamp + coalesce(time_route, '00:00'::time) AS date_time
+					FROM destinations
+					WHERE id = %d",
+					$date_time_str,
+					(int)$destination_id
 				));
-				if (!is_array($ar) || count($ar)==0){
+
+				if(is_array($ar) &amp;&amp; isset($ar['date_time'])){
+					$date_time = strtotime($ar['date_time']);
+
+					if($date_time === FALSE){
+						throw new Exception('Некорректное время доставки.');
+					}
+				}
+
+				$lang_id = (int)$lang_id;
+				$lang_id = ($lang_id === 0) ? 1 : $lang_id;
+
+				$sms_type = (floatval($quant) > 0)
+					? 'order'
+					: 'order_cancel';
+
+				$ar = $link->query_first(sprintf(
+					"SELECT pattern AS text
+					FROM sms_patterns
+					WHERE sms_type = '%s'::sms_types
+						AND lang_id = %d",
+					$sms_type,
+					$lang_id
+				));
+
+				if(!is_array($ar) || !isset($ar['text'])){
 					throw new Exception('Шаблон для SMS не найден!');
 				}
-				$text = str_replace('[quant]',$quant,$ar['text']);
-				$total_repl= ($total)? ' стоимость:'.$total:'';
-				$text = str_replace('[total]',$total_repl,$text);
-				$text = str_replace('[time]',date('H:i',$date_time),$text);
-				$text = str_replace('[date]',date('d/m/y',$date_time),$text);
-				$text = str_replace('[day_of_week]',MyDate::getRusDayOfWeek($date_time),$text);
-				
-				$is_dest = (strpos($text,'[dest]')&gt;=0);
-				$is_concr = (strpos($text,'[concrete]')&gt;=0);
-				if ($is_dest || $is_concr){
-					$q = 'SELECT ';
-					if ($is_dest){
-						$q.='(SELECT name FROM destinations WHERE id='.$destination_id.') AS dest';
-					}
-					if ($is_concr){
-						if ($is_dest){
-							$q.=',';
-						}
-						$q.='(SELECT official_name FROM concrete_types WHERE id='.$concrete_type_id.') AS concrete';
-					}
-					$ar = $dbLink->query_first($q);
-					foreach($ar as $key=>$val){
-						$text = str_replace(sprintf('[%s]',$key),$val,$text);
-					}
+
+				$text = strtr($ar['text'], array(
+					'[quant]' => (string)$quant,
+					'[total]' => $total ? ' стоимость:'.$total : '',
+					'[time]' => date('H:i', $date_time),
+					'[date]' => date('d/m/y', $date_time),
+					'[day_of_week]' => MyDate::getRusDayOfWeek($date_time)
+				));
+
+				if(
+					strpos($text, '[dest]') !== FALSE
+					|| strpos($text, '[concrete]') !== FALSE
+				){
+					$ar = $link->query_first(sprintf(
+						"SELECT
+							(SELECT name
+							FROM destinations
+							WHERE id = %d) AS dest,
+
+							(SELECT official_name
+							FROM concrete_types
+							WHERE id = %d) AS concrete",
+						(int)$destination_id,
+						(int)$concrete_type_id
+					));
+
+					$text = strtr($text, array(
+						'[dest]' => isset($ar['dest']) ? $ar['dest'] : '',
+						'[concrete]' => isset($ar['concrete']) ? $ar['concrete'] : ''
+					));
 				}
+
+				foreach($recipients as $recipient){
+					add_notification_from_contact(
+						$link,
+						$recipient['phone_cel'],
+						$text,
+						$sms_type,
+						$ordersRef,
+						$recipient['ext_contact_id']
+					);
+				}
+
+				$sms_res_ok = 1;
+				$sms_res_str = '';
 			}
-			
-			if (strlen($phone_cel)){
-				$sms_type = (floatval($quant)>0)? 'order':'order_cancel';
-				add_notification_from_contact($dbLinkMaster, $phone_cel, $text, $sms_type, $ordersRef, $extContactId);
-			}
-			
-			$sms_res_str = '';
-			$sms_res_ok = 1;
 		}
-		else{
-			$sms_res_str = 'Сервис SMS выключен.';
-			$sms_res_ok = 0;
-		}
-		
-		/**
-		 * Больше такая отправка не используется, чтобы иметь возможность
-		 * отслеживать тексты, время и т.д.
-		 */ 
-		$this->addModel(new ModelVars(
-			array('id'=>'SMSSend',
-				'values'=>array(
-					new Field('sent',DT_INT,
-						array('value'=>$sms_res_ok))
-					,					
-					new Field('resp',DT_STRING,
-						array('value'=>$sms_res_str))
-					)
-				)
+
+		$this->addModel(new ModelVars(array(
+			'id' => 'SMSSend',
+			'values' => array(
+				new Field('sent', DT_INT, array(
+					'value' => $sms_res_ok
+				)),
+				new Field('resp', DT_STRING, array(
+					'value' => $sms_res_str
+				))
 			)
-		);
-	}
-	
+		)));
+	}	
 	private static function check_pump_vehicle_min_val($dbLink, $pumpVehicleId, $orderQuant, $orderDateTime, $orderId){
 		if($_SESSION["role_id"] == "admin" || $_SESSION["role_id"] == "owner" || $_SESSION["role_id"] == "boss"){
 			return;
@@ -229,7 +260,24 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		Graph_Controller::clearCacheOnDate($this->getDbLink(),$pm->getParamValue("date_time"));
 
 		$pm->addParam(new FieldExtInt('ret_id',array('value'=>1)));
-		$id_ar = parent::insert($pm);
+		$contact_items = $this->getOrderContactItems($pm);
+		if ($contact_items === NULL) {
+			$id_ar = parent::insert($pm);
+		} else {
+			$contact_link = $this->getDbLinkMaster();
+			$contact_link->query('BEGIN');
+			try {
+				$contact_items = OrderContacts::prepare($contact_link, NULL, $contact_items);
+				OrderContacts::setLegacyParams($pm, $contact_items);
+				$id_ar = parent::insert($pm);
+				$contact_items = OrderContacts::apply($contact_link, $id_ar['id'], $contact_items);
+				$contact_link->query('COMMIT');
+			} catch (Throwable $e) {
+				$contact_link->query('ROLLBACK');
+				throw $e;
+			}
+			$this->addOrderContactsResult($contact_items);
+		}
 
 		$ar_doc = $this->getDbLinkMaster()->query_first(sprintf(
 			"SELECT
@@ -270,20 +318,24 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	}
 	
 	public function update($pm){
-		$dbLink = $this->getDbLink();
+		$dbLink = $this->getDbLinkMaster();
 
-		$pm->setParamValue('last_modif_user_id',$_SESSION['user_id']);
+		$pm->setParamValue('last_modif_user_id', $_SESSION['user_id']);
 		$order_id = $this->getExtDbVal($pm, 'old_id');
-		$new_pump_vehicle_id = $this->getExtVal($pm,'pump_vehicle_id');
+		$new_pump_vehicle_id = $this->getExtVal($pm, 'pump_vehicle_id');
 
-		//check pump vehicle
+		// Check pump vehicle.
 		if($new_pump_vehicle_id &amp;&amp; $new_pump_vehicle_id != 'null'){
 			self::check_pump_vehicle_min_val(
 				$dbLink,
 				$new_pump_vehicle_id,
-				$this->getExtVal($pm,'quant')? $this->getExtDbVal($pm, 'quant') : NULL,
-				$this->getExtVal($pm,'date_time')? $this->getExtDbVal($pm, 'date_time') : NULL,
-		        $order_id
+				$this->getExtVal($pm, 'quant')
+					? $this->getExtDbVal($pm, 'quant')
+					: NULL,
+				$this->getExtVal($pm, 'date_time')
+					? $this->getExtDbVal($pm, 'date_time')
+					: NULL,
+				$order_id
 			);
 		}
 
@@ -298,187 +350,352 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 				o.concrete_type_id,
 				o.destination_id,
 				o.lang_id,
-				COALESCE(o.pump_vehicle_id::text,'null') AS pump_vehicle_id,
+				COALESCE(o.pump_vehicle_id::text, 'null') AS pump_vehicle_id,
 				COALESCE(
-					(SELECT SUM(sh.quant)&gt;0
-					FROM shipments sh
-					WHERE sh.order_id=o.id
-					),
-				FALSE
+					(SELECT SUM(sh.quant) > 0
+					FROM shipments AS sh
+					WHERE sh.order_id = o.id),
+					FALSE
 				) AS shipped,
 				orders_ref(o) AS orders_ref,
 				coalesce(o.contact_id, ct.id) AS ext_contact_id,
-				coalesce(pv.specialist_inform,FALSE) AS specialist_inform,
+				coalesce(pv.specialist_inform, FALSE) AS specialist_inform,
 				o.client_specification_id,
 				o.pay_cash,
 				o.total_edit
-				
 			FROM orders AS o
 			LEFT JOIN pump_vehicles AS pv ON pv.id = o.pump_vehicle_id
 			LEFT JOIN contacts AS ct ON ct.tel = o.phone_cel
-			WHERE o.id=%d",
+			WHERE o.id = %d",
 			$order_id
 		));
-		
-		if (is_array($ar) &amp;&amp; count($ar)){
+
+		if(!is_array($ar) || !count($ar)){
+			throw new Exception('Документ не найден!');
+		}
+
+		// Capture recipients before prepare() can modify shared contacts.
+		$old_recipients = $this->getOrderMessageRecipients($order_id);
+
+		if(is_array($ar) &amp;&amp; count($ar)){
 			$old_date_time = strtotime($ar['date_time']);
-			$new_date_time = $pm->getParamValue("date_time");
-			
+			$new_date_time = $pm->getParamValue('date_time');
+
 			$rebuild_chart = (
-				 (floatval($this->getExtDbVal($pm,'quant'))!=floatval($ar['quant']))
-				||(intval($this->getExtDbVal($pm,'unload_speed'))!=intval($ar['unload_speed']))
-				||(isset($new_date_time) &amp;&amp; $new_date_time!=$old_date_time)
+				(floatval($this->getExtDbVal($pm, 'quant')) != floatval($ar['quant']))
+				|| (intval($this->getExtDbVal($pm, 'unload_speed')) != intval($ar['unload_speed']))
+				|| (isset($new_date_time) &amp;&amp; $new_date_time != $old_date_time)
 			);
-			if ($rebuild_chart){
+
+			if($rebuild_chart){
 				Graph_Controller::clearCacheOnDate($dbLink, $old_date_time);
 			}
-			
-			if (isset($new_date_time) &amp;&amp; $new_date_time != $old_date_time){
+
+			if(isset($new_date_time) &amp;&amp; $new_date_time != $old_date_time){
 				Graph_Controller::clearCacheOnDate($dbLink, $new_date_time);
-			}			
-			
-			//если был насос, а сейчас нет или замена насоса - СМС старому насоснику
-			if(isset($ar['pump_vehicle_id'])
-			&amp;&amp; isset($new_pump_vehicle_id)
-			&amp;&amp; ($new_pump_vehicle_id=='null' || $new_pump_vehicle_id!=$ar['pump_vehicle_id'])
+			}
+
+			// Preserve the existing cancellation call for the old pump.
+			if(
+				isset($ar['pump_vehicle_id'])
+				&amp;&amp; $ar['pump_vehicle_id'] != 'null'
+				&amp;&amp; isset($new_pump_vehicle_id)
+				&amp;&amp; (
+					$new_pump_vehicle_id == 'null'
+					|| $new_pump_vehicle_id != $ar['pump_vehicle_id']
+				)
 			){
 				try{
-					$this->send_pumpSMS('sms_pump_order_del', $order_id, $ar['orders_ref'], ($ar['specialist_inform']=='t'));
+					$this->send_pumpSMS(
+						'sms_pump_order_del',
+						$order_id,
+						$ar['orders_ref'],
+						$ar['specialist_inform'] == 't'
+					);
 				}catch(Exception $e){
 					error_log($e->getMessage());
 				}
-			}									
+			}
 		}
 
-		if($_SESSION["role_id"] == "lab_worker"){
-			//if concrete_type_id has changed and client_specification_id is not null - clear,
-			// if concrete_type_id has changed and pay_cash and !total_edit - recalc total
+		if($_SESSION['role_id'] == 'lab_worker'){
+			$concrete_type_id = $this->getExtVal($pm, 'concrete_type_id');
 
-			$concrete_type_id = $this->getExtVal($pm,'concrete_type_id');
-			if(isset($concrete_type_id) &amp;&amp; $concrete_type_id !='null'
-			&amp;&amp; $concrete_type_id != $ar["concrete_type_id"]
+			if(
+				isset($concrete_type_id)
+				&amp;&amp; $concrete_type_id != 'null'
+				&amp;&amp; $concrete_type_id != $ar['concrete_type_id']
 			){
-				if(isset($ar["client_specification_id"])){
-					//clear specification
-					$pm->setParamValue("client_specification_id", "null");
+				if(isset($ar['client_specification_id'])){
+					$pm->setParamValue('client_specification_id', 'null');
 				}
-				if(isset($ar["pay_cash"]) &amp;&amp; $ar["pay_cash"] == "t"
-				&amp;&amp; $ar["total_edit"] != "t"
+
+				if(
+					isset($ar['pay_cash'])
+					&amp;&amp; $ar['pay_cash'] == 't'
+					&amp;&amp; $ar['total_edit'] != 't'
 				){
-					//recalc is not implemented
-					throw new Exception("При изменении марки с ценой необходим пересчет!");
+					throw new Exception(
+						'При изменении марки с ценой необходим пересчет!'
+					);
 				}
 			}
 		}
 
-		//no quotes!!!	
-		$phone_cel = ($pm->getParamValue('phone_cel'))? $this->getExtVal($pm,'phone_cel'):$ar['phone_cel'];
-		$resend_sms = (
-			isset($phone_cel)&amp;&amp;strlen($phone_cel)
-			&amp;&amp; $ar['shipped']=='f'
-			&amp;&amp;
-			( ( !is_null($pm->getParamValue('quant')) &amp;&amp; $this->getExtVal($pm,'quant')!=$ar['quant'])
-			||($this->getExtVal($pm,'phone_cel') &amp;&amp; $this->getExtVal($pm,'phone_cel')!=$ar['phone_cel'])
-			||($this->getExtVal($pm,'concrete_type_id') &amp;&amp; $this->getExtVal($pm,'concrete_type_id')!=$ar['concrete_type_id'])
-			||($this->getExtVal($pm,'destination_id') &amp;&amp; $this->getExtVal($pm,'destination_id')!=$ar['destination_id'])
-			||($this->getExtVal($pm,'lang_id') &amp;&amp; $this->getExtVal($pm,'lang_id')!=$ar['lang_id'])
-			||($new_date_time &amp;&amp; $new_date_time!=$old_date_time)
-			||($new_pump_vehicle_id &amp;&amp; $new_pump_vehicle_id!=$ar['pump_vehicle_id'])
-			)
-		);
-		//
-		parent::update($pm);
-		
-		if ($resend_sms){
-			//changed phone or date_time
-			$destination_id = ($pm->getParamValue('destination_id'))? $this->getExtDbVal($pm,'destination_id'):$ar['destination_id'];
-			
-			//no quotes!!!
-			
-			$lang_id = ($pm->getParamValue('lang_id'))? $this->getExtDbVal($pm,'lang_id'):$ar['lang_id'];			
-			
-			$concrete_type_id = ($pm->getParamValue('concrete_type_id'))? $this->getExtDbVal($pm,'concrete_type_id'):$ar['concrete_type_id'];
-			
-			$pump_vehicle_id = ($pm->getParamValue('pump_vehicle_id'))? $this->getExtDbVal($pm,'pump_vehicle_id'):$ar['pump_vehicle_id'];
-			
-			$quant = (is_null($pm->getParamValue('quant')))? floatval($ar['quant']):$this->getExtDbVal($pm,'quant');
-			
-			$total = 0;
-			$pay_cash = $pm->getParamValue("pay_cash");
-			if (
-				(isset($pay_cash)&amp;&amp;$pay_cash=='true')
-				||
-				(!isset($pay_cash)&amp;&amp;$ar['pay_cash']=='t')
-			){
-				$total = $this->getExtDbVal($pm,'total');
-				$total = (isset($total))? $total:$ar['total'];
+		$contact_items = $this->getOrderContactItems($pm);
+		$contact_link = $this->getDbLinkMaster();
+
+		if($contact_items !== NULL){
+			$contact_link->query('BEGIN');
+		}
+
+		try{
+			if($contact_items !== NULL){
+				$contact_items = OrderContacts::prepare(
+					$contact_link,
+					(int)$this->getExtVal($pm, 'old_id'),
+					$contact_items
+				);
+
+				OrderContacts::setLegacyParams($pm, $contact_items);
+
+				$ar['ext_contact_id'] = count($contact_items)
+					? $contact_items[0]['contact_id']
+					: NULL;
 			}
-			
-			$date_time = ($pm->getParamValue('date_time'))? $this->getExtVal($pm,"date_time"):$old_date_time;
-			
-			if(!is_null($pm->getParamValue('quant')) || floatval($ar['quant'])>0){
-				//Если количества нет и было=0, то не отправлять!
-				$this->send_messages(
-					$order_id,
-					$phone_cel,$quant,$total,$date_time,
-					$concrete_type_id,$destination_id,
-					$lang_id,$pump_vehicle_id,TRUE,
-					$ar['orders_ref'], $ar['ext_contact_id']
+
+			// Retained for the existing send_messages() signature.
+			$phone_cel = ($contact_items !== NULL)
+				? (
+					count($contact_items)
+						? $contact_items[0]['contact']['tel']
+						: ''
+				)
+				: (
+					$pm->getParamValue('phone_cel')
+						? $this->getExtVal($pm, 'phone_cel')
+						: $ar['phone_cel']
+				);
+
+			$order_changed = (
+				(
+					!is_null($pm->getParamValue('quant'))
+					&amp;&amp; $this->getExtVal($pm, 'quant') != $ar['quant']
+				)
+				|| (
+					$this->getExtVal($pm, 'concrete_type_id')
+					&amp;&amp; $this->getExtVal($pm, 'concrete_type_id') != $ar['concrete_type_id']
+				)
+				|| (
+					$this->getExtVal($pm, 'destination_id')
+					&amp;&amp; $this->getExtVal($pm, 'destination_id') != $ar['destination_id']
+				)
+				|| (
+					$this->getExtVal($pm, 'lang_id')
+					&amp;&amp; $this->getExtVal($pm, 'lang_id') != $ar['lang_id']
+				)
+				|| ($new_date_time &amp;&amp; $new_date_time != $old_date_time)
+				|| (
+					$new_pump_vehicle_id
+					&amp;&amp; $new_pump_vehicle_id != $ar['pump_vehicle_id']
+				)
+			);
+
+			parent::update($pm);
+
+			if($contact_items !== NULL){
+				$contact_items = OrderContacts::apply(
+					$contact_link,
+					(int)$this->getExtVal($pm, 'old_id'),
+					$contact_items
 				);
 			}
-			
-			/** Тип СМС для насосника insert/update/delete
-			 * update только если был насос и он же остался (т.е. сейчас передали путую строку)
-			 * если quant=0 - delete
-			 * если авто сменилось - insert
-			 */			
+
+			$new_recipients = $this->getOrderMessageRecipients($order_id);
+
+			$resend_sms = (
+				$ar['shipped'] == 'f'
+				&amp;&amp; (
+					$order_changed
+					|| $old_recipients !== $new_recipients
+				)
+			);
+
+			if($contact_items !== NULL){
+				$contact_link->query('COMMIT');
+			}
+		}catch(Throwable $e){
+			if($contact_items !== NULL){
+				$contact_link->query('ROLLBACK');
+			}
+
+			throw $e;
+		}
+
+		if($contact_items !== NULL){
+			$this->addOrderContactsResult($contact_items);
+		}
+
+		if($resend_sms){
+			$destination_id = $pm->getParamValue('destination_id')
+				? $this->getExtDbVal($pm, 'destination_id')
+				: $ar['destination_id'];
+
+			$lang_id = $pm->getParamValue('lang_id')
+				? $this->getExtDbVal($pm, 'lang_id')
+				: $ar['lang_id'];
+
+			$concrete_type_id = $pm->getParamValue('concrete_type_id')
+				? $this->getExtDbVal($pm, 'concrete_type_id')
+				: $ar['concrete_type_id'];
+
+			$pump_vehicle_id = $pm->getParamValue('pump_vehicle_id')
+				? $this->getExtDbVal($pm, 'pump_vehicle_id')
+				: $ar['pump_vehicle_id'];
+
+			$quant = is_null($pm->getParamValue('quant'))
+				? floatval($ar['quant'])
+				: $this->getExtDbVal($pm, 'quant');
+
+			$total = 0;
+			$pay_cash = $pm->getParamValue('pay_cash');
+
+			if(
+				(isset($pay_cash) &amp;&amp; $pay_cash == 'true')
+				|| (!isset($pay_cash) &amp;&amp; $ar['pay_cash'] == 't')
+			){
+				$total = $this->getExtDbVal($pm, 'total');
+				$total = isset($total) ? $total : $ar['total'];
+			}
+
+			$date_time = $pm->getParamValue('date_time')
+				? $this->getExtVal($pm, 'date_time')
+				: $old_date_time;
+
+			if(
+				!is_null($pm->getParamValue('quant'))
+				|| floatval($ar['quant']) > 0
+			){
+				$this->send_messages(
+					$order_id,
+					$phone_cel,
+					$quant,
+					$total,
+					$date_time,
+					$concrete_type_id,
+					$destination_id,
+					$lang_id,
+					$pump_vehicle_id,
+					TRUE,
+					$ar['orders_ref'],
+					$ar['ext_contact_id']
+				);
+			}
+
+			// Contact-only edits must not send pump-update messages.
+			if(!$order_changed){
+				return;
+			}
+
 			$sms_fn_type = NULL;
 			$specialist_inform = FALSE;
-			if( (!isset($ar['pump_vehicle_id'])||$ar['pump_vehicle_id']=='null') &amp;&amp; isset($new_pump_vehicle_id) &amp;&amp; $new_pump_vehicle_id!='null'){
-				//НЕТ --> ЕСТЬ
-				$sms_fn_type = 'sms_pump_order_ins';
-				$ar_new_pv = $dbLink->query_first(sprintf(
-					"SELECT specialist_inform FROM pump_vehicles WHERE id = %d"
-					, $new_pump_vehicle_id
-				));
-				if(is_array($ar_new_pv) &amp;&amp; count($ar_new_pv)  &amp;&amp; isset($ar_new_pv['specialist_inform'])){
-					$specialist_inform = ($ar_new_pv['specialist_inform'] == 't');
-				}
-			
-			}else if(isset($ar['pump_vehicle_id']) &amp;&amp; $ar['pump_vehicle_id']!=''
-			&amp;&amp; isset($new_pump_vehicle_id) &amp;&amp; $new_pump_vehicle_id!='null' &amp;&amp; $new_pump_vehicle_id!=$ar['pump_vehicle_id']){
-				//ЕСТЬ --> ЕСТЬ другой
-				$sms_fn_type = 'sms_pump_order_ins';
-				$ar_new_pv = $dbLink->query_first(sprintf(
-					"SELECT specialist_inform FROM pump_vehicles WHERE id = %d"
-					, $new_pump_vehicle_id
-				));
-				if(is_array($ar_new_pv) &amp;&amp; count($ar_new_pv)  &amp;&amp; isset($ar_new_pv['specialist_inform'])){
-					$specialist_inform = ($ar_new_pv['specialist_inform'] == 't');
-				}
-				
-			
-			}else if(isset($ar['pump_vehicle_id']) &amp;&amp; $ar['pump_vehicle_id']!=''
-				&amp;&amp; !isset($new_pump_vehicle_id)
-				&amp;&amp; (!is_null($pm->getParamValue('quant')) || floatval($ar['quant'])>0)
+
+			if(
+				(
+					!isset($ar['pump_vehicle_id'])
+					|| $ar['pump_vehicle_id'] == 'null'
+				)
+				&amp;&amp; isset($new_pump_vehicle_id)
+				&amp;&amp; $new_pump_vehicle_id != 'null'
 			){
-				//Был и остался, поменялись другие параметры
-				//Если количества нет и было=0, то не отправлять!
-				$sms_fn_type = ($quant==0)? 'sms_pump_order_del':'sms_pump_order_upd';				
-				$specialist_inform = ($ar['specialist_inform'] == 't');
+				// No previous pump; a pump has been assigned.
+				$sms_fn_type = 'sms_pump_order_ins';
+
+				$ar_new_pv = $dbLink->query_first(sprintf(
+					"SELECT specialist_inform
+					FROM pump_vehicles
+					WHERE id = %d",
+					$new_pump_vehicle_id
+				));
+
+				if(
+					is_array($ar_new_pv)
+					&amp;&amp; count($ar_new_pv)
+					&amp;&amp; isset($ar_new_pv['specialist_inform'])
+				){
+					$specialist_inform = $ar_new_pv['specialist_inform'] == 't';
+				}
+			}else if(
+				isset($ar['pump_vehicle_id'])
+				&amp;&amp; $ar['pump_vehicle_id'] != ''
+				&amp;&amp; isset($new_pump_vehicle_id)
+				&amp;&amp; $new_pump_vehicle_id != 'null'
+				&amp;&amp; $new_pump_vehicle_id != $ar['pump_vehicle_id']
+			){
+				// A different pump has been assigned.
+				$sms_fn_type = 'sms_pump_order_ins';
+
+				$ar_new_pv = $dbLink->query_first(sprintf(
+					"SELECT specialist_inform
+					FROM pump_vehicles
+					WHERE id = %d",
+					$new_pump_vehicle_id
+				));
+
+				if(
+					is_array($ar_new_pv)
+					&amp;&amp; count($ar_new_pv)
+					&amp;&amp; isset($ar_new_pv['specialist_inform'])
+				){
+					$specialist_inform = $ar_new_pv['specialist_inform'] == 't';
+				}
+			}else if(
+				isset($ar['pump_vehicle_id'])
+				&amp;&amp; $ar['pump_vehicle_id'] != 'null'
+				&amp;&amp; (
+					!isset($new_pump_vehicle_id)
+					|| $new_pump_vehicle_id == $ar['pump_vehicle_id']
+				)
+				&amp;&amp; (
+					!is_null($pm->getParamValue('quant'))
+					|| floatval($ar['quant']) > 0
+				)
+			){
+				// The same pump remains assigned.
+				$sms_fn_type = ($quant == 0)
+					? 'sms_pump_order_del'
+					: 'sms_pump_order_upd';
+
+				$specialist_inform = $ar['specialist_inform'] == 't';
 			}
-			
-			if (!is_null($sms_fn_type)){
+
+			if(!is_null($sms_fn_type)){
 				try{
-					$this->send_pumpSMS($sms_fn_type, $order_id, $ar['orders_ref'], $specialist_inform);
+					$this->send_pumpSMS(
+						$sms_fn_type,
+						$order_id,
+						$ar['orders_ref'],
+						$specialist_inform
+					);
 				}catch(Exception $e){
 					error_log($e->getMessage());
 				}
-			}		
-			
+			}
 		}
+	}	
+	private function getOrderContactItems($pm) {
+		if ($pm->getParamValue('contact_list') === NULL) return NULL;
+		if ($_SESSION['role_id'] === 'lab_worker') throw new Exception('Изменение контактов заявки запрещено.');
+		return OrderContacts::normalize($this->getExtVal($pm, 'contact_list'));
 	}
-	
+
+	private function addOrderContactsResult($items) {
+		$this->addModel(new ModelVars(array(
+			'id'=>'OrderContactsSaved_Model',
+			'values'=>array(new Field('contact_list', DT_STRING, array('value'=>json_encode($items, JSON_UNESCAPED_UNICODE))))
+		)));
+	}
+
 	private function pumpActionRespTels($action){
 		return $this->getDbLink()->query(sprintf(
 			"SELECT
@@ -491,62 +708,50 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 	}
 	
 	public function delete($pm){
-		$order_id = $this->getExtDbVal($pm,'id');
+		$order_id = $this->getExtDbVal($pm, 'id');
 
-		/* SMS насоснику */
-		$ar_doc = $this->getDbLink()->query_first(sprintf(
+		$ar_doc = $this->getDbLinkMaster()->query_first(sprintf(
 			"SELECT
-				o.pump_vehicle_id
-				,orders_ref(o) AS orders_ref
-				,o.lang_id
-				,o.destination_id
-				,o.concrete_type_id
-				,o.date_time
-				,o.quant
-				,o.phone_cel
-				,o.pay_cash
-				,o.total
-				,coalesce(o.contact_id, ct.id) AS contact_id
-				,coalesce(pv.specialist_inform, FALSE) AS specialist_inform
-				
+				o.pump_vehicle_id,
+				orders_ref(o) AS orders_ref,
+				o.lang_id,
+				o.destination_id,
+				o.concrete_type_id,
+				o.date_time,
+				o.quant,
+				o.phone_cel,
+				o.pay_cash,
+				o.total,
+				coalesce(o.contact_id, ct.id) AS contact_id,
+				coalesce(pv.specialist_inform, FALSE) AS specialist_inform
 			FROM orders AS o
 			LEFT JOIN contacts AS ct ON ct.tel = o.phone_cel
 			LEFT JOIN pump_vehicles AS pv ON pv.id = o.pump_vehicle_id
-			WHERE o.id = %d"
-			,$order_id
-			)
-		);
-		if (!is_array($ar_doc) || !count($ar_doc) ){
+			WHERE o.id = %d",
+			$order_id
+		));
+
+		if(!is_array($ar_doc) || !count($ar_doc)){
 			throw new Exception('Document not found!');
 		}
-		
-		if(floatval($ar_doc['quant']) > 0 &amp;&amp; isset($ar_doc['pump_vehicle_id'])){
+
+		// Preserve the existing pump-cancellation timing.
+		if(
+			floatval($ar_doc['quant']) > 0
+			&amp;&amp; isset($ar_doc['pump_vehicle_id'])
+		){
 			try{
-				$this->send_pumpSMS('sms_pump_order_del', $order_id, $ar_doc['orders_ref'], ($ar_doc['specialist_inform']=='t'));
+				$this->send_pumpSMS(
+					'sms_pump_order_del',
+					$order_id,
+					$ar_doc['orders_ref'],
+					$ar_doc['specialist_inform'] == 't'
+				);
 			}catch(Exception $e){
 				error_log($e->getMessage());
-			}			
-		}		
-		
-		/* СМС клиенту о снятии */
-		if(floatval($ar_doc['quant']) > 0 &amp;&amp; isset($ar_doc['phone_cel']) &amp;&amp; strlen($ar_doc['phone_cel'])){
-			$this->send_messages(
-				$order_id,
-				$ar_doc['phone_cel'],
-				0,
-				($ar_doc['pay_cash']=='t')? $ar_doc['total']:0,			
-				strtotime($ar_doc['date_time']),
-				$ar_doc['concrete_type_id'],
-				$ar_doc['destination_id'],
-				$ar_doc['lang_id'],
-				NULL,
-				FALSE,
-				$ar_doc['orders_ref'],
-				$ar_doc['contact_id']
-			);
+			}
 		}
-					
-		//from 04/06/2024 copy deleted orders to a different table, set user who did it and time.
+
 		$fields = 'client_id,
 			destination_id,
 			concrete_type_id,
@@ -582,44 +787,72 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		';
 
 		$link = $this->getDbLinkMaster();
-		$link->query("BEGIN");
+		$link->query('BEGIN');
+
 		try{
 			$link->query(sprintf(
-				"INSERT INTO order_garbage
-					(%s,
-					last_modif_user_id, last_modif_date_time, order_id
-					)
-				SELECT 
+				"INSERT INTO order_garbage (
+					%s,
+					last_modif_user_id,
+					last_modif_date_time,
+					order_id
+				)
+				SELECT
 					%s,
 					%d,
 					now(),
 					orders.id
-				FROM orders 
-				WHERE orders.id = %d"
-				,$fields, $fields
-				,$_SESSION["user_id"]
-				,$order_id
+				FROM orders
+				WHERE orders.id = %d",
+				$fields,
+				$fields,
+				$_SESSION['user_id'],
+				$order_id
 			));
+
+			// Read and notify all associated contacts before deleting the order.
+			if(floatval($ar_doc['quant']) > 0){
+				$this->send_messages(
+					$order_id,
+					$ar_doc['phone_cel'],
+					0,
+					($ar_doc['pay_cash'] == 't') ? $ar_doc['total'] : 0,
+					strtotime($ar_doc['date_time']),
+					$ar_doc['concrete_type_id'],
+					$ar_doc['destination_id'],
+					$ar_doc['lang_id'],
+					NULL,
+					FALSE,
+					$ar_doc['orders_ref'],
+					$ar_doc['contact_id']
+				);
+			}
 
 			parent::delete($pm);
 
-			$link->query("COMMIT");
-		}catch(Exception $e){
-			$link->query("ROLLBACK");
+			$link->query('COMMIT');
+		}catch(Throwable $e){
+			$link->query('ROLLBACK');
 			throw $e;
 		}
 
-		//+event OrderGarbage.insert
-		$event_par = [];
-		$ar = $link->query_first("SELECT pg_current_wal_lsn() AS lsn");
-		if(is_array($ar) &amp;&amp; count($ar) &amp;&amp; isset($ar['lsn'])){
-		     $event_par["lsn"] = $ar["lsn"];
-		}
-		EventSrv::publishAsync('OrderGarbage.insert',$event_par);
+		$event_par = array();
+		$ar = $link->query_first(
+			"SELECT pg_current_wal_lsn() AS lsn"
+		);
 
-		Graph_Controller::clearCacheOnDate($this->getDbLink(), strtotime($ar_doc["date_time"]));
-	}
-	
+		if(is_array($ar) &amp;&amp; count($ar) &amp;&amp; isset($ar['lsn'])){
+			$event_par['lsn'] = $ar['lsn'];
+		}
+
+		EventSrv::publishAsync('OrderGarbage.insert', $event_par);
+
+		Graph_Controller::clearCacheOnDate(
+			$this->getDbLink(),
+			strtotime($ar_doc['date_time'])
+		);
+	}	
+
 	public function get_make_orders_list($pm){
 		$model = new OrderMakeList_Model($this->getDbLink());
 		$this->modelGetList($model,$pm);		
@@ -1512,7 +1745,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			"items" => $items
 		];
 		$newOrder = ExtProg::newOrder($params);
-		if(!count($rows)){
+		if(!count($newOrder["rows"])){
 			throw new Exception("tag 'rows' length is 0");
 		}
 		$ref1c = json_encode(
@@ -1559,7 +1792,7 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 		if(!isset($ar['user_ref']) || $ar["user_ref"] == ""){
 			throw new Exception("Пользователь не связан с 1с");
 		}
-		$out_file = OUTPUT_PATH.uniqid."_order_print.pdf";
+		$out_file = OUTPUT_PATH.uniqid()."_order_print.pdf";
 		Exch1c::printOrder($ar["order_ref"], $ar["user_ref"], $out_file);
 
 		$file_name = $ar["order_descr"].".pdf";
@@ -1578,7 +1811,38 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 
 	public function get_specialist_vehicle_list($pm){
 		$dateForDb = $this->getExtDbVal($pm, 'date');
-		this->addSpecialVehicleModel($dateForDb);
+		$this->addSpecialVehicleModel($dateForDb);
+	}
+
+	private function getOrderMessageRecipients($orderId){
+		$link = $this->getDbLinkMaster();
+		$q = $link->query(sprintf(
+			"SELECT DISTINCT
+				ct.id AS ext_contact_id,
+				ct.tel AS phone_cel
+			FROM order_contacts AS oc
+			JOIN contacts AS ct ON ct.id = oc.contact_id
+			WHERE oc.order_id = %d
+			ORDER BY ct.id",
+			(int)$orderId
+		));
+
+		$recipients = array();
+
+		while($row = $link->fetch_array($q)){
+			$phone = OrderContacts::phone($row['phone_cel']);
+
+			if($phone === ''){
+				continue;
+			}
+
+			$recipients[] = array(
+				'ext_contact_id' => (int)$row['ext_contact_id'],
+				'phone_cel' => $phone
+			);
+		}
+
+		return $recipients;
 	}
 }
 <![CDATA[?>]]>

@@ -191,6 +191,15 @@ function OrderList_Model(options){
 	
 	var filed_options = {};
 	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.contact_list = new FieldJSON("contact_list",filed_options);
+	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
 	filed_options.alias = 'Ссылка на справочник 1с';
 	filed_options.autoInc = false;	
 	

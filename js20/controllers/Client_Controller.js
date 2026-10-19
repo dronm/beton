@@ -31,6 +31,13 @@ function Client_Controller(options){
 	this.addGetObject();
 	this.addComplete();
 	this.add_complete_for_order();
+	this.add_get_merge_list();
+	this.add_get_merge_selected();
+	this.add_merge_select();
+	this.add_merge_unselect();
+	this.add_merge_clear_selection();
+	this.add_merge_selected();
+	this.add_merge();
 	this.add_union();
 	this.add_set_duplicate_valid();
 	this.add_get_duplicates_list();
@@ -409,6 +416,8 @@ extend(Client_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldBool("ref_1c_exists",f_opts));
+	pm.getField(this.PARAM_ORD_FIELDS).setValue("name");
+	
 }
 
 			Client_Controller.prototype.addGetObject = function(){
@@ -456,6 +465,139 @@ extend(Client_Controller,ControllerObjServer);
 	var options = {};
 	
 		pm.addField(new FieldInt("mid",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Client_Controller.prototype.add_get_merge_list = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_merge_list',opts);
+	
+	pm.addField(new FieldInt(this.PARAM_COUNT));
+	pm.addField(new FieldInt(this.PARAM_FROM));
+	pm.addField(new FieldString(this.PARAM_COND_FIELDS));
+	pm.addField(new FieldString(this.PARAM_COND_SGNS));
+	pm.addField(new FieldString(this.PARAM_COND_VALS));
+	pm.addField(new FieldString(this.PARAM_COND_ICASE));
+	pm.addField(new FieldString(this.PARAM_ORD_FIELDS));
+	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
+	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
+	pm.addField(new FieldString(this.PARAM_FIELD_LSN));
+
+	this.addPublicMethod(pm);
+}
+
+			Client_Controller.prototype.add_get_merge_selected = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_merge_selected',opts);
+	
+	pm.addField(new FieldInt(this.PARAM_COUNT));
+	pm.addField(new FieldInt(this.PARAM_FROM));
+	pm.addField(new FieldString(this.PARAM_COND_FIELDS));
+	pm.addField(new FieldString(this.PARAM_COND_SGNS));
+	pm.addField(new FieldString(this.PARAM_COND_VALS));
+	pm.addField(new FieldString(this.PARAM_COND_ICASE));
+	pm.addField(new FieldString(this.PARAM_ORD_FIELDS));
+	pm.addField(new FieldString(this.PARAM_ORD_DIRECTS));
+	pm.addField(new FieldString(this.PARAM_FIELD_SEP));
+	pm.addField(new FieldString(this.PARAM_FIELD_LSN));
+
+	this.addPublicMethod(pm);
+}
+
+			Client_Controller.prototype.add_merge_select = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('merge_select',opts);
+	
+	pm.setRequestType('post');
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("client_id",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Client_Controller.prototype.add_merge_unselect = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('merge_unselect',opts);
+	
+	pm.setRequestType('post');
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("client_id",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Client_Controller.prototype.add_merge_clear_selection = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('merge_clear_selection',opts);
+	
+	pm.setRequestType('post');
+	
+	this.addPublicMethod(pm);
+}
+
+			Client_Controller.prototype.add_merge_selected = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('merge_selected',opts);
+	
+	pm.setRequestType('post');
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("main_client_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldString("client_ids",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Client_Controller.prototype.add_merge = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('merge',opts);
+	
+	pm.setRequestType('post');
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("main_client_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldString("client_ids",options));
 	
 			
 	this.addPublicMethod(pm);

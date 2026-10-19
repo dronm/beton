@@ -406,6 +406,14 @@ class OrderDialog_Model extends ModelSQLBeton{
 		$f_client_debt_date=new FieldSQLDateTime($this->getDbLink(),$this->getDbName(),$this->getTableName(),"client_debt_date",$f_opts);
 		$this->addField($f_client_debt_date);
 		//********************
+		
+		//*** Field contact_list ***
+		$f_opts = array();
+		$f_opts['id']="contact_list";
+						
+		$f_contact_list=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"contact_list",$f_opts);
+		$this->addField($f_contact_list);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

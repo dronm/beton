@@ -1460,230 +1460,349 @@ class Shipment_Controller extends ControllerSQL{
 		));						
 	}
 		
-	public static function sendShipSMS($dbLinkMaster,$dbLink,$idForDb,$smsResOk,$smsResStr,$interactiveMode){
-		//Может не быть изменений order_id на слейве после update!!!
+	public static function sendShipSMS($dbLinkMaster, $dbLink, $idForDb,
+		&$smsResOk, &$smsResStr, $interactiveMode){
+
+		$smsResOk = 0;
+		$smsResStr = 'Нет получателей для уведомлений об отгрузке.';
+
+		// Read from the master: the shipment or its order may have just changed.
 		$ar = $dbLinkMaster->query_first(
-		"SELECT
-			orders.id AS order_id,
-			orders.phone_cel,
-			coalesce(shipments.quant) AS quant,
-			concrete_types.official_name AS concrete,
-			d.name AS d_name,
-			format_cel_standart(coalesce(d.phone_cel,'')) AS d_phone,
-			v.plate AS v_plate,
-			(SELECT pattern FROM sms_patterns
-				WHERE sms_type='ship'::sms_types
-				AND lang_id= orders.lang_id
-			) AS text,
-			coalesce( (
-				SELECT sum(sh.quant)
-				FROM shipments AS sh
-				WHERE sh.order_id=orders.id AND sh.shipped
-				)
-			,0) AS quant_shipped,
-			coalesce(orders.quant,0) AS quant_ordered,
-			shipments_ref(shipments) AS doc_ref,
-			
-			CASE WHEN (SELECT const_self_ship_dest_val()->'keys'->>'id')::int = orders.destination_id THEN FALSE
-			ELSE coalesce(dest.send_route_sms,FALSE)
-				--тот же день, тот же миксер?
-				AND
-				(coalesce(
-					(SELECT
-						count(*)
-					FROM shipments AS d_sh
-					LEFT JOIN vehicle_schedules AS d_vs ON d_vs.id=d_sh.vehicle_schedule_id
-					LEFT JOIN orders AS d_o ON d_o.id = d_sh.order_id
-					WHERE d_sh.ship_date_time::date = shipments.ship_date_time::date
-					AND d_vs.vehicle_id = vs.vehicle_id
-					AND d_sh.id <> shipments.id
-					AND d_o.destination_id = orders.destination_id
+			"SELECT
+				o.id AS order_id,
+				coalesce(sh.quant, 0) AS quant,
+				ct.official_name AS concrete,
+				d.name AS d_name,
+				format_cel_standart(coalesce(d.phone_cel, '')) AS d_phone,
+				v.plate AS v_plate,
+				(SELECT pattern
+				FROM sms_patterns
+				WHERE sms_type = 'ship'::sms_types
+					AND lang_id = o.lang_id
+				) AS text,
+				coalesce((
+					SELECT sum(s.quant)
+					FROM shipments AS s
+					WHERE s.order_id = o.id AND s.shipped
+				), 0) AS quant_shipped,
+				coalesce(o.quant, 0) AS quant_ordered,
+				shipments_ref(sh) AS doc_ref,
+
+				CASE
+					WHEN (SELECT const_self_ship_dest_val()->'keys'->>'id')::int = o.destination_id THEN FALSE
+					ELSE coalesce(dest.send_route_sms, FALSE)
+						AND NOT EXISTS (
+							SELECT 1
+							FROM shipments AS d_sh
+							LEFT JOIN vehicle_schedules AS d_vs ON d_vs.id = d_sh.vehicle_schedule_id
+							LEFT JOIN orders AS d_o ON d_o.id = d_sh.order_id
+							WHERE d_sh.ship_date_time::date = sh.ship_date_time::date
+								AND d_vs.vehicle_id = vs.vehicle_id
+								AND d_sh.id <> sh.id
+								AND d_o.destination_id = o.destination_id
+						)
+				END AS send_route_sms,
+
+				CASE
+					WHEN coalesce(v.tracker_id, '') = '' THEN FALSE
+					ELSE (
+						SELECT
+							(now() - (tr.period + age(now(), timezone('UTC'::text, now())::timestamp with time zone))) < '00:30:00'::interval
+						FROM car_tracking AS tr
+						WHERE tr.car_id = v.tracker_id
+						ORDER BY tr.period DESC
+						LIMIT 1
 					)
-				,0)=0)				
-			END AS send_route_sms,
-			
-			CASE WHEN coalesce(v.tracker_id,'') = '' THEN FALSE
-			ELSE
-				(SELECT
-					(now() - (tr.period+age(now(), timezone('UTC'::text, now())::timestamp with time zone)) ) < '00:30:00'::interval
-				FROM car_tracking AS tr
-				WHERE tr.car_id=v.tracker_id
-				ORDER BY tr.period DESC
-				LIMIT 1)
-			END AS tracker_exists,
-			
-			CASE
-				WHEN e_user.tm_id IS NOT NULL THEN ct.id
-				ELSE NULL
-			END AS tm_contact_id,
-			CASE
-				WHEN m_user.id IS NOT NULL THEN ct.id
-				ELSE NULL
-			END AS mx_contact_id,
-			coalesce(orders.contact_id, ct.id) AS resp_contact_id,
+				END AS tracker_exists,
 
-			CASE
-				WHEN e_user_d.tm_id IS NOT NULL THEN ct_d.id
-				ELSE NULL
-			END AS dr_tm_contact_id,
-			CASE
-				WHEN m_user_d.id IS NOT NULL THEN ct.id
-				ELSE NULL
-			END AS dr_mx_contact_id,
-			ct_d.id AS dr_contact_id,
+				CASE
+					WHEN EXISTS (
+						SELECT 1
+						FROM notifications.ext_users_list AS e_user_d
+						WHERE e_user_d.app_id = 1
+							AND e_user_d.ext_contact_id = ct_d.id
+							AND e_user_d.tm_id IS NOT NULL
+					) THEN ct_d.id
+					ELSE NULL
+				END AS dr_tm_contact_id,
 
-			orders.pump_vehicle_id IS NOT NULL as pump_exists
-			
-		FROM orders
-		LEFT JOIN shipments ON shipments.order_id=orders.id
-		LEFT JOIN concrete_types ON concrete_types.id=orders.concrete_type_id
-		LEFT JOIN vehicle_schedules AS vs ON vs.id=shipments.vehicle_schedule_id
-		LEFT JOIN drivers AS d ON d.id=vs.driver_id
-		LEFT JOIN vehicles AS v ON v.id=vs.vehicle_id
-		LEFT JOIN destinations AS dest ON dest.id=orders.destination_id
-		
-		LEFT JOIN contacts AS ct ON coalesce(orders.phone_cel,'') <> '' AND ct.tel = orders.phone_cel
-		LEFT JOIN notifications.ext_users_list AS e_user ON e_user.app_id = 1 AND e_user.ext_contact_id = ct.id
-		LEFT JOIN notifications.max_users AS m_user ON m_user.contact_id = ct.id
-		
-		LEFT JOIN contacts AS ct_d ON coalesce(d.phone_cel,'') <> '' AND ct_d.tel = d.phone_cel
-		LEFT JOIN notifications.ext_users_list AS e_user_d ON e_user_d.app_id = 1 AND e_user_d.ext_contact_id = ct_d.id
-		LEFT JOIN notifications.max_users AS m_user_d ON m_user_d.contact_id = ct_d.id
-		
-		WHERE shipments.id = $1",
-		[ $idForDb ]
+				CASE
+					WHEN EXISTS (
+						SELECT 1
+						FROM notifications.max_users AS m_user_d
+						WHERE m_user_d.contact_id = ct_d.id
+							AND m_user_d.id IS NOT NULL
+					) THEN ct_d.id
+					ELSE NULL
+				END AS dr_mx_contact_id
+
+			FROM shipments AS sh
+			JOIN orders AS o ON o.id = sh.order_id
+			LEFT JOIN concrete_types AS ct ON ct.id = o.concrete_type_id
+			LEFT JOIN vehicle_schedules AS vs ON vs.id = sh.vehicle_schedule_id
+			LEFT JOIN drivers AS d ON d.id = vs.driver_id
+			LEFT JOIN vehicles AS v ON v.id = vs.vehicle_id
+			LEFT JOIN destinations AS dest ON dest.id = o.destination_id
+			LEFT JOIN contacts AS ct_d ON coalesce(d.phone_cel, '') <> ''
+				AND ct_d.tel = d.phone_cel
+			WHERE sh.id = $1",
+			array((int)$idForDb)
 		);
-		
-		$d_phone_exists = (strlen($ar['d_phone'])==10);
-		
-		//responsible person notification through MAX or SMS
-		if (strlen($ar['phone_cel']) && isset($ar['resp_contact_id'] )){
-			$text = $ar['text'];
-			$text = str_replace('[quant]',$ar['quant'],$text);
-			$text = str_replace('[concrete]',$ar['concrete'],$text);
-			$text = str_replace('[car]',$ar['v_plate'],$text);				
-			$text = str_replace('[quant_shipped]', $ar['quant_shipped'], $text);
-			$text = str_replace('[quant_ordered]', $ar['quant_ordered'], $text);
-			
-			$driver = $ar['d_name'];
-			$driver.= $d_phone_exists? ' +7'.$ar['d_phone'] : '';				
-			$text = str_replace('[driver]', $driver, $text);
 
-			//route href если нет данных от миксера - не отправлять маршрут
-			if ($ar['tracker_exists']=='t'){
-				$text.= ' '.ROUTE_HREF.$idForDb;
-			}
-					
-			/*
-			if(isset($ar["mx_contact_id"])){
-				add_notification_from_contact_max($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['mx_contact_id']);
-
-			} else if(isset($ar["tm_contact_id"])){
-				add_notification_from_contact_tm($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['tm_contact_id']);
-			}
-			*/
-
-			add_notification_from_contact($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['resp_contact_id']);
+		if(!is_array($ar) || !isset($ar['order_id'])){
+			throw new Exception('Отгрузка или связанная заявка не найдена!');
 		}
 
-		//notify pump driver if there is a pump in this order
-		/*
-		    Removed this notification with 1.00330 build on 2024-05-29
-		if($ar['pump_exists'] == 't'){
-			//Вызываем новые SQL функции *_ct(), которые используют контакты, а не телефоны из таблиц!
-			$pump_sms_q_id = $dbLinkMaster->query(sprintf(
-				"SELECT * FROM sms_pump_order_ship_ct(%d)"
-				,$ar['order_id']
-			));
-			while($pump_sms_ar = $dbLinkMaster->fetch_array($pump_sms_q_id)){
-				$pump_sms_mes = $pump_sms_ar['message'];
-				add_notification_from_contact($dbLinkMaster, $pump_sms_ar['phone_cel'], $pump_sms_mes, 'ship', $ar['doc_ref'], $pump_sms_ar['ext_contact_id']);
+		$d_phone = (string)$ar['d_phone'];
+		$d_phone_exists = (strlen($d_phone) == 10);
+
+		// Order recipients come only from order_contacts, never from orders.phone_cel.
+		$contact_query = $dbLinkMaster->query(
+			"SELECT DISTINCT
+				c.id AS contact_id,
+				format_cel_standart(coalesce(c.tel, '')) AS phone_cel
+			FROM order_contacts AS oc
+			JOIN contacts AS c ON c.id = oc.contact_id
+			WHERE oc.order_id = $1
+			ORDER BY c.id",
+			array((int)$ar['order_id'])
+		);
+
+		$recipients = array();
+
+		while($contact = $dbLinkMaster->fetch_array($contact_query)){
+			$phone = trim((string)$contact['phone_cel']);
+
+			if($phone === ''){
+				continue;
 			}
-		}*/
-		
-		//Notification Max OR TM миксеристу с маршрутом
-		//Если в этот день на этот объект уже отправляли - не отправлять!
-		if(isset($ar['send_route_sms'])
-		&& $ar['send_route_sms']=='t'
-		&& $d_phone_exists
-		&& $ar['tracker_exists']=='t'
-		&& ( isset($ar['dr_tm_contact_id']) || isset($ar['dr_mx_contact_id']) )
-		){
-			$mix_pat = $dbLink->query_first(
-				"SELECT pattern FROM sms_patterns WHERE sms_type='mixer_route'::sms_types LIMIT 1"
+
+			$recipients[] = array(
+				'contact_id' => (int)$contact['contact_id'],
+				'phone_cel' => $phone
 			);
-			if(!is_array($mix_pat) || !isset($mix_pat['pattern'])){
+		}
+
+		if(count($recipients)){
+			if(!isset($ar['text']) || trim((string)$ar['text']) === ''){
+				throw new Exception('Шаблон уведомления об отгрузке не найден!');
+			}
+
+			$driver = (string)$ar['d_name'];
+
+			if($d_phone_exists){
+				$driver .= ' +7'.$d_phone;
+			}
+
+			$text = strtr($ar['text'], array(
+				'[quant]' => (string)$ar['quant'],
+				'[concrete]' => (string)$ar['concrete'],
+				'[car]' => (string)$ar['v_plate'],
+				'[quant_shipped]' => (string)$ar['quant_shipped'],
+				'[quant_ordered]' => (string)$ar['quant_ordered'],
+				'[driver]' => $driver
+			));
+
+			if($ar['tracker_exists'] == 't'){
+				$text .= ' '.ROUTE_HREF.$idForDb;
+			}
+
+			foreach($recipients as $recipient){
+				add_notification_from_contact(
+					$dbLinkMaster,
+					$recipient['phone_cel'],
+					$text,
+					'ship',
+					$ar['doc_ref'],
+					$recipient['contact_id']
+				);
+			}
+
+			$smsResOk = 1;
+			$smsResStr = 'Уведомления контактам заявки переданы в очередь.';
+		}
+
+		// Pump-driver shipment notifications remain disabled.
+
+		// Driver route notifications are independent of the order contact list.
+		if(
+			isset($ar['send_route_sms'])
+			&& $ar['send_route_sms'] == 't'
+			&& $d_phone_exists
+			&& $ar['tracker_exists'] == 't'
+			&& (isset($ar['dr_tm_contact_id']) || isset($ar['dr_mx_contact_id']))
+		){
+			$mix_pat = $dbLinkMaster->query_first(
+				"SELECT pattern
+				FROM sms_patterns
+				WHERE sms_type = 'mixer_route'::sms_types
+				LIMIT 1"
+			);
+
+			if(
+				!is_array($mix_pat)
+				|| !isset($mix_pat['pattern'])
+				|| trim((string)$mix_pat['pattern']) === ''
+			){
+				$smsResStr = (
+					$smsResOk === 1
+						? 'Уведомления контактам заявки переданы в очередь. '
+						: ''
+				).'Не найден шаблон уведомления водителю (mixer_route).';
+
+				$smsResOk = 0;
+
 				return;
 			}
-			$text = str_replace('[href]', ROUTE_HREF.'m'.$idForDb, $mix_pat['pattern']);
-			
-			if(isset($ar["dr_mx_contact_id"])){
-				add_notification_from_contact_max($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['dr_mx_contact_id']);
 
-			} else if(isset($ar["dr_tm_contact_id"])){
-				add_notification_from_contact_tm($dbLinkMaster, $ar['phone_cel'], $text, 'ship', $ar['doc_ref'], $ar['dr_tm_contact_id']);
+			$text = str_replace(
+				'[href]',
+				ROUTE_HREF.'m'.$idForDb,
+				$mix_pat['pattern']
+			);
+
+			if(isset($ar['dr_mx_contact_id'])){
+				add_notification_from_contact_max(
+					$dbLinkMaster,
+					$d_phone,
+					$text,
+					'ship',
+					$ar['doc_ref'],
+					$ar['dr_mx_contact_id']
+				);
+			}else if(isset($ar['dr_tm_contact_id'])){
+				add_notification_from_contact_tm(
+					$dbLinkMaster,
+					$d_phone,
+					$text,
+					'ship',
+					$ar['doc_ref'],
+					$ar['dr_tm_contact_id']
+				);
 			}
+
+			$smsResOk = 1;
+			$smsResStr = 'Уведомления переданы в очередь.';
 		}
-	}
-	
-	public static function setShipped($dbLinkMaster,$dbLink,$idForDb,$operatorUserId,$smsResOk,$smsResStr,$interactiveMode){
+	}	
+
+	public static function setShipped($dbLinkMaster, $dbLink, $idForDb,
+		$operatorUserId, &$smsResOk, &$smsResStr, $interactiveMode){
+
+		$smsResOk = 0;
+		$smsResStr = '';
+
+		$shipment_id = (int)$idForDb;
+		$operator_user_id = (int)$operatorUserId;
+
+		if($shipment_id <= 0){
+			throw new Exception('Некорректный идентификатор отгрузки!');
+		}
+
+		if($operator_user_id <= 0){
+			throw new Exception('Не указан пользователь, выполнивший отгрузку!');
+		}
+
+		$dbLinkMaster->query('BEGIN');
+
 		try{
-			$dbLinkMaster->query("BEGIN");
-			
-			//RETURNING order_id,date_time::date AS date
-			//$upd_res = $dbLinkMaster->query_first(
-			
-			$dbLinkMaster->query(
-				sprintf(
+			$ar = $dbLinkMaster->query_first(
 				"UPDATE shipments
 				SET
-					shipped=TRUE,
-					operator_user_id=%d
-				WHERE id=%d",
-				$_SESSION["user_id"],
-				$idForDb
-				)
+					shipped = TRUE,
+					operator_user_id = $2
+				WHERE id = $1
+				RETURNING id",
+				array($shipment_id, $operator_user_id)
 			);
-		
-			$dbLinkMaster->query("COMMIT");
-		}
-		catch (Exception $e){
-			$dbLinkMaster->query("ROLLBACK");
+
+			if(!is_array($ar) || !isset($ar['id'])){
+				throw new Exception('Отгрузка не найдена!');
+			}
+
+			$dbLinkMaster->query('COMMIT');
+		}catch(Throwable $e){
+			try{
+				$dbLinkMaster->query('ROLLBACK');
+			}catch(Throwable $rollback_error){
+				error_log($rollback_error->getMessage());
+			}
+
 			throw $e;
-		}		
-	
-		Graph_Controller::clearCacheOnShipId($dbLink,$idForDb);		
-		self::sendShipSMS($dbLinkMaster,$dbLink,$idForDb,$smsResOk,$smsResStr,$interactiveMode);	
+		}
+
+		// The shipment is committed. Report subsequent failures separately.
+		$cache_warning = '';
+
+		try{
+			Graph_Controller::clearCacheOnShipId($dbLinkMaster, $shipment_id);
+		}catch(Throwable $e){
+			error_log(sprintf(
+				'Shipment %d: graph cache error: %s',
+				$shipment_id,
+				$e->getMessage()
+			));
+
+			$cache_warning = 'Отгрузка отмечена, но не удалось обновить график.';
+		}
+
+		try{
+			self::sendShipSMS(
+				$dbLinkMaster,
+				$dbLink,
+				$shipment_id,
+				$smsResOk,
+				$smsResStr,
+				$interactiveMode
+			);
+		}catch(Throwable $e){
+			error_log(sprintf(
+				'Shipment %d: notification queue error: %s',
+				$shipment_id,
+				$e->getMessage()
+			));
+
+			$smsResOk = 0;
+			$smsResStr = 'Отгрузка отмечена, но возникла ошибка при постановке уведомлений в очередь. '
+				.'Часть уведомлений могла быть добавлена.';
+		}
+
+		if($cache_warning !== ''){
+			$smsResStr = trim($smsResStr.' '.$cache_warning);
+		}
 	}
-	
+
 	public function set_shipped($pm){
 		$sms_res_ok = 0;
 		$sms_res_str = '';
-		
+
+		$operator_user_id = isset($_SESSION['user_id'])
+			? (int)$_SESSION['user_id']
+			: 0;
+
 		self::setShipped(
 			$this->getDbLinkMaster(),
 			$this->getDbLink(),
-			$this->getExtDbVal($pm,"id"),
-			$_SESSION["user_id"],
+			$this->getExtDbVal($pm, 'id'),
+			$operator_user_id,
 			$sms_res_ok,
 			$sms_res_str,
 			FALSE
 		);
-		
-		$this->addModel(new ModelVars(
-			array('id'=>'SMSSend',
-				'values'=>array(
-					new Field('sent',DT_INT,
-						array('value'=>$sms_res_ok))
-					,					
-					new Field('resp',DT_STRING,
-						array('value'=>$sms_res_str))
-					)
-				)
+
+		$this->addModel(new ModelVars(array(
+			'id' => 'SMSSend',
+			'values' => array(
+				new Field('sent', DT_INT, array(
+					'value' => $sms_res_ok
+				)),
+				new Field('resp', DT_STRING, array(
+					'value' => $sms_res_str
+				))
 			)
-		);				
-		
+		)));
 	}
+
 	public function unset_shipped(){
 		$pm = $this->getPublicMethod("unset_shipped");
 		$dbLink = $this->getDbLink();
@@ -3104,7 +3223,6 @@ class Shipment_Controller extends ControllerSQL{
 			throw new Exception('Транспортное средство не найдено!');
 		}
 
-		/* throw new Exception($this->getExtVal($pm, 'period_from')); */
 		$period_from = (new DateTime())->setTimestamp($this->getExtVal($pm, 'period_from'));
 		$period_to = (new DateTime())->setTimestamp($this->getExtVal($pm, 'period_to'));
 
@@ -3152,6 +3270,7 @@ class Shipment_Controller extends ControllerSQL{
 				$dt_value = $dt->format('Y-m-d');
 				$out_fl = '';
 				$fl_name = '';
+
 				try{
 					try{
 						ExcelTemplate_Controller::genFilledTemplate(

@@ -57,13 +57,6 @@ type contactPayload struct {
 	VCFInfo  *string `json:"vcf_info,omitempty"`
 }
 
-type activationRow struct {
-	ID        int64
-	ContactID *int64
-	Used      bool
-	Expired   bool
-}
-
 func parseUpdate(raw []byte) (UpdateEnvelope, error) {
 	var update UpdateEnvelope
 	if err := json.Unmarshal(raw, &update); err != nil {

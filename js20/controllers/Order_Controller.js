@@ -65,6 +65,8 @@ extend(Order_Controller,ControllerObjServer);
 	
 	var pm = this.getInsert();
 	
+	pm.setRequestType('post');
+	
 	var options = {};
 	options.primaryKey = true;options.autoInc = true;
 	var field = new FieldInt("id",options);
@@ -260,12 +262,18 @@ extend(Order_Controller,ControllerObjServer);
 	
 	pm.addField(new FieldInt("ret_id",{}));
 	
+		var options = {};
+		options.alias = "Контакты";		
+		pm.addField(new FieldJSON("contact_list",options));
+	
 	
 }
 
 			Order_Controller.prototype.addUpdate = function(){
 	Order_Controller.superclass.addUpdate.call(this);
 	var pm = this.getUpdate();
+	
+	pm.setRequestType('post');
 	
 	var options = {};
 	options.primaryKey = true;options.autoInc = true;
@@ -464,6 +472,10 @@ extend(Order_Controller,ControllerObjServer);
 	
 	pm.addField(field);
 	
+		var options = {};
+		options.alias = "Контакты";		
+		pm.addField(new FieldJSON("contact_list",options));
+	
 	
 }
 
@@ -547,6 +559,9 @@ extend(Order_Controller,ControllerObjServer);
 	var f_opts = {};
 	
 	pm.addField(new FieldJSON("contacts_ref",f_opts));
+	var f_opts = {};
+	
+	pm.addField(new FieldJSON("contact_list",f_opts));
 	var f_opts = {};
 	f_opts.alias = "Ссылка на справочник 1с";
 	pm.addField(new FieldJSONB("ref_1c",f_opts));

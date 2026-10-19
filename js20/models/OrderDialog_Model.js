@@ -437,6 +437,15 @@ function OrderDialog_Model(options){
 	
 	options.fields.client_debt_date = new FieldDateTime("client_debt_date",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.contact_list = new FieldJSON("contact_list",filed_options);
+	
 		OrderDialog_Model.superclass.constructor.call(this,id,options);
 }
 extend(OrderDialog_Model,ModelXML);
