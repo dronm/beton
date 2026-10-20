@@ -1301,6 +1301,7 @@ AppBeton.prototype.MSG_OFFLINE_THROTLE = 5 * 60 * 1000;
 AppBeton.prototype.MSG_DURATION = 10 * 1000;
 
 AppBeton.prototype.initWorkers = function() {
+	/*
 	console.log('AppBeton.initWorkers');
 
 	if ('serviceWorker' in navigator) {
@@ -1308,6 +1309,7 @@ AppBeton.prototype.initWorkers = function() {
 	}
 
 	this.bindNetworkStatusEvents();
+	*/
 };
 
 AppBeton.prototype.initServiceWorker = function() {
