@@ -565,8 +565,8 @@ AppBeton.prototype.sendNotification = function(ref) {
 	var closeForm = function(v, f) {
 		v.delDOM()
 		f.delDOM();
-		delete v;
-		delete f;
+		v = null;
+		f = null;
 	}
 
 	var form = new WindowFormModalBS("notification", {
@@ -811,7 +811,6 @@ AppBeton.prototype.setSelectLoginRoleOnServer = function(roleId) {
 		this.closeSelectLoginRole();
 		return;
 	}
-	const self = this;
 	const pm = (new User_Controller()).getPublicMethod("select_login_role");
 	pm.setFieldValue("role_id", roleId);
 	pm.run({
@@ -986,7 +985,7 @@ AppBeton.prototype.htmlTagVideo = function(msg, chat) {
 				doc = document,
 				docElem = doc.documentElement,
 				body = doc.getElementsByTagName('body')[0],
-				x = (win.innerWidth || docElem.clientWidth || body.clientWidth) - 10,
+				//x = (win.innerWidth || docElem.clientWidth || body.clientWidth) - 10,
 				y = (win.innerHeight || docElem.clientHeight || body.clientHeight) - 150;
 			var img_w = w;
 			var img_h = h;
@@ -1126,7 +1125,7 @@ AppBeton.prototype.htmlTagPhoto = function(msg, chat) {
 				doc = document,
 				docElem = doc.documentElement,
 				body = doc.getElementsByTagName('body')[0],
-				x = (win.innerWidth || docElem.clientWidth || body.clientWidth) - 10,
+				//x = (win.innerWidth || docElem.clientWidth || body.clientWidth) - 10,
 				y = (win.innerHeight || docElem.clientHeight || body.clientHeight) - 150;
 			var img_w = w;
 			var img_h = h;
@@ -1188,7 +1187,7 @@ AppBeton.prototype.htmlTagSticker = function(msg, chat) {
 				doc = document,
 				docElem = doc.documentElement,
 				body = doc.getElementsByTagName('body')[0],
-				x = (win.innerWidth || docElem.clientWidth || body.clientWidth) - 10,
+				//x = (win.innerWidth || docElem.clientWidth || body.clientWidth) - 10,
 				y = (win.innerHeight || docElem.clientHeight || body.clientHeight) - 150;
 			var img_w = w;
 			var img_h = h;
@@ -1300,6 +1299,8 @@ AppBeton.prototype.MSG_OFFLINE = "Нет соединения, работа в �
 AppBeton.prototype.MSG_OFFLINE_THROTLE = 5 * 60 * 1000;
 AppBeton.prototype.MSG_DURATION = 10 * 1000;
 
+// js worker is used for push notifications and
+// offline mode.
 AppBeton.prototype.initWorkers = function() {
 	/*
 	console.log('AppBeton.initWorkers');
