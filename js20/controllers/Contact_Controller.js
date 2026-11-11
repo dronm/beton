@@ -32,6 +32,8 @@ function Contact_Controller(options){
 	this.addComplete();
 	this.add_complete_tm();
 	this.add_upsert();
+	this.add_get_facsimile();
+	this.add_process_facsimile();
 		
 }
 extend(Contact_Controller,ControllerObjServer);
@@ -216,6 +218,9 @@ extend(Contact_Controller,ControllerObjServer);
 	pm.addField(new FieldBool("tm_activated",f_opts));
 	var f_opts = {};
 	
+	pm.addField(new FieldJSON("max_data",f_opts));
+	var f_opts = {};
+	
 	pm.addField(new FieldInt("ext_id",f_opts));
 	pm.getField(this.PARAM_ORD_FIELDS).setValue("descr");
 	
@@ -314,6 +319,162 @@ extend(Contact_Controller,ControllerObjServer);
 		options.maxlength = "20";
 	
 		pm.addField(new FieldString("tel_ext",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Contact_Controller.prototype.add_get_facsimile = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('get_facsimile',opts);
+	
+	pm.setRequestType('post');
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		options.maxlength = "128";
+	
+		pm.addField(new FieldString("content_id",options));
+	
+			
+	this.addPublicMethod(pm);
+}
+
+			Contact_Controller.prototype.add_process_facsimile = function(){
+	var opts = {"controller":this};	
+	var pm = new PublicMethodServer('process_facsimile',opts);
+	
+	pm.setRequestType('post');
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		options.maxlength = "128";
+	
+		pm.addField(new FieldString("content_id",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		options.maxlength = "64";
+	
+		pm.addField(new FieldString("source_hash",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("x",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("y",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("width",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("height",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("output_width",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("output_height",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldBool("remove_background",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("fuzz",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldBool("save",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		pm.addField(new FieldInt("rotation",options));
+	
+				
+	
+	var options = {};
+	
+		options.required = true;
+	
+		options.maxlength = "7";
+	
+		pm.addField(new FieldString("background_color",options));
 	
 			
 	this.addPublicMethod(pm);

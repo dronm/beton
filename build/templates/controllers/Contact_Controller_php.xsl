@@ -28,6 +28,18 @@ class <xsl:value-of select="@id"/>_Controller extends <xsl:value-of select="@par
 
 <xsl:template name="extra_methods">
 
+	public function get_facsimile($pm) {
+		require_once(FUNC_PATH.'ContactFacsimile.php');
+		$this->addModel(ContactFacsimile::get($this, $pm));
+	}
+
+	public function process_facsimile($pm) {
+		require_once(FUNC_PATH.'ContactFacsimile.php');
+		$this->addModel(ContactFacsimile::process($this, $pm));
+	}
+
+
+
 	public function upsert($pm){
 		$tel_db = $this->getExtDbVal($pm, 'tel');
 

@@ -1,4 +1,4 @@
--- Function: transp_nakl_print(in_shipment_id int, in_shipment_ind int, in_buh_doc jsonb, in_consignee int)
+-- Function: transp_nakl_print(in_shipment_id int, in_shipment_ind int, in_buh_doc jsonb, in_consignee int)transp_nakl_print
 
 -- DROP FUNCTION transp_nakl_print(in_shipment_id int, in_shipment_ind int, in_buh_doc jsonb, in_consignee int);
 
@@ -185,7 +185,12 @@ AS $BODY$
 	LEFT JOIN vehicles vh ON vh.id = sch.vehicle_id
 	LEFT JOIN production_sites pr_st ON pr_st.id = sh.production_site_id
 	LEFT JOIN drivers dr ON dr.id = vh.driver_id
-	LEFT JOIN users AS op_u ON op_u.id = 563 --sh.operator_user_id
+
+	--LEFT JOIN users AS op_u ON op_u.id = 563 --sh.operator_user_id
+	LEFT JOIN operators_for_transp_nakl_schedules AS opers ON 
+		opers.production_site_id  = sh.production_site_id AND opers.for_date = sh.date_time::date
+	LEFT JOIN users AS op_u ON op_u.id  = opers.user_id
+
 	LEFT JOIN vehicle_owners AS v_own ON v_own.id = vh.official_vehicle_owner_id
 	LEFT JOIN clients AS vh_cl ON vh_cl.id = v_own.client_id
 	

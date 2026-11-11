@@ -15,6 +15,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSON.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtArray.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBigInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
 
 /**
@@ -294,9 +295,131 @@ class Contact_Controller extends ControllerSQL{
 			
 		$this->addPublicMethod($pm);
 
+			
+		$pm = new PublicMethod('get_facsimile');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('id',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=128;
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtString('content_id',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
+			
+		$pm = new PublicMethod('process_facsimile');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('id',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=128;
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtString('content_id',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=64;
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtString('source_hash',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('x',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('y',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('width',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('height',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('output_width',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('output_height',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtBool('remove_background',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtInt('fuzz',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtBool('save',$opts));
+	
+				
+	$opts=array();
+					
+		$pm->addParam(new FieldExtInt('rotation',$opts));
+	
+				
+	$opts=array();
+	
+		$opts['length']=7;				
+		$pm->addParam(new FieldExtString('background_color',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
 		
 	}	
 	
+
+	public function get_facsimile($pm) {
+		require_once(FUNC_PATH.'ContactFacsimile.php');
+		$this->addModel(ContactFacsimile::get($this, $pm));
+	}
+
+	public function process_facsimile($pm) {
+		require_once(FUNC_PATH.'ContactFacsimile.php');
+		$this->addModel(ContactFacsimile::process($this, $pm));
+	}
+
+
 
 	public function upsert($pm){
 		$tel_db = $this->getExtDbVal($pm, 'tel');

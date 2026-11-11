@@ -1843,6 +1843,12 @@ feat(clients): add client merging with persistent per-user selections
 - Transfer references and delete merged clients in one transaction
 - Reject stale selections and roll back on conflicting data
 
+1.00433
+- Add cropping, zoom, proportional resizing and clockwise rotation.
+- Add background colour sampling, adjustable transparency tolerance and preview.
+- Configure ImageMagick through Config.php.
+- Update controller metadata and generation templates.
+- Add image-processing and UI regression tests.
 
 What to check, implement:
 - php-redis, check logout

@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-10-19 18:12:44</lastBuild></version>
+		<lastBuild>2026-11-11 04:46:43</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -336,10 +336,8 @@
 		<version dateOpen="2026-08-10 16:16:57" dateClose="2026-08-17 05:49:52">1.00428</version>
 		<version dateOpen="2026-08-18 08:38:57" dateClose="2026-08-21 06:01:16">1.00429</version>
 		<version dateOpen="2026-08-31 11:13:26" dateClose="2026-09-10 18:19:53">1.00430</version>
-		<version dateOpen="2026-09-22 10:33:18" dateClose="2026-10-19 18:12:47">1.00431</version>
-		<version dateOpen="2026-10-20 06:20:05" dateClose="2026-10-20 06:20:20">1.00432</version>
-		<version dateOpen="2026-10-20 06:50:14" dateClose="2026-10-20 07:12:55">1.00433</version>
-	</versions>
+		<version dateOpen="2026-09-22 10:33:18" dateClose="2026-10-28 09:26:14">1.00431</version>
+	<version dateOpen="2026-11-10 04:12:31" dateClose="2026-11-10 04:12:58">1.00432</version><version dateOpen="2026-11-11 04:08:20" dateClose="2026-11-11 04:46:46">1.00433</version></versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
 		<field id="vehicle_owner_client_list"/>
@@ -975,15 +973,10 @@
 			<field id="user_id" dataType="Int" refTable="users" refField="id" required="TRUE" primaryKey="TRUE"/>
 			<field id="client_id" dataType="Int" refTable="clients" refField="id" required="TRUE" primaryKey="TRUE"/>
 			<field id="selected_at" dataType="DateTimeTZ" required="TRUE" defaultValue="CURRENT_TIMESTAMP"/>
-			<index id="client_merge_selections_client_id_idx">
-				<field id="client_id"/>
-			</index>
+			<index id="client_merge_selections_client_id_idx"><field id="client_id"/></index>
 		</model>
 		<model id="ClientMergeList" parent="ModelSQL" dataTable="client_merge_list" virtual="TRUE">
-			<defaultOrder>
-				<field id="name"/>
-				<field id="id"/>
-			</defaultOrder>
+			<defaultOrder><field id="name"/><field id="id"/></defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
 			<field id="name" dataType="String" alias="Наименование"/>
 			<field id="inn" dataType="String" alias="ИНН"/>
@@ -991,10 +984,7 @@
 			<field id="orders_count" dataType="BigInt" alias="Количество заявок"/>
 		</model>
 		<model id="ClientMergeSelectedList" parent="ModelSQL" dataTable="client_merge_list" virtual="TRUE">
-			<defaultOrder>
-				<field id="name"/>
-				<field id="id"/>
-			</defaultOrder>
+			<defaultOrder><field id="name"/><field id="id"/></defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
 			<field id="name" dataType="String" alias="Наименование"/>
 			<field id="inn" dataType="String" alias="ИНН"/>
@@ -7873,6 +7863,26 @@
 				<field id="email" dataType="String" length="100" required="FALSE"/>
 				<field id="tel_ext" dataType="String" length="20" required="FALSE"/>
 			</publicMethod>
+			<publicMethod id="get_facsimile" requestType="post">
+				<field id="id" dataType="Int" required="TRUE"/>
+				<field id="content_id" dataType="String" length="128" required="TRUE"/>
+			</publicMethod>
+			<publicMethod id="process_facsimile" requestType="post">
+				<field id="id" dataType="Int" required="TRUE"/>
+				<field id="content_id" dataType="String" length="128" required="TRUE"/>
+				<field id="source_hash" dataType="String" length="64" required="TRUE"/>
+				<field id="x" dataType="Int" required="TRUE"/>
+				<field id="y" dataType="Int" required="TRUE"/>
+				<field id="width" dataType="Int" required="TRUE"/>
+				<field id="height" dataType="Int" required="TRUE"/>
+				<field id="output_width" dataType="Int" required="TRUE"/>
+				<field id="output_height" dataType="Int" required="TRUE"/>
+				<field id="remove_background" dataType="Bool" required="TRUE"/>
+				<field id="fuzz" dataType="Int" required="TRUE"/>
+				<field id="save" dataType="Bool" required="TRUE"/>
+				<field id="rotation" dataType="Int" required="FALSE"/>
+				<field id="background_color" dataType="String" length="7" required="FALSE"/>
+			</publicMethod>
 		</controller>
 		<controller id="EntityContact" parentId="ControllerSQL" noState="FALSE">
 			<publicMethod id="insert" modelId="EntityContact"/>
@@ -8564,6 +8574,7 @@
 		<view id="10016" c="VehicleSchedule_Controller" t="VehicleScheduleList" f="get_list" section="Справочники" descr="Расписания работы ТС"/>
 		<view id="10017" c="RawMaterial_Controller" t="RawMaterialList" f="get_list" section="Справочники" descr="Материалы"/>
 		<view id="10018" c="ProductionSite_Controller" t="ProductionSiteList" f="get_list" section="Справочники" descr="Заводы"/>
+		<view id="10064" t="ProductionSiteManager" section="Справочники" descr="Управление заводами"/>
 		<view id="10019" c="ShipQuantForCostGrade_Controller" t="ShipQuantForCostGradeList" f="get_list" section="Справочники" descr="Минимальные объемы для расчета стоимости доставки"/>
 		<view id="10020" c="RawMaterialConsRateDate_Controller" t="RawMaterialConsRateDateList" f="get_list" section="Справочники" descr="Нормы расхода материалов"/>
 		<view id="10021" c="SMSPattern_Controller" t="SMSPatternList" f="get_list" section="Справочники" descr="Шаблоны СМС сообщений"/>
@@ -8751,6 +8762,7 @@
 		<serverTemplate id="RouteToDestAvgTimeRep"/>
 		<serverTemplate id="VehicleEfficiency"/>
 		<serverTemplate id="ProductionSiteList"/>
+		<serverTemplate id="ProductionSiteManager"/>
 		<serverTemplate id="ProductionSiteForEditList"/>
 		<serverTemplate id="ProductionBaseList"/>
 		<serverTemplate id="ShipQuantForCostGradeList"/>
@@ -9410,6 +9422,7 @@
 		<jsScript file="js20/views/OperatorList_View.js"/>
 		<jsScript file="js20/views/VehicleRun_View.js"/>
 		<jsScript file="js20/views/ProductionSiteList_View.js"/>
+		<jsScript file="js20/views/ProductionSiteManager_View.js"/>
 		<jsScript file="js20/views/ProductionSiteForEditList_View.js"/>
 		<jsScript file="js20/views/ProductionBaseList_View.js"/>
 		<jsScript file="js20/views/ShipQuantForCostGradeList_View.js"/>
@@ -9504,6 +9517,7 @@
 		<jsScript file="js20/views/PostDialog_View.js"/>
 		<jsScript file="js20/views/ContactList_View.js"/>
 		<jsScript file="js20/views/ContactDialog_View.js"/>
+		<jsScript file="js20/custom_controls/ContactFacsimileEditor.js"/>
 		<jsScript file="js20/views/EntityContactList_View.js"/>
 		<jsScript file="js20/views/RawMaterialTicketList_View.js"/>
 		<jsScript file="js20/views/RawMaterialTicketClose_View.js"/>

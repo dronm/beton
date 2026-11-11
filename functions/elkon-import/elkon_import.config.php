@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 return array(
 	'postgres' => array(
-		'dsn' => 'pgsql:host=192.168.1.177;port=6432;dbname=beton',
+		'dsn' => 'pgsql:host=localhost;port=6432;dbname=beton',
 		'user' => 'beton',
 		'password' => '159753',
 	),

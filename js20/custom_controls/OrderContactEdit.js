@@ -59,7 +59,7 @@ function OrderContactEdit(id, options){
 			});
 		}
 		this.addElement(new EditString(id+":descr", editOptions));
-		this.addElement(new EditPhone(id+":phone_cel", {
+		var phoneEdit = new EditPhone(id+":phone_cel", {
 			labelCaption: "Телефон:", labelClassName: labelClass,
 			enabled: !self.m_readOnly,
 			onClear: function(){ self.onEdit(); },
@@ -69,7 +69,17 @@ function OrderContactEdit(id, options){
 				keyup: function(){ self.onEdit(); self.onLeaveContact(); },
 				blur: function(){ self.onLeaveContact(); }
 			}
-		}));
+		});
+		// Edit.setValue() initializes Cleave from the current input value. For a phone
+		// that value must already contain Cleave's +7 prefix; otherwise Cleave treats
+		// the first two subscriber digits as the configured prefix and drops them.
+		// Also keep the mask initialization idempotent: Edit.toDOM() calls it again.
+		var applyPhoneMask = phoneEdit.applyMask;
+		phoneEdit.applyMask = function(){
+			if(this.m_cleave) return;
+			applyPhoneMask.call(this);
+		};
+		this.addElement(phoneEdit);
 		// Keep messenger controls separate from Edit's ErrorControl. Clearing a
 		// messenger must not detach the input's validation error node.
 		this.addElement(new ControlContainer(id+":messenger", "DIV", {className: "order-contact-messenger"}));
@@ -103,6 +113,17 @@ OrderContactEdit.normalizePhone = function(value){
 	var phone = value == null ? "" : String(value).replace(/\D/g, "");
 	if(phone.length === 11 && (phone[0] === "7" || phone[0] === "8")) phone = phone.substring(1);
 	return phone;
+};
+OrderContactEdit.setPhoneValue = function(control, value){
+	var phone = OrderContactEdit.normalizePhone(value);
+	// EditPhone normally creates Cleave from an empty input during rendering. A row
+	// loaded from contact_list receives its value before rendering, so initialize the
+	// formatter with its configured prefix first and then use the normal setValue path.
+	if(window["Cleave"] && control.m_formatterOptions && !control.m_cleave){
+		control.getNode().value = control.m_formatterOptions.prefix || "";
+		control.applyMask();
+	}
+	control.setValue(phone);
 };
 OrderContactEdit.fieldValue = function(fields, name){
 	return fields && fields[name] && fields[name].getValue ? fields[name].getValue() : undefined;
@@ -142,7 +163,7 @@ OrderContactEdit.prototype.onEdit = function(){
 OrderContactEdit.prototype.clearContact = function(){
 	this.m_settingValue = true;
 	this.getElement("descr").setValue("");
-	this.getElement("phone_cel").setValue("");
+	OrderContactEdit.setPhoneValue(this.getElement("phone_cel"), "");
 	this.m_settingValue = false;
 	this.onEdit();
 };
@@ -154,7 +175,7 @@ OrderContactEdit.prototype.setValue = function(value){
 	this.m_linkId = OrderContactEdit.parseId(value.id);
 	this.m_contactId = OrderContactEdit.parseId(value.contact_id || contact.contact_id || (value.contact && contact.id));
 	this.getElement("descr").setValue(contact.name == null ? (contact.descr || "") : String(contact.name));
-	this.getElement("phone_cel").setValue(OrderContactEdit.normalizePhone(contact.tel == null ? contact.phone_cel : contact.tel));
+	OrderContactEdit.setPhoneValue(this.getElement("phone_cel"), contact.tel == null ? contact.phone_cel : contact.tel);
 	this.m_identity = this.currentIdentity();
 	this.m_settingValue = false;
 	this.hideMsngInvite();
@@ -238,7 +259,7 @@ OrderContactEdit.prototype.onSelectDescr = function(fields){
 	var get = OrderContactEdit.fieldValue;
 	this.m_settingValue = true;
 	this.getElement("descr").setValue(get(fields, "descr") || "");
-	this.getElement("phone_cel").setValue(OrderContactEdit.normalizePhone(get(fields, "phone_cel")));
+	OrderContactEdit.setPhoneValue(this.getElement("phone_cel"), get(fields, "phone_cel"));
 	this.m_contactId = OrderContactEdit.parseId(get(fields, "contact_id"));
 	this.m_identity = this.currentIdentity();
 	this.m_revision++;
@@ -396,4 +417,3 @@ OrderContactEdit.prototype.delDOM = function(){
 	this.hideMsngInvite();
 	OrderContactEdit.superclass.delDOM.call(this);
 };
-

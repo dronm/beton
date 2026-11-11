@@ -1,0 +1,18 @@
+ insert into shipments (date_time, order_id, vehicle_schedule_id, quant, user_id, shipped, operator_user_id, ship_date_time, production_site_id, 
+ owner_agreed, pump_for_client_cost_edit,owner_pump_agreed, pump_cost_edit   )
+ VALUES (
+	'2026-10-17 20:55:00', 142328, 
+	 (select sch.id from vehicle_schedules AS sch where sch.schedule_date='2026-10-17' and vehicle_id=(select v.id from vehicles AS v where v.plate ilike '%323%')), 
+	 0, 80, true, 1047, '2026-10-17 20:55:00', 2, false, false, false, false
+)
+
+--select * from operators_for_transp_nakl_schedules where for_date =
+--select * from users where name ilike '%Смирнов%'
+update operators_for_transp_nakl_schedules set user_id = 1047
+where id in (
+	SELECT id 
+	FROM operators_for_transp_nakl_schedules
+	WHERE EXTRACT(MONTH FROM for_date) = 11
+	  AND EXTRACT(YEAR FROM for_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+	 and user_id = 1048
+)

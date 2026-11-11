@@ -1550,6 +1550,10 @@ $permissions = array();
 				
 					$permissions['Contact_Controller_upsert']=TRUE;
 				
+					$permissions['Contact_Controller_get_facsimile']=TRUE;
+				
+					$permissions['Contact_Controller_process_facsimile']=TRUE;
+				
 					$permissions['EntityContact_Controller_insert']=TRUE;
 				
 					$permissions['EntityContact_Controller_update']=TRUE;

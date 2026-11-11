@@ -2,7 +2,9 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"test": "node client-merge.test.js && node client-merge-selection.test.js && node client-merge-list.test.js && node client-merge-ui.test.cjs"
+		"test": "node client-merge.test.js && node client-merge-selection.test.js && node client-merge-list.test.js && node client-merge-ui.test.cjs && node production-site-manager.test.cjs",
+		"test:plants": "node production-site-manager.test.cjs",
+		"test:facsimile": "node contact-facsimile-ui.test.ts"
 	},
 	"devDependencies": {
 		"@electric-sql/pglite": "0.5.10",

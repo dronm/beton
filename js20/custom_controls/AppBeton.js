@@ -565,8 +565,8 @@ AppBeton.prototype.sendNotification = function(ref) {
 	var closeForm = function(v, f) {
 		v.delDOM()
 		f.delDOM();
-		v = null;
-		f = null;
+		delete v;
+		delete f;
 	}
 
 	var form = new WindowFormModalBS("notification", {
@@ -811,6 +811,7 @@ AppBeton.prototype.setSelectLoginRoleOnServer = function(roleId) {
 		this.closeSelectLoginRole();
 		return;
 	}
+	const self = this;
 	const pm = (new User_Controller()).getPublicMethod("select_login_role");
 	pm.setFieldValue("role_id", roleId);
 	pm.run({
@@ -985,7 +986,7 @@ AppBeton.prototype.htmlTagVideo = function(msg, chat) {
 				doc = document,
 				docElem = doc.documentElement,
 				body = doc.getElementsByTagName('body')[0],
-				//x = (win.innerWidth || docElem.clientWidth || body.clientWidth) - 10,
+				x = (win.innerWidth || docElem.clientWidth || body.clientWidth) - 10,
 				y = (win.innerHeight || docElem.clientHeight || body.clientHeight) - 150;
 			var img_w = w;
 			var img_h = h;
@@ -1125,7 +1126,7 @@ AppBeton.prototype.htmlTagPhoto = function(msg, chat) {
 				doc = document,
 				docElem = doc.documentElement,
 				body = doc.getElementsByTagName('body')[0],
-				//x = (win.innerWidth || docElem.clientWidth || body.clientWidth) - 10,
+				x = (win.innerWidth || docElem.clientWidth || body.clientWidth) - 10,
 				y = (win.innerHeight || docElem.clientHeight || body.clientHeight) - 150;
 			var img_w = w;
 			var img_h = h;
@@ -1187,7 +1188,7 @@ AppBeton.prototype.htmlTagSticker = function(msg, chat) {
 				doc = document,
 				docElem = doc.documentElement,
 				body = doc.getElementsByTagName('body')[0],
-				//x = (win.innerWidth || docElem.clientWidth || body.clientWidth) - 10,
+				x = (win.innerWidth || docElem.clientWidth || body.clientWidth) - 10,
 				y = (win.innerHeight || docElem.clientHeight || body.clientHeight) - 150;
 			var img_w = w;
 			var img_h = h;
@@ -1299,10 +1300,7 @@ AppBeton.prototype.MSG_OFFLINE = "Нет соединения, работа в �
 AppBeton.prototype.MSG_OFFLINE_THROTLE = 5 * 60 * 1000;
 AppBeton.prototype.MSG_DURATION = 10 * 1000;
 
-// js worker is used for push notifications and
-// offline mode.
 AppBeton.prototype.initWorkers = function() {
-	/*
 	console.log('AppBeton.initWorkers');
 
 	if ('serviceWorker' in navigator) {
@@ -1310,7 +1308,6 @@ AppBeton.prototype.initWorkers = function() {
 	}
 
 	this.bindNetworkStatusEvents();
-	*/
 };
 
 AppBeton.prototype.initServiceWorker = function() {
@@ -1519,27 +1516,52 @@ AppBeton.prototype.normalizePath = (path) => {
 	return path.startsWith("/") ? path : "/"+path;
 };
 
-AppBeton.prototype.sendCommandToElkon = async function(cmd, queryId, body) {
-	const base = (this.m_servVars.debug == "1")?
-		this.ELKON_DEBUG_SRV : this.m_servVars.basePath;
-	const url = this.normalizePath(base) + "eurobeton/api-post/elkon-production-cmd/" + cmd
-
-	const response = await fetch(url, {
+/** Send a plant command using the current browser session's token cookie. */
+AppBeton.prototype.sendCommandToElkon = async function(cmd, queryId, body, options) {
+	options = options || {};
+	if (["get", "set-config-params", "fetch-production", "fetch-config"].indexOf(cmd) < 0) {
+		throw new Error("Неизвестная команда завода: " + cmd);
+	}
+	if (!queryId) {
+		throw new Error("Не задан идентификатор запроса.");
+	}
+	var base = this.m_servVars.basePath || window.location.href;
+	var apiPath = this.m_servVars.elkonCommandApiURL || "eurobeton/api-post/elkon-production-cmd/";
+	var apiBase = new URL(apiPath, base);
+	if (!apiBase.pathname.endsWith("/")) {
+		apiBase.pathname += "/";
+	}
+	var url = new URL(cmd, apiBase);
+	var response = await fetch(url.toString(), {
 		method: "POST",
+		credentials: "include",
+		cache: "no-store",
 		headers: {
 			"Content-Type": "application/json",
-			"Query-Id": queryId,
-			"Cookie": "_s="+this.m_servVars.token,
+			"Query-Id": queryId
 		},
-		body
+		body: typeof body === "string" ? body : JSON.stringify(body),
+		signal: options.signal
 	});
-
-	const bodyResp = await response.text();
-
-	if (!response.ok) {
-		throw new Error("fetch-config failed: HTTP:"+response.status+"; body:"+bodyResp);
+	var text = await response.text();
+	var result = null;
+	if (text.trim()) {
+		try {
+			result = JSON.parse(text);
+		}
+		catch (error) {
+			if (response.ok) {
+				throw new Error("Сервер вернул некорректный JSON: " + text);
+			}
+		}
 	}
-}
+	if (!response.ok || (result && (result.error || result.success === false))) {
+		var detail = result && result.error;
+		var message = detail && detail.message ? detail.message : (typeof detail === "string" ? detail : text);
+		throw new Error(cmd + ": HTTP " + response.status + (message ? "; " + message : ""));
+	}
+	return {status: response.status, body: result, text: text};
+};
 
 AppBeton.prototype.initOSMLayer = function() {
 	return new OpenLayers.Layer.OSM(
