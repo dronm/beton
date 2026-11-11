@@ -274,6 +274,15 @@ function OrderMakeForLabList_Model(options){
 	
 	options.fields.is_needed = new FieldBool("is_needed",filed_options);
 	
+				
+	
+	var filed_options = {};
+	filed_options.primaryKey = false;	
+	
+	filed_options.autoInc = false;	
+	
+	options.fields.contact_list = new FieldJSON("contact_list",filed_options);
+	
 		OrderMakeForLabList_Model.superclass.constructor.call(this,id,options);
 }
 extend(OrderMakeForLabList_Model,ModelXML);

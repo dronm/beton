@@ -254,6 +254,15 @@ class OrderMakeForLabList_Model extends ModelSQLBeton{
 		$f_is_needed=new FieldSQLBool($this->getDbLink(),$this->getDbName(),$this->getTableName(),"is_needed",$f_opts);
 		$this->addField($f_is_needed);
 		//********************
+		
+		//*** Field contact_list ***
+		$f_opts = array();
+		$f_opts['sysCol']=TRUE;
+		$f_opts['id']="contact_list";
+						
+		$f_contact_list=new FieldSQLJSON($this->getDbLink(),$this->getDbName(),$this->getTableName(),"contact_list",$f_opts);
+		$this->addField($f_contact_list);
+		//********************
 	$this->setLimitConstant('doc_per_page_count');
 	}
 

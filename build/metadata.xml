@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-11-11 04:46:43</lastBuild></version>
+		<lastBuild>2026-11-11 08:33:17</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -337,7 +337,7 @@
 		<version dateOpen="2026-08-18 08:38:57" dateClose="2026-08-21 06:01:16">1.00429</version>
 		<version dateOpen="2026-08-31 11:13:26" dateClose="2026-09-10 18:19:53">1.00430</version>
 		<version dateOpen="2026-09-22 10:33:18" dateClose="2026-10-28 09:26:14">1.00431</version>
-	<version dateOpen="2026-11-10 04:12:31" dateClose="2026-11-10 04:12:58">1.00432</version><version dateOpen="2026-11-11 04:08:20" dateClose="2026-11-11 04:46:46">1.00433</version></versions>
+	<version dateOpen="2026-11-10 04:12:31" dateClose="2026-11-10 04:12:58">1.00432</version><version dateOpen="2026-11-11 04:08:20" dateClose="2026-11-11 04:46:46">1.00433</version><version dateOpen="2026-11-11 07:02:42" dateClose="2026-11-11 08:09:14">1.00434</version><version dateOpen="2026-11-11 08:39:19" dateClose="2026-11-11 08:39:31">1.00435</version></versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
 		<field id="vehicle_owner_client_list"/>
@@ -1894,6 +1894,7 @@
 			<field id="pump_vehicle_length" dataType="Int"/>
 			<field id="pump_vehicle_comment" dataType="String"/>
 			<field id="is_needed" dataType="Bool"/>
+			<field id="contact_list" dataType="JSON" sysCol="TRUE"/>
 		</model>
 		<model id="OrderMakeForLabDialog" parent="ModelSQLBeton" dataTable="orders_make_for_lab_dialog" virtual="TRUE">
 			<field id="id" dataType="Int" primaryKey="TRUE"/>

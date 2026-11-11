@@ -223,4 +223,4 @@ ContactList_View.prototype.showPhotoMax = function(ctrl, maxData){
 		'<div><img src="'+maxData.avatar_url+'"/></div>',
 		{"title":"Данные по контакту"}
 	);
-}
+};

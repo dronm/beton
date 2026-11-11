@@ -1850,6 +1850,12 @@ feat(clients): add client merging with persistent per-user selections
 - Update controller metadata and generation templates.
 - Add image-processing and UI regression tests.
 
+
+1.00434
+- Bug: lab worker interface error
+
+
+
 What to check, implement:
 - php-redis, check logout
 - Vehicle->get_track(), pass result to osrm

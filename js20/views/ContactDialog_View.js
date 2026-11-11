@@ -1,4 +1,4 @@
-"use strict";
+//"use strict";
 // @ts-nocheck -- Legacy view framework is untyped. This is the source for ContactDialog_View.js.
 /**
  * @author Andrey Mikhalevich <katrenplus@mail.ru>, 2017,2025
