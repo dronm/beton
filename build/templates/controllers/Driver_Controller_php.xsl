@@ -60,6 +60,15 @@ class <xsl:value-of select="@id"/>_Controller extends ControllerSQL{
 			),
 		'WorkTimeReport_Model');
 	}
+
+	public function vehicleDriverWorkTime($pm){
+		$this->addNewModel(
+			sprintf("SELECT * FROM public.vehicle_driver_work_time(%s::date)",
+				$this->getExtDbVal($pm, 'month_date')
+			),
+			'WorkTimeReport_Model'
+		);
+	}
 }
 
 <![CDATA[?>]]>

@@ -23,9 +23,13 @@ class ContactFacsimileEditor {
 		this.rotation = 0;
 		this.pickingBackground = false;
 		this.sampleButton = null;
-		this.pointerStart = null;
-		this.pointerId = null;
+		this.drag = null;
+		this.hasSelection = false;
 		this.crop = { x: 0, y: 0, width: 1, height: 1 };
+		this.previewRevision = 0;
+		this.previewPending = false;
+		this.previewQueued = false;
+		this.backgroundMode = "auto";
 		this.cropLabel = document.createElement("p");
 		this.open = () => {
 			if (this.form || this.closed) {
@@ -114,7 +118,7 @@ class ContactFacsimileEditor {
 			this.status.setAttribute("role", "status");
 			this.status.setAttribute("aria-live", "polite");
 			const hint = document.createElement("p");
-			hint.textContent = "Выделите подпись мышью или задайте границы в пикселях. Масштаб просмотра не меняет размер готового файла.";
+			hint.textContent = "Обведите подпись мышью. Потяните за край или угол, чтобы изменить размер, или за середину, чтобы переместить рамку. Правый щелчок снимает выделение.";
 			const saveHint = document.createElement("p");
 			saveHint.className = "help-block";
 			saveHint.textContent = "«Применить» сохраняет файл сразу. «Отмена» оставляет загруженное изображение без обработки.";
@@ -128,14 +132,24 @@ class ContactFacsimileEditor {
 			this.zoom.value = "100";
 			this.zoom.addEventListener("input", this.updateZoom);
 			this.controls.push(this.zoom);
-			toolbar.append(this.label("Масштаб просмотра", this.zoom), this.zoomValue, this.button("Всё изображение", this.resetCrop), this.button("Повернуть на 90° ↻", this.rotateClockwise));
+			toolbar.append(this.label("Масштаб просмотра", this.zoom), this.zoomValue, this.button("Всё изображение", () => {
+				this.resetCrop();
+				this.process(false);
+			}), this.button("Повернуть на 90° ↻", this.rotateClockwise));
 			const scroll = document.createElement("div");
 			scroll.className = "facsimile-editor-source facsimile-editor-checkerboard";
 			this.canvas.setAttribute("aria-label", "Исходное изображение. Выделите прямоугольник для обрезки.");
 			this.canvas.addEventListener("pointerdown", this.startCrop);
 			this.canvas.addEventListener("pointermove", this.moveCrop);
 			this.canvas.addEventListener("pointerup", this.endCrop);
-			this.canvas.addEventListener("pointercancel", this.endCrop);
+			this.canvas.addEventListener("pointercancel", this.cancelCrop);
+			this.canvas.addEventListener("lostpointercapture", this.cancelCrop);
+			this.canvas.addEventListener("contextmenu", (event) => {
+				event.preventDefault();
+				if (!this.busy && this.source) {
+					this.resetCrop();
+				}
+			});
 			scroll.append(this.canvas);
 			const fields = document.createElement("div");
 			fields.className = "facsimile-editor-fields";
@@ -157,19 +171,14 @@ class ContactFacsimileEditor {
 			const backgroundFields = document.createElement("div");
 			backgroundFields.className = "facsimile-editor-toolbar";
 			this.background.type = "checkbox";
-			this.background.addEventListener("change", () => {
-				if (!this.background.checked) {
-					this.setPickingBackground(false);
-				}
-				this.invalidatePreview();
-			});
-			this.controls.push(this.background);
+			this.background.checked = true;
+			this.background.disabled = true;
 			this.backgroundColor.type = "color";
 			this.backgroundColor.value = "#ffffff";
 			this.backgroundColor.className = "form-control facsimile-editor-color";
 			const updateBackgroundColor = () => {
 				this.setPickingBackground(false);
-				this.background.checked = true;
+				this.backgroundMode = this.backgroundColor.value;
 				this.invalidatePreview();
 			};
 			this.backgroundColor.addEventListener("input", updateBackgroundColor);
@@ -190,14 +199,16 @@ class ContactFacsimileEditor {
 			backgroundHint.textContent = "По умолчанию убирается белый фон. Для серого или желтоватого фона выберите его цвет на изображении. Если фон остаётся, попробуйте допуск 15, 20 или 30%. Высокий допуск может удалить слабые линии подписи.";
 			this.preview.alt = "Предпросмотр результата обработки";
 			this.preview.hidden = true;
-			this.previewMessage.textContent = "Нажмите «Предпросмотр», чтобы проверить результат. Шахматный фон обозначает прозрачность.";
 			const previewBox = document.createElement("div");
 			previewBox.className = "facsimile-editor-preview facsimile-editor-checkerboard";
 			previewBox.append(this.previewMessage, this.preview);
 			const actions = document.createElement("div");
 			actions.className = "facsimile-editor-actions";
 			actions.append(this.button("Предпросмотр", () => this.process(false)), this.button("Применить", () => this.process(true), "btn-primary"));
-			this.root.append(toolbar, scroll, this.cropLabel, fields, outputFields, backgroundFields, backgroundHint, previewBox, actions);
+			const settings = document.createElement("div");
+			settings.hidden = true;
+			settings.append(this.cropLabel, fields, outputFields, backgroundFields, backgroundHint);
+			this.root.append(toolbar, scroll, settings, previewBox, actions);
 		};
 		this.label = (caption, input) => {
 			const label = document.createElement("label");
@@ -242,8 +253,31 @@ class ContactFacsimileEditor {
 				y: Math.max(0, Math.min(this.canvas.height, Math.round((event.clientY - rect.top) * this.canvas.height / rect.height))),
 			};
 		};
+		this.dragMode = (point) => {
+			if (!this.hasSelection) {
+				return "new";
+			}
+			const { x, y, width, height } = this.crop;
+			const radius = 7 / (Number(this.zoom.value) / 100);
+			const horizontal = Math.min(radius, width / 3);
+			const vertical = Math.min(radius, height / 3);
+			if (point.x < x - horizontal || point.x > x + width + horizontal || point.y < y - vertical || point.y > y + height + vertical) {
+				return "new";
+			}
+			const side = Math.abs(point.x - x) <= horizontal ? "w" : Math.abs(point.x - x - width) <= horizontal ? "e" : "";
+			if (Math.abs(point.y - y) <= vertical) {
+				return side === "w" ? "nw" : side === "e" ? "ne" : "n";
+			}
+			if (Math.abs(point.y - y - height) <= vertical) {
+				return side === "w" ? "sw" : side === "e" ? "se" : "s";
+			}
+			return side || "move";
+		};
+		this.updateCursor = (mode) => {
+			this.canvas.style.cursor = mode === "new" ? "crosshair" : mode === "move" ? "move" : mode + "-resize";
+		};
 		this.startCrop = (event) => {
-			if (this.busy || !this.source || event.button !== 0 || this.pointerId !== null) {
+			if (this.busy || !this.source || event.button !== 0 || this.drag) {
 				return;
 			}
 			event.preventDefault();
@@ -251,37 +285,97 @@ class ContactFacsimileEditor {
 				this.sampleBackground(event);
 				return;
 			}
-			this.pointerStart = this.point(event);
-			this.pointerId = event.pointerId;
+			const start = this.point(event);
+			const mode = this.dragMode(start);
+			this.drag = { id: event.pointerId, mode, start, crop: Object.assign({}, this.crop), selected: this.hasSelection };
+			this.updateCursor(mode);
 			this.canvas.setPointerCapture(event.pointerId);
 		};
 		this.moveCrop = (event) => {
-			if (!this.pointerStart || event.pointerId !== this.pointerId) {
+			const drag = this.drag;
+			const point = this.point(event);
+			if (!drag) {
+				if (!this.pickingBackground) {
+					this.updateCursor(this.dragMode(point));
+				}
 				return;
 			}
-			const point = this.point(event);
-			const x = Math.min(this.pointerStart.x, point.x, this.canvas.width - 1);
-			const y = Math.min(this.pointerStart.y, point.y, this.canvas.height - 1);
-			this.crop = {
-				x,
-				y,
-				width: Math.max(1, Math.abs(point.x - this.pointerStart.x)),
-				height: Math.max(1, Math.abs(point.y - this.pointerStart.y)),
-			};
+			if (event.pointerId !== drag.id) {
+				return;
+			}
+			const { start, crop, mode } = drag;
+			const dx = point.x - start.x;
+			const dy = point.y - start.y;
+			let { x, y, width, height } = crop;
+			if (mode === "new") {
+				if (dx === 0 && dy === 0) {
+					return;
+				}
+				x = Math.min(start.x, point.x, this.canvas.width - 1);
+				y = Math.min(start.y, point.y, this.canvas.height - 1);
+				width = Math.max(1, Math.abs(dx));
+				height = Math.max(1, Math.abs(dy));
+			}
+			else if (mode === "move") {
+				x = Math.max(0, Math.min(this.canvas.width - width, x + dx));
+				y = Math.max(0, Math.min(this.canvas.height - height, y + dy));
+			}
+			else {
+				if (mode.includes("w")) {
+					x = Math.max(0, Math.min(crop.x + width - 1, x + dx));
+					width = crop.x + width - x;
+				}
+				else if (mode.includes("e")) {
+					width = Math.max(1, Math.min(this.canvas.width - x, width + dx));
+				}
+				if (mode.includes("n")) {
+					y = Math.max(0, Math.min(crop.y + height - 1, y + dy));
+					height = crop.y + height - y;
+				}
+				else if (mode.includes("s")) {
+					height = Math.max(1, Math.min(this.canvas.height - y, height + dy));
+				}
+			}
+			if (this.hasSelection && x === this.crop.x && y === this.crop.y && width === this.crop.width && height === this.crop.height) {
+				return;
+			}
+			this.hasSelection = true;
+			this.crop = { x, y, width, height };
 			this.syncCrop();
 		};
+		this.releaseDrag = () => {
+			const drag = this.drag;
+			this.drag = null;
+			if (drag && this.canvas.hasPointerCapture(drag.id)) {
+				this.canvas.releasePointerCapture(drag.id);
+			}
+		};
 		this.endCrop = (event) => {
-			if (event.pointerId !== this.pointerId) {
+			if (!this.drag || event.pointerId !== this.drag.id) {
 				return;
 			}
 			this.moveCrop(event);
-			this.pointerStart = null;
-			this.pointerId = null;
-			if (this.canvas.hasPointerCapture(event.pointerId)) {
-				this.canvas.releasePointerCapture(event.pointerId);
+			this.releaseDrag();
+			if (this.hasSelection && this.preview.hidden) {
+				this.process(false);
+			}
+		};
+		this.cancelCrop = (event) => {
+			if (!this.drag || event.pointerId !== this.drag.id) {
+				return;
+			}
+			this.crop = this.drag.crop;
+			this.hasSelection = this.drag.selected;
+			this.releaseDrag();
+			this.syncCrop();
+			if (this.hasSelection) {
+				this.process(false);
 			}
 		};
 		this.resetCrop = () => {
+			this.releaseDrag();
+			this.hasSelection = false;
+			this.updateCursor("new");
 			this.crop = { x: 0, y: 0, width: this.canvas.width, height: this.canvas.height };
 			this.syncCrop();
 		};
@@ -310,7 +404,7 @@ class ContactFacsimileEditor {
 			context.restore();
 		};
 		this.rotateClockwise = () => {
-			if (this.busy || !this.source || this.pointerId !== null) {
+			if (this.busy || !this.source || this.drag) {
 				return;
 			}
 			const oldHeight = this.canvas.height;
@@ -330,6 +424,7 @@ class ContactFacsimileEditor {
 			this.inputs.output_width.value = outputHeight;
 			this.inputs.output_height.value = outputWidth;
 			this.updateZoom();
+			this.process(false);
 		};
 		this.setPickingBackground = (picking) => {
 			this.pickingBackground = picking;
@@ -355,7 +450,7 @@ class ContactFacsimileEditor {
 				return;
 			}
 			this.backgroundColor.value = "#" + Array.from(pixel.slice(0, 3)).map((value) => value.toString(16).padStart(2, "0")).join("");
-			this.background.checked = true;
+			this.backgroundMode = this.backgroundColor.value;
 			this.setPickingBackground(false);
 			this.invalidatePreview();
 		};
@@ -363,6 +458,7 @@ class ContactFacsimileEditor {
 			const value = (key) => Math.round(Number(this.inputs[key].value) || 0);
 			const x = Math.max(0, Math.min(this.canvas.width - 1, value("x")));
 			const y = Math.max(0, Math.min(this.canvas.height - 1, value("y")));
+			this.hasSelection = true;
 			this.crop = {
 				x,
 				y,
@@ -402,6 +498,9 @@ class ContactFacsimileEditor {
 			}
 			context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 			context.drawImage(this.sourceCanvas, 0, 0);
+			if (!this.hasSelection) {
+				return;
+			}
 			const { x, y, width, height } = this.crop;
 			context.fillStyle = "rgba(0, 0, 0, 0.32)";
 			context.fillRect(0, 0, this.canvas.width, y);
@@ -411,6 +510,20 @@ class ContactFacsimileEditor {
 			context.strokeStyle = "#1473e6";
 			context.lineWidth = 2 / (Number(this.zoom.value) / 100);
 			context.strokeRect(x, y, width, height);
+			const size = Math.min(7 / (Number(this.zoom.value) / 100), width / 3, height / 3);
+			context.fillStyle = "white";
+			context.lineWidth /= 2;
+			for (const hx of [0, 0.5, 1]) {
+				for (const hy of [0, 0.5, 1]) {
+					if (hx === 0.5 && hy === 0.5) {
+						continue;
+					}
+					const left = x + width * hx - size / 2;
+					const top = y + height * hy - size / 2;
+					context.fillRect(left, top, size, size);
+					context.strokeRect(left, top, size, size);
+				}
+			}
 		};
 		this.resizeOutput = (key) => {
 			const input = this.inputs[key];
@@ -426,9 +539,13 @@ class ContactFacsimileEditor {
 			this.invalidatePreview();
 		};
 		this.invalidatePreview = () => {
+			this.previewRevision++;
+			this.previewQueued = false;
+			this.status.className = "facsimile-editor-status";
+			this.status.textContent = "";
 			this.preview.hidden = true;
 			this.previewMessage.hidden = false;
-			this.previewMessage.textContent = "Нажмите «Предпросмотр», чтобы проверить результат. Шахматный фон обозначает прозрачность.";
+			this.previewMessage.textContent = this.hasSelection ? "Фон выделенной области будет удалён автоматически." : "Выделите подпись для предпросмотра. Без выделения обрабатывается всё изображение.";
 		};
 		this.setBusy = (busy, message = "") => {
 			this.busy = busy;
@@ -454,7 +571,7 @@ class ContactFacsimileEditor {
 			this.status.textContent = message;
 		};
 		this.process = (save) => {
-			if (this.busy || !this.source || this.closed) {
+			if (this.busy || !this.source || this.closed || this.drag) {
 				return;
 			}
 			const width = Number(this.inputs.output_width.value);
@@ -464,23 +581,53 @@ class ContactFacsimileEditor {
 				this.showError("Размер файла должен быть от 1 до 4096 px и до 8 млн пикселей. Допуск цвета: от 0 до 30%.");
 				return;
 			}
-			this.saving = save;
-			this.setBusy(true, save ? "Сохранение факсимиле…" : "Подготовка предпросмотра…");
-			this.request("process_facsimile", Object.assign(Object.assign({ source_hash: this.source.source_hash }, this.crop), { output_width: width, output_height: height, remove_background: this.background.checked, background_color: this.backgroundColor.value, rotation: this.rotation, fuzz,
+			if (save) {
+				this.invalidatePreview();
+				this.saving = true;
+				this.setBusy(true, "Сохранение факсимиле…");
+			}
+			else {
+				if (this.previewPending) {
+					this.previewQueued = true;
+					return;
+				}
+				this.previewPending = true;
+				this.status.className = "facsimile-editor-status";
+				this.status.textContent = "Подготовка предпросмотра…";
+			}
+			const revision = this.previewRevision;
+			const finishPreview = () => {
+				this.previewPending = false;
+				if (this.previewQueued) {
+					this.previewQueued = false;
+					this.process(false);
+					return false;
+				}
+				return revision === this.previewRevision;
+			};
+			this.request("process_facsimile", Object.assign(Object.assign({ source_hash: this.source.source_hash }, this.crop), { output_width: width, output_height: height, remove_background: true, background_color: this.backgroundMode, rotation: this.rotation, fuzz,
 				save }), (row) => {
-				this.setBusy(false);
 				if (save) {
+					this.setBusy(false);
 					this.options.onSaved(row);
 					this.close();
 					return;
 				}
+				if (!finishPreview()) {
+					return;
+				}
+				this.status.textContent = "";
 				this.preview.src = "data:" + row.mime_type + ";base64," + row.data_base64;
 				this.preview.hidden = false;
 				this.previewMessage.hidden = false;
 				this.previewMessage.textContent = "Результат: " + row.width + " × " + row.height + " px, PNG. Шахматный фон обозначает прозрачность.";
+			}, (message) => {
+				if (save || finishPreview()) {
+					this.showError(message);
+				}
 			});
 		};
-		this.request = (method, values, callback) => {
+		this.request = (method, values, callback, onError = this.showError) => {
 			try {
 				const pm = (new Contact_Controller()).getPublicMethod(method);
 				pm.setFieldValue("id", this.options.contactId);
@@ -513,14 +660,18 @@ class ContactFacsimileEditor {
 							callback(row);
 						}
 						catch (error) {
-							this.showError(error instanceof Error ? error.message : "Ошибка обработки изображения.");
+							onError(error instanceof Error ? error.message : "Ошибка обработки изображения.");
 						}
 					},
-					fail: (_response, _code, message) => this.showError(message || "Не удалось обработать изображение."),
+					fail: (_response, _code, message) => {
+						if (!this.closed) {
+							onError(message || "Не удалось обработать изображение.");
+						}
+					},
 				});
 			}
 			catch (error) {
-				this.showError(error instanceof Error ? error.message : "Ошибка обработки изображения.");
+				onError(error instanceof Error ? error.message : "Ошибка обработки изображения.");
 			}
 		};
 		this.options = options;

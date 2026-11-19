@@ -1,6 +1,6 @@
 -- VIEW: contacts_list
 
-DROP VIEW contacts_list;
+--DROP VIEW contacts_list;
 
 CREATE OR REPLACE VIEW contacts_list AS
 	SELECT
@@ -12,12 +12,21 @@ CREATE OR REPLACE VIEW contacts_list AS
 		ct.descr,
 		ct.tel_ext,
 		ct.comment_text,
+		/*
 		e_us.tm_first_name AS tm_first_name,
 		e_us.tm_photo,
 		e_us.id AS ext_id,
 		(e_us.id IS NOT NULL) AS tm_exists,
 		(e_us.tm_id IS NOT NULL) AS tm_activated,
+		*/
 
+		NULL AS tm_first_name,
+		NULL AS tm_photo,
+		NULL AS ext_id,
+		NULL AS tm_exists,
+		NULL AS tm_activated,
+		NULL AS max_data
+		/*
 		CASE WHEN mxu.max_user_id IS NULL THEN NULL
 		ELSE
 			json_build_object(
@@ -26,10 +35,11 @@ CREATE OR REPLACE VIEW contacts_list AS
 				'avatar_url', mxu.avatar_url
 			) 
 		END AS max_data
+		*/
 		
 	FROM contacts AS ct
 	LEFT JOIN posts AS p ON p.id = ct.post_id
-	LEFT JOIN notifications.ext_users_photo_list AS e_us ON e_us.ext_contact_id = ct.id
-	LEFT JOIN notifications.max_users AS mxu ON mxu.contact_id = ct.id
+	--LEFT JOIN notifications.ext_users_photo_list AS e_us ON e_us.ext_contact_id = ct.id
+	--LEFT JOIN notifications.max_users AS mxu ON mxu.contact_id = ct.id
 	ORDER BY ct.name
 	;

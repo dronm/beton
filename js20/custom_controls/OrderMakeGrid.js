@@ -74,7 +74,7 @@ function OrderMakeGrid(id,options){
 					new GridColumn({
 						"id":"inf1",
 						"formatFunction":function(fields,cell){
-							var res = String.fromCharCode(10)+window.getApp().formatCell(fields.clients_ref,cell,self.m_listView.COL_CLIENT_LEN);
+							let res = String.fromCharCode(10)+window.getApp().formatCell(fields.clients_ref,cell,self.m_listView.COL_CLIENT_LEN);
 							res+= String.fromCharCode(10)+window.getApp().formatCell(fields.destinations_ref,cell,self.m_listView.COL_DEST_LEN);
 							res+= String.fromCharCode(10);
 							var tel = fields.phone_cel.getValue();

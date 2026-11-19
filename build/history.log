@@ -1855,6 +1855,10 @@ feat(clients): add client merging with persistent per-user selections
 - Bug: lab worker interface error
 
 
+1.00436
+- Contact facsimile, no parameters, no background, full automatic.
+- VehicleDriverWorkTime
+
 
 What to check, implement:
 - php-redis, check logout

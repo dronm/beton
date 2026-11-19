@@ -150,8 +150,8 @@ class ContactFacsimile {
 			throw new Exception('Допустим поворот на 0, 90, 180 или 270 градусов.');
 		}
 		$backgroundColor = isset($options['background_color']) ? $options['background_color'] : '#ffffff';
-		if (!is_string($backgroundColor) || !preg_match('/^#[a-fA-F0-9]{6}$/D', $backgroundColor)) {
-			throw new Exception('Недопустимый цвет фона. Используйте формат #rrggbb.');
+		if ($backgroundColor !== 'auto' && (!is_string($backgroundColor) || !preg_match('/^#[a-fA-F0-9]{6}$/D', $backgroundColor))) {
+			throw new Exception('Недопустимый цвет фона. Используйте auto или формат #rrggbb.');
 		}
 		if ($rotation === 90 || $rotation === 270) {
 			$size = [$size[1], $size[0]];
@@ -176,7 +176,12 @@ class ContactFacsimile {
 		$args = $rotation === 0 ? [] : ['-rotate', (string)$rotation, '+repage'];
 		$args = array_merge($args, ['-crop', $width.'x'.$height.'+'.$x.'+'.$y, '+repage']);
 		if (!empty($options['remove_background'])) {
-			$args = array_merge($args, ['-alpha', 'set', '-fuzz', $fuzz.'%', '-transparent', $backgroundColor]);
+			if ($backgroundColor === 'auto') {
+				$backgroundColor = self::detectBackground($image, $args, $width, $height);
+			}
+			if ($backgroundColor !== NULL) {
+				$args = array_merge($args, ['-alpha', 'set', '-fuzz', $fuzz.'%', '-transparent', $backgroundColor]);
+			}
 		}
 		// The pair is validated above; force these exact rounded pixel dimensions.
 		$args = array_merge($args, ['-resize', $outputWidth.'x'.$outputHeight.'!']);
@@ -185,6 +190,53 @@ class ContactFacsimile {
 			throw new Exception('Размер результата превышает 8 МБ. Уменьшите размер факсимиле.');
 		}
 		return $result;
+	}
+
+	private static function detectBackground($image, array $crop, $width, $height) {
+		// Sample original pixels without averaging fine strokes into the paper colour.
+		$w = min(64, $width);
+		$h = min(64, $height);
+		$args = array_merge($crop, ['-sample', $w.'x'.$h.'!', '-colorspace', 'sRGB', '-alpha', 'set', '-depth', '8']);
+		$pixels = self::convert($image, 'PNG', $args, 'RGBA');
+		if (strlen($pixels) !== 4 * $w * $h) {
+			throw new Exception('Не удалось определить цвет фона факсимиле.');
+		}
+		$groups = [];
+		$clear = 0;
+		// Give the perimeter an extra vote: a tight crop can contain more ink than paper.
+		$perimeter = $w * $h - max(0, $w - 2) * max(0, $h - 2);
+		$edgeWeight = 1 + intdiv($w * $h, $perimeter);
+		for ($i = 0; $i < strlen($pixels); $i += 4) {
+			$index = intdiv($i, 4);
+			$x = $index % $w;
+			$y = intdiv($index, $w);
+			$weight = ($x === 0 || $y === 0 || $x === $w - 1 || $y === $h - 1) ? $edgeWeight : 1;
+			if (ord($pixels[$i + 3]) < 128) {
+				$clear += $weight;
+				continue;
+			}
+			$r = ord($pixels[$i]);
+			$g = ord($pixels[$i + 1]);
+			$b = ord($pixels[$i + 2]);
+			// Group nearby scan colours and retain their actual channel values.
+			$key = (($r >> 4) << 8) | (($g >> 4) << 4) | ($b >> 4);
+			if (!isset($groups[$key])) {
+				$groups[$key] = [0, 0, 0, 0];
+			}
+			$groups[$key][0] += $weight;
+			$groups[$key][1] += $r * $weight;
+			$groups[$key][2] += $g * $weight;
+			$groups[$key][3] += $b * $weight;
+		}
+		$largest = $clear;
+		$color = NULL;
+		foreach ($groups as list($count, $red, $green, $blue)) {
+			if ($count > $largest) {
+				$largest = $count;
+				$color = sprintf('#%02x%02x%02x', round($red / $count), round($green / $count), round($blue / $count));
+			}
+		}
+		return $color;
 	}
 
 	private static function thumbnail($image) {
@@ -208,7 +260,7 @@ class ContactFacsimile {
 		]);
 	}
 
-	private static function convert($source, $format, array $operations) {
+	private static function convert($source, $format, array $operations, $outputFormat = 'PNG32') {
 		$binary = defined('FACSIMILE_IMAGEMAGICK_BINARY') ? FACSIMILE_IMAGEMAGICK_BINARY : '';
 		if ($binary === '' || $binary[0] !== '/' || !is_executable($binary)) {
 			throw new Exception('Редактор факсимиле недоступен: настройте FACSIMILE_IMAGEMAGICK_BINARY в Config.php.');
@@ -231,13 +283,15 @@ class ContactFacsimile {
 				'-limit', 'disk', '256MiB',
 				'-limit', 'time', '20',
 				$format.':'.$input.'[0]',
-			], $operations, ['-strip', 'PNG32:'.$output]);
+			], $operations, ['-strip', $outputFormat.':'.$output]);
 			self::run($command);
 			$image = file_get_contents($output);
 			if ($image === FALSE || $image === '' || strlen($image) > 32 * 1024 * 1024) {
 				throw new Exception('Не удалось обработать изображение факсимиле.');
 			}
-			self::dimensions($image);
+			if ($outputFormat === 'PNG32') {
+				self::dimensions($image);
+			}
 			return $image;
 		} finally {
 			unlink($input);

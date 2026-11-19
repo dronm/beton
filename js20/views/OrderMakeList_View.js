@@ -99,8 +99,8 @@ function OrderMakeList_View(id,options){
 		//var contr = new Order_Controller();
 		
 		//orders
-		var model = options.models.OrderMakeList_Model;		
-		var grid = new OrderMakeGrid(id+":order_make_grid",{
+		//let model = options.models.OrderMakeList_Model;		
+		const grid = new OrderMakeGrid(id+":order_make_grid",{
 			"model":options.models.OrderMakeList_Model,
 			"periodSelect":per_select,
 			"className":"table-bordered table-responsive table-make_order order_make_grid",
@@ -171,7 +171,7 @@ function OrderMakeList_View(id,options){
 		}));
 
 		//features_grid		
-		var model = options.models.VehFeaturesOnDateList_Model;	
+		const model = options.models.VehFeaturesOnDateList_Model;	
 		this.addElement(new Grid(id+":features_grid",{
 			"model":model,
 			"keyIds":["feature"],

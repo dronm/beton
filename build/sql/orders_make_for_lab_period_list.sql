@@ -108,8 +108,27 @@ CREATE OR REPLACE VIEW public.orders_make_for_lab_period_list AS
 	    ) AS f_val,
 	    coalesce(o.w_val,
 	    	coalesce((SELECT qp.w_val FROM quality_passports qp WHERE qp.order_id = o.id LIMIT 1), concr.w_val)
-	    ) AS w_val
+	    ) AS w_val,
 		    
+	    coalesce(
+        (
+            SELECT json_agg(
+                json_build_object(
+                    'id', oct.id,
+                    'contact', json_build_object(
+                        'name', oct_ct.name,
+                        'tel', oct_ct.tel
+                    )
+                )
+                ORDER BY oct.id
+            )
+            FROM public.order_contacts AS oct
+            JOIN public.contacts AS oct_ct ON oct_ct.id = oct.contact_id
+            WHERE oct.order_id = o.id
+        ),
+        '[]'::json
+    ) AS contact_list	
+
 	FROM orders o
 	LEFT JOIN clients cl ON cl.id = o.client_id
 	LEFT JOIN destinations d ON d.id = o.destination_id
@@ -152,6 +171,3 @@ CREATE OR REPLACE VIEW public.orders_make_for_lab_period_list AS
 
 	ORDER BY o.date_time
 	;
-	
-ALTER TABLE public.orders_make_for_lab_period_list OWNER TO ;
-

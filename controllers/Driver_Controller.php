@@ -15,6 +15,7 @@ require_once(FRAME_WORK_PATH.'basic_classes/FieldExtDateTimeTZ.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSON.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtJSONB.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtArray.php');
+require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBigInt.php');
 require_once(FRAME_WORK_PATH.'basic_classes/FieldExtBytea.php');
 
 /**
@@ -277,6 +278,18 @@ class Driver_Controller extends ControllerSQL{
 			
 		$this->addPublicMethod($pm);
 
+			
+		$pm = new PublicMethod('vehicleDriverWorkTime');
+		
+				
+	$opts=array();
+	
+		$opts['required']=TRUE;				
+		$pm->addParam(new FieldExtDate('month_date',$opts));
+	
+			
+		$this->addPublicMethod($pm);
+
 		
 	}
 	
@@ -317,5 +330,15 @@ class Driver_Controller extends ControllerSQL{
 			),
 		'WorkTimeReport_Model');
 	}
+
+	public function vehicleDriverWorkTime($pm){
+		$this->addNewModel(
+			sprintf("SELECT * FROM public.vehicle_driver_work_time(%s::date)",
+				$this->getExtDbVal($pm, 'month_date')
+			),
+			'WorkTimeReport_Model'
+		);
+	}
 }
+
 ?>

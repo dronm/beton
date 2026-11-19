@@ -4,7 +4,7 @@
 	<versions>
 		<version dateOpen="2019-02-08 15:02:26">1.001</version>
 		<version dateOpen="2019-02-08 15:02:26" dateClose="2019-03-27 12:03:51">1.001 
-		<lastBuild>2026-11-11 08:33:17</lastBuild></version>
+		<lastBuild>2026-11-19 05:42:38</lastBuild></version>
 		<version dateOpen="2019-03-27 14:03:22" dateClose="2019-03-27 14:03:37">1.002</version>
 		<version dateOpen="2019-03-29 07:03:18" dateClose="2019-03-29 07:03:18">1.003</version>
 		<version dateOpen="2019-03-29 09:03:29" dateClose="2019-03-29 09:03:29">1.004</version>
@@ -337,7 +337,12 @@
 		<version dateOpen="2026-08-18 08:38:57" dateClose="2026-08-21 06:01:16">1.00429</version>
 		<version dateOpen="2026-08-31 11:13:26" dateClose="2026-09-10 18:19:53">1.00430</version>
 		<version dateOpen="2026-09-22 10:33:18" dateClose="2026-10-28 09:26:14">1.00431</version>
-	<version dateOpen="2026-11-10 04:12:31" dateClose="2026-11-10 04:12:58">1.00432</version><version dateOpen="2026-11-11 04:08:20" dateClose="2026-11-11 04:46:46">1.00433</version><version dateOpen="2026-11-11 07:02:42" dateClose="2026-11-11 08:09:14">1.00434</version><version dateOpen="2026-11-11 08:39:19" dateClose="2026-11-11 08:39:31">1.00435</version></versions>
+		<version dateOpen="2026-11-10 04:12:31" dateClose="2026-11-10 04:12:58">1.00432</version>
+		<version dateOpen="2026-11-11 04:08:20" dateClose="2026-11-11 04:46:46">1.00433</version>
+		<version dateOpen="2026-11-11 07:02:42" dateClose="2026-11-11 08:09:14">1.00434</version>
+		<version dateOpen="2026-11-11 08:39:19" dateClose="2026-11-11 08:39:31">1.00435</version>
+		<version dateOpen="2026-11-18 08:18:33" dateClose="2026-11-19 05:42:41">1.00436</version>
+	</versions>
 	<globalFilters>
 		<field id="vehicle_owner_id"/>
 		<field id="vehicle_owner_client_list"/>
@@ -973,10 +978,15 @@
 			<field id="user_id" dataType="Int" refTable="users" refField="id" required="TRUE" primaryKey="TRUE"/>
 			<field id="client_id" dataType="Int" refTable="clients" refField="id" required="TRUE" primaryKey="TRUE"/>
 			<field id="selected_at" dataType="DateTimeTZ" required="TRUE" defaultValue="CURRENT_TIMESTAMP"/>
-			<index id="client_merge_selections_client_id_idx"><field id="client_id"/></index>
+			<index id="client_merge_selections_client_id_idx">
+				<field id="client_id"/>
+			</index>
 		</model>
 		<model id="ClientMergeList" parent="ModelSQL" dataTable="client_merge_list" virtual="TRUE">
-			<defaultOrder><field id="name"/><field id="id"/></defaultOrder>
+			<defaultOrder>
+				<field id="name"/>
+				<field id="id"/>
+			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
 			<field id="name" dataType="String" alias="Наименование"/>
 			<field id="inn" dataType="String" alias="ИНН"/>
@@ -984,7 +994,10 @@
 			<field id="orders_count" dataType="BigInt" alias="Количество заявок"/>
 		</model>
 		<model id="ClientMergeSelectedList" parent="ModelSQL" dataTable="client_merge_list" virtual="TRUE">
-			<defaultOrder><field id="name"/><field id="id"/></defaultOrder>
+			<defaultOrder>
+				<field id="name"/>
+				<field id="id"/>
+			</defaultOrder>
 			<field id="id" dataType="Int" primaryKey="TRUE" sysCol="TRUE"/>
 			<field id="name" dataType="String" alias="Наименование"/>
 			<field id="inn" dataType="String" alias="ИНН"/>
@@ -6484,6 +6497,9 @@
 				<field id="vehicle_id" dataType="Int"/>
 				<field id="driver_id" dataType="Int"/>
 			</publicMethod>
+			<publicMethod id="vehicleDriverWorkTime">
+				<field id="month_date" dataType="Date" required="TRUE"/>
+			</publicMethod>
 		</controller>
 		<controller id="RawMaterial" parentId="ControllerSQL" state="TRUE" noState="FALSE">
 			<publicMethod id="insert" modelId="RawMaterial"/>
@@ -8720,6 +8736,7 @@
 		<view id="50025" t="DriverWorkTimeReport" section="Отчеты" descr="Табель по водителям"/>
 		<view id="50026" t="RepVehicleFuelFlow" section="Отчеты" descr="Отчет по движению топлива"/>
 		<view id="50027" t="PutevoiListOnPeriod" section="Отчеты" descr="Путоевой лист за период"/>
+		<view id="50028" t="vehicleDriverWorkTime" section="Отчеты" descr="Табель водителей по отгрузкам"/>
 		<view id="40000" c="Constant_Controller" t="ConstantList" f="get_list" section="Константы" descr="Все константы"/>
 	</views>
 	<serverTemplates>
@@ -8884,6 +8901,7 @@
 		<serverTemplate id="PutevoiListOnPeriod"/>
 		<serverTemplate id="ShipmentWeightRedirectionList" class="list"/>
 		<serverTemplate id="ShipmentWeightSelfShipList" class="list"/>
+		<serverTemplate id="vehicleDriverWorkTime" class="list"/>
 	</serverTemplates>
 	<jsTemplates>
 		<jsTemplate id="FatalException" file="js20/tmpl/FatalException.html"/>
@@ -9780,6 +9798,7 @@
 		<jsScript file="js20/custom_controls/MAXShowQRBtn.js"/>
 		<jsScript file="js20/custom_controls/MAXInviteBtn.js"/>
 		<jsScript file="js20/custom_controls/DriverWorkTimeReport_View.js"/>
+		<jsScript file="js20/custom_controls/vehicleDriverWorkTime_View.js"/>
 		<jsScript file="js20/custom_controls/BuhDocItemGrid.js"/>
 		<jsScript file="js20/custom_controls/TrackerManager.js"/>
 		<jsScript file="js20/custom_controls/MacAddressListGrid.js"/>

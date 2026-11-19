@@ -49,13 +49,14 @@ function rejects($callback, $message) {
 function pngChunk($type, $data) {
 	return pack('N', strlen($data)).$type.$data.pack('N', crc32($type.$data));
 }
-function fixture($width = 80, $height = 40, $background = [255, 255, 255, 255]) {
+function fixture($width = 80, $height = 40, $background = [255, 255, 255, 255], $colorAt = NULL) {
 	$rows = '';
 	for ($y = 0; $y < $height; $y++) {
 		$rows .= "\0";
 		for ($x = 0; $x < $width; $x++) {
 			$pixel = $x >= 20 && $x < 60 && $y >= 10 && $y < 30 ? "\0\0\0\xff" : pack('C4', ...$background);
 			if ($x === 2 && $y === 2) { $pixel = "\x14\x1e\x28\x40"; }
+			if ($colorAt) { $pixel = pack('C4', ...$colorAt($x, $y)); }
 			$rows .= $pixel;
 		}
 	}
@@ -156,6 +157,19 @@ try {
 		check(pixel($paperResult, 80, 0, 0)[3] === 0, 'Selected gray/yellow paper color was not removed');
 		check(pixel($paperResult, 80, 40, 20) === [0, 0, 0, 255], 'Paper background removal changed signature ink');
 		check(pixel($paperResult, 80, 2, 2)[3] === 64, 'Paper background removal changed existing alpha');
+		$autoResult = rgba(ContactFacsimile::render($paper, array_merge($paperOptions, ['background_color' => 'auto'])));
+		check($autoResult === $paperResult, 'Automatic removal differs from the known paper colour');
+	}
+	$tightOptions = array_merge($whole, ['x' => 19, 'y' => 9, 'width' => 42, 'height' => 22, 'output_width' => 42, 'output_height' => 22, 'remove_background' => TRUE, 'background_color' => 'auto']);
+	foreach ([[186, 169, 155, 255], [0, 0, 0, 0]] as $edge) {
+		$tight = fixture(80, 40, [255, 255, 255, 255], function($x, $y) use ($edge) {
+			if ($x < 19 || $x > 60 || $y < 9 || $y > 30) { return [255, 255, 255, 255]; }
+			if ($x === 19 || $x === 60 || $y === 9 || $y === 30) { return $edge; }
+			return [10, 25, 100, 255];
+		});
+		$tightResult = rgba(ContactFacsimile::render($tight, $tightOptions));
+		check(pixel($tightResult, 42, 0, 0)[3] === 0, 'Auto detection must use the selected area');
+		check(pixel($tightResult, 42, 20, 10) === [10, 25, 100, 255], 'A tight crop lost signature ink');
 	}
 	$asymmetric = asymmetricFixture();
 	$originalPixels = rgba($asymmetric);
@@ -222,7 +236,7 @@ try {
 	$paper = fixture(80, 40, [180, 174, 158, 255]);
 	$paperDb = new FakeFacsimileDb($paper);
 	$paperController = new FakeFacsimileController($paperDb);
-	$paperSave = array_merge($pm, ['x' => 0, 'y' => 0, 'width' => 40, 'height' => 80, 'output_width' => 40, 'output_height' => 80, 'rotation' => 90, 'background_color' => '#b4ae9e', 'remove_background' => '1', 'save' => TRUE, 'fuzz' => 0, 'source_hash' => hash('sha256', $paper)]);
+	$paperSave = array_merge($pm, ['x' => 0, 'y' => 0, 'width' => 40, 'height' => 80, 'output_width' => 40, 'output_height' => 80, 'rotation' => 90, 'background_color' => 'auto', 'remove_background' => '1', 'save' => TRUE, 'fuzz' => 0, 'source_hash' => hash('sha256', $paper)]);
 	$paperPreview = ContactFacsimile::process($paperController, array_merge($paperSave, ['save' => '0']));
 	check($paperDb->row['content_data'] === $paper, 'Rotated paper preview mutated storage');
 	$paperSaved = ContactFacsimile::process($paperController, $paperSave);

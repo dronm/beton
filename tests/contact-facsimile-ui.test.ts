@@ -142,6 +142,11 @@ const fixture = async (defer = false) => {
 	assert.deepEqual(f.requests[0].values, { id: 42, content_id: "sig-1" });
 	assert.equal(f.editor.canvas.width, 400);
 	assert.equal(f.editor.canvas.height, 200);
+	for (const control of [...Object.values(f.editor.inputs), f.editor.background, f.editor.backgroundColor, f.editor.fuzz, f.editor.sampleButton]) {
+		assert.ok(control.closest("[hidden]"), "advanced controls remain in a hidden container");
+	}
+	assert.ok(Array.from(f.editor.root.querySelectorAll("span")).find((node) => node.textContent.includes("Пропорции сохраняются")).closest("[hidden]"));
+	assert.equal(f.editor.hasSelection, false);
 	f.editor.zoom.value = "200";
 	f.editor.zoom.dispatchEvent(new f.w.Event("input"));
 	assert.equal(f.editor.canvas.style.width, "800px");
@@ -153,16 +158,22 @@ const fixture = async (defer = false) => {
 	};
 	pointer("pointerdown", 110, 70);
 	pointer("pointermove", 610, 270);
+	assert.equal(f.requests.length, 1, "dragging does not send intermediate crops");
 	pointer("pointerup", 610, 270);
+	assert.equal(f.requests.length, 2, "release automatically requests a single preview");
+	assert.equal(f.requests[1].values.save, false);
+	assert.equal(f.requests[1].values.remove_background, true);
+	assert.equal(f.requests[1].values.background_color, "auto");
+	assert.equal(f.editor.preview.hidden, false);
 	assert.equal(JSON.stringify(f.editor.crop), JSON.stringify({ x: 50, y: 25, width: 250, height: 100 }), "crop coordinates map back from zoomed display to original pixels");
 	f.change(f.editor.inputs.output_width, "500");
 	assert.equal(f.editor.inputs.output_height.value, "200", "enlargement preserves crop aspect ratio");
-	f.editor.background.checked = true;
+	assert.equal(f.editor.background.checked, true);
 	f.change(f.editor.fuzz, "15");
 	f.button("Предпросмотр").click();
 	assert.deepEqual(f.requests.at(-1).values, {
 		id: 42, content_id: "sig-1", source_hash: "a".repeat(64), x: 50, y: 25, width: 250, height: 100,
-		output_width: 500, output_height: 200, remove_background: true, background_color: "#ffffff", rotation: 0, fuzz: 15, save: false,
+		output_width: 500, output_height: 200, remove_background: true, background_color: "auto", rotation: 0, fuzz: 15, save: false,
 	});
 	assert.equal(f.saved.length, 0, "preview does not save");
 	assert.equal(f.editor.preview.hidden, false);
@@ -200,13 +211,13 @@ const fixture = async (defer = false) => {
 		assert.deepEqual([f.editor.canvas.width, f.editor.canvas.height], state.canvas, "quarter turns swap displayed image dimensions");
 		assert.equal(JSON.stringify(f.editor.crop), JSON.stringify(state.crop), "clockwise rotation preserves selected signature pixels");
 		assert.deepEqual([Number(f.editor.inputs.output_width.value), Number(f.editor.inputs.output_height.value)], state.output, "rotation preserves enlargement and swaps output dimensions");
-		assert.equal(f.editor.preview.hidden, true, "rotation invalidates any previous preview");
+		assert.equal(f.editor.preview.hidden, false, "rotation automatically refreshes the result");
 		const sourceContext = f.canvasContexts.get(f.editor.sourceCanvas);
 		assert.deepEqual(sourceContext.operations.at(-1), ["rotate", state.rotation * Math.PI / 180], "source pixels rotate clockwise for the requested angle");
 		f.button("Предпросмотр").click();
 		const values = f.requests.at(-1).values;
 		assert.equal(values.rotation, state.rotation);
-		assert.equal(values.background_color, "#ffffff");
+		assert.equal(values.background_color, "auto");
 		for (const [key, value] of Object.entries(state.crop)) {
 			assert.equal(values[key], value, "backend receives crop in rotated coordinates");
 		}
@@ -252,7 +263,7 @@ const fixture = async (defer = false) => {
 	f.button("Предпросмотр").click();
 	assert.equal(f.requests.at(-1).values.background_color, "#e6e8eb");
 	assert.equal(f.requests.at(-1).values.remove_background, true);
-	f.editor.background.checked = false;
+	assert.equal(f.editor.background.disabled, true, "background removal is always enabled");
 	f.editor.backgroundColor.value = "#ddddcc";
 	f.editor.backgroundColor.dispatchEvent(new f.w.Event("input", { bubbles: true }));
 	assert.equal(f.editor.background.checked, true, "manual background colour enables removal");
@@ -284,6 +295,64 @@ const fixture = async (defer = false) => {
 	assert.equal(f.editor.pickingBackground, false, "changing colour directly exits point sampling");
 	assert.equal(f.editor.preview.hidden, true);
 	f.editor.close();
+	f.dom.window.close();
+}
+
+{
+	const f = await fixture(true);
+	await f.open();
+	f.complete(f.requests[0]);
+	await f.tick();
+	f.editor.canvas.getBoundingClientRect = () => ({ left: 0, top: 0, width: 400, height: 200 });
+	const gesture = (type: string, x: number, y: number) => {
+		const event = new f.w.Event(type, { bubbles: true, cancelable: true });
+		Object.assign(event, { pointerId: 7, button: type === "contextmenu" ? 2 : 0, clientX: x, clientY: y });
+		f.editor.canvas.dispatchEvent(event);
+		return event;
+	};
+	const drag = (x1: number, y1: number, x2: number, y2: number) => {
+		gesture("pointerdown", x1, y1);
+		gesture("pointermove", x2, y2);
+		gesture("pointerup", x2, y2);
+	};
+	const crop = () => JSON.parse(JSON.stringify(f.editor.crop));
+	drag(180, 110, 50, 40);
+	const first = f.requests.at(-1);
+	assert.deepEqual(crop(), { x: 50, y: 40, width: 130, height: 70 });
+	drag(180, 110, 220, 130);
+	assert.deepEqual(crop(), { x: 50, y: 40, width: 170, height: 90 }, "corner changes both dimensions");
+	drag(135, 40, 135, 20);
+	assert.deepEqual(crop(), { x: 50, y: 20, width: 170, height: 110 }, "edge changes only its own axis");
+	drag(100, 70, 500, 400);
+	assert.deepEqual(crop(), { x: 230, y: 90, width: 170, height: 110 }, "moving preserves size and clamps to the image");
+	assert.equal(f.requests.at(-1), first, "only one preview in flight during rapid edits");
+	first.options.fail(null, 1, "Obsolete error");
+	assert.equal(f.editor.preview.hidden, true);
+	assert.equal(f.requests.length, 3, "only the latest crop is sent after the outstanding preview");
+	assert.equal(f.requests.at(-1).values.x, 230);
+	assert.doesNotMatch(f.editor.status.textContent, /Obsolete/);
+	const pending = f.requests.at(-1);
+	assert.equal(gesture("contextmenu", 250, 100).defaultPrevented, true);
+	assert.equal(f.editor.hasSelection, false);
+	assert.deepEqual(crop(), { x: 0, y: 0, width: 400, height: 200 });
+	f.complete(pending);
+	assert.equal(f.editor.preview.hidden, true, "clearing a selection ignores a late preview");
+	assert.equal(f.canvasContexts.get(f.editor.canvas).shaded, false, "right-click removes the rectangle and overlay");
+	drag(10, 10, 90, 80);
+	f.complete(f.requests.at(-1));
+	gesture("pointerdown", 10, 10);
+	gesture("pointermove", 0, 0);
+	gesture("pointercancel", 0, 0);
+	assert.deepEqual(crop(), { x: 10, y: 10, width: 80, height: 70 }, "interrupted resizing restores the crop");
+	const cancelledPreview = f.requests.at(-1);
+	f.button("Применить").click();
+	const save = f.requests.at(-1);
+	cancelledPreview.options.fail(null, 1, "Late preview error");
+	assert.equal(f.editor.saving, true, "late preview errors cannot unlock an active save");
+	assert.equal(save.values.save, true);
+	assert.equal(save.values.background_color, "auto");
+	f.complete(save);
+	assert.equal(f.closed(), 1);
 	f.dom.window.close();
 }
 

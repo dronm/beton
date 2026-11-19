@@ -1685,6 +1685,7 @@ class ViewBase extends ViewHTMLXSLT {
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/MAXShowQRBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/MAXShowQRBtn.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/MAXInviteBtn.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/MAXInviteBtn.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/DriverWorkTimeReport_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/DriverWorkTimeReport_View.js')) ));
+		$this->addJsModel(new ModelJavaScript('js20/custom_controls/vehicleDriverWorkTime_View.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/vehicleDriverWorkTime_View.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/BuhDocItemGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/BuhDocItemGrid.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/TrackerManager.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/TrackerManager.js')) ));
 		$this->addJsModel(new ModelJavaScript('js20/custom_controls/MacAddressListGrid.js', NULL, date("Y-m-dTH:i:s", filemtime('js20/custom_controls/MacAddressListGrid.js')) ));

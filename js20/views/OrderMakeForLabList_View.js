@@ -79,8 +79,8 @@ function OrderMakeForLabList_View(id,options){
 		this.addElement(per_select);	
 			
 		//orders
-		var model = options.models.OrderMakeForLabList_Model;
-		var grid = new OrderMakeGrid(id+":order_make_grid",{
+		// var model = options.models.OrderMakeForLabList_Model;
+		const grid = new OrderMakeGrid(id+":order_make_grid",{
 			//edit comment
 			"editViewClass":OrderMakeForLabDialog_View,
 			"editWinClass":WindowFormModalBS,
