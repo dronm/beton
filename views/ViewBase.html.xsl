@@ -62,7 +62,7 @@
 						
 						<!-- Footer -->
 						<div class="footer text-muted text-center">
-							2013г - 2025г  <a href="#">Катрэн+</a>
+							2013г - 2026г  <a href="#">Катрэн+</a>
 						</div>
 						<!-- /footer -->
 
@@ -697,7 +697,7 @@ these classes fix the menum but hides some content: navbar-default navbar-fixed-
 				</li>			
 				<li class="dropdown">
 					<a id="tm_status" title="Сообщения Telegram" style="padding: 0px 0px;">
-						<img src="img/tm.png" width="25" height="25">
+						<img src="img/tm.png?v2" width="25" height="25">
 						</img>
 					</a>
 				</li>			

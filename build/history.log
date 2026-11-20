@@ -1856,9 +1856,12 @@ feat(clients): add client merging with persistent per-user selections
 
 
 1.00436
-- Contact facsimile, no parameters, no background, full automatic.
-- VehicleDriverWorkTime
+feat:
+Contact facsimile, no parameters, no background, full automatic.
+VehicleDriverWorkTime
 
+1.00437
+bug: some gui css issues.
 
 What to check, implement:
 - php-redis, check logout

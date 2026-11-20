@@ -5,7 +5,7 @@
 function PlantLoadGraphControl(id,options){	
 	PlantLoadGraphControl.superclass.constructor.call(this,id,"canvas",options);
 	
-	const chartHeight = (window.getWidthType()=="sm")? 120 : 60;
+	const chartHeight = (window.getWidthType()=="sm")? 240 : 60;
 	this.getNode().height = chartHeight;
 	var ctx = this.getNode().getContext('2d');
 

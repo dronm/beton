@@ -1,95 +1,255 @@
 <div id="{{id}}">
 	<div id="{{id}}:colLeft" class="{{bsCol}}9">
-		{{#showChart}}
-		<canvas id="{{id}}:plant_load_graph">
-		</canvas>
+		{{#showChart}}		
+		<div class="panel panel-default">
+			{{#notLowResDevice}}		
+			<div class="panel-heading">
+				<h6 class="panel-title">Загрузка заводов
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li>
+							<a id="{{id}}:plantLoadTgl" data-action="collapse" class="">
+							</a>
+						</li>
+					</ul>
+				</div>				
+			</div>
+			{{/notLowResDevice}}		
+			
+			<div class="panel-body">
+				<canvas id="{{id}}:plant_load_graph">
+				</canvas>
+			</div>
+		</div>
 		{{/showChart}}
-		<div id="totContainer">
-			<label class="lbl" id="totOrdered_l" for="totOrdered">Звл.:</label>
-			<input id="totOrdered" disabled="disabled" class="" type="text" size="4">
-			</input>
-			<span id="totOrdered_m" class="">м3</span>
+		<div class="panel panel-default">
+			<div class="panel-body wideGridPanelBody">
+				<div id="totContainer">
+					<div class="ordListParamCont" title="Заявлено, м3">
+						<span class="ordListParamPref" >Звл.:
+						</span>
+						<span id="totOrdered">
+						</span>
+						<span class="ordListParamPostf">м3
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Отгружено, м3">
+						<span class="ordListParamPref">Отг.:
+						</span>
+						<span id="totShipped">
+						</span>
+						<span class="ordListParamPostf">м3
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Остаток, м3">
+						<span class="ordListParamPref">Ост.:
+						</span>
+						<span id="totBalance">
+						</span>
+						<span class="ordListParamPostf">м3
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Состояние текущее">
+						<span class="ordListParamPref">Сост.:
+						</span>
+						<span id="totEfficiency">
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Скорость дневная {{workHours}}ч., м3/ч">
+						<span class="ordListParamPref">Скор.д.:
+						</span>
+						<span id="totDayVelocity">
+						</span>
+						<span class="ordListParamPostf">м3/ч
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Скорость текущая, м3/ч">
+						<span class="ordListParamPref">Скор.т.:
+						</span>
+						<span id="totCurVelocity">
+						</span>
+						<span class="ordListParamPostf">м3/ч
+						</span>
+					</div>
+					
+					{{#notLowResDevice}}		
+					<div class="ordListParamCont" title="Заявлено {{workHours}}ч., м3">
+						<span class="ordListParamPref">Звл.({{workHours}}):
+						</span>
+						<span id="totOrderedDay">
+						</span>
+						<span class="ordListParamPostf">м3
+						</span>
+					</div>
+					{{/notLowResDevice}}		
+
+				</div>	
+				<div id="{{id}}:order_make_filter">
+				</div>	
+				<div id="{{id}}:order_make_grid">
+				</div>
 			
-			<label class="lbl" id="totShipped_l" for="totShipped">Отг.:</label>
-			<input id="totShipped" disabled="disabled" class="" type="text" size="4">
-			</input>
-			<span id="totShipped_m" class="">м3</span>
-			
-			<label class="lbl" id="totBalance_l" for="totShipped">Ост.:</label>
-			<input id="totBalance" disabled="disabled" class="" type="text" size="4">
-			</input>
-			<span id="totBalance_m" class="">м3</span>
-			
-			<label class="lbl" id="totEfficiency_l" for="totEfficiency">Сост.:</label>
-			<input id="totEfficiency" disabled="disabled" class="" type="text" size="4" value="0">
-			</input>
-			<span id="totEfficiency_m" class="">м3</span>
-			
-			<label class="lbl" id="totDayVelocity_l" for="totDayVelocity">Скор.д:</label>
-			<input id="totDayVelocity" disabled="disabled" class="" type="text" size="2">
-			</input>
-			<span id="totDayVelocity_m" class="">м3/ч</span>
-			
-			<label class="lbl" id="totCurVelocity_l" for="totCurVelocity">Скор.т:</label>
-			<input id="totCurVelocity" disabled="disabled" class="" type="text" size="2">
-			</input>
-			<span id="totCurVelocity_m" class="">м3/ч</span>
-			
-			<label class="lbl" id="totOrderedDay_l" for="totOrderedDay">Звл.({{workHours}}):</label>
-			<input id="totOrderedDay" disabled="disabled" class="" type="text" size="4">
-			</input>
-			<span id="totOrderedDay_m" class="">м3</span>
-		</div>	
-		<div id="{{id}}:order_make_filter">
-		</div>	
-		<div id="{{id}}:order_make_grid">
-		</div>	
+			</div>	
+		</div>		
 	</div>	
 	
-	<div class="{{bsCol}}3">
-		{{#showProductionSites}}
-		<div class="row order-l-grid">
-			<div id="{{id}}:production_sites">
-			</div>
-			<div id="{{id}}:material_stores">
-			</div>			
-		</div>	
-		{{/showProductionSites}}
-		
-		{{#showGridHeaders}}
-		<h4>Остатки материалов</h4>
-		{{/showGridHeaders}}
-		<div class="row order-l-grid">
-			<div id="{{id}}:mat_totals_grid">
-			</div>
-		</div>			
+	<div id="{{id}}:panelCont" class="{{bsCol}}3 hidden" style="position:static;">
+		{{#productionBases}}
+			<div id="{{id}}:prodBaseCont_{{productionBaseId}}" class="panel panel-default draggable">
+				<div class="panel-heading">
+					<h6 class="panel-title">{{productionBaseName}}
+					</h6>
+					<div class="heading-elements">
+						<ul class="icons-list">
+				        		<li>
+				        			<a id="{{id}}:prodBase{{productionBaseId}}Tgl" data-action="collapse" class="">
+				        			</a>
+				        		</li>
+				        	</ul>
+					</div>				
+				</div>
 				
-		{{#showGridHeaders}}
-		<h4>Назначенные транспорнтные средства</h4>
-		{{/showGridHeaders}}
-		<div class="row order-l-grid">		
-			<div id="{{id}}:veh_assigning" class="row">
-			</div>	
-		</div>	
+				<div class="panel-body">
+					{{#showProductionSites}}
+					<div class="row order-l-grid">
+						<div id="{{id}}:production_sites{{productionBaseId}}">
+						</div>
+						<div id="{{id}}:material_stores{{productionBaseId}}">
+						</div>			
+					</div>	
+					{{/showProductionSites}}
+					
+					<div class="row order-l-grid">
+						<div id="{{id}}:mat_totals_grid{{productionBaseId}}">
+						</div>
+					</div>					
+				</div>
+			</div>
+		{{/productionBases}}		
 		
-		{{#showGridHeaders}}
-		<h4>Все транспорнтные средства</h4>
-		{{/showGridHeaders}}
-		<div class="row order-l-grid">
-			<div id="{{id}}:veh_schedule_grid">
-			</div>	
-		</div>	
+		{{#notLowResDevice}}		
+		<div id="{{id}}:vehAssignCont" class="panel panel-default draggable">
+			{{#showGridHeaders}}
+			<div class="panel-heading">
+				<h6 class="panel-title">Назначенные транспорнтные средства
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:vehAssignTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>
+			{{/showGridHeaders}}
+			<div class="panel-body">
+				<div class="row order-l-grid">		
+					<div id="{{id}}:veh_assigning" class="row">
+					</div>	
+				</div>
+			</div>			
+		</div>
+		{{/notLowResDevice}}		
 		
-		{{#showGridHeaders}}
-		<h4>Свойства транспорнтных средств</h4>
-		{{/showGridHeaders}}
-		<div class="row order-l-grid">
-			<div id="{{id}}:features_grid">
+		<div id="{{id}}:vehAllCont" class="panel panel-default draggable">
+			{{#showGridHeaders}}
+			<div class="panel-heading">
+				<h6 class="panel-title">Все транспорнтные средства
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:vehAllTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>			
+			{{/showGridHeaders}}
+			
+			<div class="panel-body wideGridPanelBody">
+				<div class="row order-l-grid">
+					<div id="{{id}}:veh_schedule_grid">
+					</div>	
+				</div>
 			</div>	
-		</div>	
+		</div>			
 		
-		<i id="{{id}}:statistics" class="icon-plus3" title="Показать/скрыть статистику"> Статистика
-		</i>	
+		<div id="{{id}}:vehSpecialCont" class="panel panel-default draggable">
+			{{#showGridHeaders}}
+			<div class="panel-heading">
+				<h6 class="panel-title">Спецтехника
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:vehSpecialTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>
+			{{/showGridHeaders}}
+			<div class="panel-body">
+				<div class="row order-l-grid">		
+					<div id="{{id}}:veh_special_grid" class="row">
+					</div>	
+				</div>
+			</div>			
+		</div>
+
+		<div id="{{id}}:vehFeatureCont" class="panel panel-default draggable">
+			{{#showGridHeaders}}
+			<div class="panel-heading">
+				<h6 class="panel-title">Свойства транспортных средств
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:vehFeatureTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>			
+			{{/showGridHeaders}}
+			
+			<div class="panel-body">
+				<div class="row order-l-grid">
+					<div id="{{id}}:features_grid">
+					</div>	
+				</div>
+			</div>	
+		</div>			
+		
+		<div id="{{id}}:statisticsCont" class="panel panel-default draggable">
+			<div class="panel-heading">
+				<h6 class="panel-title">Статистика
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:statisticsTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>
+		
+			<div class="panel-body">
+				<div class="row order-l-grid">
+					<div id="{{id}}:statistics">
+					</div>	
+				</div>
+			</div>				
+		</div>			
 	</div>	
 	
 </div>

@@ -1,0 +1,121 @@
+<div id="{{id}}">
+	<div id="{{id}}:colLeft" class="{{bsCol}}9">
+		<div id="{{id}}:order_make_filter">
+		</div>	
+	
+		<div id="{{id}}:order_make_grid">
+		</div>	
+		
+		<div id="{{id}}:OperatorList_View">
+	
+			<div id="totContainer">
+				<span style="margin-right:20px;">
+					<label class="lbl" id="totOrdered_l" for="totOrdered">Заявлено:</label>
+					<input id="totOrdered" disabled="disabled" class="" type="text" size="4">
+					</input>
+					<span id="totOrdered_m" class="">м3</span>
+				</span>
+		
+				<span style="margin-right:20px;">
+					<label class="lbl" id="totShipped_l" for="totShipped">Отгружено:</label>
+					<input id="totShipped" disabled="disabled" class="" type="text" size="4">
+					</input>
+					<span id="totShipped_m" class="">м3</span>
+				</span>
+		
+				<span style="margin-right:20px;">
+					<label class="lbl" id="totBalance_l" for="totShipped">Остаток:</label>
+					<input id="totBalance" disabled="disabled" class="" type="text" size="4">
+					</input>
+					<span id="totBalance_m" class="">м3</span>		
+				</span>
+			</div>	
+	
+			<div id="{{id}}:OperatorList_View:grid">
+			</div>	
+		
+		</div>	
+		
+		<div id="{{id}}:lab_entry_grid">
+		</div>	
+				
+	</div>	
+	
+	<div id="{{id}}:panelCont" class="{{bsCol}}3 hidden" style="position:static;">
+		{{#productionBases}}
+		<div id="{{id}}:prodBaseCont_{{productionBaseId}}" class="panel panel-default draggable">
+			<div class="panel-heading">
+				<h6 class="panel-title">{{productionBaseName}}
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:prodBase{{productionBaseId}}Tgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>
+			
+			<div class="panel-body">				
+				<div class="row order-l-grid">
+					<div id="{{id}}:production_sites{{productionBaseId}}">
+					</div>
+					<div id="{{id}}:material_stores{{productionBaseId}}">
+					</div>			
+				</div>	
+				
+				<div class="row order-l-grid">
+					<div id="{{id}}:mat_totals_grid{{productionBaseId}}">
+					</div>
+				</div>				
+			</div>	
+		</div>	
+		{{/productionBases}}
+
+		<div id="{{id}}:vehAssignCont" class="panel panel-default draggable">
+			<div class="panel-heading">
+				<h6 class="panel-title">Назначенные транспорнтные средства
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:vehAssignTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>
+			
+			<div class="panel-body">				
+				<div class="row order-l-grid">		
+					<div id="{{id}}:veh_assigning" class="row">
+					</div>	
+				</div>
+			</div>				
+		</div>		
+
+		<div id="{{id}}:vehAllCont" class="panel panel-default draggable">
+			<div class="panel-heading">
+				<h6 class="panel-title">Все транспорнтные средства
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:vehAllTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>
+			
+			<div class="panel-body">				
+				<div class="row order-l-grid">
+					<div id="{{id}}:veh_schedule_grid">
+					</div>	
+				</div>			
+			</div>
+		</div>
+	</div>	
+	
+</div>

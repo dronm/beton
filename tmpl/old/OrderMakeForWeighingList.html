@@ -1,0 +1,143 @@
+<div id="{{id}}">
+	<div id="{{id}}:colLeft" class="{{bsCol}}9">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h6 class="panel-title">Гашение талонов
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:ticketCloseTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>
+			
+			<div class="panel-body">										
+				<div id="{{id}}:ticket_close">
+				</div>	
+			</div>	
+		</div>		
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h6 class="panel-title">Заявки
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:orderCloseTgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>
+			
+			<div class="panel-body wideGridPanelBody">										
+				<div id="totContainer">
+					<div class="ordListParamCont" title="Заявлено, м3">
+						<span class="ordListParamPref" >Звл.:
+						</span>
+						<span id="totOrdered">
+						</span>
+						<span class="ordListParamPostf">м3
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Отгружено, м3">
+						<span class="ordListParamPref">Отг.:
+						</span>
+						<span id="totShipped">
+						</span>
+						<span class="ordListParamPostf">м3
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Остаток, м3">
+						<span class="ordListParamPref">Ост.:
+						</span>
+						<span id="totBalance">
+						</span>
+						<span class="ordListParamPostf">м3
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Состояние текущее">
+						<span class="ordListParamPref">Сост.:
+						</span>
+						<span id="totEfficiency">
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Скорость дневная {{workHours}}ч., м3/ч">
+						<span class="ordListParamPref">Скор.д.:
+						</span>
+						<span id="totDayVelocity">
+						</span>
+						<span class="ordListParamPostf">м3/ч
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Скорость текущая, м3/ч">
+						<span class="ordListParamPref">Скор.т.:
+						</span>
+						<span id="totCurVelocity">
+						</span>
+						<span class="ordListParamPostf">м3/ч
+						</span>
+					</div>
+					
+					<div class="ordListParamCont" title="Заявлено {{workHours}}ч., м3">
+						<span class="ordListParamPref">Звл.({{workHours}}):
+						</span>
+						<span id="totOrderedDay">
+						</span>
+						<span class="ordListParamPostf">м3
+						</span>
+					</div>
+						
+				</div>	
+
+				<div id="{{id}}:order_make_filter">
+				</div>	
+				<div id="{{id}}:order_make_grid">
+				</div>	
+			</div>	
+		</div>		
+		
+	</div>	
+	<div id="{{id}}:panelCont" class="{{bsCol}}3 hidden" style="position:static;">
+		{{#productionBases}}
+		<div id="{{id}}:prodBaseCont_{{productionBaseId}}" class="panel panel-default draggable">
+			<div class="panel-heading">
+				<h6 class="panel-title">{{productionBaseName}}
+				</h6>
+				<div class="heading-elements">
+					<ul class="icons-list">
+		                		<li>
+		                			<a id="{{id}}:prodBase{{productionBaseId}}Tgl" data-action="collapse" class="">
+		                			</a>
+		                		</li>
+		                	</ul>
+		        	</div>				
+			</div>
+			
+			<div class="panel-body">							
+				<div class="row order-l-grid">
+					<div id="{{id}}:production_sites{{productionBaseId}}">
+					</div>
+					<div id="{{id}}:material_stores{{productionBaseId}}">
+					</div>			
+				</div>	
+			
+				<div class="row order-l-grid">
+					<div id="{{id}}:mat_totals_grid{{productionBaseId}}">
+					</div>
+				</div>		
+			</div>		
+		</div>			
+		{{/productionBases}}
+	</div>	
+	
+</div>

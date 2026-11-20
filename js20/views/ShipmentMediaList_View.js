@@ -4,7 +4,9 @@
 function ShipmentMediaList_View(id,options){	
 
 	options = options || {};
-	options.HEAD_TITLE = "Медиа файлы водителей";
+	if(options.detail !== true){
+		options.HEAD_TITLE = "Медиа файлы водителей";
+	}
 
 	ShipmentMediaList_View.superclass.constructor.call(this,id,options);
 	
